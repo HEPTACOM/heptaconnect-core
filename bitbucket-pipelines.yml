@@ -1,0 +1,60 @@
+image: heptacom/heptaconnect-pipeline:php74
+
+pipelines:
+    default:
+        -   step:
+                name: Install
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make vendor
+        -   step:
+                name: Code style
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make cs
+        -   step:
+                name: Static code analysis
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make statcs
+        -   step:
+                name: Unit test
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make test
+        -   step:
+                name: Unit test coverage
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make coverage
+        -   step:
+                name: Unit test infection detection
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                script:
+                    - make infection
+
+definitions:
+    services:
+        mysql:
+            image: mysql:5.7
+            variables:
+                MYSQL_DATABASE: 'pipelines'
+                MYSQL_ROOT_PASSWORD: 'let_me_in'
