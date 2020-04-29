@@ -5,3 +5,4 @@ composer.lock
 /.build/.php_cs.cache
 /.build/infection-log.txt
 /.build/phpstan
+/.build/.phpunit
