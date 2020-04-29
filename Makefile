@@ -17,8 +17,9 @@ infection: vendor
 test: vendor
 	vendor/bin/phpunit test
 
-vendor: composer.json composer.lock
+vendor: composer.json
 	composer self-update
 	composer validate
 	composer install
 
+composer.lock: vendor
