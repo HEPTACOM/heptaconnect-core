@@ -14,6 +14,7 @@ Read more under [Overview](../heptaconnect-docs).
 ## Additional development requirements
 
 * Make
+* Any debugging/coverage php extension like xdebug or pcov
 
 
 ## License
