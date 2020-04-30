@@ -1,11 +1,14 @@
-.PHONY: coverage cs infection integration it test statcs
+.PHONY: coverage cs csfix infection integration it test statcs
 
-it: cs statcs test
+it: csfix statcs test
 
 coverage: vendor
 	vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
 cs: vendor
+	vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.php --diff --verbose
+
+csfix: vendor
 	vendor/bin/php-cs-fixer fix --config=.php_cs.php --diff --verbose
 
 statcs: vendor
