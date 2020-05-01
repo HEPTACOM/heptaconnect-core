@@ -1,5 +1,13 @@
 image: heptacom/heptaconnect-pipeline:php74-latest
 
+definitions:
+    services:
+        mysql:
+            image: mysql:5.7
+            variables:
+                MYSQL_DATABASE: 'pipelines'
+                MYSQL_ROOT_PASSWORD: 'let_me_in'
+
 pipelines:
     default:
         -   step:
@@ -50,11 +58,3 @@ pipelines:
                     - .build/**
                 script:
                     - make infection
-
-definitions:
-    services:
-        mysql:
-            image: mysql:5.7
-            variables:
-                MYSQL_DATABASE: 'pipelines'
-                MYSQL_ROOT_PASSWORD: 'let_me_in'
