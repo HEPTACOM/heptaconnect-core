@@ -7,54 +7,44 @@ definitions:
             variables:
                 MYSQL_DATABASE: 'pipelines'
                 MYSQL_ROOT_PASSWORD: 'let_me_in'
+    steps:
+        -   step: &default-step
+                caches:
+                    - composer
+                artifacts:
+                    - .build/**
+                    - vendor/**
+                    - composer.lock
 
 pipelines:
     default:
         -   step:
+                <<: *default-step
                 name: Install
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make vendor
         -   step:
+                <<: *default-step
                 name: Code style
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make cs
         -   step:
+                <<: *default-step
                 name: Static code analysis
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make statcs
         -   step:
+                <<: *default-step
                 name: Unit test
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make test
         -   step:
+                <<: *default-step
                 name: Unit test coverage
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make coverage
         -   step:
+                <<: *default-step
                 name: Unit test infection detection
-                caches:
-                    - composer
-                artifacts:
-                    - .build/**
                 script:
                     - make infection
