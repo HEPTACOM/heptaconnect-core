@@ -1,8 +1,8 @@
-# repo-base
+# HEPTAConnect Core
 
 ## Description
 
-This is a HEPTAConnect package.
+This is the HEPTAConnect core package. Here are all processes and entrypoints combined.
 Read more under [Overview](../heptaconnect-docs).
 
 

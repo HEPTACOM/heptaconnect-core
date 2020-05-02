@@ -1,10 +1,10 @@
 {
-    "name": "heptacom/heptaconnect-repository-base",
-    "description": "HEPTAConnect package",
+    "name": "heptacom/heptaconnect-core",
+    "description": "HEPTAConnect core processes",
     "type": "library",
     "keywords": [
-        "heptaconnect-dataset",
-        "heptaconnect-adapter"
+        "heptaconnect",
+        "messaging"
     ],
     "license": [
         "MIT",
@@ -21,7 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Heptacom\\HeptaConnect\\": "src/"
+            "Heptacom\\HeptaConnect\\Core\\": "src/"
         }
     },
     "require-dev": {
@@ -38,7 +38,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Heptacom\\HeptaConnect\\Test\\": "src/"
+            "Heptacom\\HeptaConnect\\Core\\Test\\": "test/"
         }
     }
 }
