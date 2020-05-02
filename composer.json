@@ -17,7 +17,9 @@
         }
     ],
     "require": {
-        "php": ">=7.4 <7.5"
+        "php": ">=7.4 <7.5",
+        "heptacom/heptaconnect-portal-base": "dev-master",
+        "heptacom/heptaconnect-dataset-base": "dev-master"
     },
     "autoload": {
         "psr-4": {
