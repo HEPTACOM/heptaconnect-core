@@ -38,7 +38,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Heptacom\\HeptaConnect\\Test\\": "src/"
+            "Heptacom\\HeptaConnect\\Test\\": "test/"
         }
     }
 }
