@@ -57,7 +57,7 @@ class EmitService implements EmitServiceInteface
             }
 
             /** @var EmitterInterface $emitter */
-            foreach ($emitters as $emitterKey => $emitter) {
+            foreach ($emitters as $emitter) {
                 try {
                     $result->push(...$emitter->emit($typedMappings, $this->emitContext));
                 } catch (\Throwable $exception) {
