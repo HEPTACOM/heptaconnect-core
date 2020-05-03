@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Emit\EmitService;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEmitter;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
+use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
@@ -80,20 +81,53 @@ class EmitServiceTest extends TestCase
         $this->assertEquals(0, $result->count());
     }
 
-    public function provideEmitCount(): array
+    /**
+     * @dataProvider provideEmitCount
+     */
+    public function testEmitterFailing(int $count): void
     {
-        return [
-            [0],
-            [1],
-            [2],
-            [3],
-            [4],
-            [5],
-            [6],
-            [7],
-            [8],
-            [9],
-            [10],
-        ];
+        $emitter = new ThrowEmitter();
+
+        $emitContext = $this->createMock(EmitContextInterface::class);
+
+        $mappingService = $this->createMock(MappingServiceInterface::class);
+        $mappingService->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
+
+        $emitterRegistry = $this->createMock(EmitterRegistryInterface::class);
+        $emitterRegistry->expects($count > 0 ? $this->once() : $this->never())
+            ->method('bySupport')
+            ->with(FooBarEntity::class)
+            ->willReturn([$emitter]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($count > 0 ? $this->atLeastOnce() : $this->never())
+            ->method('critical')
+            ->with(LogMessage::EMIT_NO_THROW());
+
+        $mapping = $this->createMock(MappingInterface::class);
+
+        $emitService = new EmitService($emitContext, $mappingService, $emitterRegistry, $logger);
+        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
+        $this->assertEquals(0, $result->count());
+    }
+
+    /**
+     * @return iterable<array-key, array<array-key, int>>
+     */
+    public function provideEmitCount(): iterable
+    {
+        yield [0];
+        yield [1];
+        yield [2];
+        yield [3];
+        yield [4];
+        yield [5];
+        yield [6];
+        yield [7];
+        yield [8];
+        yield [9];
+        yield [10];
     }
 }
