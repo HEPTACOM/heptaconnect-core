@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Emit;
+namespace Heptacom\HeptaConnect\Core\Emit\Component;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;

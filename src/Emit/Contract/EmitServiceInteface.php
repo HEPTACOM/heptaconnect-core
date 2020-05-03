@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Emit\Contract;
 
-use Heptacom\HeptaConnect\Core\Emit\EmitResult;
+use Heptacom\HeptaConnect\Core\Emit\Component\EmitResult;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
 interface EmitServiceInteface

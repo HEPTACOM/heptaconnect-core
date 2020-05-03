@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Emit;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Emit\Component\EmitResult;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInteface;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
