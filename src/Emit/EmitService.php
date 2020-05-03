@@ -59,6 +59,7 @@ class EmitService implements EmitServiceInteface
             /** @var EmitterInterface $emitter */
             foreach ($emitters as $emitter) {
                 try {
+                    // TODO chunk
                     $result->push(...$emitter->emit($typedMappings, $this->emitContext));
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
