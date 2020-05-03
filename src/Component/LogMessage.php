@@ -8,7 +8,7 @@ namespace Heptacom\HeptaConnect\Core\Component;
  */
 abstract class LogMessage
 {
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments): string
     {
         return $name;
     }

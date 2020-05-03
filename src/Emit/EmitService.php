@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 
@@ -37,6 +38,7 @@ class EmitService implements EmitServiceInteface
     {
         $mappingsByType = [];
 
+        /** @var MappingInterface $mapping */
         foreach ($mappings as $mapping) {
             $mappingType = $this->mappingService->getDatasetEntityClassName($mapping);
             $mappingsByType[$mappingType] ??= new MappingCollection();

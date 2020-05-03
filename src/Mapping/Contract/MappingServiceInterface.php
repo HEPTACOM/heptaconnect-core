@@ -8,5 +8,8 @@ interface MappingServiceInterface
 {
     public function getSendingPortalNodeId(MappingInterface $mapping): ?string;
 
+    /**
+     * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
+     */
     public function getDatasetEntityClassName(MappingInterface $mapping): string;
 }
