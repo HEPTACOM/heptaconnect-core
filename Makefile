@@ -1,11 +1,11 @@
 .PHONY: coverage cs csfix infection integration it test statcs
 
 clear:
-	rm composer.lock
-	rm -rf vendor
-	rm -rf .build
-	mkdir .build
-	touch .build/.gitkeep
+	[[ ! -f composer.lock ]] || rm composer.lock
+	[[ ! -d vendor ]] || rm -rf vendor
+	[[ ! -d vendor ]] || rm -rf .build
+	[[ -d .build ]] || mkdir .build
+	[[ -f .build/.gitkeep ]] || touch .build/.gitkeep
 
 it: csfix statcs test
 
