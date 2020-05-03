@@ -14,9 +14,9 @@ class EmitterRegistry implements EmitterRegistryInterface
 
     /**
      * @var array<
-     *     class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>,
-     *     array<array-key, \Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface>
-     * >|null
+     *             class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>,
+     *             array<array-key, \Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface>
+     *             >|null
      */
     private ?array $bySupport;
 

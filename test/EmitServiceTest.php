@@ -46,7 +46,7 @@ class EmitServiceTest extends TestCase
         $mapping = $this->createMock(MappingInterface::class);
 
         $emitService = new EmitService($emitContext, $mappingService, $emitterRegistry, $logger);
-        $result = $emitService->emit(new MappingCollection(...array_fill(0, $count, $mapping)));
+        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
         $this->assertEquals($count, $result->count());
     }
 
@@ -76,7 +76,7 @@ class EmitServiceTest extends TestCase
         $mapping = $this->createMock(MappingInterface::class);
 
         $emitService = new EmitService($emitContext, $mappingService, $emitterRegistry, $logger);
-        $result = $emitService->emit(new MappingCollection(...array_fill(0, $count, $mapping)));
+        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
         $this->assertEquals(0, $result->count());
     }
 
