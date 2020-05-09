@@ -28,7 +28,6 @@ test: vendor
 	vendor/bin/phpunit --config=test/phpunit.xml
 
 vendor: composer.json
-	composer self-update
 	composer validate
 	composer install
 
