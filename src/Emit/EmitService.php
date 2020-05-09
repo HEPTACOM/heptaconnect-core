@@ -6,7 +6,6 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emit\Component\EmitResult;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInteface;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
@@ -17,20 +16,16 @@ class EmitService implements EmitServiceInteface
 {
     private EmitContextInterface $emitContext;
 
-    private MappingServiceInterface $mappingService;
-
     private EmitterRegistryInterface $emitterRegistry;
 
     private LoggerInterface $logger;
 
     public function __construct(
         EmitContextInterface $emitContext,
-        MappingServiceInterface $mappingService,
         EmitterRegistryInterface $emitterRegistry,
         LoggerInterface $logger
     ) {
         $this->emitContext = $emitContext;
-        $this->mappingService = $mappingService;
         $this->logger = $logger;
         $this->emitterRegistry = $emitterRegistry;
     }
@@ -41,7 +36,7 @@ class EmitService implements EmitServiceInteface
 
         /** @var MappingInterface $mapping */
         foreach ($mappings as $mapping) {
-            $mappingType = $this->mappingService->getDatasetEntityClassName($mapping);
+            $mappingType = $mapping->getDatasetEntityClassName();
             $mappingsByType[$mappingType] ??= new MappingCollection();
             $mappingsByType[$mappingType]->push($mapping);
         }

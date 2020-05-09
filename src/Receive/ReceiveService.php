@@ -45,7 +45,7 @@ class ReceiveService implements ReceiveServiceInterface
 
         /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
-            $mappingType = $this->mappingService->getDatasetEntityClassName($mappedDatasetEntity->getMapping());
+            $mappingType = $mappedDatasetEntity->getMapping()->getDatasetEntityClassName();
             $mappingsByType[$mappingType] ??= new MappedDatasetEntityCollection();
             $mappingsByType[$mappingType]->push($mappedDatasetEntity);
         }

@@ -8,11 +8,6 @@ interface MappingServiceInterface
 {
     public function getSendingPortalNodeId(MappingInterface $mapping): ?string;
 
-    /**
-     * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
-     */
-    public function getDatasetEntityClassName(MappingInterface $mapping): string;
-
     public function addException(MappingInterface $mapping, \Throwable $exception): void;
 
     public function setExternalId(MappingInterface $mapping, string $externalId): void;
