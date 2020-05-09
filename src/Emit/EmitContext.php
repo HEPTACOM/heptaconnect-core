@@ -31,20 +31,12 @@ class EmitContext implements EmitContextInterface
     {
         $portalNodeId = $mapping->getPortalNodeId();
 
-        if (\is_null($portalNodeId)) {
-            return null;
-        }
-
         return $this->configurationService->getPortalNodeConfiguration($portalNodeId);
     }
 
     public function getPortalNode(MappingInterface $mapping): ?PortalNodeInterface
     {
         $portalNodeId = $mapping->getPortalNodeId();
-
-        if (\is_null($portalNodeId)) {
-            return null;
-        }
 
         return $this->portalNodeRegistry->getPortalNode($portalNodeId);
     }
