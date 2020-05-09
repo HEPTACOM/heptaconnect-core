@@ -62,8 +62,8 @@ class ReceiveService implements ReceiveServiceInterface
             foreach ($receivers as $receiver) {
                 try {
                     // TODO chunk
-                    foreach ($receiver->receive($typedMappings, $this->receiveContext) as $externalId => $mapping) {
-                        $this->mappingService->setExternalId($mapping, $externalId);
+                    foreach ($receiver->receive($typedMappings, $this->receiveContext) as $mapping) {
+                        $this->mappingService->save($mapping);
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [

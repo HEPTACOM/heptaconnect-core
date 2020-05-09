@@ -8,5 +8,5 @@ interface MappingServiceInterface
 {
     public function addException(MappingInterface $mapping, \Throwable $exception): void;
 
-    public function setExternalId(MappingInterface $mapping, string $externalId): void;
+    public function save(MappingInterface $mapping): void;
 }
