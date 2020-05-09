@@ -29,7 +29,7 @@ class EmitContext implements EmitContextInterface
 
     public function getConfig(MappingInterface $mapping): ?\ArrayAccess
     {
-        $portalNodeId = $this->mappingService->getSendingPortalNodeId($mapping);
+        $portalNodeId = $mapping->getPortalNodeId();
 
         if (\is_null($portalNodeId)) {
             return null;
@@ -40,7 +40,7 @@ class EmitContext implements EmitContextInterface
 
     public function getPortalNode(MappingInterface $mapping): ?PortalNodeInterface
     {
-        $portalNodeId = $this->mappingService->getSendingPortalNodeId($mapping);
+        $portalNodeId = $mapping->getPortalNodeId();
 
         if (\is_null($portalNodeId)) {
             return null;
