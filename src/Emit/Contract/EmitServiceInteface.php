@@ -2,10 +2,10 @@
 
 namespace Heptacom\HeptaConnect\Core\Emit\Contract;
 
-use Heptacom\HeptaConnect\Core\Emit\Component\EmitResult;
+use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
 interface EmitServiceInteface
 {
-    public function emit(MappingCollection $mappings): EmitResult;
+    public function emit(MappingCollection $mappings): MappedDatasetEntityCollection;
 }

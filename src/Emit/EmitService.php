@@ -3,12 +3,12 @@
 namespace Heptacom\HeptaConnect\Core\Emit;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Emit\Component\EmitResult;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInteface;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 
@@ -30,7 +30,7 @@ class EmitService implements EmitServiceInteface
         $this->emitterRegistry = $emitterRegistry;
     }
 
-    public function emit(MappingCollection $mappings): EmitResult
+    public function emit(MappingCollection $mappings): MappedDatasetEntityCollection
     {
         $mappingsByType = [];
 
@@ -41,7 +41,7 @@ class EmitService implements EmitServiceInteface
             $mappingsByType[$mappingType]->push($mapping);
         }
 
-        $result = new EmitResult();
+        $result = new MappedDatasetEntityCollection();
 
         foreach ($mappingsByType as $type => $typedMappings) {
             $emitters = $this->emitterRegistry->bySupport($type);

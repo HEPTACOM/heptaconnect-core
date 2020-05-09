@@ -17,7 +17,6 @@ use Psr\Log\LoggerInterface;
 /**
  * @covers \Heptacom\HeptaConnect\Core\Emit\EmitService
  * @covers \Heptacom\HeptaConnect\Core\Component\LogMessage
- * @covers \Heptacom\HeptaConnect\Core\Emit\Component\EmitResult
  */
 class EmitServiceTest extends TestCase
 {

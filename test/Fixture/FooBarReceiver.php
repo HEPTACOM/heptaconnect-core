@@ -15,7 +15,10 @@ class FooBarReceiver implements ReceiverInterface
     ): iterable {
         /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
-            yield '' => $mappedDatasetEntity->getMapping();
+            $mapping = $mappedDatasetEntity->getMapping();
+            $mapping->setExternalId('');
+
+            yield $mapping;
         }
     }
 
