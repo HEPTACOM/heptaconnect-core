@@ -30,11 +30,7 @@ class ReceiveServiceTest extends TestCase
         $emitter = new FooBarReceiver();
 
         $receiveContext = $this->createMock(ReceiveContextInterface::class);
-
         $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
 
         $receiverRegistry = $this->createMock(ReceiverRegistryInterface::class);
         $receiverRegistry->expects($count > 0 ? $this->once() : $this->never())
@@ -45,6 +41,9 @@ class ReceiveServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
         $mappedDatasetEntity->expects($this->exactly($count * 2))
@@ -61,11 +60,7 @@ class ReceiveServiceTest extends TestCase
     public function testMissingReceiver(int $count): void
     {
         $emitContext = $this->createMock(ReceiveContextInterface::class);
-
         $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
 
         $receiverRegistry = $this->createMock(ReceiverRegistryInterface::class);
         $receiverRegistry->expects($count > 0 ? $this->once() : $this->never())
@@ -79,6 +74,9 @@ class ReceiveServiceTest extends TestCase
             ->with(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE());
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
         $mappedDatasetEntity->expects($this->exactly($count))
@@ -97,11 +95,7 @@ class ReceiveServiceTest extends TestCase
         $emitter = new ThrowReceiver();
 
         $receiveContext = $this->createMock(ReceiveContextInterface::class);
-
         $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
 
         $receiverRegistry = $this->createMock(ReceiverRegistryInterface::class);
         $receiverRegistry->expects($count > 0 ? $this->once() : $this->never())
@@ -115,6 +109,9 @@ class ReceiveServiceTest extends TestCase
             ->with(LogMessage::RECEIVE_NO_THROW());
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
         $mappedDatasetEntity->expects($this->exactly($count))

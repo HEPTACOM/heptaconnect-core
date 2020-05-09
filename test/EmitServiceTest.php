@@ -5,7 +5,6 @@ namespace Heptacom\HeptaConnect\Core\Test;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Core\Emit\EmitService;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEmitter;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
@@ -31,11 +30,6 @@ class EmitServiceTest extends TestCase
 
         $emitContext = $this->createMock(EmitContextInterface::class);
 
-        $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
-
         $emitterRegistry = $this->createMock(EmitterRegistryInterface::class);
         $emitterRegistry->expects($count > 0 ? $this->once() : $this->never())
             ->method('bySupport')
@@ -45,6 +39,9 @@ class EmitServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
         $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
@@ -58,11 +55,6 @@ class EmitServiceTest extends TestCase
     {
         $emitContext = $this->createMock(EmitContextInterface::class);
 
-        $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
-
         $emitterRegistry = $this->createMock(EmitterRegistryInterface::class);
         $emitterRegistry->expects($count > 0 ? $this->once() : $this->never())
             ->method('bySupport')
@@ -75,6 +67,9 @@ class EmitServiceTest extends TestCase
             ->with(LogMessage::EMIT_NO_EMITTER_FOR_TYPE());
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
         $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
@@ -90,11 +85,6 @@ class EmitServiceTest extends TestCase
 
         $emitContext = $this->createMock(EmitContextInterface::class);
 
-        $mappingService = $this->createMock(MappingServiceInterface::class);
-        $mappingService->expects($this->exactly($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
-
         $emitterRegistry = $this->createMock(EmitterRegistryInterface::class);
         $emitterRegistry->expects($count > 0 ? $this->once() : $this->never())
             ->method('bySupport')
@@ -107,6 +97,9 @@ class EmitServiceTest extends TestCase
             ->with(LogMessage::EMIT_NO_THROW());
 
         $mapping = $this->createMock(MappingInterface::class);
+        $mapping->expects($this->exactly($count))
+            ->method('getDatasetEntityClassName')
+            ->willReturn(FooBarEntity::class);
 
         $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
         $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
