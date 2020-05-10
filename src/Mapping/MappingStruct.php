@@ -6,7 +6,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 
 class MappingStruct implements MappingInterface
 {
-    private ?string $externalId;
+    private ?string $externalId = null;
 
     private string $portalNodeId;
 

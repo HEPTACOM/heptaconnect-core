@@ -6,8 +6,14 @@ class MappingNodeStruct
 {
     private string $id;
 
+    /**
+     * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
+     */
     private string $datasetEntityClassName;
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     */
     public function __construct(string $id, string $datasetEntityClassName)
     {
         $this->id = $id;
@@ -26,11 +32,17 @@ class MappingNodeStruct
         return $this;
     }
 
+    /**
+     * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
+     */
     public function getDatasetEntityClassName(): string
     {
         return $this->datasetEntityClassName;
     }
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     */
     public function setDatasetEntityClassName(string $datasetEntityClassName): self
     {
         $this->datasetEntityClassName = $datasetEntityClassName;
