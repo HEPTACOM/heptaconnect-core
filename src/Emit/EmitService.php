@@ -4,7 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Emit;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
-use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInteface;
+use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class EmitService implements EmitServiceInteface
+class EmitService implements EmitServiceInterface
 {
     private EmitContextInterface $emitContext;
 

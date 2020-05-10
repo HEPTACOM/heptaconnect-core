@@ -4,7 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Emit\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
-interface EmitServiceInteface
+interface EmitServiceInterface
 {
     public function emit(MappingCollection $mappings): void;
 }
