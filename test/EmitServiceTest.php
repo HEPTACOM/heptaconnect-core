@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @covers \Heptacom\HeptaConnect\Core\Emit\EmitService
@@ -37,14 +38,15 @@ class EmitServiceTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
 
+        $messageBus = $this->createMock(MessageBusInterface::class);
+
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($this->exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
-        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
-        $this->assertEquals($count, $result->count());
+        $emitService = new EmitService($emitContext, $emitterRegistry, $logger, $messageBus);
+        $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
     }
 
     /**
@@ -65,14 +67,15 @@ class EmitServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::EMIT_NO_EMITTER_FOR_TYPE());
 
+        $messageBus = $this->createMock(MessageBusInterface::class);
+
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($this->exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
-        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
-        $this->assertEquals(0, $result->count());
+        $emitService = new EmitService($emitContext, $emitterRegistry, $logger, $messageBus);
+        $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
     }
 
     /**
@@ -95,14 +98,15 @@ class EmitServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::EMIT_NO_THROW());
 
+        $messageBus = $this->createMock(MessageBusInterface::class);
+
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($this->exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $emitterRegistry, $logger);
-        $result = $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
-        $this->assertEquals(0, $result->count());
+        $emitService = new EmitService($emitContext, $emitterRegistry, $logger, $messageBus);
+        $emitService->emit(new MappingCollection(...\array_fill(0, $count, $mapping)));
     }
 
     /**

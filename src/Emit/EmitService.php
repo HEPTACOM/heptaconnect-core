@@ -3,14 +3,15 @@
 namespace Heptacom\HeptaConnect\Core\Emit;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInteface;
 use Heptacom\HeptaConnect\Core\Emit\Contract\EmitterRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class EmitService implements EmitServiceInteface
 {
@@ -20,17 +21,21 @@ class EmitService implements EmitServiceInteface
 
     private LoggerInterface $logger;
 
+    private MessageBusInterface $messageBus;
+
     public function __construct(
         EmitContextInterface $emitContext,
         EmitterRegistryInterface $emitterRegistry,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        MessageBusInterface $messageBus
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
         $this->emitterRegistry = $emitterRegistry;
+        $this->messageBus = $messageBus;
     }
 
-    public function emit(MappingCollection $mappings): MappedDatasetEntityCollection
+    public function emit(MappingCollection $mappings): void
     {
         $mappingsByType = [];
 
@@ -40,8 +45,6 @@ class EmitService implements EmitServiceInteface
             $mappingsByType[$mappingType] ??= new MappingCollection();
             $mappingsByType[$mappingType]->push($mapping);
         }
-
-        $result = new MappedDatasetEntityCollection();
 
         foreach ($mappingsByType as $type => $typedMappings) {
             $emitters = $this->emitterRegistry->bySupport($type);
@@ -54,8 +57,9 @@ class EmitService implements EmitServiceInteface
             /** @var EmitterInterface $emitter */
             foreach ($emitters as $emitter) {
                 try {
-                    // TODO chunk
-                    $result->push(...$emitter->emit($typedMappings, $this->emitContext));
+                    foreach ($emitter->emit($typedMappings, $this->emitContext) as $mappedDatasetEntityStruct) {
+                        $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
+                    }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
                         'type' => $type,
@@ -65,7 +69,5 @@ class EmitService implements EmitServiceInteface
                 }
             }
         }
-
-        return $result;
     }
 }
