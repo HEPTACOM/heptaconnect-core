@@ -2,9 +2,9 @@
 
 namespace Heptacom\HeptaConnect\Core\Receive\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 
 interface ReceiveServiceInterface
 {
-    public function receive(MappedDatasetEntityCollection $mappedDatasetEntities): void;
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void;
 }

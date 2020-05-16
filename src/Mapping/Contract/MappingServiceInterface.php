@@ -9,4 +9,6 @@ interface MappingServiceInterface
     public function addException(MappingInterface $mapping, \Throwable $exception): void;
 
     public function save(MappingInterface $mapping): void;
+
+    public function reflect(MappingInterface $mapping, string $portalNodeId): MappingInterface;
 }

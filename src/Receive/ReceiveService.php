@@ -4,74 +4,94 @@ namespace Heptacom\HeptaConnect\Core\Receive;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiverRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
 {
-    private ReceiverRegistryInterface $receiverRegistry;
-
     private MappingServiceInterface $mappingService;
 
     private ReceiveContextInterface $receiveContext;
 
     private LoggerInterface $logger;
 
+    private PortalNodeRegistryInterface $portalNodeRegistry;
+
     public function __construct(
-        ReceiverRegistryInterface $receiverRegistry,
         MappingServiceInterface $mappingService,
         ReceiveContextInterface $receiveContext,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        PortalNodeRegistryInterface $portalNodeRegistry
     ) {
-        $this->receiverRegistry = $receiverRegistry;
         $this->mappingService = $mappingService;
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
+        $this->portalNodeRegistry = $portalNodeRegistry;
     }
 
-    public function receive(MappedDatasetEntityCollection $mappedDatasetEntities): void
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void
     {
-        /** @var array<
-         *     class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>,
-         *     MappedDatasetEntityCollection
-         * > $mappingsByType
-         */
-        $mappingsByType = [];
+        $receivingPortalNodes = [];
+        $entityClassName = $mappedDatasetEntities->getType();
 
         /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
-            $mappingType = $mappedDatasetEntity->getMapping()->getDatasetEntityClassName();
-            $mappingsByType[$mappingType] ??= new MappedDatasetEntityCollection();
-            $mappingsByType[$mappingType]->push($mappedDatasetEntity);
-        }
+            $portalNodeId = $mappedDatasetEntity->getMapping()->getPortalNodeId();
 
-        foreach ($mappingsByType as $type => $typedMappings) {
-            $receivers = $this->receiverRegistry->bySupport($type);
-
-            if (empty($receivers)) {
-                $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), ['type' => $type]);
+            if (isset($receivingPortalNodes[$portalNodeId])) {
                 continue;
             }
 
+            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeId);
+            if (!$portalNode instanceof PortalNodeInterface) {
+                continue;
+            }
+
+            $receivingPortalNodes[$portalNodeId] = $portalNode->getReceivers()->bySupport($entityClassName);
+        }
+
+        foreach ($receivingPortalNodes as $portalNodeId => $receivers) {
+            $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeId): bool {
+                return $mappedDatasetEntityStruct->getMapping()->getPortalNodeId() === $portalNodeId;
+            });
+
+            /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
+            $mappedDatasetEntitiesForPortalNode = \iterator_to_array($mappedDatasetEntitiesIterator);
+            $mappedDatasetEntitiesForPortalNode = new TypedMappedDatasetEntityCollection(
+                $entityClassName,
+                $mappedDatasetEntitiesForPortalNode
+            );
+
+            $hasReceivers = false;
+
             /** @var ReceiverInterface $receiver */
             foreach ($receivers as $receiver) {
+                $hasReceivers = true;
+
                 try {
-                    // TODO chunk
-                    foreach ($receiver->receive($typedMappings, $this->receiveContext) as $mapping) {
+                    foreach ($receiver->receive($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
                         $this->mappingService->save($mapping);
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                        'type' => $type,
+                        'type' => $entityClassName,
                         'receiver' => \get_class($receiver),
                         'exception' => $exception,
                     ]);
                 }
+            }
+
+            if (!$hasReceivers) {
+                $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), [
+                    'type' => $entityClassName,
+                    'portalNodeId' => $portalNodeId,
+                ]);
             }
         }
     }

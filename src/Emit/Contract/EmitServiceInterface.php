@@ -2,9 +2,9 @@
 
 namespace Heptacom\HeptaConnect\Core\Emit\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
 
 interface EmitServiceInterface
 {
-    public function emit(MappingCollection $mappings): void;
+    public function emit(TypedMappingCollection $mappings): void;
 }

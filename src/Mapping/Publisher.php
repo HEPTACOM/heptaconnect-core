@@ -25,7 +25,7 @@ class Publisher implements PublisherInterface
     {
         [$mappingNode] = $this->storage->createMappingNodes([$datasetEntityClassName]);
         $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);
-        $this->storage->createMappings(new MappingCollection($mapping));
+        $this->storage->createMappings(new MappingCollection([$mapping]));
 
         $this->messageBus->dispatch(new PublishMessage($mapping));
 

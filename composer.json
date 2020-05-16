@@ -21,7 +21,8 @@
         "heptacom/heptaconnect-portal-base": "dev-master",
         "heptacom/heptaconnect-dataset-base": "dev-master",
         "heptacom/heptaconnect-storage-base": "dev-master",
-        "symfony/messenger": "^4.0 || ^5.0"
+        "symfony/messenger": "^4.0 || ^5.0",
+        "psr/log": "^1.1"
     },
     "autoload": {
         "psr-4": {
