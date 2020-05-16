@@ -14,6 +14,7 @@ cs: vendor .build
 	vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
 	vendor/bin/phpstan analyse -c dev-ops/phpstan.neon
 	vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
+	vendor/bin/composer-require-checker check --config-file=dev-ops/composer-soft-requirements.json composer.json
 
 csfix: vendor .build
 	vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose

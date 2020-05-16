@@ -34,7 +34,8 @@
         "psalm/plugin-phpunit": ">=0.10 <0.11",
         "vimeo/psalm": ">=3 <4",
         "infection/infection": ">=0.15 <0.16",
-        "friendsofphp/php-cs-fixer": ">=2 <3"
+        "friendsofphp/php-cs-fixer": ">=2 <3",
+        "maglnet/composer-require-checker": ">=2 <3"
     },
     "autoload-dev": {
         "psr-4": {
