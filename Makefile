@@ -12,6 +12,7 @@ coverage: vendor .build
 
 cs: vendor .build
 	vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
+	vendor/bin/phpstan analyse -c dev-ops/phpstan.neon
 	vendor/bin/psalm -c dev-ops/psalm.xml
 
 csfix: vendor .build
