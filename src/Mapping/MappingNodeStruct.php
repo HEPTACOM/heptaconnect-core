@@ -2,7 +2,9 @@
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
-class MappingNodeStruct
+use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
+
+class MappingNodeStruct implements MappingNodeStructInterface
 {
     private string $id;
 
