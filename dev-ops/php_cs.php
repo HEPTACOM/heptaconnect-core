@@ -4,12 +4,12 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $finder = Finder::create()
-    ->in(__DIR__ . DIRECTORY_SEPARATOR . 'src')
-    ->in(__DIR__ . DIRECTORY_SEPARATOR . 'test');
+    ->in(dirname(__DIR__) . '/src')
+    ->in(dirname(__DIR__) . '/test');
 
 return Config::create()
     ->setFinder($finder)
-    ->setCacheFile(__DIR__ . '/.build/.php_cs.cache')
+    ->setCacheFile(dirname(__DIR__) . '/.build/.php_cs.cache')
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR2' => true,

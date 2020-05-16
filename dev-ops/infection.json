@@ -6,9 +6,9 @@
         ]
     },
     "phpUnit": {
-        "configDir": "test"
+        "configDir": "../test"
     },
     "logs": {
-        "text": ".build/infection-log.txt"
+        "text": "../.build/infection-log.txt"
     }
 }
