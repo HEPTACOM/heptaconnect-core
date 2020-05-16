@@ -46,10 +46,9 @@ class EmitterRegistry implements EmitterRegistryInterface
 
             /** @var EmitterInterface $emit */
             foreach ($this->emitters as $emit) {
-                /* @noinspection SuspiciousLoopInspection */
-                foreach ($emit->supports() as $datasetEntityClassName) {
-                    $this->bySupport[$datasetEntityClassName] ??= [];
-                    $this->bySupport[$datasetEntityClassName][] = $emit;
+                foreach ($emit->supports() as $className) {
+                    $this->bySupport[$className] ??= [];
+                    $this->bySupport[$className][] = $emit;
                 }
             }
         }

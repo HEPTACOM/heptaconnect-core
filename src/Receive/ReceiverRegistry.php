@@ -45,10 +45,9 @@ class ReceiverRegistry implements Contract\ReceiverRegistryInterface
 
             /** @var ReceiverInterface $receiver */
             foreach ($this->receivers as $receiver) {
-                /* @noinspection SuspiciousLoopInspection */
-                foreach ($receiver->supports() as $datasetEntityClassName) {
-                    $this->bySupport[$datasetEntityClassName] ??= [];
-                    $this->bySupport[$datasetEntityClassName][] = $receiver;
+                foreach ($receiver->supports() as $className) {
+                    $this->bySupport[$className] ??= [];
+                    $this->bySupport[$className][] = $receiver;
                 }
             }
         }
