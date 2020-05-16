@@ -25,14 +25,9 @@ pipelines:
                     - make vendor
         -   step:
                 <<: *default-step
-                name: Code style
+                name: Code style and static code analysis
                 script:
                     - make cs
-        -   step:
-                <<: *default-step
-                name: Static code analysis
-                script:
-                    - make statcs
         -   step:
                 <<: *default-step
                 name: Unit test
