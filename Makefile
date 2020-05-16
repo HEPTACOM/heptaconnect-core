@@ -3,32 +3,33 @@
 clear:
 	[[ ! -f composer.lock ]] || rm composer.lock
 	[[ ! -d vendor ]] || rm -rf vendor
-	[[ ! -d vendor ]] || rm -rf .build
-	[[ -d .build ]] || mkdir .build
-	[[ -f .build/.gitkeep ]] || touch .build/.gitkeep
+	[[ ! -d .build ]] || rm -rf .build
 
 it: csfix statcs test
 
-coverage: vendor
+coverage: vendor .build
 	vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
-cs: vendor
+cs: vendor .build
 	vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.php --diff --verbose
 
-csfix: vendor
+csfix: vendor .build
 	vendor/bin/php-cs-fixer fix --config=.php_cs.php --diff --verbose
 
-statcs: vendor
+statcs: vendor .build
 	vendor/bin/psalm -c .psalm.xml
 
-infection: vendor
+infection: vendor .build
 	vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=.infection.json
 
-test: vendor
+test: vendor .build
 	vendor/bin/phpunit --config=test/phpunit.xml
 
 vendor: composer.json
 	composer validate
 	composer install
+
+.build:
+	[[ -d .build ]] || mkdir .build
 
 composer.lock: vendor
