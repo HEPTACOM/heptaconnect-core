@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 .PHONY: clean
 clean:
 	[[ ! -f composer.lock ]] || rm composer.lock
