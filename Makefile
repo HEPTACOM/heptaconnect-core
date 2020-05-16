@@ -1,34 +1,53 @@
-.PHONY: coverage cs csfix infection integration it test statcs
-
+.PHONY: clear
 clear:
 	[[ ! -f composer.lock ]] || rm composer.lock
 	[[ ! -d vendor ]] || rm -rf vendor
-	[[ ! -d vendor ]] || rm -rf .build
-	[[ -d .build ]] || mkdir .build
-	[[ -f .build/.gitkeep ]] || touch .build/.gitkeep
+	[[ ! -d .build ]] || rm -rf .build
 
-it: csfix statcs test
+.PHONY: it
+it: csfix cs test
 
-coverage: vendor
+.PHONY: coverage
+coverage: vendor .build
 	vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
-cs: vendor
-	vendor/bin/php-cs-fixer fix --dry-run --config=.php_cs.php --diff --verbose
+.PHONY: cs
+cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require
 
-csfix: vendor
-	vendor/bin/php-cs-fixer fix --config=.php_cs.php --diff --verbose
+.PHONY: cs-fixer-dry-run
+cs-fixer-dry-run: vendor .build
+	vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
 
-statcs: vendor
-	vendor/bin/psalm -c .psalm.xml
+.PHONY: cs-phpstan
+cs-phpstan: vendor .build
+	vendor/bin/phpstan analyse -c dev-ops/phpstan.neon
 
-infection: vendor
-	vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=.infection.json
+.PHONY: cs-psalm
+cs-psalm: vendor .build
+	vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
 
-test: vendor
+.PHONY: cs-soft-require
+cs-soft-require: vendor .build
+	vendor/bin/composer-require-checker check --config-file=dev-ops/composer-soft-requirements.json composer.json
+
+.PHONY: csfix
+csfix: vendor .build
+	vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose
+
+.PHONY: infection
+infection: vendor .build
+	vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json
+
+.PHONY: test
+test: vendor .build
 	vendor/bin/phpunit --config=test/phpunit.xml
 
 vendor: composer.json
 	composer validate
 	composer install
+
+.PHONY: .build
+.build:
+	[[ -d .build ]] || mkdir .build
 
 composer.lock: vendor
