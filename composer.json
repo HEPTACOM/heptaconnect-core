@@ -22,7 +22,8 @@
         "heptacom/heptaconnect-dataset-base": "dev-master",
         "heptacom/heptaconnect-storage-base": "dev-master",
         "symfony/messenger": "^4.0 || ^5.0",
-        "psr/log": "^1.1"
+        "psr/log": "^1.1",
+        "bentools/iterable-functions": "^1.4"
     },
     "autoload": {
         "psr-4": {

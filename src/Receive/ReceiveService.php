@@ -62,7 +62,7 @@ class ReceiveService implements ReceiveServiceInterface
             });
 
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
-            $mappedDatasetEntitiesForPortalNode = \iterator_to_array($mappedDatasetEntitiesIterator);
+            $mappedDatasetEntitiesForPortalNode = iterable_to_array($mappedDatasetEntitiesIterator);
             $mappedDatasetEntitiesForPortalNode = new TypedMappedDatasetEntityCollection(
                 $entityClassName,
                 $mappedDatasetEntitiesForPortalNode
