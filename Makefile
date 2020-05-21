@@ -35,7 +35,7 @@ cs-psalm: vendor .build
 
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor
-	$(COMPOSER) unused --no-progress -vvv
+	$(COMPOSER) unused --no-progress
 
 .PHONY: cs-soft-require
 cs-soft-require: vendor .build
