@@ -48,5 +48,10 @@
         "psr-4": {
             "Heptacom\\HeptaConnect\\Core\\Test\\": "test/"
         }
+    },
+    "extra": {
+        "unused": [
+            "bentools/iterable-functions"
+        ]
     }
 }
