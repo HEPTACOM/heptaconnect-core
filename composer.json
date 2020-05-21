@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "php": ">=7.4 <7.5",
+        "php": ">=7.4",
         "heptacom/heptaconnect-portal-base": "dev-master",
         "heptacom/heptaconnect-dataset-base": "dev-master",
         "heptacom/heptaconnect-storage-base": "dev-master",
@@ -32,16 +32,17 @@
     },
     "require-dev": {
         "phpunit/phpunit": ">=9.1 <10",
-        "phpstan/phpstan": ">=0.12 <0.13",
-        "phpstan/extension-installer": ">=1 <2",
-        "phpstan/phpstan-phpunit": ">=0.12 <0.13",
-        "phpstan/phpstan-deprecation-rules": ">=0.12 <0.13",
-        "phpstan/phpstan-strict-rules": ">=0.12 <0.13",
-        "psalm/plugin-phpunit": ">=0.10 <0.11",
-        "vimeo/psalm": ">=3 <4",
-        "infection/infection": ">=0.15 <0.16",
-        "friendsofphp/php-cs-fixer": ">=2 <3",
-        "maglnet/composer-require-checker": ">=2 <3"
+        "phpstan/phpstan": ">=0.12",
+        "phpstan/extension-installer": ">=1",
+        "phpstan/phpstan-phpunit": ">=0.12",
+        "phpstan/phpstan-deprecation-rules": ">=0.12",
+        "phpstan/phpstan-strict-rules": ">=0.12",
+        "psalm/plugin-phpunit": ">=0.10",
+        "vimeo/psalm": ">=3",
+        "infection/infection": ">=0.15",
+        "friendsofphp/php-cs-fixer": ">=2",
+        "maglnet/composer-require-checker": ">=2",
+        "icanhazstring/composer-unused": ">=0.7"
     },
     "autoload-dev": {
         "psr-4": {
