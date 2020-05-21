@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+.PHONY: all
+all: clean csfix cs test coverage infection
+
 .PHONY: clean
 clean:
 	[[ ! -f composer.lock ]] || rm composer.lock
