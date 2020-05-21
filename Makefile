@@ -53,9 +53,15 @@ infection: vendor .build
 test: vendor .build
 	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml
 
-vendor: composer.json
+.PHONY: composer-update
+composer-update:
+	$(COMPOSER) update
+
+.PHONY: composer-validate
+composer-validate: composer.json
 	$(COMPOSER) validate
-	$(COMPOSER) install
+
+vendor: composer-validate composer-update
 
 .PHONY: .build
 .build:
