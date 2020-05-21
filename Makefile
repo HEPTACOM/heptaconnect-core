@@ -17,7 +17,7 @@ coverage: vendor .build
 	vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
 .PHONY: cs
-cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require
+cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused
 
 .PHONY: cs-fixer-dry-run
 cs-fixer-dry-run: vendor .build
@@ -30,6 +30,10 @@ cs-phpstan: vendor .build
 .PHONY: cs-psalm
 cs-psalm: vendor .build
 	vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
+
+.PHONY: cs-composer-unused
+cs-composer-unused: vendor
+	composer unused --no-progress -vvv
 
 .PHONY: cs-soft-require
 cs-soft-require: vendor .build
