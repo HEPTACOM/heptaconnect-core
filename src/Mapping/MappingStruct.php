@@ -36,6 +36,11 @@ class MappingStruct implements MappingInterface
         return $this->portalNodeId;
     }
 
+    public function getMappingNodeId(): string
+    {
+        return $this->mappingNodeStruct->getId();
+    }
+
     public function getDatasetEntityClassName(): string
     {
         return $this->mappingNodeStruct->getDatasetEntityClassName();
