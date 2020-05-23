@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StorageMappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
@@ -39,9 +40,9 @@ class MappingStruct implements MappingInterface
         return $this->portalNodeId;
     }
 
-    public function getMappingNodeId(): string
+    public function getMappingNodeKey(): StorageMappingNodeKeyInterface
     {
-        return $this->mappingNodeStruct->getId();
+        return $this->mappingNodeStruct->getKey();
     }
 
     public function getDatasetEntityClassName(): string

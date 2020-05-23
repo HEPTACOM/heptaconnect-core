@@ -2,11 +2,12 @@
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
+use Heptacom\HeptaConnect\Portal\Base\Contract\StorageMappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
 class MappingNodeStruct implements MappingNodeStructInterface
 {
-    private string $id;
+    private StorageMappingNodeKeyInterface $id;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
@@ -16,18 +17,18 @@ class MappingNodeStruct implements MappingNodeStructInterface
     /**
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
      */
-    public function __construct(string $id, string $datasetEntityClassName)
+    public function __construct(StorageMappingNodeKeyInterface $id, string $datasetEntityClassName)
     {
         $this->id = $id;
         $this->datasetEntityClassName = $datasetEntityClassName;
     }
 
-    public function getId(): string
+    public function getKey(): StorageMappingNodeKeyInterface
     {
         return $this->id;
     }
 
-    public function setId(string $id): self
+    public function setId(StorageMappingNodeKeyInterface $id): self
     {
         $this->id = $id;
 

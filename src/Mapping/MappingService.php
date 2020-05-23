@@ -29,14 +29,14 @@ class MappingService implements MappingServiceInterface
 
     public function reflect(MappingInterface $mapping, StoragePortalNodeKeyInterface $portalNodeKey): MappingInterface
     {
-        if (!$this->storage->getMapping($mapping->getMappingNodeId(), $mapping->getPortalNodeKey()) instanceof MappingInterface) {
+        if (!$this->storage->getMapping($mapping->getMappingNodeKey(), $mapping->getPortalNodeKey()) instanceof MappingInterface) {
             $this->storage->createMappings(new MappingCollection([$mapping]));
         }
 
-        $targetMapping = $this->storage->getMapping($mapping->getMappingNodeId(), $portalNodeKey);
+        $targetMapping = $this->storage->getMapping($mapping->getMappingNodeKey(), $portalNodeKey);
 
         if (!$targetMapping instanceof MappingInterface) {
-            $mappingNode = new MappingNodeStruct($mapping->getMappingNodeId(), $mapping->getDatasetEntityClassName());
+            $mappingNode = new MappingNodeStruct($mapping->getMappingNodeKey(), $mapping->getDatasetEntityClassName());
             $targetMapping = new MappingStruct($portalNodeKey, $mappingNode);
         }
 
