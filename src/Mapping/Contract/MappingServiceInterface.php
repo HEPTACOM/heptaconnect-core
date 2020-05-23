@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Mapping\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 
 interface MappingServiceInterface
 {
@@ -10,5 +11,5 @@ interface MappingServiceInterface
 
     public function save(MappingInterface $mapping): void;
 
-    public function reflect(MappingInterface $mapping, string $portalNodeId): MappingInterface;
+    public function reflect(MappingInterface $mapping, StoragePortalNodeKeyInterface $portalNodeKey): MappingInterface;
 }

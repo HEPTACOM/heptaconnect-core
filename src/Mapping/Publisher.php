@@ -5,6 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PublisherInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -21,9 +22,12 @@ class Publisher implements PublisherInterface
         $this->messageBus = $messageBus;
     }
 
-    public function publish(string $datasetEntityClassName, string $portalNodeId, string $externalId): MappingInterface
-    {
-        [$mappingNode] = $this->storage->createMappingNodes([$datasetEntityClassName]);
+    public function publish(
+        string $datasetEntityClassName,
+        StoragePortalNodeKeyInterface $portalNodeId,
+        string $externalId
+    ): MappingInterface {
+        [$mappingNode] = $this->storage->createMappingNodes([$datasetEntityClassName], $portalNodeId);
         $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);
         $this->storage->createMappings(new MappingCollection([$mapping]));
 

@@ -29,16 +29,12 @@ class ReceiveContext implements ReceiveContextInterface
 
     public function getConfig(MappingInterface $mapping): ?\ArrayAccess
     {
-        $portalNodeId = $mapping->getPortalNodeId();
-
-        return $this->configurationService->getPortalNodeConfiguration($portalNodeId);
+        return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
     public function getPortalNode(MappingInterface $mapping): ?PortalNodeInterface
     {
-        $portalNodeId = $mapping->getPortalNodeId();
-
-        return $this->portalNodeRegistry->getPortalNode($portalNodeId);
+        return $this->portalNodeRegistry->getPortalNode($mapping->getPortalNodeKey());
     }
 
     public function markAsFailed(MappingInterface $mapping, \Throwable $throwable): void

@@ -3,18 +3,21 @@
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
 class MappingStruct implements MappingInterface
 {
     private ?string $externalId = null;
 
-    private string $portalNodeId;
+    private StoragePortalNodeKeyInterface $portalNodeId;
 
     private MappingNodeStructInterface $mappingNodeStruct;
 
-    public function __construct(string $portalNodeId, MappingNodeStructInterface $mappingNodeStruct)
-    {
+    public function __construct(
+        StoragePortalNodeKeyInterface $portalNodeId,
+        MappingNodeStructInterface $mappingNodeStruct
+    ) {
         $this->portalNodeId = $portalNodeId;
         $this->mappingNodeStruct = $mappingNodeStruct;
     }
@@ -31,7 +34,7 @@ class MappingStruct implements MappingInterface
         return $this;
     }
 
-    public function getPortalNodeId(): string
+    public function getPortalNodeKey(): StoragePortalNodeKeyInterface
     {
         return $this->portalNodeId;
     }

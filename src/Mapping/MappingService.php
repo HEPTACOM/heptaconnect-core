@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 
@@ -26,17 +27,17 @@ class MappingService implements MappingServiceInterface
         $this->storage->createMappings(new MappingCollection([$mapping]));
     }
 
-    public function reflect(MappingInterface $mapping, string $portalNodeId): MappingInterface
+    public function reflect(MappingInterface $mapping, StoragePortalNodeKeyInterface $portalNodeKey): MappingInterface
     {
-        if (!$this->storage->getMapping($mapping->getMappingNodeId(), $mapping->getPortalNodeId()) instanceof MappingInterface) {
+        if (!$this->storage->getMapping($mapping->getMappingNodeId(), $mapping->getPortalNodeKey()) instanceof MappingInterface) {
             $this->storage->createMappings(new MappingCollection([$mapping]));
         }
 
-        $targetMapping = $this->storage->getMapping($mapping->getMappingNodeId(), $portalNodeId);
+        $targetMapping = $this->storage->getMapping($mapping->getMappingNodeId(), $portalNodeKey);
 
         if (!$targetMapping instanceof MappingInterface) {
             $mappingNode = new MappingNodeStruct($mapping->getMappingNodeId(), $mapping->getDatasetEntityClassName());
-            $targetMapping = new MappingStruct($portalNodeId, $mappingNode);
+            $targetMapping = new MappingStruct($portalNodeKey, $mappingNode);
         }
 
         return $targetMapping;

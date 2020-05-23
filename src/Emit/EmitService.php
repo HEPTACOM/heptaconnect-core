@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -43,25 +44,24 @@ class EmitService implements EmitServiceInterface
 
         /** @var MappingInterface $mapping */
         foreach ($mappings as $mapping) {
-            $portalNodeId = $mapping->getPortalNodeId();
+            $portalNodeKey = $mapping->getPortalNodeKey();
 
-            if (isset($emittingPortalNodes[$portalNodeId])) {
+            if (\array_reduce($emittingPortalNodes, static function (bool $match, StoragePortalNodeKeyInterface $key) use ($portalNodeKey): bool {
+                return $match || $key->equals($portalNodeKey);
+            }, false)) {
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeId);
+            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeKey);
             if (!$portalNode instanceof PortalNodeInterface) {
                 continue;
             }
 
-            $emittingPortalNodes[$portalNodeId] = $portalNode->getEmitters()->bySupport($entityClassName);
-        }
-
-        foreach ($emittingPortalNodes as $portalNodeId => $emitters) {
-            $mappingsIterator = $mappings->filter(function (MappingInterface $mapping) use ($portalNodeId): bool {
-                return $mapping->getPortalNodeId() === $portalNodeId;
+            $emitters = $portalNode->getEmitters()->bySupport($entityClassName);
+            $emittingPortalNodes[] = $portalNodeKey;
+            $mappingsIterator = $mappings->filter(static function (MappingInterface $mapping) use ($portalNodeKey): bool {
+                return $mapping->getPortalNodeKey()->equals($portalNodeKey);
             });
-
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface> $mappingsForPortalNode */
             $mappingsForPortalNode = iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
@@ -88,7 +88,7 @@ class EmitService implements EmitServiceInterface
             if (!$hasEmitters) {
                 $this->logger->critical(LogMessage::EMIT_NO_EMITTER_FOR_TYPE(), [
                     'type' => $entityClassName,
-                    'portalNodeId' => $portalNodeId,
+                    'portalNodeKey' => $portalNodeKey,
                 ]);
             }
         }

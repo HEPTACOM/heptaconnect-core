@@ -59,12 +59,12 @@ class EmitServiceTest extends TestCase
         $messageBus = $this->createMock(MessageBusInterface::class);
 
         $portalNode = $this->createMock(PortalNodeInterface::class);
-        $portalNode->expects($count > 0 ? static::once() : static::never())
+        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection());
 
         $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::once() : static::never())
+        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
 
@@ -92,12 +92,12 @@ class EmitServiceTest extends TestCase
         $messageBus = $this->createMock(MessageBusInterface::class);
 
         $portalNode = $this->createMock(PortalNodeInterface::class);
-        $portalNode->expects($count > 0 ? static::once() : static::never())
+        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection([new ThrowEmitter()]));
 
         $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::once() : static::never())
+        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
 

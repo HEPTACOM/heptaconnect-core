@@ -60,13 +60,12 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $mapping = $mappedDatasetEntityStruct->getMapping();
 
         $targetPortalNodeIds = $this->storage->getRouteTargets(
-            $mapping->getPortalNodeId(),
+            $mapping->getPortalNodeKey(),
             $mapping->getDatasetEntityClassName()
         );
 
         $typedMappedDatasetEntityCollections = [];
 
-        /** @var string $targetPortalNodeId */
         foreach ($targetPortalNodeIds as $targetPortalNodeId) {
             $targetMapping = $this->mappingService->reflect($mapping, $targetPortalNodeId);
             $entityClassName = $targetMapping->getDatasetEntityClassName();

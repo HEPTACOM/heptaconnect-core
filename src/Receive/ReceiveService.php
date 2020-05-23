@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
@@ -42,25 +43,24 @@ class ReceiveService implements ReceiveServiceInterface
 
         /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
-            $portalNodeId = $mappedDatasetEntity->getMapping()->getPortalNodeId();
+            $portalNodeKey = $mappedDatasetEntity->getMapping()->getPortalNodeKey();
 
-            if (isset($receivingPortalNodes[$portalNodeId])) {
+            if (\array_reduce($receivingPortalNodes, static function (bool $match, StoragePortalNodeKeyInterface $key) use ($portalNodeKey): bool {
+                return $match || $key->equals($portalNodeKey);
+            }, false)) {
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeId);
+            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeKey);
             if (!$portalNode instanceof PortalNodeInterface) {
                 continue;
             }
 
-            $receivingPortalNodes[$portalNodeId] = $portalNode->getReceivers()->bySupport($entityClassName);
-        }
-
-        foreach ($receivingPortalNodes as $portalNodeId => $receivers) {
-            $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeId): bool {
-                return $mappedDatasetEntityStruct->getMapping()->getPortalNodeId() === $portalNodeId;
+            $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
+            $receivingPortalNodes[] = $portalNodeKey;
+            $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
+                return $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey);
             });
-
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
             $mappedDatasetEntitiesForPortalNode = iterable_to_array($mappedDatasetEntitiesIterator);
             $mappedDatasetEntitiesForPortalNode = new TypedMappedDatasetEntityCollection(
@@ -90,7 +90,7 @@ class ReceiveService implements ReceiveServiceInterface
             if (!$hasReceivers) {
                 $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), [
                     'type' => $entityClassName,
-                    'portalNodeId' => $portalNodeId,
+                    'portalNodeKey' => $portalNodeKey,
                 ]);
             }
         }
