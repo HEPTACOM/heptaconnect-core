@@ -19,7 +19,7 @@ class MappingService implements MappingServiceInterface
 
     public function addException(MappingInterface $mapping, \Throwable $exception): void
     {
-        // TODO: Implement addException() method.
+        $this->storage->addMappingException($mapping, $exception);
     }
 
     public function save(MappingInterface $mapping): void
