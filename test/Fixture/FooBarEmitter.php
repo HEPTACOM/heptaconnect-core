@@ -4,8 +4,8 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StorageMappingNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\MappingNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
@@ -13,14 +13,14 @@ class FooBarEmitter implements EmitterInterface
 {
     private int $count;
 
-    private StoragePortalNodeKeyInterface $portalNodeKey;
+    private PortalNodeKeyInterface $portalNodeKey;
 
-    private StorageMappingNodeKeyInterface $mappingNodeKey;
+    private MappingNodeKeyInterface $mappingNodeKey;
 
     public function __construct(
         int $count,
-        StoragePortalNodeKeyInterface $portalNodeKey,
-        StorageMappingNodeKeyInterface $mappingNodeKey
+        PortalNodeKeyInterface $portalNodeKey,
+        MappingNodeKeyInterface $mappingNodeKey
     ) {
         $this->count = $count;
         $this->portalNodeKey = $portalNodeKey;

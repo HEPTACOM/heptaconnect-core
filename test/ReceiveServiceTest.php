@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
@@ -79,7 +79,7 @@ class ReceiveServiceTest extends TestCase
             ->willReturn(FooBarEntity::class);
         $mapping->expects(static::atLeast($count))
             ->method('getPortalNodeKey')
-            ->willReturn($this->createMock(StoragePortalNodeKeyInterface::class));
+            ->willReturn($this->createMock(PortalNodeKeyInterface::class));
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
         $mappedDatasetEntity->expects(static::atLeast($count))
@@ -119,7 +119,7 @@ class ReceiveServiceTest extends TestCase
             ->willReturn(FooBarEntity::class);
         $mapping->expects(static::atLeast($count))
             ->method('getPortalNodeKey')
-            ->willReturn($this->createMock(StoragePortalNodeKeyInterface::class));
+            ->willReturn($this->createMock(PortalNodeKeyInterface::class));
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
         $mappedDatasetEntity->expects(static::atLeast($count))

@@ -3,21 +3,21 @@
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StorageMappingNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\MappingNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\ReceiverCollection;
 
 class FooBarPortal implements PortalNodeInterface
 {
-    private StoragePortalNodeKeyInterface $portalNodeKey;
+    private PortalNodeKeyInterface $portalNodeKey;
 
-    private StorageMappingNodeKeyInterface $mappingNodeKey;
+    private MappingNodeKeyInterface $mappingNodeKey;
 
     public function __construct(
-        StoragePortalNodeKeyInterface $portalNodeKey,
-        StorageMappingNodeKeyInterface $mappingNodeKey
+        PortalNodeKeyInterface $portalNodeKey,
+        MappingNodeKeyInterface $mappingNodeKey
     ) {
         $this->portalNodeKey = $portalNodeKey;
         $this->mappingNodeKey = $mappingNodeKey;

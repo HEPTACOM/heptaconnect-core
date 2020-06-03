@@ -3,9 +3,9 @@
 namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 
 interface PortalNodeRegistryInterface
 {
-    public function getPortalNode(StoragePortalNodeKeyInterface $portalNodeId): ?PortalNodeInterface;
+    public function getPortalNode(PortalNodeKeyInterface $portalNodeId): ?PortalNodeInterface;
 }

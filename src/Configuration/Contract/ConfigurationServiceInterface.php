@@ -2,12 +2,12 @@
 
 namespace Heptacom\HeptaConnect\Core\Configuration\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 
 interface ConfigurationServiceInterface
 {
     /**
      * @psalm-return \ArrayAccess<array-key, mixed>|null
      */
-    public function getPortalNodeConfiguration(StoragePortalNodeKeyInterface $portalNodeKey): ?\ArrayAccess;
+    public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?\ArrayAccess;
 }

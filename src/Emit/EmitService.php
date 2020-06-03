@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -46,7 +46,7 @@ class EmitService implements EmitServiceInterface
         foreach ($mappings as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 
-            if (\array_reduce($emittingPortalNodes, static function (bool $match, StoragePortalNodeKeyInterface $key) use ($portalNodeKey): bool {
+            if (\array_reduce($emittingPortalNodes, static function (bool $match, PortalNodeKeyInterface $key) use ($portalNodeKey): bool {
                 return $match || $key->equals($portalNodeKey);
             }, false)) {
                 continue;

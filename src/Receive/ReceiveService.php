@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
@@ -45,7 +45,7 @@ class ReceiveService implements ReceiveServiceInterface
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
             $portalNodeKey = $mappedDatasetEntity->getMapping()->getPortalNodeKey();
 
-            if (\array_reduce($receivingPortalNodes, static function (bool $match, StoragePortalNodeKeyInterface $key) use ($portalNodeKey): bool {
+            if (\array_reduce($receivingPortalNodes, static function (bool $match, PortalNodeKeyInterface $key) use ($portalNodeKey): bool {
                 return $match || $key->equals($portalNodeKey);
             }, false)) {
                 continue;
