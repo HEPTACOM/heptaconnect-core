@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
 
@@ -73,9 +74,10 @@ class ReceiveService implements ReceiveServiceInterface
             /** @var ReceiverInterface $receiver */
             foreach ($receivers as $receiver) {
                 $hasReceivers = true;
+                $stack = new ReceiverStack([$receiver]);
 
                 try {
-                    foreach ($receiver->receive($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
+                    foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
                         $this->mappingService->save($mapping);
                     }
                 } catch (\Throwable $exception) {

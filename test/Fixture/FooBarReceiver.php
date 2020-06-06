@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 
@@ -11,7 +12,8 @@ class FooBarReceiver implements ReceiverInterface
 {
     public function receive(
         MappedDatasetEntityCollection $mappedDatasetEntities,
-        ReceiveContextInterface $context
+        ReceiveContextInterface $context,
+        ReceiverStackInterface $stack
     ): iterable {
         /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
@@ -20,6 +22,8 @@ class FooBarReceiver implements ReceiverInterface
 
             yield $mapping;
         }
+
+        yield from $stack->next($mappedDatasetEntities, $context);
     }
 
     public function supports(): array

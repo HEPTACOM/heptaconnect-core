@@ -4,11 +4,12 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
 class ThrowEmitter implements EmitterInterface
 {
-    public function emit(MappingCollection $mappings, EmitContextInterface $context): iterable
+    public function emit(MappingCollection $mappings, EmitContextInterface $context, EmitterStackInterface $stack): iterable
     {
         throw new \RuntimeException();
     }

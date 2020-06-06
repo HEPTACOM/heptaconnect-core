@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StorageMappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
@@ -27,7 +28,7 @@ class FooBarEmitter implements EmitterInterface
         $this->mappingNodeKey = $mappingNodeKey;
     }
 
-    public function emit(MappingCollection $mappings, EmitContextInterface $context): iterable
+    public function emit(MappingCollection $mappings, EmitContextInterface $context, EmitterStackInterface $stack): iterable
     {
         for ($c = 0; $c < $this->count; ++$c) {
             yield new MappedDatasetEntityStruct(
@@ -35,6 +36,8 @@ class FooBarEmitter implements EmitterInterface
                 new FooBarEntity()
             );
         }
+
+        yield from $stack->next($mappings, $context);
     }
 
     public function supports(): array

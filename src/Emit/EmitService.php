@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -71,9 +72,10 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterInterface $emitter */
             foreach ($emitters as $emitter) {
                 $hasEmitters = true;
+                $stack = new EmitterStack([$emitter]);
 
                 try {
-                    foreach ($emitter->emit($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
+                    foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
                         $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
                     }
                 } catch (\Throwable $exception) {
