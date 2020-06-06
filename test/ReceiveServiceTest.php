@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\StoragePortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\PortalNodeExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use PHPUnit\Framework\TestCase;
@@ -72,6 +73,9 @@ class ReceiveServiceTest extends TestCase
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
+        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalNodeExtensions')
+            ->willReturn(new PortalNodeExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
@@ -112,6 +116,9 @@ class ReceiveServiceTest extends TestCase
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
+        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalNodeExtensions')
+            ->willReturn(new PortalNodeExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))

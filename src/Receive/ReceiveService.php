@@ -57,6 +57,7 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
+            $portalExtensions = $this->portalNodeRegistry->getPortalNodeExtensions($portalNodeKey);
             $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;
             $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
@@ -74,7 +75,10 @@ class ReceiveService implements ReceiveServiceInterface
             /** @var ReceiverInterface $receiver */
             foreach ($receivers as $receiver) {
                 $hasReceivers = true;
-                $stack = new ReceiverStack([$receiver]);
+                $stack = new ReceiverStack([
+                    ...$portalExtensions->getReceiverDecorators()->bySupport($entityClassName),
+                    $receiver,
+                ]);
 
                 try {
                     foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {

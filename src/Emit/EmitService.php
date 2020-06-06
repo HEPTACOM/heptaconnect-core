@@ -58,6 +58,7 @@ class EmitService implements EmitServiceInterface
                 continue;
             }
 
+            $portalExtensions = $this->portalNodeRegistry->getPortalNodeExtensions($portalNodeKey);
             $emitters = $portalNode->getEmitters()->bySupport($entityClassName);
             $emittingPortalNodes[] = $portalNodeKey;
             $mappingsIterator = $mappings->filter(static function (MappingInterface $mapping) use ($portalNodeKey): bool {
@@ -72,7 +73,10 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterInterface $emitter */
             foreach ($emitters as $emitter) {
                 $hasEmitters = true;
-                $stack = new EmitterStack([$emitter]);
+                $stack = new EmitterStack([
+                    ...$portalExtensions->getEmitterDecorators()->bySupport($entityClassName),
+                    $emitter,
+                ]);
 
                 try {
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
