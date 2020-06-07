@@ -2,8 +2,8 @@
 
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\ExplorerCollection;
