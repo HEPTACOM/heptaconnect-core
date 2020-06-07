@@ -4,13 +4,15 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 
 class ThrowReceiver implements ReceiverInterface
 {
     public function receive(
         MappedDatasetEntityCollection $mappedDatasetEntities,
-        ReceiveContextInterface $context
+        ReceiveContextInterface $context,
+        ReceiverStackInterface $stack
     ): iterable {
         throw new \RuntimeException();
     }
