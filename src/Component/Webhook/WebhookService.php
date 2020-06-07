@@ -29,7 +29,7 @@ class WebhookService implements WebhookServiceInterface
         return $webhook;
     }
 
-    public function scheduleRefresh(WebhookInterface $webhook, \DateTimeInterface $dateTime)
+    public function scheduleRefresh(WebhookInterface $webhook, \DateTimeInterface $dateTime): void
     {
         // TODO: Implement scheduleRefresh() method.
     }
