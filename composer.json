@@ -7,7 +7,7 @@
         "heptaconnect-adapter"
     ],
     "license": [
-        "Apache-2.0",
+        "AGPL-3.0-or-later",
         "proprietary"
     ],
     "minimum-stability": "stable",
