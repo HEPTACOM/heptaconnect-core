@@ -1,0 +1,346 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "ab91ee1bf4e522b460f0838546f3c315",
+    "packages": [
+        {
+            "name": "bentools/iterable-functions",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bpolaszek/php-iterable-functions.git",
+                "reference": "ea52a3d06acc5841426e4dc041d05e8650d00de2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bpolaszek/php-iterable-functions/zipball/ea52a3d06acc5841426e4dc041d05e8650d00de2",
+                "reference": "ea52a3d06acc5841426e4dc041d05e8650d00de2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0|^5.0|^6.0|^7.0",
+                "squizlabs/php_codesniffer": "^2.0|^3.4",
+                "symfony/var-dumper": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BenTools\\IterableFunctions\\": "src"
+                },
+                "files": [
+                    "src/iterable-functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Provides functions for iterable variables: is_iterable(), iterable_to_array()",
+            "time": "2020-05-01T07:50:30+00:00"
+        },
+        {
+            "name": "heptacom-fixture/heptaconnect-portal-a",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "portal-package",
+                "reference": "0f425e1a8fcd059b90ec34e4939e23b25294c36a"
+            },
+            "require": {
+                "heptacom/heptaconnect-portal-base": ">=1",
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "extra": {
+                "heptaconnect": {
+                    "portals": [
+                        "HeptacomFixture\\Portal\\A\\Portal"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HeptacomFixture\\Portal\\A\\": "src/"
+                }
+            },
+            "description": "Fixture",
+            "keywords": [
+                "heptaconnect-portal",
+                "other-fancy-keyword"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "heptacom-fixture/heptaconnect-portal-extension-a",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "portal-package-extension",
+                "reference": "2a0d93bb308d35e9cf20324035401157075d3721"
+            },
+            "require": {
+                "heptacom/heptaconnect-portal-base": ">=1",
+                "php": ">=7.4"
+            },
+            "type": "library",
+            "extra": {
+                "heptaconnect": {
+                    "portalExtensions": [
+                        "HeptacomFixture\\Portal\\Extension\\PortalExtension"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "HeptacomFixture\\Portal\\Extension\\": "src/"
+                }
+            },
+            "description": "Fixture",
+            "keywords": [
+                "heptaconnect-portal-extension",
+                "just-a-fancy-keyword"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "heptacom/heptaconnect-dataset-base",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../../../vendor/heptacom/heptaconnect-dataset-base",
+                "reference": "c6bdebe3313585534791a3d231deb54a5a0b5975"
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": ">=2",
+                "icanhazstring/composer-unused": ">=0.7",
+                "infection/infection": ">=0.15",
+                "maglnet/composer-require-checker": ">=2",
+                "phpstan/extension-installer": ">=1",
+                "phpstan/phpstan": ">=0.12",
+                "phpstan/phpstan-deprecation-rules": ">=0.12",
+                "phpstan/phpstan-phpunit": ">=0.12",
+                "phpstan/phpstan-strict-rules": ">=0.12",
+                "phpunit/phpunit": ">=9.1 <10",
+                "psalm/plugin-phpunit": ">=0.10",
+                "vimeo/psalm": ">=3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Heptacom\\HeptaConnect\\Dataset\\Base\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Heptacom\\HeptaConnect\\Dataset\\Base\\Test\\": "test/"
+                }
+            },
+            "license": [
+                "AGPL-3.0-or-later",
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "HEPTACOM GmbH"
+                }
+            ],
+            "description": "HEPTAConnect base dataset that every other dataset is based on",
+            "keywords": [
+                "heptaconnect-dataset"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "heptacom/heptaconnect-portal-base",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../../../vendor/heptacom/heptaconnect-portal-base",
+                "reference": "5d681f65d9ab81abafb5b23c0a056bbe742b0d2e"
+            },
+            "require": {
+                "bentools/iterable-functions": ">=1.4",
+                "ext-json": "*",
+                "heptacom/heptaconnect-dataset-base": "dev-master",
+                "php": ">=7.4",
+                "psr/http-client": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": ">=2",
+                "icanhazstring/composer-unused": ">=0.7",
+                "infection/infection": ">=0.15",
+                "maglnet/composer-require-checker": ">=2",
+                "phpstan/extension-installer": ">=1",
+                "phpstan/phpstan": ">=0.12",
+                "phpstan/phpstan-deprecation-rules": ">=0.12",
+                "phpstan/phpstan-phpunit": ">=0.12",
+                "phpstan/phpstan-strict-rules": ">=0.12",
+                "phpunit/phpunit": ">=9.1 <10",
+                "psalm/plugin-phpunit": ">=0.10",
+                "vimeo/psalm": ">=3"
+            },
+            "type": "library",
+            "extra": {
+                "unused": [
+                    "bentools/iterable-functions",
+                    "psr/http-client"
+                ]
+            },
+            "autoload": {
+                "psr-4": {
+                    "Heptacom\\HeptaConnect\\Portal\\Base\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Heptacom\\HeptaConnect\\Portal\\Base\\Test\\": "test/"
+                }
+            },
+            "license": [
+                "AGPL-3.0-or-later",
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "HEPTACOM GmbH"
+                }
+            ],
+            "description": "HEPTAConnect base dataset that every other portal is based on",
+            "keywords": [
+                "heptaconnect-portal"
+            ],
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "psr/http-client",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-client.git",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0 || ^8.0",
+                "psr/http-message": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP clients",
+            "homepage": "https://github.com/php-fig/http-client",
+            "keywords": [
+                "http",
+                "http-client",
+                "psr",
+                "psr-18"
+            ],
+            "time": "2020-06-29T06:28:15+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
+                "reference": "efd67d1dc14a7ef4fc4e518e7dee91c271d524e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2019-08-29T13:16:46+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "heptacom-fixture/heptaconnect-portal-a": 20,
+        "heptacom-fixture/heptaconnect-portal-extension-a": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.4"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}

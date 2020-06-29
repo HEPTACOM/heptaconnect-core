@@ -1,0 +1,25 @@
+{
+    "name": "heptacom/heptaconnect-core-fixture",
+    "description": "Core fixture",
+    "type": "project",
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "portal-package"
+        },
+        {
+            "type": "path",
+            "url": "portal-package-extension"
+        },
+        {
+            "type": "path",
+            "url": "../../../vendor/heptacom/*"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "heptacom-fixture/heptaconnect-portal-a": "dev-master",
+        "heptacom-fixture/heptaconnect-portal-extension-a": "dev-master"
+    }
+}

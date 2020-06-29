@@ -17,6 +17,7 @@
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>.</directory>
+            <exclude>./Fixture</exclude>
         </testsuite>
     </testsuites>
     <filter>
