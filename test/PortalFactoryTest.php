@@ -52,6 +52,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
+            /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
             $portalFactory->instantiatePortalNode(\DateTime::class);
         } catch (UnexpectedClassInheritanceOnInstantionException $exception) {
             static::assertEquals('DateTime', $exception->getClass());
@@ -68,6 +69,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
+            /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
             $portalFactory->instantiatePortalNodeExtension(\DateTime::class);
         } catch (UnexpectedClassInheritanceOnInstantionException $exception) {
             static::assertEquals('DateTime', $exception->getClass());
@@ -84,6 +86,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
+            /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
             $portalFactory->instantiatePortalNode('Unknown🙃Class');
         } catch (ClassNotFoundOnInstantionException $exception) {
             static::assertEquals('Unknown🙃Class', $exception->getClass());
@@ -99,6 +102,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
+            /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
             $portalFactory->instantiatePortalNodeExtension('Unknown🙃Class');
         } catch (ClassNotFoundOnInstantionException $exception) {
             static::assertEquals('Unknown🙃Class', $exception->getClass());

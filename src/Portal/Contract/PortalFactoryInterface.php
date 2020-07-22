@@ -16,7 +16,7 @@ interface PortalFactoryInterface
     public function instantiatePortalNode(string $class): PortalNodeInterface;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface> $class
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeExtensionInterface> $class
      *
      * @throws AbstractInstantiationException
      */
