@@ -55,6 +55,6 @@ class ExploreService implements ExploreServiceInterface
             $types[$explorer->supports()] = true;
         }
 
-        return array_keys($types);
+        return \array_keys($types);
     }
 }
