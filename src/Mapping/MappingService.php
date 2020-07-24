@@ -24,7 +24,11 @@ class MappingService implements MappingServiceInterface
 
     public function save(MappingInterface $mapping): void
     {
-        $this->storage->createMappings(new MappingCollection([$mapping]));
+        $existingMapping = $this->storage->getMapping($mapping->getMappingNodeKey(), $mapping->getPortalNodeKey());
+
+        if (!$existingMapping instanceof MappingInterface) {
+            $this->storage->createMappings(new MappingCollection([$mapping]));
+        }
     }
 
     public function reflect(MappingInterface $mapping, PortalNodeKeyInterface $portalNodeKey): MappingInterface
