@@ -5,9 +5,11 @@ namespace Heptacom\HeptaConnect\Core\Explore;
 use Heptacom\HeptaConnect\Core\Explore\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Explore\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ExplorerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeExtensionInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\ExplorerStack;
 
@@ -17,12 +19,16 @@ class ExploreService implements ExploreServiceInterface
 
     private PortalNodeRegistryInterface $portalNodeRegistry;
 
+    private PublisherInterface $publisher;
+
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
-        PortalNodeRegistryInterface $portalNodeRegistry
+        PortalNodeRegistryInterface $portalNodeRegistry,
+        PublisherInterface $publisher
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
         $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->publisher = $publisher;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey): void
@@ -42,7 +48,14 @@ class ExploreService implements ExploreServiceInterface
         /** @var string $supportedType */
         foreach (self::getSupportedTypes($explorers) as $supportedType) {
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
-            $explorerStack->next($context);
+
+            foreach ($explorerStack->next($context) as $entity) {
+                if (!$entity instanceof DatasetEntityInterface) {
+                    continue;
+                }
+
+                $this->publisher->publish(get_class($entity), $portalNodeKey, $entity->getPrimaryKey());
+            }
         }
     }
 
