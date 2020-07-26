@@ -8,11 +8,11 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
