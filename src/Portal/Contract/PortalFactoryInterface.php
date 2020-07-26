@@ -3,13 +3,13 @@
 namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
 
 interface PortalFactoryInterface
 {
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface> $class
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface> $class
      *
      * @throws AbstractInstantiationException
      */

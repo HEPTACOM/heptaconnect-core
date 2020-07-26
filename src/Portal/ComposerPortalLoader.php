@@ -19,7 +19,7 @@ class ComposerPortalLoader
     }
 
     /**
-     * @return iterable<array-key, \Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface>
+     * @return iterable<array-key, \Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface>
      */
     public function getPortals(): iterable
     {

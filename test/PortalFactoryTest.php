@@ -11,8 +11,8 @@ use Heptacom\HeptaConnect\Core\Test\Fixture\DependentPortal;
 use Heptacom\HeptaConnect\Core\Test\Fixture\DependentPortalExtension;
 use Heptacom\HeptaConnect\Core\Test\Fixture\UninstantiablePortal;
 use Heptacom\HeptaConnect\Core\Test\Fixture\UninstantiablePortalExtension;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
 use PHPUnit\Framework\TestCase;
 
 /**

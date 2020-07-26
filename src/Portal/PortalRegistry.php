@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
 use Heptacom\HeptaConnect\Portal\Base\PortalNodeExtensionCollection;
 
 class PortalRegistry
