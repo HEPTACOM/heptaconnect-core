@@ -45,10 +45,15 @@ class ComposerPortalLoader
 
         /** @var PackageConfiguration $package */
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
-            $portals = $package->getConfiguration()['portalExtensions'] ?? [];
+            $portalExtensions = (array) ($package->getConfiguration()['portalExtensions'] ?? []);
 
-            foreach ($portals as $portal) {
-                $result->push([$this->portalFactory->instantiatePortalNodeExtension($portal)]);
+            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface> $portalExtension */
+            foreach ($portalExtensions as $portalExtension) {
+                try {
+                    $result->push([$this->portalFactory->instantiatePortalNodeExtension($portalExtension)]);
+                } catch (AbstractInstantiationException $exception) {
+                    // TODO log
+                }
             }
         }
 

@@ -9,6 +9,7 @@ class PortalRegistry
 {
     private ComposerPortalLoader $portalLoader;
 
+    /** @var PortalNodeInterface[]|null */
     private ?array $portals = null;
 
     private ?PortalNodeExtensionCollection $portalExtensions = null;
@@ -24,7 +25,9 @@ class PortalRegistry
     public function getPortals(): array
     {
         if (\is_null($this->portals)) {
-            $this->portals = iterable_to_array($this->portalLoader->getPortals());
+            /** @var PortalNodeInterface[] $portals */
+            $portals = iterable_to_array($this->portalLoader->getPortals());
+            $this->portals = $portals;
         }
 
         return $this->portals;
