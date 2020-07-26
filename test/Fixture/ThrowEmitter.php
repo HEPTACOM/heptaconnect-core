@@ -2,9 +2,9 @@
 
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 
 class ThrowEmitter implements EmitterInterface
