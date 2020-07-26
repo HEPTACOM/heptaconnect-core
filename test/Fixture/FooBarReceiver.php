@@ -2,11 +2,11 @@
 
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverInterface;
 
 class FooBarReceiver implements ReceiverInterface
 {
