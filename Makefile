@@ -57,12 +57,7 @@ test: vendor .build test-setup-fixture
 composer-update:
 	$(COMPOSER) update
 
-.PHONY: composer-validate
-composer-validate: composer.json
-	$(COMPOSER) validate
-
 vendor: composer-update
-
 .PHONY: .build
 .build:
 	[[ -d .build ]] || mkdir .build
