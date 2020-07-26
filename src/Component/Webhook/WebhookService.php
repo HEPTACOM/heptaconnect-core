@@ -22,7 +22,7 @@ class WebhookService implements WebhookServiceInterface
     public function register(string $webhookHandler): WebhookInterface
     {
         $webhook = $this->storage->createWebhook(
-            $this->urlProvider->provide(),
+            $this->urlProvider->provide()->getPath(),
             $webhookHandler
         );
 
