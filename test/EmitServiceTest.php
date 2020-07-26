@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

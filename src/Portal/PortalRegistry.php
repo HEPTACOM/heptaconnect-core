@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
 
 class PortalRegistry
 {

@@ -4,7 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
-use Heptacom\HeptaConnect\Portal\Base\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
 
 class ComposerPortalLoader
 {
