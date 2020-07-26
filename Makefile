@@ -61,7 +61,7 @@ composer-update:
 composer-validate: composer.json
 	$(COMPOSER) validate
 
-vendor: composer-validate composer-update
+vendor: composer-update
 
 .PHONY: .build
 .build:
