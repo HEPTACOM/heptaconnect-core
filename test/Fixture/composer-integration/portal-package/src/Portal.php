@@ -3,7 +3,7 @@
 namespace HeptacomFixture\Portal\A;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\EmitterCollection;
+use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\ReceiverCollection;
 
