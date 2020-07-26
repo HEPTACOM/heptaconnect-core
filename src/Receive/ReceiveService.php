@@ -7,11 +7,11 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\ReceiverStack;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
 

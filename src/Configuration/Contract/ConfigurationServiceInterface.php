@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Configuration\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 interface ConfigurationServiceInterface
 {

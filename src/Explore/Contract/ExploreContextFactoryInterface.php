@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Explore\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\Contract\ExploreContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 interface ExploreContextFactoryInterface
 {

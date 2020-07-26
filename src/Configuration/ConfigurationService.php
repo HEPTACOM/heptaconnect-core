@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ConfigurationService implements ConfigurationServiceInterface
 {
