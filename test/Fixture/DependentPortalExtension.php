@@ -2,9 +2,9 @@
 
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeExtensionInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
 class DependentPortalExtension implements PortalNodeExtensionInterface
