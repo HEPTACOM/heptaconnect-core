@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Component\Messenger\Message;
 
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 
 class EmitMessage
 {

@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
