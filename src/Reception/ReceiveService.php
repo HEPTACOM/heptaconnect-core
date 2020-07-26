@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Receive;
+namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
-use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\ReceiverInterface;
-use Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\ReceiverStack;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
@@ -63,7 +63,7 @@ class ReceiveService implements ReceiveServiceInterface
             $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
                 return $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey);
             });
-            /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
+            /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
             $mappedDatasetEntitiesForPortalNode = iterable_to_array($mappedDatasetEntitiesIterator);
             $mappedDatasetEntitiesForPortalNode = new TypedMappedDatasetEntityCollection(
                 $entityClassName,
