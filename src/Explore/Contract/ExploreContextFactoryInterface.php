@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Explore\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\ExploreContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 interface ExploreContextFactoryInterface
