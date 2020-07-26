@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;

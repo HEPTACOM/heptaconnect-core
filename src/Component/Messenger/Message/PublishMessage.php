@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Component\Messenger\Message;
 
-use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 
 class PublishMessage
 {
