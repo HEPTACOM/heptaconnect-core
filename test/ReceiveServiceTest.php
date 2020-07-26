@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Test;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
-use Heptacom\HeptaConnect\Core\Receive\ReceiveService;
+use Heptacom\HeptaConnect\Core\Reception\ReceiveService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
- * @covers \Heptacom\HeptaConnect\Core\Receive\ReceiveService
+ * @covers \Heptacom\HeptaConnect\Core\Reception\ReceiveService
  * @covers \Heptacom\HeptaConnect\Core\Component\LogMessage
  */
 class ReceiveServiceTest extends TestCase

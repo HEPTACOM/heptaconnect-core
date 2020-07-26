@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Receive\Contract;
+namespace Heptacom\HeptaConnect\Core\Reception\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\TypedMappedDatasetEntityCollection;
 
