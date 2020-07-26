@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Explore;
+namespace Heptacom\HeptaConnect\Core\Exploration;
 
-use Heptacom\HeptaConnect\Core\Explore\Contract\ExploreContextFactoryInterface;
-use Heptacom\HeptaConnect\Core\Explore\Contract\ExploreServiceInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeExtensionInterface;
