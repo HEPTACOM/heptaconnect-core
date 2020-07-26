@@ -57,10 +57,6 @@ test: vendor .build
 composer-update:
 	$(COMPOSER) update
 
-.PHONY: composer-validate
-composer-validate: composer.json
-	$(COMPOSER) validate
-
 vendor: composer-update
 
 .PHONY: .build
