@@ -45,10 +45,10 @@ class ExploreService implements ExploreServiceInterface
             $explorers->push($portalNodeExtension->getExplorerDecorators());
         }
 
-        /** @var string $supportedType */
         foreach (self::getSupportedTypes($explorers) as $supportedType) {
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
 
+            /** @var DatasetEntityInterface|null $entity */
             foreach ($explorerStack->next($context) as $entity) {
                 if (!$entity instanceof DatasetEntityInterface) {
                     continue;
@@ -59,6 +59,11 @@ class ExploreService implements ExploreServiceInterface
         }
     }
 
+    /**
+     * @psalm-return array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>>
+     *
+     * @return array|string[]
+     */
     protected static function getSupportedTypes(ExplorerCollection $explorers): array
     {
         $types = [];

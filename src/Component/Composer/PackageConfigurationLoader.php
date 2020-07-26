@@ -21,19 +21,18 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         $result = new PackageConfigurationCollection();
 
         if ($factory->getLocker()->isLocked()) {
-            $packageLockData = $factory->getLocker()->getLockData()['packages'] ?? [];
+            $packageLockData = (array) ($factory->getLocker()->getLockData()['packages'] ?? []);
+            $packageLockData = \array_filter($packageLockData, 'is_array');
 
+            /** @var array $package */
             foreach ($packageLockData as $package) {
-                $extra = $package['extra'] ?? [];
-                $heptaconnect = $extra['heptaconnect'] ?? [];
+                $extra = (array) ($package['extra'] ?? []);
+                $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
                 if (\count($heptaconnect) > 0) {
                     $config = new PackageConfiguration();
                     $config->setName((string) $package['name']);
-                    $config->setTags(new StringCollection(\array_filter(
-                        $package['keywords'] ?? [],
-                        fn (string $k): bool => str_starts_with($k, 'heptaconnect-')
-                    )));
+                    $config->setTags(new StringCollection($this->getHeptaconnectKeywords((array) ($package['keywords'] ?? []))));
                     $config->setConfiguration($heptaconnect);
                     $result->push([$config]);
                 }
@@ -41,5 +40,14 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         }
 
         return $result;
+    }
+
+    /**
+     * @return array<array-key, string>
+     */
+    private function getHeptaconnectKeywords(array $keywords): array
+    {
+        /* @var array<array-key, string> */
+        return \array_filter($keywords, fn (string $k): bool => str_starts_with($k, 'heptaconnect-'));
     }
 }

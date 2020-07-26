@@ -29,6 +29,11 @@ class PortalNodeRegistry implements PortalNodeRegistryInterface
     {
         $portalClass = $this->storage->getPortalNode($portalNodeKey);
 
+        if (!\is_a($portalClass, PortalNodeInterface::class, true)) {
+            return null;
+        }
+
+        /* @phpstan-ignore-next-line $portalClass is class-string<PortalNodeInterface> */
         return $this->portalFactory->instantiatePortalNode($portalClass);
     }
 
