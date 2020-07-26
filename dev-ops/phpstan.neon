@@ -4,5 +4,4 @@ parameters:
 	level: max
 	paths:
 		- ../src/
-		- ../test/
 	tmpDir: ../.build/phpstan/
