@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Emit\EmitService;
+use Heptacom\HeptaConnect\Core\Emission\EmitService;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
- * @covers \Heptacom\HeptaConnect\Core\Emit\EmitService
+ * @covers \Heptacom\HeptaConnect\Core\Emission\EmitService
  * @covers \Heptacom\HeptaConnect\Core\Component\LogMessage
  */
 class EmitServiceTest extends TestCase

@@ -4,7 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Router;
 
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
-use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Receive\Contract\ReceiveServiceInterface;

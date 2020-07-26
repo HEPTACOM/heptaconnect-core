@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Emit;
+namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
-use Heptacom\HeptaConnect\Core\Emit\Contract\EmitServiceInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeInterface;
