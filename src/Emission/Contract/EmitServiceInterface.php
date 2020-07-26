@@ -2,7 +2,7 @@
 
 namespace Heptacom\HeptaConnect\Core\Emission\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\TypedMappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 
 interface EmitServiceInterface
 {
