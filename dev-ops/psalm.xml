@@ -8,27 +8,6 @@
 >
     <issueHandlers>
         <LessSpecificReturnType errorLevel="info" />
-        <InternalMethod>
-            <errorLevel type="info">
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::after"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::canDefineParameters"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::id"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::method"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::will"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturn"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturn"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnArgument"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnCallback"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnMap"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnOnConsecutiveCalls"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnReference"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willReturnSelf"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::willThrowException"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::with"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::withAnyParameters"/>
-                <referencedMethod name="PHPUnit\Framework\MockObject\Builder\InvocationMocker::withConsecutive"/>
-            </errorLevel>
-        </InternalMethod>
     </issueHandlers>
 
     <plugins>
@@ -37,7 +16,6 @@
 
     <projectFiles>
         <directory name="src/" />
-        <directory name="test/" />
         <ignoreFiles>
             <directory name="vendor/" />
         </ignoreFiles>
