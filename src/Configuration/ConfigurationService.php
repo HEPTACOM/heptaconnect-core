@@ -9,6 +9,9 @@ class ConfigurationService implements ConfigurationServiceInterface
 {
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?\ArrayAccess
     {
-        return new \ArrayObject();
+        /** @var \ArrayObject<array-key, mixed> $result */
+        $result = new \ArrayObject();
+
+        return $result;
     }
 }

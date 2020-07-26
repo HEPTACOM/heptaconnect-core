@@ -26,7 +26,7 @@ class ExploreContext implements ExploreContextInterface
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    public function getPortalNode(): PortalNodeInterface
+    public function getPortalNode(): ?PortalNodeInterface
     {
         return $this->portalNodeRegistry->getPortalNode($this->portalNodeKey);
     }

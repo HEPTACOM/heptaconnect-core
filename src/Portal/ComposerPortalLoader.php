@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
+use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
 
 class ComposerPortalLoader
@@ -25,10 +26,15 @@ class ComposerPortalLoader
     {
         /** @var PackageConfiguration $package */
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
-            $portals = $package->getConfiguration()['portals'] ?? [];
+            $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
+            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface> $portal */
             foreach ($portals as $portal) {
-                yield $this->portalFactory->instantiatePortalNode($portal);
+                try {
+                    yield $this->portalFactory->instantiatePortalNode($portal);
+                } catch (AbstractInstantiationException $exception) {
+                    // TODO log
+                }
             }
         }
     }
