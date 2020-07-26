@@ -6,7 +6,6 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
@@ -21,8 +20,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private ReceiveServiceInterface $receiveService;
 
-    private PortalNodeRegistryInterface $portalNodeRegistry;
-
     private StorageInterface $storage;
 
     private MappingServiceInterface $mappingService;
@@ -30,13 +27,11 @@ class Router implements RouterInterface, MessageSubscriberInterface
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
-        PortalNodeRegistryInterface $portalNodeRegistry,
         StorageInterface $storage,
         MappingServiceInterface $mappingService
     ) {
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
-        $this->portalNodeRegistry = $portalNodeRegistry;
         $this->storage = $storage;
         $this->mappingService = $mappingService;
     }
