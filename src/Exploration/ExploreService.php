@@ -7,10 +7,10 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Contract\PortalNodeExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ExploreService implements ExploreServiceInterface
