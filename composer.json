@@ -38,6 +38,9 @@
         "maglnet/composer-require-checker": ">=2",
         "icanhazstring/composer-unused": ">=0.7"
     },
+    "conflict": {
+        "nikic/php-parser": "4.7.0"
+    },
     "autoload-dev": {
         "psr-4": {
             "Heptacom\\HeptaConnect\\Test\\": "test/"
