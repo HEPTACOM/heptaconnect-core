@@ -18,10 +18,14 @@
     ],
     "require": {
         "php": ">=7.4",
+        "ext-json": "*",
+        "composer/composer": ">=1",
         "heptacom/heptaconnect-portal-base": "@dev",
         "heptacom/heptaconnect-dataset-base": "@dev",
         "heptacom/heptaconnect-storage-base": "@dev",
         "symfony/messenger": "^4.0 || ^5.0",
+        "symfony/polyfill-php80": ">=1.15",
+        "psr/http-message": "^1.0",
         "psr/log": "^1.1",
         "bentools/iterable-functions": "^1.4"
     },
