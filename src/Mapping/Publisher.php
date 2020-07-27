@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
+use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
@@ -33,6 +34,10 @@ class Publisher implements PublisherInterface
 
         if (!$mappingNode instanceof MappingNodeStructInterface) {
             $mappingNode = $this->storage->createMappingNodes([$datasetEntityClassName], $portalNodeId)->first();
+        }
+
+        if (!$mappingNode instanceof MappingNodeStructInterface) {
+            throw new MappingNodeNotCreatedException();
         }
 
         $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);
