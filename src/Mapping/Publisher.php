@@ -32,7 +32,7 @@ class Publisher implements PublisherInterface
         $mappingExists = $mappingNode instanceof MappingNodeStructInterface;
 
         if (!$mappingNode instanceof MappingNodeStructInterface) {
-            [$mappingNode] = $this->storage->createMappingNodes([$datasetEntityClassName], $portalNodeId);
+            $mappingNode = $this->storage->createMappingNodes([$datasetEntityClassName], $portalNodeId)->first();
         }
 
         $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);

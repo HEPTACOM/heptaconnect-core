@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
@@ -54,15 +55,16 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $mappedDatasetEntityStruct = $message->getMappedDatasetEntityStruct();
         $mapping = $mappedDatasetEntityStruct->getMapping();
 
-        $targetPortalNodeIds = $this->storage->getRouteTargets(
+        $targetPortalNodeKeys = $this->storage->getRouteTargets(
             $mapping->getPortalNodeKey(),
             $mapping->getDatasetEntityClassName()
         );
 
         $typedMappedDatasetEntityCollections = [];
 
-        foreach ($targetPortalNodeIds as $targetPortalNodeId) {
-            $targetMapping = $this->mappingService->reflect($mapping, $targetPortalNodeId);
+        /** @var PortalNodeKeyInterface $targetPortalNodeKey */
+        foreach ($targetPortalNodeKeys as $targetPortalNodeKey) {
+            $targetMapping = $this->mappingService->reflect($mapping, $targetPortalNodeKey);
             $entityClassName = $targetMapping->getDatasetEntityClassName();
 
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
