@@ -5,13 +5,13 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Exception\PortalNodeNotFoundException;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -19,13 +19,13 @@ class ExploreService implements ExploreServiceInterface
 {
     private ExploreContextFactoryInterface $exploreContextFactory;
 
-    private PortalNodeRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalNodeRegistry;
 
     private PublisherInterface $publisher;
 
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
-        PortalNodeRegistryInterface $portalNodeRegistry,
+        PortalRegistryInterface $portalNodeRegistry,
         PublisherInterface $publisher
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
@@ -36,17 +36,17 @@ class ExploreService implements ExploreServiceInterface
     public function explore(PortalNodeKeyInterface $portalNodeKey): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
-        $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeKey);
+        $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
 
-        if (!$portalNode instanceof PortalNodeInterface) {
+        if (!$portalNode instanceof PortalInterface) {
             throw new PortalNodeNotFoundException($portalNodeKey);
         }
 
-        $portalNodeExtensions = $this->portalNodeRegistry->getPortalNodeExtensions($portalNodeKey);
+        $portalNodeExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
 
         $explorers = $portalNode->getExplorers();
 
-        /** @var PortalNodeExtensionInterface $portalNodeExtension */
+        /** @var PortalExtensionInterface $portalNodeExtension */
         foreach ($portalNodeExtensions as $portalNodeExtension) {
             $explorers->push($portalNodeExtension->getExplorerDecorators());
         }

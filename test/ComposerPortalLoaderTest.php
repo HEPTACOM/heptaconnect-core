@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Test;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader;
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\PortalFactory;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use HeptacomFixture\Portal\A\Portal;
 use HeptacomFixture\Portal\Extension\PortalExtension;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +34,7 @@ class ComposerPortalLoaderTest extends TestCase
         static::assertCount(1, $portals);
         static::assertCount(1, $portalExtensions);
 
-        /** @var PortalNodeInterface $portal */
+        /** @var PortalInterface $portal */
         foreach ($portals as $portal) {
             static::assertInstanceOf(Portal::class, $portal);
         }

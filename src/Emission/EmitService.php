@@ -5,13 +5,13 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -24,13 +24,13 @@ class EmitService implements EmitServiceInterface
 
     private MessageBusInterface $messageBus;
 
-    private PortalNodeRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalNodeRegistry;
 
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
-        PortalNodeRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalNodeRegistry
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
@@ -53,12 +53,12 @@ class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeKey);
-            if (!$portalNode instanceof PortalNodeInterface) {
+            $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
+            if (!$portalNode instanceof PortalInterface) {
                 continue;
             }
 
-            $portalExtensions = $this->portalNodeRegistry->getPortalNodeExtensions($portalNodeKey);
+            $portalExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
             $emitters = $portalNode->getEmitters()->bySupport($entityClassName);
             $emittingPortalNodes[] = $portalNodeKey;
             $mappingsIterator = $mappings->filter(static function (MappingInterface $mapping) use ($portalNodeKey): bool {

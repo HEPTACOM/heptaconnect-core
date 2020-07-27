@@ -2,43 +2,53 @@
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 
-class PortalRegistry
+class PortalRegistry implements PortalRegistryInterface
 {
+    private PortalFactoryInterface $portalFactory;
+
+    private StorageInterface $storage;
+
     private ComposerPortalLoader $portalLoader;
 
-    /** @var PortalNodeInterface[]|null */
-    private ?array $portals = null;
-
-    private ?PortalNodeExtensionCollection $portalExtensions = null;
-
-    public function __construct(ComposerPortalLoader $portalLoader)
-    {
+    public function __construct(
+        PortalFactoryInterface $portalFactory,
+        StorageInterface $storage,
+        ComposerPortalLoader $portalLoader
+    ) {
+        $this->portalFactory = $portalFactory;
+        $this->storage = $storage;
         $this->portalLoader = $portalLoader;
     }
 
-    /**
-     * @return PortalNodeInterface[]
-     */
-    public function getPortals(): array
+    public function getPortal(PortalNodeKeyInterface $portalNodeKey): ?PortalInterface
     {
-        if (\is_null($this->portals)) {
-            /** @var PortalNodeInterface[] $portals */
-            $portals = iterable_to_array($this->portalLoader->getPortals());
-            $this->portals = $portals;
+        $portalClass = $this->storage->getPortalNode($portalNodeKey);
+
+        if (!\is_a($portalClass, PortalInterface::class, true)) {
+            return null;
         }
 
-        return $this->portals;
+        /* @phpstan-ignore-next-line $portalClass is class-string<PortalNodeInterface> */
+        return $this->portalFactory->instantiatePortalNode($portalClass);
     }
 
-    public function getPortalExtensions(): PortalNodeExtensionCollection
+    public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
-        if (\is_null($this->portalExtensions)) {
-            $this->portalExtensions = $this->portalLoader->getPortalExtensions();
-        }
+        $portalClass = $this->storage->getPortalNode($portalNodeKey);
+        $extensions = $this->portalLoader->getPortalExtensions();
 
-        return $this->portalExtensions;
+        $extensions = $extensions->filter(function (PortalExtensionInterface $extension) use ($portalClass): bool {
+            return \is_a($extension->supports(), $portalClass, true);
+        });
+
+        return new PortalExtensionCollection($extensions);
     }
 }

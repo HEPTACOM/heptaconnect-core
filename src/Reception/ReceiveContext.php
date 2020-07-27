@@ -4,9 +4,9 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 
 class ReceiveContext implements ReceiveContextInterface
@@ -15,12 +15,12 @@ class ReceiveContext implements ReceiveContextInterface
 
     private ConfigurationServiceInterface $configurationService;
 
-    private PortalNodeRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalNodeRegistry;
 
     public function __construct(
         MappingServiceInterface $mappingService,
         ConfigurationServiceInterface $configurationService,
-        PortalNodeRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalNodeRegistry
     ) {
         $this->mappingService = $mappingService;
         $this->configurationService = $configurationService;
@@ -32,9 +32,9 @@ class ReceiveContext implements ReceiveContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortalNode(MappingInterface $mapping): ?PortalNodeInterface
+    public function getPortalNode(MappingInterface $mapping): ?PortalInterface
     {
-        return $this->portalNodeRegistry->getPortalNode($mapping->getPortalNodeKey());
+        return $this->portalNodeRegistry->getPortal($mapping->getPortalNodeKey());
     }
 
     public function markAsFailed(MappingInterface $mapping, \Throwable $throwable): void

@@ -4,15 +4,15 @@ namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\ReceiveService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -35,7 +35,7 @@ class ReceiveServiceTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::exactly($count))
@@ -64,18 +64,18 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE());
 
-        $portalNode = $this->createMock(PortalNodeInterface::class);
+        $portalNode = $this->createMock(PortalInterface::class);
         $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection());
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNodeExtensions')
-            ->willReturn(new PortalNodeExtensionCollection());
+            ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
@@ -107,18 +107,18 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_THROW());
 
-        $portalNode = $this->createMock(PortalNodeInterface::class);
+        $portalNode = $this->createMock(PortalInterface::class);
         $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection([new ThrowReceiver()]));
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNodeExtensions')
-            ->willReturn(new PortalNodeExtensionCollection());
+            ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))

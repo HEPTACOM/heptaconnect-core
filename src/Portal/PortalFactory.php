@@ -2,19 +2,19 @@
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 
 class PortalFactory implements Contract\PortalFactoryInterface
 {
-    public function instantiatePortalNode(string $class): PortalNodeInterface
+    public function instantiatePortalNode(string $class): PortalInterface
     {
         if (!\class_exists($class)) {
             throw new Exception\ClassNotFoundOnInstantionException($class);
         }
 
-        if (!\is_a($class, PortalNodeInterface::class, true)) {
-            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalNodeInterface::class);
+        if (!\is_a($class, PortalInterface::class, true)) {
+            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalInterface::class);
         }
 
         $reflection = new \ReflectionClass($class);
@@ -32,14 +32,14 @@ class PortalFactory implements Contract\PortalFactoryInterface
         return new $class();
     }
 
-    public function instantiatePortalNodeExtension(string $class): PortalNodeExtensionInterface
+    public function instantiatePortalNodeExtension(string $class): PortalExtensionInterface
     {
         if (!\class_exists($class)) {
             throw new Exception\ClassNotFoundOnInstantionException($class);
         }
 
-        if (!\is_a($class, PortalNodeExtensionInterface::class, true)) {
-            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalNodeExtensionInterface::class);
+        if (!\is_a($class, PortalExtensionInterface::class, true)) {
+            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalExtensionInterface::class);
         }
 
         $reflection = new \ReflectionClass($class);

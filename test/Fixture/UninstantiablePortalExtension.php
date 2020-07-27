@@ -4,10 +4,10 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
-abstract class UninstantiablePortalExtension implements PortalNodeExtensionInterface
+abstract class UninstantiablePortalExtension implements PortalExtensionInterface
 {
     public function getExplorerDecorators(): ExplorerCollection
     {

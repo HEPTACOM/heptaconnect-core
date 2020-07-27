@@ -4,10 +4,10 @@ namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
-class DependentPortal implements PortalNodeInterface
+class DependentPortal implements PortalInterface
 {
     private ExplorerCollection $explorerCollection;
 

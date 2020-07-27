@@ -4,11 +4,11 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
@@ -23,13 +23,13 @@ class ReceiveService implements ReceiveServiceInterface
 
     private LoggerInterface $logger;
 
-    private PortalNodeRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalNodeRegistry;
 
     public function __construct(
         MappingServiceInterface $mappingService,
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
-        PortalNodeRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalNodeRegistry
     ) {
         $this->mappingService = $mappingService;
         $this->receiveContext = $receiveContext;
@@ -52,12 +52,12 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortalNode($portalNodeKey);
-            if (!$portalNode instanceof PortalNodeInterface) {
+            $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
+            if (!$portalNode instanceof PortalInterface) {
                 continue;
             }
 
-            $portalExtensions = $this->portalNodeRegistry->getPortalNodeExtensions($portalNodeKey);
+            $portalExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
             $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;
             $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {

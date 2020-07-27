@@ -4,15 +4,15 @@ namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\EmitService;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -34,7 +34,7 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::exactly($count))
@@ -59,18 +59,18 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNode = $this->createMock(PortalNodeInterface::class);
+        $portalNode = $this->createMock(PortalInterface::class);
         $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection());
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNodeExtensions')
-            ->willReturn(new PortalNodeExtensionCollection());
+            ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
@@ -95,18 +95,18 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNode = $this->createMock(PortalNodeInterface::class);
+        $portalNode = $this->createMock(PortalInterface::class);
         $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection([new ThrowEmitter()]));
 
-        $portalNodeRegistry = $this->createMock(PortalNodeRegistryInterface::class);
+        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNode')
             ->willReturn($portalNode);
         $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getPortalNodeExtensions')
-            ->willReturn(new PortalNodeExtensionCollection());
+            ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
