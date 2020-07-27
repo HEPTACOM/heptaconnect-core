@@ -28,7 +28,7 @@ class ComposerPortalLoader
     }
 
     /**
-     * @return iterable<array-key, \Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface>
+     * @return iterable<array-key, \Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface>
      */
     public function getPortals(): iterable
     {
@@ -36,10 +36,10 @@ class ComposerPortalLoader
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
-            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface> $portal */
+            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> $portal */
             foreach ($portals as $portal) {
                 try {
-                    yield $this->portalFactory->instantiatePortalNode($portal);
+                    yield $this->portalFactory->instantiatePortal($portal);
                 } catch (AbstractInstantiationException $exception) {
                     $this->logger->critical(LogMessage::PORTAL_LOAD_ERROR(), [
                         'portal' => $portal,
@@ -58,10 +58,10 @@ class ComposerPortalLoader
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
             $portalExtensions = (array) ($package->getConfiguration()['portalExtensions'] ?? []);
 
-            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface> $portalExtension */
+            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface> $portalExtension */
             foreach ($portalExtensions as $portalExtension) {
                 try {
-                    $result->push([$this->portalFactory->instantiatePortalNodeExtension($portalExtension)]);
+                    $result->push([$this->portalFactory->instantiatePortalExtension($portalExtension)]);
                 } catch (AbstractInstantiationException $exception) {
                     $this->logger->critical(LogMessage::PORTAL_EXTENSION_LOAD_ERROR(), [
                         'portalExtension' => $portalExtension,

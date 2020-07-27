@@ -10,25 +10,25 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 class ExploreContext implements ExploreContextInterface
 {
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     private ConfigurationServiceInterface $configurationService;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
     public function __construct(
-        PortalRegistryInterface $portalNodeRegistry,
+        PortalRegistryInterface $portalRegistry,
         ConfigurationServiceInterface $configurationService,
         PortalNodeKeyInterface $portalNodeKey
     ) {
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
         $this->configurationService = $configurationService;
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    public function getPortalNode(): ?PortalInterface
+    public function getPortal(): ?PortalInterface
     {
-        return $this->portalNodeRegistry->getPortal($this->portalNodeKey);
+        return $this->portalRegistry->getPortal($this->portalNodeKey);
     }
 
     public function getConfig(): ?\ArrayAccess

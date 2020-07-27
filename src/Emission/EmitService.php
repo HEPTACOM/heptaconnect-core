@@ -24,18 +24,18 @@ class EmitService implements EmitServiceInterface
 
     private MessageBusInterface $messageBus;
 
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
-        PortalRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalRegistry
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
         $this->messageBus = $messageBus;
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -53,13 +53,13 @@ class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
-            if (!$portalNode instanceof PortalInterface) {
+            $portal = $this->portalRegistry->getPortal($portalNodeKey);
+            if (!$portal instanceof PortalInterface) {
                 continue;
             }
 
-            $portalExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
-            $emitters = $portalNode->getEmitters()->bySupport($entityClassName);
+            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
+            $emitters = $portal->getEmitters()->bySupport($entityClassName);
             $emittingPortalNodes[] = $portalNodeKey;
             $mappingsIterator = $mappings->filter(static function (MappingInterface $mapping) use ($portalNodeKey): bool {
                 return $mapping->getPortalNodeKey()->equals($portalNodeKey);

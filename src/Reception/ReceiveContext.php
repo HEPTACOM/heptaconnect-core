@@ -15,16 +15,16 @@ class ReceiveContext implements ReceiveContextInterface
 
     private ConfigurationServiceInterface $configurationService;
 
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     public function __construct(
         MappingServiceInterface $mappingService,
         ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalRegistry
     ) {
         $this->mappingService = $mappingService;
         $this->configurationService = $configurationService;
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
     }
 
     public function getConfig(MappingInterface $mapping): ?\ArrayAccess
@@ -32,9 +32,9 @@ class ReceiveContext implements ReceiveContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortalNode(MappingInterface $mapping): ?PortalInterface
+    public function getPortal(MappingInterface $mapping): ?PortalInterface
     {
-        return $this->portalNodeRegistry->getPortal($mapping->getPortalNodeKey());
+        return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
     }
 
     public function markAsFailed(MappingInterface $mapping, \Throwable $throwable): void

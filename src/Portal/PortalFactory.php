@@ -7,7 +7,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 
 class PortalFactory implements Contract\PortalFactoryInterface
 {
-    public function instantiatePortalNode(string $class): PortalInterface
+    public function instantiatePortal(string $class): PortalInterface
     {
         if (!\class_exists($class)) {
             throw new Exception\ClassNotFoundOnInstantionException($class);
@@ -32,7 +32,7 @@ class PortalFactory implements Contract\PortalFactoryInterface
         return new $class();
     }
 
-    public function instantiatePortalNodeExtension(string $class): PortalExtensionInterface
+    public function instantiatePortalExtension(string $class): PortalExtensionInterface
     {
         if (!\class_exists($class)) {
             throw new Exception\ClassNotFoundOnInstantionException($class);

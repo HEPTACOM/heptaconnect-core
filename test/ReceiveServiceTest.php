@@ -35,7 +35,7 @@ class ReceiveServiceTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::exactly($count))
@@ -47,7 +47,7 @@ class ReceiveServiceTest extends TestCase
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalNodeRegistry);
+        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalRegistry);
         $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
     }
 
@@ -64,17 +64,17 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE());
 
-        $portalNode = $this->createMock(PortalInterface::class);
-        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
+        $portal = $this->createMock(PortalInterface::class);
+        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection());
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNode')
-            ->willReturn($portalNode);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNodeExtensions')
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortal')
+            ->willReturn($portal);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalExtensions')
             ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
@@ -90,7 +90,7 @@ class ReceiveServiceTest extends TestCase
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $emitContext, $logger, $portalNodeRegistry);
+        $emitService = new ReceiveService($mappingService, $emitContext, $logger, $portalRegistry);
         $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
     }
 
@@ -107,17 +107,17 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_THROW());
 
-        $portalNode = $this->createMock(PortalInterface::class);
-        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
+        $portal = $this->createMock(PortalInterface::class);
+        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection([new ThrowReceiver()]));
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNode')
-            ->willReturn($portalNode);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNodeExtensions')
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortal')
+            ->willReturn($portal);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalExtensions')
             ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
@@ -133,7 +133,7 @@ class ReceiveServiceTest extends TestCase
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalNodeRegistry);
+        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalRegistry);
         $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
     }
 

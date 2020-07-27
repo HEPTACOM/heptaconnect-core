@@ -23,18 +23,18 @@ class ReceiveService implements ReceiveServiceInterface
 
     private LoggerInterface $logger;
 
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     public function __construct(
         MappingServiceInterface $mappingService,
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
-        PortalRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalRegistry
     ) {
         $this->mappingService = $mappingService;
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
     }
 
     public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void
@@ -52,12 +52,12 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
+            $portalNode = $this->portalRegistry->getPortal($portalNodeKey);
             if (!$portalNode instanceof PortalInterface) {
                 continue;
             }
 
-            $portalExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
+            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
             $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;
             $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {

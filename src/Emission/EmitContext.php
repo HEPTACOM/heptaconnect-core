@@ -12,14 +12,14 @@ class EmitContext implements EmitContextInterface
 {
     private ConfigurationServiceInterface $configurationService;
 
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     public function __construct(
         ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalNodeRegistry
+        PortalRegistryInterface $portalRegistry
     ) {
         $this->configurationService = $configurationService;
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
     }
 
     public function getConfig(MappingInterface $mapping): ?\ArrayAccess
@@ -27,8 +27,8 @@ class EmitContext implements EmitContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortalNode(MappingInterface $mapping): ?PortalInterface
+    public function getPortal(MappingInterface $mapping): ?PortalInterface
     {
-        return $this->portalNodeRegistry->getPortal($mapping->getPortalNodeKey());
+        return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
     }
 }

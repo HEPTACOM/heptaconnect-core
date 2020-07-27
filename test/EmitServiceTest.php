@@ -34,14 +34,14 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalNodeRegistry);
+        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalRegistry);
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 
@@ -59,17 +59,17 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNode = $this->createMock(PortalInterface::class);
-        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
+        $portal = $this->createMock(PortalInterface::class);
+        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection());
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNode')
-            ->willReturn($portalNode);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNodeExtensions')
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortal')
+            ->willReturn($portal);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalExtensions')
             ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
@@ -77,7 +77,7 @@ class EmitServiceTest extends TestCase
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalNodeRegistry);
+        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalRegistry);
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 
@@ -95,17 +95,17 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portalNode = $this->createMock(PortalInterface::class);
-        $portalNode->expects($count > 0 ? static::atLeastOnce() : static::never())
+        $portal = $this->createMock(PortalInterface::class);
+        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection([new ThrowEmitter()]));
 
-        $portalNodeRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNode')
-            ->willReturn($portalNode);
-        $portalNodeRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalNodeExtensions')
+        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortal')
+            ->willReturn($portal);
+        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
+            ->method('getPortalExtensions')
             ->willReturn(new PortalExtensionCollection());
 
         $mapping = $this->createMock(MappingInterface::class);
@@ -113,7 +113,7 @@ class EmitServiceTest extends TestCase
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalNodeRegistry);
+        $emitService = new EmitService($emitContext, $logger, $messageBus, $portalRegistry);
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 

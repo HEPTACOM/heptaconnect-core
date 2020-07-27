@@ -19,36 +19,36 @@ class ExploreService implements ExploreServiceInterface
 {
     private ExploreContextFactoryInterface $exploreContextFactory;
 
-    private PortalRegistryInterface $portalNodeRegistry;
+    private PortalRegistryInterface $portalRegistry;
 
     private PublisherInterface $publisher;
 
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
-        PortalRegistryInterface $portalNodeRegistry,
+        PortalRegistryInterface $portalRegistry,
         PublisherInterface $publisher
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
-        $this->portalNodeRegistry = $portalNodeRegistry;
+        $this->portalRegistry = $portalRegistry;
         $this->publisher = $publisher;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
-        $portalNode = $this->portalNodeRegistry->getPortal($portalNodeKey);
+        $portal = $this->portalRegistry->getPortal($portalNodeKey);
 
-        if (!$portalNode instanceof PortalInterface) {
+        if (!$portal instanceof PortalInterface) {
             throw new PortalNodeNotFoundException($portalNodeKey);
         }
 
-        $portalNodeExtensions = $this->portalNodeRegistry->getPortalExtensions($portalNodeKey);
+        $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
 
-        $explorers = $portalNode->getExplorers();
+        $explorers = $portal->getExplorers();
 
-        /** @var PortalExtensionInterface $portalNodeExtension */
-        foreach ($portalNodeExtensions as $portalNodeExtension) {
-            $explorers->push($portalNodeExtension->getExplorerDecorators());
+        /** @var PortalExtensionInterface $portalExtension */
+        foreach ($portalExtensions as $portalExtension) {
+            $explorers->push($portalExtension->getExplorerDecorators());
         }
 
         foreach (self::getSupportedTypes($explorers) as $supportedType) {

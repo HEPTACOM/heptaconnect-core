@@ -32,7 +32,7 @@ class PortalFactoryTest extends TestCase
 
         static::assertInstanceOf(
             \HeptacomFixture\Portal\A\Portal::class,
-            $portalFactory->instantiatePortalNode(\HeptacomFixture\Portal\A\Portal::class)
+            $portalFactory->instantiatePortal(\HeptacomFixture\Portal\A\Portal::class)
         );
     }
 
@@ -43,7 +43,7 @@ class PortalFactoryTest extends TestCase
 
         static::assertInstanceOf(
             \HeptacomFixture\Portal\Extension\PortalExtension::class,
-            $portalFactory->instantiatePortalNodeExtension(\HeptacomFixture\Portal\Extension\PortalExtension::class)
+            $portalFactory->instantiatePortalExtension(\HeptacomFixture\Portal\Extension\PortalExtension::class)
         );
     }
 
@@ -53,7 +53,7 @@ class PortalFactoryTest extends TestCase
 
         try {
             /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
-            $portalFactory->instantiatePortalNode(\DateTime::class);
+            $portalFactory->instantiatePortal(\DateTime::class);
         } catch (UnexpectedClassInheritanceOnInstantionException $exception) {
             static::assertEquals('DateTime', $exception->getClass());
             static::assertEquals(PortalInterface::class, $exception->getExpectedInheritedClass());
@@ -70,7 +70,7 @@ class PortalFactoryTest extends TestCase
 
         try {
             /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
-            $portalFactory->instantiatePortalNodeExtension(\DateTime::class);
+            $portalFactory->instantiatePortalExtension(\DateTime::class);
         } catch (UnexpectedClassInheritanceOnInstantionException $exception) {
             static::assertEquals('DateTime', $exception->getClass());
             static::assertEquals(PortalExtensionInterface::class, $exception->getExpectedInheritedClass());
@@ -87,7 +87,7 @@ class PortalFactoryTest extends TestCase
 
         try {
             /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
-            $portalFactory->instantiatePortalNode('Unknown🙃Class');
+            $portalFactory->instantiatePortal('Unknown🙃Class');
         } catch (ClassNotFoundOnInstantionException $exception) {
             static::assertEquals('Unknown🙃Class', $exception->getClass());
 
@@ -103,7 +103,7 @@ class PortalFactoryTest extends TestCase
 
         try {
             /* @phpstan-ignore-next-line treatPhpDocTypesAsCertain checks soft check but this is the hard check */
-            $portalFactory->instantiatePortalNodeExtension('Unknown🙃Class');
+            $portalFactory->instantiatePortalExtension('Unknown🙃Class');
         } catch (ClassNotFoundOnInstantionException $exception) {
             static::assertEquals('Unknown🙃Class', $exception->getClass());
 
@@ -118,7 +118,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
-            $portalFactory->instantiatePortalNode(UninstantiablePortal::class);
+            $portalFactory->instantiatePortal(UninstantiablePortal::class);
         } catch (InaccessableConstructorOnInstantionException $exception) {
             static::assertEquals(UninstantiablePortal::class, $exception->getClass());
 
@@ -133,7 +133,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
-            $portalFactory->instantiatePortalNodeExtension(UninstantiablePortalExtension::class);
+            $portalFactory->instantiatePortalExtension(UninstantiablePortalExtension::class);
         } catch (InaccessableConstructorOnInstantionException $exception) {
             static::assertEquals(UninstantiablePortalExtension::class, $exception->getClass());
 
@@ -148,7 +148,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
-            $portalFactory->instantiatePortalNode(DependentPortal::class);
+            $portalFactory->instantiatePortal(DependentPortal::class);
         } catch (UnexpectedRequiredParameterInConstructorOnInstantionException $exception) {
             static::assertEquals(DependentPortal::class, $exception->getClass());
 
@@ -163,7 +163,7 @@ class PortalFactoryTest extends TestCase
         $portalFactory = new PortalFactory();
 
         try {
-            $portalFactory->instantiatePortalNodeExtension(DependentPortalExtension::class);
+            $portalFactory->instantiatePortalExtension(DependentPortalExtension::class);
         } catch (UnexpectedRequiredParameterInConstructorOnInstantionException $exception) {
             static::assertEquals(DependentPortalExtension::class, $exception->getClass());
 

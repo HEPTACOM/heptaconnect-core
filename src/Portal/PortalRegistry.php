@@ -36,8 +36,8 @@ class PortalRegistry implements PortalRegistryInterface
             return null;
         }
 
-        /* @phpstan-ignore-next-line $portalClass is class-string<PortalNodeInterface> */
-        return $this->portalFactory->instantiatePortalNode($portalClass);
+        /* @phpstan-ignore-next-line $portalClass is class-string<PortalInterface> */
+        return $this->portalFactory->instantiatePortal($portalClass);
     }
 
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection

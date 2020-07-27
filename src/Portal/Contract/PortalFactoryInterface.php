@@ -9,16 +9,16 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 interface PortalFactoryInterface
 {
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeInterface> $class
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> $class
      *
      * @throws AbstractInstantiationException
      */
-    public function instantiatePortalNode(string $class): PortalInterface;
+    public function instantiatePortal(string $class): PortalInterface;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeExtensionInterface> $class
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface> $class
      *
      * @throws AbstractInstantiationException
      */
-    public function instantiatePortalNodeExtension(string $class): PortalExtensionInterface;
+    public function instantiatePortalExtension(string $class): PortalExtensionInterface;
 }
