@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use HeptacomFixture\Portal\A\Portal;
 use HeptacomFixture\Portal\Extension\PortalExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration
@@ -26,7 +27,8 @@ class ComposerPortalLoaderTest extends TestCase
 
         $loader = new ComposerPortalLoader(
             new PackageConfigurationLoader(__DIR__.'/Fixture/composer-integration/composer.json'),
-            new PortalFactory()
+            new PortalFactory(),
+            $this->createMock(LoggerInterface::class)
         );
         $portals = [...$loader->getPortals()];
         $portalExtensions = $loader->getPortalExtensions();
