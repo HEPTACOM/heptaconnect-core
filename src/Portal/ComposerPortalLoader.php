@@ -6,6 +6,7 @@ use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationL
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Psr\Log\LoggerInterface;
 
@@ -27,11 +28,10 @@ class ComposerPortalLoader
         $this->logger = $logger;
     }
 
-    /**
-     * @return iterable<array-key, \Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface>
-     */
-    public function getPortals(): iterable
+    public function getPortals(): PortalCollection
     {
+        $portalCollection = new PortalCollection();
+
         /** @var PackageConfiguration $package */
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
@@ -39,7 +39,7 @@ class ComposerPortalLoader
             /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> $portal */
             foreach ($portals as $portal) {
                 try {
-                    yield $this->portalFactory->instantiatePortal($portal);
+                    $portalCollection->push([$this->portalFactory->instantiatePortal($portal)]);
                 } catch (AbstractInstantiationException $exception) {
                     $this->logger->critical(LogMessage::PORTAL_LOAD_ERROR(), [
                         'portal' => $portal,
@@ -48,6 +48,8 @@ class ComposerPortalLoader
                 }
             }
         }
+
+        return $portalCollection;
     }
 
     public function getPortalExtensions(): PortalExtensionCollection

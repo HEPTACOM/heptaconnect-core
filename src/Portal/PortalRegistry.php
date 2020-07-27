@@ -36,7 +36,7 @@ class PortalRegistry implements PortalRegistryInterface
             return null;
         }
 
-        /* @phpstan-ignore-next-line $portalClass is class-string<PortalInterface> */
+        /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> */
         return $this->portalFactory->instantiatePortal($portalClass);
     }
 
