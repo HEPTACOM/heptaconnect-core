@@ -4,8 +4,10 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
+use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalNodeExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Psr\Log\LoggerInterface;
 
 class ComposerPortalLoader
 {
@@ -13,10 +15,16 @@ class ComposerPortalLoader
 
     private PortalFactory $portalFactory;
 
-    public function __construct(PackageConfigurationLoaderInterface $packageConfigLoader, PortalFactory $portalFactory)
-    {
+    private LoggerInterface $logger;
+
+    public function __construct(
+        PackageConfigurationLoaderInterface $packageConfigLoader,
+        PortalFactory $portalFactory,
+        LoggerInterface $logger
+    ) {
         $this->packageConfigLoader = $packageConfigLoader;
         $this->portalFactory = $portalFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -33,15 +41,18 @@ class ComposerPortalLoader
                 try {
                     yield $this->portalFactory->instantiatePortalNode($portal);
                 } catch (AbstractInstantiationException $exception) {
-                    // TODO log
+                    $this->logger->critical(LogMessage::PORTAL_LOAD_ERROR(), [
+                        'portal' => $portal,
+                        'exception' => $exception,
+                    ]);
                 }
             }
         }
     }
 
-    public function getPortalExtensions(): PortalNodeExtensionCollection
+    public function getPortalExtensions(): PortalExtensionCollection
     {
-        $result = new PortalNodeExtensionCollection();
+        $result = new PortalExtensionCollection();
 
         /** @var PackageConfiguration $package */
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
@@ -52,7 +63,10 @@ class ComposerPortalLoader
                 try {
                     $result->push([$this->portalFactory->instantiatePortalNodeExtension($portalExtension)]);
                 } catch (AbstractInstantiationException $exception) {
-                    // TODO log
+                    $this->logger->critical(LogMessage::PORTAL_EXTENSION_LOAD_ERROR(), [
+                        'portalExtension' => $portalExtension,
+                        'exception' => $exception,
+                    ]);
                 }
             }
         }
