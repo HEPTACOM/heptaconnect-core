@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
@@ -72,7 +72,7 @@ class ReceiveService implements ReceiveServiceInterface
 
             $hasReceivers = false;
 
-            /** @var ReceiverInterface $receiver */
+            /** @var ReceiverContract $receiver */
             foreach ($receivers as $receiver) {
                 $hasReceivers = true;
                 $stack = new ReceiverStack([
