@@ -36,7 +36,7 @@ class ComposerPortalLoader
         foreach ($this->packageConfigLoader->getPackageConfigurations() as $package) {
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
-            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> $portal */
+            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> $portal */
             foreach ($portals as $portal) {
                 try {
                     $portalCollection->push([$this->portalFactory->instantiatePortal($portal)]);

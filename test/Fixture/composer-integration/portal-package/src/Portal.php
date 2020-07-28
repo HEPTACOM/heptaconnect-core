@@ -4,10 +4,10 @@ namespace HeptacomFixture\Portal\A;
 
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
-class Portal implements PortalInterface
+class Portal extends PortalContract
 {
     public function getExplorers(): ExplorerCollection
     {

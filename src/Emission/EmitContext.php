@@ -6,7 +6,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 
 class EmitContext implements EmitContextInterface
 {
@@ -27,7 +27,7 @@ class EmitContext implements EmitContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortal(MappingInterface $mapping): ?PortalInterface
+    public function getPortal(MappingInterface $mapping): ?PortalContract
     {
         return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
     }

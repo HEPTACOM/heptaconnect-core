@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -59,7 +59,7 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portal = $this->createMock(PortalInterface::class);
+        $portal = $this->createMock(PortalContract::class);
         $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection());
@@ -95,7 +95,7 @@ class EmitServiceTest extends TestCase
 
         $messageBus = $this->createMock(MessageBusInterface::class);
 
-        $portal = $this->createMock(PortalInterface::class);
+        $portal = $this->createMock(PortalContract::class);
         $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getEmitters')
             ->willReturn(new EmitterCollection([new ThrowEmitter()]));

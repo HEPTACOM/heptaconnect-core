@@ -4,8 +4,8 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
@@ -28,15 +28,15 @@ class PortalRegistry implements PortalRegistryInterface
         $this->portalLoader = $portalLoader;
     }
 
-    public function getPortal(PortalNodeKeyInterface $portalNodeKey): ?PortalInterface
+    public function getPortal(PortalNodeKeyInterface $portalNodeKey): ?PortalContract
     {
         $portalClass = $this->storage->getPortalNode($portalNodeKey);
 
-        if (!\is_a($portalClass, PortalInterface::class, true)) {
+        if (!\is_a($portalClass, PortalContract::class, true)) {
             return null;
         }
 
-        /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface> */
+        /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */
         return $this->portalFactory->instantiatePortal($portalClass);
     }
 

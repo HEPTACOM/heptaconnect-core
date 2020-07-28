@@ -11,8 +11,8 @@ use Heptacom\HeptaConnect\Core\Test\Fixture\DependentPortal;
 use Heptacom\HeptaConnect\Core\Test\Fixture\DependentPortalExtension;
 use Heptacom\HeptaConnect\Core\Test\Fixture\UninstantiablePortal;
 use Heptacom\HeptaConnect\Core\Test\Fixture\UninstantiablePortalExtension;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -56,7 +56,7 @@ class PortalFactoryTest extends TestCase
             $portalFactory->instantiatePortal(\DateTime::class);
         } catch (UnexpectedClassInheritanceOnInstantionException $exception) {
             static::assertEquals('DateTime', $exception->getClass());
-            static::assertEquals(PortalInterface::class, $exception->getExpectedInheritedClass());
+            static::assertEquals(PortalContract::class, $exception->getExpectedInheritedClass());
 
             static::assertEquals(0, $exception->getCode());
             static::assertNull($exception->getPrevious());

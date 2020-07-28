@@ -10,8 +10,8 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -38,7 +38,7 @@ class ExploreService implements ExploreServiceInterface
         $context = $this->exploreContextFactory->factory($portalNodeKey);
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
 
-        if (!$portal instanceof PortalInterface) {
+        if (!$portal instanceof PortalContract) {
             throw new PortalNodeNotFoundException($portalNodeKey);
         }
 

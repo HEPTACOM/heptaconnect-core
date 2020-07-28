@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
@@ -64,7 +64,7 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE());
 
-        $portal = $this->createMock(PortalInterface::class);
+        $portal = $this->createMock(PortalContract::class);
         $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection());
@@ -107,7 +107,7 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_THROW());
 
-        $portal = $this->createMock(PortalInterface::class);
+        $portal = $this->createMock(PortalContract::class);
         $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getReceivers')
             ->willReturn(new ReceiverCollection([new ThrowReceiver()]));

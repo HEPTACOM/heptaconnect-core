@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -54,7 +54,7 @@ class EmitService implements EmitServiceInterface
             }
 
             $portal = $this->portalRegistry->getPortal($portalNodeKey);
-            if (!$portal instanceof PortalInterface) {
+            if (!$portal instanceof PortalContract) {
                 continue;
             }
 

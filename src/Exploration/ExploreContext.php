@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ExploreContext implements ExploreContextInterface
@@ -26,7 +26,7 @@ class ExploreContext implements ExploreContextInterface
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    public function getPortal(): ?PortalInterface
+    public function getPortal(): ?PortalContract
     {
         return $this->portalRegistry->getPortal($this->portalNodeKey);
     }

@@ -6,7 +6,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 
 class ReceiveContext implements ReceiveContextInterface
@@ -32,7 +32,7 @@ class ReceiveContext implements ReceiveContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortal(MappingInterface $mapping): ?PortalInterface
+    public function getPortal(MappingInterface $mapping): ?PortalContract
     {
         return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
     }
