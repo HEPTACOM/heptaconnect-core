@@ -5,6 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
@@ -14,13 +15,13 @@ class ComposerPortalLoader
 {
     private PackageConfigurationLoaderInterface $packageConfigLoader;
 
-    private PortalFactory $portalFactory;
+    private PortalFactoryInterface $portalFactory;
 
     private LoggerInterface $logger;
 
     public function __construct(
         PackageConfigurationLoaderInterface $packageConfigLoader,
-        PortalFactory $portalFactory,
+        PortalFactoryInterface $portalFactory,
         LoggerInterface $logger
     ) {
         $this->packageConfigLoader = $packageConfigLoader;
