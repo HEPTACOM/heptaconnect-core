@@ -27,7 +27,7 @@ class ReceiveContext implements ReceiveContextInterface
         $this->portalRegistry = $portalRegistry;
     }
 
-    public function getConfig(MappingInterface $mapping): ?\ArrayAccess
+    public function getConfig(MappingInterface $mapping): ?array
     {
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }

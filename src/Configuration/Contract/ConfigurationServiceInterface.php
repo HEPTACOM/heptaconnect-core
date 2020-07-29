@@ -6,8 +6,5 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 interface ConfigurationServiceInterface
 {
-    /**
-     * @psalm-return \ArrayAccess<array-key, mixed>|null
-     */
-    public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?\ArrayAccess;
+    public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array;
 }

@@ -31,7 +31,7 @@ class ExploreContext implements ExploreContextInterface
         return $this->portalRegistry->getPortal($this->portalNodeKey);
     }
 
-    public function getConfig(): ?\ArrayAccess
+    public function getConfig(): ?array
     {
         return $this->configurationService->getPortalNodeConfiguration($this->portalNodeKey);
     }

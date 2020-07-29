@@ -3,15 +3,27 @@
 namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ConfigurationService implements ConfigurationServiceInterface
 {
-    public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?\ArrayAccess
-    {
-        /** @var \ArrayObject<array-key, mixed> $result */
-        $result = new \ArrayObject();
+    private PortalRegistryInterface $portalRegistry;
 
-        return $result;
+    public function __construct(PortalRegistryInterface $portalRegistry)
+    {
+        $this->portalRegistry = $portalRegistry;
+    }
+
+    public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
+    {
+        $portal = $this->portalRegistry->getPortal($portalNodeKey);
+
+        if (!$portal instanceof PortalContract) {
+            return null;
+        }
+
+        return $portal->getConfigurationTemplate()->resolve();
     }
 }
