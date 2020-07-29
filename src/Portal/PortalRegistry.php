@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
@@ -45,7 +45,7 @@ class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->storage->getPortalNode($portalNodeKey);
         $extensions = $this->portalLoader->getPortalExtensions();
 
-        $extensions = $extensions->filter(function (PortalExtensionInterface $extension) use ($portalClass): bool {
+        $extensions = $extensions->filter(function (PortalExtensionContract $extension) use ($portalClass): bool {
             return \is_a($extension->supports(), $portalClass, true);
         });
 

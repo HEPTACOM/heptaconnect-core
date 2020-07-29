@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -46,7 +46,7 @@ class ExploreService implements ExploreServiceInterface
 
         $explorers = $portal->getExplorers();
 
-        /** @var PortalExtensionInterface $portalExtension */
+        /** @var PortalExtensionContract $portalExtension */
         foreach ($portalExtensions as $portalExtension) {
             $explorers->push($portalExtension->getExplorerDecorators());
         }

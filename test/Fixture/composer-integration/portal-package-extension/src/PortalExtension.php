@@ -2,9 +2,9 @@
 
 namespace HeptacomFixture\Portal\Extension;
 
-use Heptacom\HeptaConnect\Portal\Base\Support\AbstractPortalExtension;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 
-class PortalExtension extends AbstractPortalExtension
+class PortalExtension extends PortalExtensionContract
 {
     public function supports(): string
     {

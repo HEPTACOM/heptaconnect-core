@@ -3,7 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 
 class PortalFactory implements Contract\PortalFactoryInterface
 {
@@ -32,14 +32,14 @@ class PortalFactory implements Contract\PortalFactoryInterface
         return new $class();
     }
 
-    public function instantiatePortalExtension(string $class): PortalExtensionInterface
+    public function instantiatePortalExtension(string $class): PortalExtensionContract
     {
         if (!\class_exists($class)) {
             throw new Exception\ClassNotFoundOnInstantionException($class);
         }
 
-        if (!\is_a($class, PortalExtensionInterface::class, true)) {
-            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalExtensionInterface::class);
+        if (!\is_a($class, PortalExtensionContract::class, true)) {
+            throw new Exception\UnexpectedClassInheritanceOnInstantionException($class, PortalExtensionContract::class);
         }
 
         $reflection = new \ReflectionClass($class);
