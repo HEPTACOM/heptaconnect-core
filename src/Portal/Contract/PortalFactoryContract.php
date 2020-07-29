@@ -42,7 +42,6 @@ abstract class PortalFactoryContract
         return new $class();
     }
 
-
     /**
      * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract> $class
      *
