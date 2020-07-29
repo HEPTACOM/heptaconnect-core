@@ -24,6 +24,13 @@ class ConfigurationService implements ConfigurationServiceInterface
             return null;
         }
 
-        return $portal->getConfigurationTemplate()->resolve();
+        $template = $portal->getConfigurationTemplate();
+        $extensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
+
+        foreach ($extensions as $extension) {
+            $template = $extension->extendConfiguration($template);
+        }
+
+        return $template->resolve();
     }
 }
