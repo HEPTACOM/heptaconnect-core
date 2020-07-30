@@ -6,14 +6,18 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 
 class ConfigurationService implements ConfigurationServiceInterface
 {
     private PortalRegistryInterface $portalRegistry;
 
-    public function __construct(PortalRegistryInterface $portalRegistry)
+    private StorageInterface $storage;
+
+    public function __construct(PortalRegistryInterface $portalRegistry, StorageInterface $storage)
     {
         $this->portalRegistry = $portalRegistry;
+        $this->storage = $storage;
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
@@ -31,6 +35,6 @@ class ConfigurationService implements ConfigurationServiceInterface
             $template = $extension->extendConfiguration($template);
         }
 
-        return $template->resolve();
+        return $template->resolve($this->storage->getConfiguration($portalNodeKey));
     }
 }
