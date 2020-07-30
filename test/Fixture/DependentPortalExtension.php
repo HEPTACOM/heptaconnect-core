@@ -7,7 +7,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
-class DependentPortalExtension implements PortalExtensionContract
+class DependentPortalExtension extends PortalExtensionContract
 {
     public int $number;
 

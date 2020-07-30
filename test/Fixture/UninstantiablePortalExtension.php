@@ -7,7 +7,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 
-abstract class UninstantiablePortalExtension implements PortalExtensionContract
+abstract class UninstantiablePortalExtension extends PortalExtensionContract
 {
     public function getExplorerDecorators(): ExplorerCollection
     {
