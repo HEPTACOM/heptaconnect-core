@@ -20,7 +20,7 @@ class ConfigurationServiceTest extends TestCase
     public function testConfigurationTemplateLoading(): void
     {
         $registry = $this->createMock(PortalRegistryInterface::class);
-        $registry->method('getPortal')->willReturn(new class extends PortalContract {
+        $registry->method('getPortal')->willReturn(new class() extends PortalContract {
             public function getConfigurationTemplate(): OptionsResolver
             {
                 return parent::getConfigurationTemplate()
@@ -41,7 +41,7 @@ class ConfigurationServiceTest extends TestCase
     public function testConfigurationTemplateLoadingWithExtensionOverrides(): void
     {
         $registry = $this->createMock(PortalRegistryInterface::class);
-        $registry->method('getPortal')->willReturn(new class extends PortalContract {
+        $registry->method('getPortal')->willReturn(new class() extends PortalContract {
             public function getConfigurationTemplate(): OptionsResolver
             {
                 return parent::getConfigurationTemplate()
@@ -50,7 +50,7 @@ class ConfigurationServiceTest extends TestCase
             }
         });
         $registry->method('getPortalExtensions')->willReturn(new PortalExtensionCollection([
-            new class extends PortalExtensionContract {
+            new class() extends PortalExtensionContract {
                 public function supports(): string
                 {
                     return PortalContract::class;
@@ -63,7 +63,7 @@ class ConfigurationServiceTest extends TestCase
                         ->setDefault('offset', 1000)
                         ->setDefault('limit', 200);
                 }
-            }
+            },
         ]));
         $storage = $this->createMock(StorageInterface::class);
         $storage->method('getConfiguration')->willReturn([]);
