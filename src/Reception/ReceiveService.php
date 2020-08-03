@@ -46,9 +46,7 @@ class ReceiveService implements ReceiveServiceInterface
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
             $portalNodeKey = $mappedDatasetEntity->getMapping()->getPortalNodeKey();
 
-            if (\array_reduce($receivingPortalNodes, static function (bool $match, PortalNodeKeyInterface $key) use ($portalNodeKey): bool {
-                return $match || $key->equals($portalNodeKey);
-            }, false)) {
+            if (\array_reduce($receivingPortalNodes, fn (bool $match, PortalNodeKeyInterface $key) => $match || $key->equals($portalNodeKey), false)) {
                 continue;
             }
 
@@ -60,9 +58,9 @@ class ReceiveService implements ReceiveServiceInterface
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
             $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;
-            $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
-                return $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey);
-            });
+            $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(
+                fn (MappedDatasetEntityStruct $mappedDatasetEntityStruct) => $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey)
+            );
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct> $mappedDatasetEntitiesForPortalNode */
             $mappedDatasetEntitiesForPortalNode = iterable_to_array($mappedDatasetEntitiesIterator);
             $mappedDatasetEntitiesForPortalNode = new TypedMappedDatasetEntityCollection(

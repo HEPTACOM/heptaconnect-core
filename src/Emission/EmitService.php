@@ -47,9 +47,7 @@ class EmitService implements EmitServiceInterface
         foreach ($mappings as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 
-            if (\array_reduce($emittingPortalNodes, static function (bool $match, PortalNodeKeyInterface $key) use ($portalNodeKey): bool {
-                return $match || $key->equals($portalNodeKey);
-            }, false)) {
+            if (\array_reduce($emittingPortalNodes, fn (bool $match, PortalNodeKeyInterface $key) => $match || $key->equals($portalNodeKey), false)) {
                 continue;
             }
 
@@ -61,9 +59,7 @@ class EmitService implements EmitServiceInterface
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
             $emitters = $portal->getEmitters()->bySupport($entityClassName);
             $emittingPortalNodes[] = $portalNodeKey;
-            $mappingsIterator = $mappings->filter(static function (MappingInterface $mapping) use ($portalNodeKey): bool {
-                return $mapping->getPortalNodeKey()->equals($portalNodeKey);
-            });
+            $mappingsIterator = $mappings->filter(fn (MappingInterface $mapping) => $mapping->getPortalNodeKey()->equals($portalNodeKey));
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface> $mappingsForPortalNode */
             $mappingsForPortalNode = iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);

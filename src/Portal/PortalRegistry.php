@@ -45,9 +45,7 @@ class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->storage->getPortalNode($portalNodeKey);
         $extensions = $this->portalLoader->getPortalExtensions();
 
-        $extensions = $extensions->filter(function (PortalExtensionContract $extension) use ($portalClass): bool {
-            return \is_a($extension->supports(), $portalClass, true);
-        });
+        $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
 
         return new PortalExtensionCollection($extensions);
     }
