@@ -167,7 +167,7 @@
                     "name": "HEPTACOM GmbH"
                 }
             ],
-            "description": "HEPTAConnect base dataset that every other dataset is based on",
+            "description": "HEPTAconnect base dataset that every other dataset is based on",
             "keywords": [
                 "heptaconnect-dataset"
             ],
@@ -237,7 +237,7 @@
                     "name": "HEPTACOM GmbH"
                 }
             ],
-            "description": "HEPTAConnect base dataset that every other portal is based on",
+            "description": "HEPTAconnect base dataset that every other portal is based on",
             "keywords": [
                 "heptaconnect-portal"
             ],

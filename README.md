@@ -1,9 +1,9 @@
-# HEPTAConnect Core
+# HEPTAconnect Core
 #### This is part of HEPTACOM solutions for medium and large enterprises.
 
 ## Description
 
-This is the HEPTAConnect core package. Here are all processes and entrypoints combined.
+This is the HEPTAconnect core package. Here are all processes and entrypoints combined.
 Read more under [Overview](../heptaconnect-docs).
 
 

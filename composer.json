@@ -1,6 +1,6 @@
 {
     "name": "heptacom/heptaconnect-core",
-    "description": "HEPTAConnect core processes",
+    "description": "HEPTAconnect core processes",
     "type": "library",
     "keywords": [
         "heptaconnect",
