@@ -3,7 +3,7 @@
 
 ## Description
 
-This is a HEPTAConnect package.
+This is a HEPTAconnect package.
 Read more under [Overview](../heptaconnect-docs).
 
 

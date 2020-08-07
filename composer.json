@@ -1,6 +1,6 @@
 {
     "name": "heptacom/heptaconnect-repository-base",
-    "description": "HEPTAConnect package",
+    "description": "HEPTAconnect package",
     "type": "library",
     "keywords": [
         "heptaconnect-dataset",
