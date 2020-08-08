@@ -12,9 +12,12 @@ class PackageConfiguration
 
     private array $configuration = [];
 
+    private PackageConfigurationClassMap $autoloadedFiles;
+
     public function __construct()
     {
         $this->tags = new StringCollection();
+        $this->autoloadedFiles = new PackageConfigurationClassMap();
     }
 
     public function getName(): string
@@ -45,5 +48,15 @@ class PackageConfiguration
     public function setConfiguration(array $configuration): void
     {
         $this->configuration = $configuration;
+    }
+
+    public function getAutoloadedFiles(): PackageConfigurationClassMap
+    {
+        return $this->autoloadedFiles;
+    }
+
+    public function setAutoloadedFiles(PackageConfigurationClassMap $autoloadedFiles): void
+    {
+        $this->autoloadedFiles = $autoloadedFiles;
     }
 }

@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration
+ * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationClassMap
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader
  */
@@ -18,14 +19,14 @@ class ComposerPackageConfigurationLoaderTest extends TestCase
         $loader = new PackageConfigurationLoader(__DIR__.'/../test-composer-integration/composer.json');
         $configs = $loader->getPackageConfigurations();
 
-        static::assertCount(2, $configs);
+        static::assertCount(4, $configs);
         static::assertCount(1, $configs->filter(
             fn (PackageConfiguration $pkg): bool => $pkg->getName() === 'heptacom-fixture/heptaconnect-portal-a'
         ));
         static::assertCount(1, $configs->filter(
             fn (PackageConfiguration $pkg): bool => $pkg->getName() === 'heptacom-fixture/heptaconnect-portal-extension-a'
         ));
-        static::assertCount(2, $configs->filter(
+        static::assertCount(3, $configs->filter(
             fn (PackageConfiguration $pkg): bool => $pkg->getTags()->filter(
                     fn (string $tag): bool => str_contains($tag, 'portal')
                 )->valid()
@@ -40,6 +41,9 @@ class ComposerPackageConfigurationLoaderTest extends TestCase
                     \array_keys($pkg->getConfiguration()),
                     fn (string $configKey): bool => str_contains($configKey, 'portal')
                 )) > 0
+        ));
+        static::assertCount(4, $configs->filter(
+            fn (PackageConfiguration $pkg): bool => $pkg->getAutoloadedFiles()->count() > 0
         ));
     }
 }

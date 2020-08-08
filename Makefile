@@ -15,7 +15,7 @@ clean:
 it: csfix cs test
 
 .PHONY: coverage
-coverage: vendor .build test-setup-fixture
+coverage: vendor .build test-refresh-fixture
 	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
 .PHONY: cs
@@ -46,11 +46,17 @@ csfix: vendor .build
 	$(PHP) vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose
 
 .PHONY: infection
-infection: vendor .build test-setup-fixture
+infection: test-setup-fixture run-infection test-clean-fixture
+
+.PHONY: run-infection
+run-infection: vendor .build
 	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json
 
 .PHONY: test
-test: vendor .build test-setup-fixture
+test: test-setup-fixture run-phpunit test-clean-fixture
+
+.PHONY: run-phpunit
+run-phpunit: vendor .build
 	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml
 
 .PHONY: composer-update
@@ -64,9 +70,16 @@ vendor: composer-update
 
 composer.lock: vendor
 
+.PHONY: test-refresh-fixture
+test-refresh-fixture: test-setup-fixture test-clean-fixture
+
 .PHONY: test-setup-fixture
 test-setup-fixture: vendor
+	[[ ! -d test-composer-integration/vendor ]] || rm -rf test/Fixture/composer-integration/vendor
 	[[ ! -d test-composer-integration/vendor ]] || rm -rf test-composer-integration/vendor
 	[[ ! -f test-composer-integration/composer.lock ]] || rm test-composer-integration/composer.lock
 	composer install -d test-composer-integration/
+
+.PHONY: test-clean-fixture
+test-clean-fixture:
 	[[ ! -d test-composer-integration/vendor ]] || rm -rf test-composer-integration/vendor
