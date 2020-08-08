@@ -28,7 +28,7 @@ class PortalFactoryTest extends TestCase
     public function testPortal(): void
     {
         $portalFactory = new PortalFactory();
-        require_once __DIR__.'/Fixture/composer-integration/portal-package/src/Portal.php';
+        require_once __DIR__.'/../test-composer-integration/portal-package/src/Portal.php';
 
         static::assertInstanceOf(
             \HeptacomFixture\Portal\A\Portal::class,
@@ -39,7 +39,7 @@ class PortalFactoryTest extends TestCase
     public function testPortalExtension(): void
     {
         $portalFactory = new PortalFactory();
-        require_once __DIR__.'/Fixture/composer-integration/portal-package-extension/src/PortalExtension.php';
+        require_once __DIR__.'/../test-composer-integration/portal-package-extension/src/PortalExtension.php';
 
         static::assertInstanceOf(
             \HeptacomFixture\Portal\Extension\PortalExtension::class,

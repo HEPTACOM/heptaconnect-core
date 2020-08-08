@@ -15,7 +15,7 @@ class ComposerPackageConfigurationLoaderTest extends TestCase
 {
     public function testLoadingPlugin(): void
     {
-        $loader = new PackageConfigurationLoader(__DIR__.'/Fixture/composer-integration/composer.json');
+        $loader = new PackageConfigurationLoader(__DIR__.'/../test-composer-integration/composer.json');
         $configs = $loader->getPackageConfigurations();
 
         static::assertCount(2, $configs);

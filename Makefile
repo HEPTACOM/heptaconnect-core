@@ -66,7 +66,7 @@ composer.lock: vendor
 
 .PHONY: test-setup-fixture
 test-setup-fixture: vendor
-	[[ ! -d test/Fixture/composer-integration/vendor ]] || rm -rf test/Fixture/composer-integration/vendor
-	[[ ! -f test/Fixture/composer-integration/composer.lock ]] || rm test/Fixture/composer-integration/composer.lock
-	composer install -d test/Fixture/composer-integration/
-	[[ ! -d test/Fixture/composer-integration/vendor ]] || rm -rf test/Fixture/composer-integration/vendor
+	[[ ! -d test-composer-integration/vendor ]] || rm -rf test-composer-integration/vendor
+	[[ ! -f test-composer-integration/composer.lock ]] || rm test-composer-integration/composer.lock
+	composer install -d test-composer-integration/
+	[[ ! -d test-composer-integration/vendor ]] || rm -rf test-composer-integration/vendor

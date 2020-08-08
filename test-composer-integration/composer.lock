@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ab91ee1bf4e522b460f0838546f3c315",
+    "content-hash": "9fa7a7d871200c3bd7d0a548fcf184e0",
     "packages": [
         {
             "name": "bentools/iterable-functions",
@@ -117,8 +117,8 @@
             "version": "dev-master",
             "dist": {
                 "type": "path",
-                "url": "../../../vendor/heptacom/heptaconnect-dataset-base",
-                "reference": "aac7b4b51e9d379075ebdefad7dbe0fe9bddb4ab"
+                "url": "../vendor/heptacom/heptaconnect-dataset-base",
+                "reference": "76cbec2429dda10502f8f20be20387edcd60e618"
             },
             "require": {
                 "bentools/iterable-functions": ">=1",
@@ -180,8 +180,8 @@
             "version": "dev-master",
             "dist": {
                 "type": "path",
-                "url": "../../../vendor/heptacom/heptaconnect-portal-base",
-                "reference": "5fb2bb948d96fa6a3a1cfe7cce805634a62e1e28"
+                "url": "../vendor/heptacom/heptaconnect-portal-base",
+                "reference": "20f9a5f7a5d7a33b79828cc9f8b71f2ae04557ec"
             },
             "require": {
                 "bentools/iterable-functions": ">=1.4",

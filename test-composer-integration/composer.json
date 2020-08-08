@@ -14,7 +14,7 @@
         },
         {
             "type": "path",
-            "url": "../../../vendor/heptacom/*"
+            "url": "../vendor/heptacom/*"
         }
     ],
     "require": {
