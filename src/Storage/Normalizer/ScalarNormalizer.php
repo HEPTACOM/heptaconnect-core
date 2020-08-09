@@ -1,0 +1,28 @@
+<?php declare(strict_types=1);
+
+namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
+
+use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+
+class ScalarNormalizer implements NormalizerInterface
+{
+    public function getType(): string
+    {
+        return 'scalar';
+    }
+
+    public function normalize($object, $format = null, array $context = [])
+    {
+        if (!$this->supportsNormalization($object)) {
+            throw new InvalidArgumentException();
+        }
+
+        return \serialize($object);
+    }
+
+    public function supportsNormalization($data, $format = null)
+    {
+        return \is_bool($data) || \is_string($data) || \is_null($data) || \is_float($data) || \is_int($data);
+    }
+}
