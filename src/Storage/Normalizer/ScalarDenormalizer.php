@@ -18,13 +18,13 @@ class ScalarDenormalizer implements DenormalizerInterface
             throw new InvalidArgumentException();
         }
 
-        return \unserialize($data, false);
+        return \unserialize($data, ['allowed_classes' => false]);
     }
 
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()
             && \is_string($data)
-            && (\unserialize($data, false) !== false || $data === 'b:0;');
+            && (\unserialize($data, ['allowed_classes' => false]) !== false || $data === 'b:0;');
     }
 }
