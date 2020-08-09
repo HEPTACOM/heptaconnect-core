@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Component\Webhook;
+namespace Heptacom\HeptaConnect\Core\Webhook;
 
-use Heptacom\HeptaConnect\Core\Component\Webhook\Contract\UrlProviderInterface;
+use Heptacom\HeptaConnect\Core\Webhook\Contract\UrlProviderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookServiceInterface;
