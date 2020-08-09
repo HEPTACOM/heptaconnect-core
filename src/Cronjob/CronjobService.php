@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Component\Cronjob;
+namespace Heptacom\HeptaConnect\Core\Cronjob;
 
 use Cron\CronExpression;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
