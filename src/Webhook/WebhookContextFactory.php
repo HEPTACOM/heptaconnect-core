@@ -4,40 +4,25 @@ namespace Heptacom\HeptaConnect\Core\Webhook;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 
-class WebhookContext implements WebhookContextInterface
+class WebhookContextFactory
 {
     private ConfigurationServiceInterface $configurationService;
 
     private PortalRegistryInterface $portalRegistry;
 
-    private WebhookInterface $webhook;
-
     public function __construct(
         ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalRegistry,
-        WebhookInterface $webhook
+        PortalRegistryInterface $portalRegistry
     ) {
         $this->configurationService = $configurationService;
         $this->portalRegistry = $portalRegistry;
-        $this->webhook = $webhook;
     }
 
-    public function getPortal(): PortalContract
+    public function createContext(WebhookInterface $webhook): WebhookContextInterface
     {
-        return $this->portalRegistry->getPortal($this->webhook->getPortalNodeKey());
-    }
-
-    public function getConfig(): ?array
-    {
-        return $this->configurationService->getPortalNodeConfiguration($this->webhook->getPortalNodeKey());
-    }
-
-    public function getWebhook(): WebhookInterface
-    {
-        return $this->webhook;
+        return new WebhookContext($this->configurationService, $this->portalRegistry, $webhook);
     }
 }

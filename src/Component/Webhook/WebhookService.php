@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Component\Webhook;
 
 use Heptacom\HeptaConnect\Core\Component\Webhook\Contract\UrlProviderInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookServiceInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
@@ -19,15 +20,14 @@ class WebhookService implements WebhookServiceInterface
         $this->urlProvider = $urlProvider;
     }
 
-    public function register(string $webhookHandler, ?array $payload = null): WebhookInterface
+    public function register(PortalNodeKeyInterface $portalNodeKey, string $webhookHandler, ?array $payload = null): WebhookInterface
     {
-        $webhook = $this->storage->createWebhook(
+        return $this->storage->createWebhook(
+            $portalNodeKey,
             $this->urlProvider->provide()->getPath(),
             $webhookHandler,
             $payload
         );
-
-        return $webhook;
     }
 
     public function scheduleRefresh(WebhookInterface $webhook, \DateTimeInterface $dateTime): void
