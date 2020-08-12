@@ -26,7 +26,9 @@ class MappingService implements MappingServiceInterface
     {
         $existingMapping = $this->storage->getMapping($mapping->getMappingNodeKey(), $mapping->getPortalNodeKey());
 
-        if (!$existingMapping instanceof MappingInterface) {
+        if ($existingMapping instanceof MappingInterface) {
+            $this->storage->updateMappings(new MappingCollection([$mapping]));
+        } else {
             $this->storage->createMappings(new MappingCollection([$mapping]));
         }
     }
