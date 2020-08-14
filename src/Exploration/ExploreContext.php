@@ -32,7 +32,7 @@ class ExploreContext implements ExploreContextInterface
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    public function getPortal(): ?PortalContract
+    public function getPortal(): PortalContract
     {
         return $this->portalRegistry->getPortal($this->portalNodeKey);
     }

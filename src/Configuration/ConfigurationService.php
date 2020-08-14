@@ -4,7 +4,6 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -72,10 +71,6 @@ class ConfigurationService implements ConfigurationServiceInterface
     private function getMergedConfigurationTemplate(PortalNodeKeyInterface $portalNodeKey): ?OptionsResolver
     {
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
-
-        if (!($portal instanceof PortalContract)) {
-            return null;
-        }
 
         $template = $portal->getConfigurationTemplate();
         $extensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);

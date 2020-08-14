@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
@@ -51,10 +50,6 @@ class ReceiveService implements ReceiveServiceInterface
             }
 
             $portalNode = $this->portalRegistry->getPortal($portalNodeKey);
-            if (!$portalNode instanceof PortalContract) {
-                continue;
-            }
-
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
             $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;

@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 interface PortalRegistryInterface
 {
-    public function getPortal(PortalNodeKeyInterface $portalNodeKey): ?PortalContract;
+    public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract;
 
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection;
 }

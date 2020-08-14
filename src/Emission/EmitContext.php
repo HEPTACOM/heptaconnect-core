@@ -33,7 +33,7 @@ class EmitContext implements EmitContextInterface
         return $this->configurationService->getPortalNodeConfiguration($mapping->getPortalNodeKey());
     }
 
-    public function getPortal(MappingInterface $mapping): ?PortalContract
+    public function getPortal(MappingInterface $mapping): PortalContract
     {
         return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
     }

@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 
 class PortalRegistry implements PortalRegistryInterface
 {
@@ -28,12 +29,12 @@ class PortalRegistry implements PortalRegistryInterface
         $this->portalLoader = $portalLoader;
     }
 
-    public function getPortal(PortalNodeKeyInterface $portalNodeKey): ?PortalContract
+    public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
         $portalClass = $this->storage->getPortalNode($portalNodeKey);
 
         if (!\is_a($portalClass, PortalContract::class, true)) {
-            return null;
+            throw new InvalidPortalNodeKeyException($portalNodeKey);
         }
 
         /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */

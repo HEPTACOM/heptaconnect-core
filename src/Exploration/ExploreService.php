@@ -4,13 +4,11 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
-use Heptacom\HeptaConnect\Core\Exploration\Exception\PortalNodeNotFoundException;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -37,10 +35,6 @@ class ExploreService implements ExploreServiceInterface
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
-
-        if (!$portal instanceof PortalContract) {
-            throw new PortalNodeNotFoundException($portalNodeKey);
-        }
 
         $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
 
