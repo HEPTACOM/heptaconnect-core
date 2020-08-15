@@ -96,6 +96,8 @@ class EmitService implements EmitServiceInterface
                     ]);
                 }
             }
+
+            unset($stacks);
         }
     }
 
