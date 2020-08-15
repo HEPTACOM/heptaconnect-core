@@ -117,6 +117,9 @@ class EmitService implements EmitServiceInterface
             }
         }
 
-        return $this->emitterStackCache[$cacheKey] ??= [];
+        return array_map(
+            fn (EmitterStackInterface $emitterStack) => clone $emitterStack,
+            $this->emitterStackCache[$cacheKey] ??= []
+        );
     }
 }
