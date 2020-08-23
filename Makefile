@@ -43,7 +43,7 @@ cs-soft-require: vendor .build
 
 .PHONY: cs-composer-normalize
 cs-composer-normalize: vendor
-	$(COMPOSER) normalize --diff --dry-run composer.json
+	$(COMPOSER) normalize --diff --dry-run --no-check-lock --no-update-lock composer.json
 
 .PHONY: cs-fix-composer-normalize
 cs-fix-composer-normalize: vendor
