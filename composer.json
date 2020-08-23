@@ -1,7 +1,7 @@
 {
     "name": "heptacom/heptaconnect-core",
-    "description": "HEPTAconnect core processes",
     "type": "library",
+    "description": "HEPTAconnect core processes",
     "keywords": [
         "heptaconnect",
         "messaging"
@@ -10,7 +10,6 @@
         "AGPL-3.0-or-later",
         "proprietary"
     ],
-    "minimum-stability": "stable",
     "authors": [
         {
             "name": "HEPTACOM GmbH"
@@ -19,47 +18,46 @@
     "require": {
         "php": ">=7.4",
         "ext-json": "*",
+        "bentools/iterable-functions": "^1.4",
         "composer/composer": ">=1",
-        "heptacom/heptaconnect-portal-base": "@dev",
+        "dragonmantank/cron-expression": ">=3",
         "heptacom/heptaconnect-dataset-base": "@dev",
+        "heptacom/heptaconnect-portal-base": "@dev",
         "heptacom/heptaconnect-storage-base": "@dev",
-        "symfony/messenger": "^4.0 || ^5.0",
-        "symfony/polyfill-php80": ">=1.15",
         "psr/http-message": "^1.0",
         "psr/log": "^1.1",
-        "bentools/iterable-functions": "^1.4",
-        "dragonmantank/cron-expression": ">=3"
+        "symfony/messenger": "^4.0 || ^5.0",
+        "symfony/polyfill-php80": ">=1.15"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": ">=2.7",
+        "friendsofphp/php-cs-fixer": ">=2",
+        "icanhazstring/composer-unused": ">=0.7",
+        "infection/infection": ">=0.15",
+        "maglnet/composer-require-checker": ">=2",
+        "phpstan/extension-installer": ">=1",
+        "phpstan/phpstan": ">=0.12",
+        "phpstan/phpstan-deprecation-rules": ">=0.12",
+        "phpstan/phpstan-phpunit": ">=0.12",
+        "phpstan/phpstan-strict-rules": ">=0.12",
+        "phpunit/phpunit": ">=9.1 <10",
+        "psalm/plugin-phpunit": ">=0.10",
+        "vimeo/psalm": ">=3"
+    },
+    "extra": {
+        "unused": [
+            "bentools/iterable-functions"
+        ]
     },
     "autoload": {
         "psr-4": {
             "Heptacom\\HeptaConnect\\Core\\": "src/"
         }
     },
-    "require-dev": {
-        "phpunit/phpunit": ">=9.1 <10",
-        "phpstan/phpstan": ">=0.12",
-        "phpstan/extension-installer": ">=1",
-        "phpstan/phpstan-phpunit": ">=0.12",
-        "phpstan/phpstan-deprecation-rules": ">=0.12",
-        "phpstan/phpstan-strict-rules": ">=0.12",
-        "psalm/plugin-phpunit": ">=0.10",
-        "vimeo/psalm": ">=3",
-        "infection/infection": ">=0.15",
-        "friendsofphp/php-cs-fixer": ">=2",
-        "maglnet/composer-require-checker": ">=2",
-        "icanhazstring/composer-unused": ">=0.7"
-    },
-    "conflict": {
-        "nikic/php-parser": "4.7.0"
-    },
     "autoload-dev": {
         "psr-4": {
             "Heptacom\\HeptaConnect\\Core\\Test\\": "test/"
         }
     },
-    "extra": {
-        "unused": [
-            "bentools/iterable-functions"
-        ]
-    }
+    "minimum-stability": "stable"
 }

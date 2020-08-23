@@ -26,11 +26,6 @@ pipelines:
                     - make vendor
         -   step:
                 <<: *default-step
-                name: Code style and static code analysis
-                script:
-                    - make cs
-        -   step:
-                <<: *default-step
                 name: Unit test
                 script:
                     - make test
@@ -39,6 +34,15 @@ pipelines:
                 name: Unit test coverage
                 script:
                     - make coverage
+        -   step:
+                name: Lint json files
+                script:
+                    - "for json in $(find . -name '*.json') ; do jq . $json || exit 1 ; done"
+        -   step:
+                <<: *default-step
+                name: Code style and static code analysis
+                script:
+                    - make cs
         -   step:
                 <<: *default-step
                 name: Unit test infection detection
