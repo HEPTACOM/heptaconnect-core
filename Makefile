@@ -3,7 +3,7 @@ PHP := $(shell which php)
 COMPOSER := $(PHP) $(shell which composer)
 
 .PHONY: all
-all: clean csfix cs test coverage infection
+all: clean it coverage infection
 
 .PHONY: clean
 clean:
