@@ -55,7 +55,10 @@ csfix: vendor .build
 
 .PHONY: infection
 infection: vendor .build
-	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json
+	# Can be simplified when infection/infection#1283 is resolved
+	[[ -d .build/phpunit-logs ]] || mkdir -p .build/.phpunit-coverage
+	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-xml=.build/.phpunit-coverage/xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json --coverage=../.build/.phpunit-coverage --show-mutations --no-interaction
 
 .PHONY: test
 test: vendor .build
