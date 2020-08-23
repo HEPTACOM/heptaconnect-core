@@ -19,9 +19,12 @@
             <directory>.</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist addUncoveredFilesFromWhitelist="true" processUncoveredFilesFromWhitelist="true">
+    <coverage
+        includeUncoveredFiles="true"
+        processUncoveredFiles="true"
+    >
+        <include>
             <directory suffix=".php">../src/</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
 </phpunit>
