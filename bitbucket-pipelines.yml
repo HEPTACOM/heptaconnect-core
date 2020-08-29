@@ -35,10 +35,6 @@ pipelines:
                 script:
                     - make coverage
         -   step:
-                name: Lint json files
-                script:
-                    - "for json in $(find . -name '*.json') ; do jq . $json || exit 1 ; done"
-        -   step:
                 <<: *default-step
                 name: Code style and static code analysis
                 script:

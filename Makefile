@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 PHP := $(shell which php)
 COMPOSER := $(PHP) $(shell which composer)
+JQ := $(shell which jq)
+JSON_FILES := $(shell find . -name '*.json' -not -path './vendor/*')
 
 .PHONY: all
 all: clean it coverage infection
@@ -19,7 +21,7 @@ coverage: vendor .build
 	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
 
 .PHONY: cs
-cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused cs-composer-normalize
+cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused cs-composer-normalize cs-json
 
 .PHONY: cs-fixer-dry-run
 cs-fixer-dry-run: vendor .build
@@ -44,6 +46,13 @@ cs-soft-require: vendor .build
 .PHONY: cs-composer-normalize
 cs-composer-normalize: vendor
 	$(COMPOSER) normalize --diff --dry-run --no-check-lock --no-update-lock composer.json
+
+.PHONY: cs-json
+cs-json: $(JSON_FILES)
+
+.PHONY: $(JSON_FILES)
+$(JSON_FILES):
+	$(JQ) . "$@"
 
 .PHONY: cs-fix-composer-normalize
 cs-fix-composer-normalize: vendor
