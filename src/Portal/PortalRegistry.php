@@ -19,6 +19,12 @@ class PortalRegistry implements PortalRegistryInterface
 
     private ComposerPortalLoader $portalLoader;
 
+    private array $cache = [
+        'classes' => [],
+        'portals' => [],
+        'portalExtensions' => [],
+    ];
+
     public function __construct(
         PortalFactoryContract $portalFactory,
         StorageInterface $storage,
@@ -31,23 +37,35 @@ class PortalRegistry implements PortalRegistryInterface
 
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
-        $portalClass = $this->storage->getPortalNode($portalNodeKey);
+        $cacheKey = \md5(\json_encode($portalNodeKey));
+        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
 
-        if (!\is_a($portalClass, PortalContract::class, true)) {
-            throw new InvalidPortalNodeKeyException($portalNodeKey);
+        if (!isset($this->cache['portals'][$portalClass])) {
+            if (!\is_a($portalClass, PortalContract::class, true)) {
+                throw new InvalidPortalNodeKeyException($portalNodeKey);
+            }
+
+            /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */
+            $this->cache['portals'][$portalClass] = $this->portalFactory->instantiatePortal($portalClass);
         }
 
-        /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */
-        return $this->portalFactory->instantiatePortal($portalClass);
+        return $this->cache['portals'][$portalClass];
     }
 
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
-        $portalClass = $this->storage->getPortalNode($portalNodeKey);
-        $extensions = $this->portalLoader->getPortalExtensions();
+        $cacheKey = \md5(\json_encode($portalNodeKey));
+        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
 
-        $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
+        if (!isset($this->cache['portalExtensions'][$portalClass])) {
+            $portalClass = $this->storage->getPortalNode($portalNodeKey);
+            $extensions = $this->portalLoader->getPortalExtensions();
 
-        return new PortalExtensionCollection($extensions);
+            $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
+
+            $this->cache['portalExtensions'][$portalClass] = new PortalExtensionCollection($extensions);
+        }
+
+        return $this->cache['portalExtensions'][$portalClass];
     }
 }
