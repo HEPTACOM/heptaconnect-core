@@ -6,10 +6,11 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
@@ -23,6 +24,8 @@ class ReceiveService implements ReceiveServiceInterface
     private LoggerInterface $logger;
 
     private PortalRegistryInterface $portalRegistry;
+
+    private array $receiverStackCache = [];
 
     public function __construct(
         MappingServiceInterface $mappingService,
@@ -49,9 +52,6 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            $portalNode = $this->portalRegistry->getPortal($portalNodeKey);
-            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $receivers = $portalNode->getReceivers()->bySupport($entityClassName);
             $receivingPortalNodes[] = $portalNodeKey;
             $mappedDatasetEntitiesIterator = $mappedDatasetEntities->filter(
                 fn (MappedDatasetEntityStruct $mappedDatasetEntityStruct) => $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey)
@@ -63,35 +63,67 @@ class ReceiveService implements ReceiveServiceInterface
                 $mappedDatasetEntitiesForPortalNode
             );
 
-            $hasReceivers = false;
-
-            /** @var ReceiverContract $receiver */
-            foreach ($receivers as $receiver) {
-                $hasReceivers = true;
-                $stack = new ReceiverStack([
-                    ...$portalExtensions->getReceiverDecorators()->bySupport($entityClassName),
-                    $receiver,
+            try {
+                $stacks = $this->getReceiverStacks($portalNodeKey, $entityClassName);
+            } catch (\Throwable $exception) {
+                $this->logger->critical(LogMessage::RECEIVE_NO_STACKS(), [
+                    'type' => $entityClassName,
+                    'portalNodeKey' => $portalNodeKey,
+                    'exception' => $exception,
                 ]);
 
+                continue;
+            }
+
+            if (empty($stacks)) {
+                $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), [
+                    'type' => $entityClassName,
+                    'portalNodeKey' => $portalNodeKey,
+                ]);
+
+                continue;
+            }
+
+            /** @var ReceiverStackInterface $stack */
+            foreach ($stacks as $stack) {
                 try {
+                    /** @var MappingInterface $mapping */
                     foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
                         $this->mappingService->save($mapping);
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
                         'type' => $entityClassName,
-                        'receiver' => \get_class($receiver),
+                        'portalNodeKey' => $portalNodeKey,
+                        'stack' => $stack,
                         'exception' => $exception,
                     ]);
                 }
             }
+        }
+    }
 
-            if (!$hasReceivers) {
-                $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), [
-                    'type' => $entityClassName,
-                    'portalNodeKey' => $portalNodeKey,
-                ]);
+    /**
+     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\ReceiverStackInterface>
+     */
+    private function getReceiverStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
+    {
+        $cacheKey = \md5(\join([\json_encode($portalNodeKey), $entityClassName]));
+
+        if (!isset($this->receiverStackCache[$cacheKey])) {
+            $portal = $this->portalRegistry->getPortal($portalNodeKey);
+            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
+            $receivers = $portal->getReceivers()->bySupport($entityClassName);
+            $receiverDecorators = $portalExtensions->getReceiverDecorators()->bySupport($entityClassName);
+
+            foreach ($receivers as $receiver) {
+                $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators, $receiver]);
             }
         }
+
+        return \array_map(
+            fn (ReceiverStackInterface $receiverStack) => clone $receiverStack,
+            $this->receiverStackCache[$cacheKey] ??= []
+        );
     }
 }
