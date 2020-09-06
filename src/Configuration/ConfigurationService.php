@@ -5,16 +5,16 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConfigurationService implements ConfigurationServiceInterface
 {
     private PortalRegistryInterface $portalRegistry;
 
-    private StorageInterface $storage;
+    private ConfigurationStorageContract $storage;
 
-    public function __construct(PortalRegistryInterface $portalRegistry, StorageInterface $storage)
+    public function __construct(PortalRegistryInterface $portalRegistry, ConfigurationStorageContract $storage)
     {
         $this->portalRegistry = $portalRegistry;
         $this->storage = $storage;
