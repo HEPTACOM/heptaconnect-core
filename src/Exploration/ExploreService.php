@@ -54,7 +54,13 @@ class ExploreService implements ExploreServiceInterface
                     continue;
                 }
 
-                $this->publisher->publish(\get_class($entity), $portalNodeKey, $entity->getPrimaryKey());
+                $externalId = $entity->getPrimaryKey();
+
+                if ($externalId === null) {
+                    continue;
+                }
+
+                $this->publisher->publish(\get_class($entity), $portalNodeKey, $externalId);
             }
         }
     }

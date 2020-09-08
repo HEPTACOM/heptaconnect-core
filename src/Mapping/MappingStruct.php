@@ -28,7 +28,7 @@ class MappingStruct implements MappingInterface
         return $this->externalId;
     }
 
-    public function setExternalId(string $externalId): MappingInterface
+    public function setExternalId(?string $externalId): MappingInterface
     {
         $this->externalId = $externalId;
 

@@ -6,6 +6,7 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Support\DatasetEntityTracker;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
@@ -88,9 +89,17 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterStackInterface $stack */
             foreach ($stacks as $stack) {
                 try {
+                    DatasetEntityTracker::listen();
+
                     /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
-                        $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
+                        try {
+                            $trackedEntities = DatasetEntityTracker::retrieve();
+
+                            $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
+                        } finally {
+                            DatasetEntityTracker::listen();
+                        }
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
@@ -99,6 +108,8 @@ class EmitService implements EmitServiceInterface
                         'stack' => $stack,
                         'exception' => $exception,
                     ]);
+                } finally {
+                    DatasetEntityTracker::retrieve();
                 }
             }
 
