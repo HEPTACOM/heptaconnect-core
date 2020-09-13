@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
@@ -25,18 +26,22 @@ class ReceiveService implements ReceiveServiceInterface
 
     private PortalRegistryInterface $portalRegistry;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     private array $receiverStackCache = [];
 
     public function __construct(
         MappingServiceInterface $mappingService,
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
-        PortalRegistryInterface $portalRegistry
+        PortalRegistryInterface $portalRegistry,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->mappingService = $mappingService;
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
         $this->portalRegistry = $portalRegistry;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void
@@ -108,7 +113,7 @@ class ReceiveService implements ReceiveServiceInterface
      */
     private function getReceiverStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
     {
-        $cacheKey = \md5(\join([\json_encode($portalNodeKey), $entityClassName]));
+        $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]));
 
         if (!isset($this->receiverStackCache[$cacheKey])) {
             $portal = $this->portalRegistry->getPortal($portalNodeKey);

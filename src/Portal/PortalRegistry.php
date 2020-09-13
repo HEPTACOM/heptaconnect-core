@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 
 class PortalRegistry implements PortalRegistryInterface
@@ -19,6 +20,8 @@ class PortalRegistry implements PortalRegistryInterface
 
     private ComposerPortalLoader $portalLoader;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     private array $cache = [
         'classes' => [],
         'portals' => [],
@@ -28,16 +31,18 @@ class PortalRegistry implements PortalRegistryInterface
     public function __construct(
         PortalFactoryContract $portalFactory,
         StorageInterface $storage,
-        ComposerPortalLoader $portalLoader
+        ComposerPortalLoader $portalLoader,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->portalFactory = $portalFactory;
         $this->storage = $storage;
         $this->portalLoader = $portalLoader;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
-        $cacheKey = \md5(\json_encode($portalNodeKey));
+        $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey));
         $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
 
         if (!isset($this->cache['portals'][$portalClass])) {
@@ -54,7 +59,7 @@ class PortalRegistry implements PortalRegistryInterface
 
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
-        $cacheKey = \md5(\json_encode($portalNodeKey));
+        $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey));
         $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
 
         if (!isset($this->cache['portalExtensions'][$portalClass])) {

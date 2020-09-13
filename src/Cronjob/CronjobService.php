@@ -7,21 +7,25 @@ use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Exception\InvalidCronExpressionException;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\CronjobKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\CronjobRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
-use Heptacom\HeptaConnect\Storage\Base\Exception\StorageMethodNotImplemented;
 
 class CronjobService implements CronjobServiceInterface
 {
-    private StorageInterface $storage;
+    private CronjobRepositoryContract $cronjobRepository;
 
-    public function __construct(StorageInterface $storage)
+    public function __construct(CronjobRepositoryContract $cronjobRepository)
     {
-        $this->storage = $storage;
+        $this->cronjobRepository = $cronjobRepository;
     }
 
-    public function register(string $cronjobHandler, string $cronExpression, ?array $payload = null): CronjobInterface
-    {
+    public function register(
+        PortalNodeKeyInterface $portalNodeKey,
+        string $cronjobHandler,
+        string $cronExpression,
+        ?array $payload = null
+    ): CronjobInterface {
         if (!CronExpression::isValidExpression($cronExpression)) {
             throw new InvalidCronExpressionException($cronExpression);
         }
@@ -32,15 +36,14 @@ class CronjobService implements CronjobServiceInterface
             throw new InvalidCronExpressionException($cronExpression, $t);
         }
 
-        return $this->storage->createCronjob($cronExpression, $cronjobHandler, $nextExecution, $payload);
+        return $this->cronjobRepository->create($portalNodeKey, $cronExpression, $cronjobHandler, $nextExecution, $payload);
     }
 
     public function unregister(CronjobKeyInterface $cronjobKey): void
     {
         try {
-            $this->storage->removeCronjob($cronjobKey);
+            $this->cronjobRepository->delete($cronjobKey);
         } catch (NotFoundException $e) {
-        } catch (StorageMethodNotImplemented $e) {
         }
     }
 }

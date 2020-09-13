@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -26,18 +27,22 @@ class EmitService implements EmitServiceInterface
 
     private PortalRegistryInterface $portalRegistry;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     private array $emitterStackCache = [];
 
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
-        PortalRegistryInterface $portalRegistry
+        PortalRegistryInterface $portalRegistry,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
         $this->messageBus = $messageBus;
         $this->portalRegistry = $portalRegistry;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -106,7 +111,7 @@ class EmitService implements EmitServiceInterface
      */
     private function getEmitterStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
     {
-        $cacheKey = \md5(\join([\json_encode($portalNodeKey), $entityClassName]));
+        $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]));
 
         if (!isset($this->emitterStackCache[$cacheKey])) {
             $portal = $this->portalRegistry->getPortal($portalNodeKey);
