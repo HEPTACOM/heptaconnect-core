@@ -7,34 +7,34 @@ use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 
 class PortalStorage implements PortalStorageInterface
 {
     private NormalizationRegistry $normalizationRegistry;
 
-    private StorageInterface $storage;
+    private PortalStorageContract $portalStorage;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
     public function __construct(
         NormalizationRegistry $normalizationRegistry,
-        StorageInterface $storage,
+        PortalStorageContract $portalStorage,
         PortalNodeKeyInterface $portalNodeKey
     ) {
         $this->normalizationRegistry = $normalizationRegistry;
-        $this->storage = $storage;
+        $this->portalStorage = $portalStorage;
         $this->portalNodeKey = $portalNodeKey;
     }
 
     public function get(string $key)
     {
-        if (!$this->storage->hasPortalStorageValue($this->portalNodeKey, $key)) {
+        if (!$this->portalStorage->has($this->portalNodeKey, $key)) {
             return null;
         }
 
-        $value = $this->storage->getPortalStorageValue($this->portalNodeKey, $key);
-        $type = $this->storage->getPortalStorageType($this->portalNodeKey, $key);
+        $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
+        $type = $this->portalStorage->getType($this->portalNodeKey, $key);
         $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
 
         if (!$denormalizer instanceof DenormalizerInterface) {
@@ -56,7 +56,7 @@ class PortalStorage implements PortalStorageInterface
             return;
         }
 
-        $this->storage->setPortalStorageValue(
+        $this->portalStorage->set(
             $this->portalNodeKey,
             $key,
             (string) $normalizer->normalize($value),
@@ -66,12 +66,12 @@ class PortalStorage implements PortalStorageInterface
 
     public function has(string $key): bool
     {
-        return $this->storage->hasPortalStorageValue($this->portalNodeKey, $key);
+        return $this->portalStorage->has($this->portalNodeKey, $key);
     }
 
     public function unset(string $key): void
     {
-        $this->storage->unsetPortalStorageValue($this->portalNodeKey, $key);
+        $this->portalStorage->unset($this->portalNodeKey, $key);
     }
 
     public function canGet(string $type): bool
