@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\PortalNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 
@@ -16,7 +16,7 @@ class PortalRegistry implements PortalRegistryInterface
 {
     private PortalFactoryContract $portalFactory;
 
-    private StorageInterface $storage;
+    private PortalNodeRepositoryContract $portalNodeRepository;
 
     private ComposerPortalLoader $portalLoader;
 
@@ -30,12 +30,12 @@ class PortalRegistry implements PortalRegistryInterface
 
     public function __construct(
         PortalFactoryContract $portalFactory,
-        StorageInterface $storage,
+        PortalNodeRepositoryContract $portalNodeRepository,
         ComposerPortalLoader $portalLoader,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->portalFactory = $portalFactory;
-        $this->storage = $storage;
+        $this->portalNodeRepository = $portalNodeRepository;
         $this->portalLoader = $portalLoader;
         $this->storageKeyGenerator = $storageKeyGenerator;
     }
@@ -43,7 +43,7 @@ class PortalRegistry implements PortalRegistryInterface
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
         $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey));
-        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
+        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->portalNodeRepository->read($portalNodeKey));
 
         if (!isset($this->cache['portals'][$portalClass])) {
             if (!\is_a($portalClass, PortalContract::class, true)) {
@@ -60,10 +60,10 @@ class PortalRegistry implements PortalRegistryInterface
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
         $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey));
-        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->storage->getPortalNode($portalNodeKey));
+        $portalClass = $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->portalNodeRepository->read($portalNodeKey));
 
         if (!isset($this->cache['portalExtensions'][$portalClass])) {
-            $portalClass = $this->storage->getPortalNode($portalNodeKey);
+            $portalClass = $this->portalNodeRepository->read($portalNodeKey);
             $extensions = $this->portalLoader->getPortalExtensions();
 
             $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
