@@ -11,8 +11,7 @@ use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\RouteRepositoryContract;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
@@ -21,19 +20,19 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private ReceiveServiceInterface $receiveService;
 
-    private StorageInterface $storage;
+    private RouteRepositoryContract $routeRepository;
 
     private MappingServiceInterface $mappingService;
 
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
-        StorageInterface $storage,
+        RouteRepositoryContract $routeRepository,
         MappingServiceInterface $mappingService
     ) {
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
-        $this->storage = $storage;
+        $this->routeRepository = $routeRepository;
         $this->mappingService = $mappingService;
     }
 
@@ -54,17 +53,15 @@ class Router implements RouterInterface, MessageSubscriberInterface
     {
         $mappedDatasetEntityStruct = $message->getMappedDatasetEntityStruct();
         $mapping = $mappedDatasetEntityStruct->getMapping();
-
-        $targetPortalNodeKeys = $this->storage->getRouteTargets(
+        $routeIds = $this->routeRepository->listBySourceAndEntityType(
             $mapping->getPortalNodeKey(),
             $mapping->getDatasetEntityClassName()
         );
-
         $typedMappedDatasetEntityCollections = [];
 
-        /** @var PortalNodeKeyInterface $targetPortalNodeKey */
-        foreach ($targetPortalNodeKeys as $targetPortalNodeKey) {
-            $targetMapping = $this->mappingService->reflect($mapping, $targetPortalNodeKey);
+        foreach ($routeIds as $routeId) {
+            $route = $this->routeRepository->read($routeId);
+            $targetMapping = $this->mappingService->reflect($mapping, $route->getTargetKey());
             $entityClassName = $targetMapping->getDatasetEntityClassName();
 
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
