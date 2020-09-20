@@ -6,7 +6,7 @@ use Heptacom\HeptaConnect\Core\Webhook\Contract\UrlProviderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookServiceInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\WebhookRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\WebhookRepositoryContract;
 
 class WebhookService implements WebhookServiceInterface
 {

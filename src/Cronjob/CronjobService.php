@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Exception\InvalidCronExpressionException;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\CronjobKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\CronjobRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\CronjobRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 
 class CronjobService implements CronjobServiceInterface
