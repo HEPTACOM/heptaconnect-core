@@ -5,10 +5,10 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\MappingRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -18,10 +18,16 @@ class Publisher implements PublisherInterface
 
     private MessageBusInterface $messageBus;
 
-    public function __construct(StorageInterface $storage, MessageBusInterface $messageBus)
-    {
+    private MappingRepositoryContract $mappingRepository;
+
+    public function __construct(
+        StorageInterface $storage,
+        MessageBusInterface $messageBus,
+        MappingRepositoryContract $mappingRepository
+    ) {
         $this->storage = $storage;
         $this->messageBus = $messageBus;
+        $this->mappingRepository = $mappingRepository;
     }
 
     public function publish(
@@ -43,7 +49,11 @@ class Publisher implements PublisherInterface
         $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);
 
         if (!$mappingExists) {
-            $this->storage->createMappings(new MappingCollection([$mapping]));
+            $this->mappingRepository->create(
+                $mapping->getPortalNodeKey(),
+                $mapping->getMappingNodeKey(),
+                $mapping->getExternalId()
+            );
         }
 
         $this->messageBus->dispatch(new PublishMessage($mapping));
