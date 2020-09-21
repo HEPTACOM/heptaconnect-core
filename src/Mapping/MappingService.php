@@ -4,25 +4,47 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingExceptionRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 
 class MappingService implements MappingServiceInterface
 {
-    private StorageInterface $storage;
-
     private MappingRepositoryContract $mappingRepository;
 
-    public function __construct(StorageInterface $storage, MappingRepositoryContract $mappingRepository)
-    {
-        $this->storage = $storage;
+    private MappingExceptionRepositoryContract $mappingExceptionRepository;
+
+    public function __construct(
+        MappingRepositoryContract $mappingRepository,
+        MappingExceptionRepositoryContract $mappingExceptionRepository
+    ) {
         $this->mappingRepository = $mappingRepository;
+        $this->mappingExceptionRepository = $mappingExceptionRepository;
     }
 
     public function addException(MappingInterface $mapping, \Throwable $exception): void
     {
-        $this->storage->addMappingException($mapping, $exception);
+        $mappingKeys = $this->mappingRepository->listByNodes(
+            $mapping->getMappingNodeKey(),
+            $mapping->getPortalNodeKey()
+        );
+        $mappingKey = null;
+
+        foreach ($mappingKeys as $mappingKey) {
+            $mappingKey = $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
+            break;
+        }
+
+        if (!$mappingKey instanceof MappingKeyInterface) {
+            $mappingKey = $this->mappingRepository->create(
+                $mapping->getPortalNodeKey(),
+                $mapping->getMappingNodeKey(),
+                $mapping->getExternalId()
+            );
+        }
+
+        $this->mappingExceptionRepository->create($mappingKey, $exception);
     }
 
     public function save(MappingInterface $mapping): void
