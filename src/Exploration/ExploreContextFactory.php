@@ -7,6 +7,8 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterfa
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ExploreContextFactory implements ExploreContextFactoryInterface
@@ -17,14 +19,18 @@ class ExploreContextFactory implements ExploreContextFactoryInterface
 
     private PortalStorageFactory $portalStorageFactory;
 
+    private ResourceLockingContract $resourceLocking;
+
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         ConfigurationServiceInterface $configurationService,
-        PortalStorageFactory $portalStorageFactory
+        PortalStorageFactory $portalStorageFactory,
+        ResourceLockingContract $resourceLocking
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->configurationService = $configurationService;
         $this->portalStorageFactory = $portalStorageFactory;
+        $this->resourceLocking = $resourceLocking;
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): ExploreContextInterface
@@ -33,7 +39,8 @@ class ExploreContextFactory implements ExploreContextFactoryInterface
             $this->portalRegistry,
             $this->configurationService,
             $this->portalStorageFactory,
-            $portalNodeKey
+            $portalNodeKey,
+            new ResourceLockFacade($this->resourceLocking)
         );
     }
 }

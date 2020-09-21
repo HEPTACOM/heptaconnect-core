@@ -6,6 +6,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -20,16 +21,20 @@ class ExploreContext implements ExploreContextInterface
 
     private PortalNodeKeyInterface $portalNodeKey;
 
+    private ResourceLockFacade $resourceLockFacade;
+
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         ConfigurationServiceInterface $configurationService,
         PortalStorageFactory $portalStorageFactory,
-        PortalNodeKeyInterface $portalNodeKey
+        PortalNodeKeyInterface $portalNodeKey,
+        ResourceLockFacade $resourceLockFacade
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->configurationService = $configurationService;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->portalNodeKey = $portalNodeKey;
+        $this->resourceLockFacade = $resourceLockFacade;
     }
 
     public function getPortal(): PortalContract
@@ -45,5 +50,10 @@ class ExploreContext implements ExploreContextInterface
     public function getStorage(): PortalStorageInterface
     {
         return $this->portalStorageFactory->createPortalStorage($this->portalNodeKey);
+    }
+
+    public function getResourceLocker(): ResourceLockFacade
+    {
+        return $this->resourceLockFacade;
     }
 }
