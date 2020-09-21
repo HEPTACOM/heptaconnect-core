@@ -6,28 +6,28 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class Publisher implements PublisherInterface
 {
-    private StorageInterface $storage;
-
     private MessageBusInterface $messageBus;
 
     private MappingRepositoryContract $mappingRepository;
 
+    private MappingNodeRepositoryContract $mappingNodeRepository;
+
     public function __construct(
-        StorageInterface $storage,
         MessageBusInterface $messageBus,
-        MappingRepositoryContract $mappingRepository
+        MappingRepositoryContract $mappingRepository,
+        MappingNodeRepositoryContract $mappingNodeRepository
     ) {
-        $this->storage = $storage;
         $this->messageBus = $messageBus;
         $this->mappingRepository = $mappingRepository;
+        $this->mappingNodeRepository = $mappingNodeRepository;
     }
 
     public function publish(
@@ -35,18 +35,19 @@ class Publisher implements PublisherInterface
         PortalNodeKeyInterface $portalNodeId,
         string $externalId
     ): MappingInterface {
-        $mappingNode = $this->storage->getMappingNode($datasetEntityClassName, $portalNodeId, $externalId);
-        $mappingExists = $mappingNode instanceof MappingNodeStructInterface;
+        $mappingNodeId = $this->getMappingNodeId($datasetEntityClassName, $portalNodeId, $externalId);
+        $mappingExists = $mappingNodeId instanceof MappingNodeKeyInterface;
 
-        if (!$mappingNode instanceof MappingNodeStructInterface) {
-            $mappingNode = $this->storage->createMappingNodes([$datasetEntityClassName], $portalNodeId)->first();
+        if (!$mappingExists) {
+            $mappingNodeId = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeId);
         }
 
-        if (!$mappingNode instanceof MappingNodeStructInterface) {
+        if (!$mappingNodeId instanceof MappingNodeKeyInterface) {
             throw new MappingNodeNotCreatedException();
         }
 
-        $mapping = (new MappingStruct($portalNodeId, $mappingNode))->setExternalId($externalId);
+        $mapping = (new MappingStruct($portalNodeId, $this->mappingNodeRepository->read($mappingNodeId)))
+            ->setExternalId($externalId);
 
         if (!$mappingExists) {
             $this->mappingRepository->create(
@@ -59,5 +60,23 @@ class Publisher implements PublisherInterface
         $this->messageBus->dispatch(new PublishMessage($mapping));
 
         return $mapping;
+    }
+
+    private function getMappingNodeId(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        string $externalId
+    ): ?MappingNodeKeyInterface {
+        $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
+            $datasetEntityClassName,
+            $portalNodeKey,
+            $externalId
+        );
+
+        foreach ($ids as $id) {
+            return $id;
+        }
+
+        return null;
     }
 }
