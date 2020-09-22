@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-PHP := $(shell which php)
+PHP := $(shell which php) $(PHP_EXTRA_ARGS)
 COMPOSER := $(PHP) $(shell which composer)
 JQ := $(shell which jq)
 JSON_FILES := $(shell find . -name '*.json' -not -path './vendor/*')
