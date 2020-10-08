@@ -16,14 +16,15 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
 {
+    private DeepCopy $deepCopy;
+
     private EmitServiceInterface $emitService;
 
     private ReceiveServiceInterface $receiveService;
@@ -32,19 +33,21 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private MappingServiceInterface $mappingService;
 
-    private DeepCopy $deepCopy;
+    private MappingNodeRepositoryContract $mappingNodeRepository;
 
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
         RouteRepositoryContract $routeRepository,
-        MappingServiceInterface $mappingService
+        MappingServiceInterface $mappingService,
+        MappingNodeRepositoryContract $mappingNodeRepository
     ) {
+        $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
         $this->routeRepository = $routeRepository;
         $this->mappingService = $mappingService;
-        $this->deepCopy = new DeepCopy();
+        $this->mappingNodeRepository = $mappingNodeRepository;
     }
 
     public static function getHandledMessages(): iterable
@@ -64,19 +67,14 @@ class Router implements RouterInterface, MessageSubscriberInterface
     {
         $mappedDatasetEntityStruct = $message->getMappedDatasetEntityStruct();
         $mapping = $mappedDatasetEntityStruct->getMapping();
-        $routeIds = $this->routeRepository->listBySourceAndEntityType(
-            $mapping->getPortalNodeKey(),
-            $mapping->getDatasetEntityClassName()
-        );
-
         $portalNodeKey = $mapping->getPortalNodeKey();
-        $trackedEntities = $this->getTrackedEntities($portalNodeKey, $message->getTrackedEntities());
 
-        $targetPortalNodeKeys = $this->storage->getRouteTargets(
+        $routeIds = $this->routeRepository->listBySourceAndEntityType(
             $portalNodeKey,
             $mapping->getDatasetEntityClassName()
         );
 
+        $trackedEntities = $this->getTrackedEntities($portalNodeKey, $message->getTrackedEntities());
         $typedMappedDatasetEntityCollections = [];
 
         foreach ($routeIds as $routeId) {
@@ -86,7 +84,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
 
-            $this->reflectTrackedEntities($trackedEntities, $targetPortalNodeKey);
+            $this->reflectTrackedEntities($trackedEntities, $route->getTargetKey());
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
 
             $typedMappedDatasetEntityCollections[$entityClassName]->push([
@@ -108,11 +106,11 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $primaryKey = $entity->getPrimaryKey();
 
             if ($primaryKey !== null) {
-                $mappingNode = $this->storage->getMappingNode($dataType, $portalNodeKey, $primaryKey);
+                $mappingNodeKey = [...$this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId($dataType, $portalNodeKey, $primaryKey)][0] ?? null;
             }
 
-            /** @var MappingNodeStructInterface $mappingNode */
-            $mappingNode ??= $this->storage->createMappingNodes([$dataType], $portalNodeKey)->first();
+            $mappingNodeKey ??= $this->mappingNodeRepository->create($dataType, $portalNodeKey);
+            $mappingNode = $this->mappingNodeRepository->read($mappingNodeKey);
 
             $mapping = (new MappingStruct($portalNodeKey, $mappingNode))->setExternalId($primaryKey);
 
