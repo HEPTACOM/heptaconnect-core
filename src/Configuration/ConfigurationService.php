@@ -39,11 +39,16 @@ class ConfigurationService implements ConfigurationServiceInterface
             return;
         }
 
-        $data = $this->storage->getConfiguration($portalNodeKey);
-        $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration ?? []);
-        $data = \is_null($configuration) ? [] : \array_replace_recursive($data, $configuration);
+        if (\is_null($configuration)) {
+            $data = null;
+        } else {
+            $data = $this->storage->getConfiguration($portalNodeKey);
+            $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration ?? []);
+            $data = \array_replace_recursive($data, $configuration);
 
-        $template->resolve($data);
+            $template->resolve($data);
+        }
+
         $this->storage->setConfiguration($portalNodeKey, $data);
     }
 
