@@ -5,16 +5,16 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 use Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Core\Storage\Struct\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
-use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 class StreamDenormalizer implements DenormalizerInterface
 {
-    private Filesystem $filesystem;
+    private FilesystemInterface $filesystem;
 
     private StreamFactoryInterface $streamFactory;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(FilesystemInterface $filesystem)
     {
         $this->filesystem = $filesystem;
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();

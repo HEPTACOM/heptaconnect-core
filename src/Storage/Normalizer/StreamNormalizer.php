@@ -4,7 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Core\Storage\Struct\SerializableStream;
-use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
@@ -12,9 +12,9 @@ class StreamNormalizer implements NormalizerInterface
 {
     public const STORAGE_LOCATION = '42c5acf20a7011eba428f754dbb80254';
 
-    private Filesystem $filesystem;
+    private FilesystemInterface $filesystem;
 
-    public function __construct(Filesystem $filesystem)
+    public function __construct(FilesystemInterface $filesystem)
     {
         $this->filesystem = $filesystem;
     }
