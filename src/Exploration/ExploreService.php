@@ -47,7 +47,7 @@ class ExploreService implements ExploreServiceInterface
         $this->mappingNodeRepository = $mappingNodeRepository;
     }
 
-    public function explore(PortalNodeKeyInterface $portalNodeKey): void
+    public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
@@ -64,6 +64,10 @@ class ExploreService implements ExploreServiceInterface
         $mappings = [];
 
         foreach (self::getSupportedTypes($explorers) as $supportedType) {
+            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes)) {
+                continue;
+            }
+
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
 
             /** @var DatasetEntityInterface|null $entity */
