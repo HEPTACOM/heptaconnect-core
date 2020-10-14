@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Router;
 
 use DeepCopy\DeepCopy;
+use Heptacom\HeptaConnect\Core\Component\Messenger\Message\BatchPublishMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
@@ -12,6 +13,7 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntity;
 use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
@@ -53,6 +55,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
     public static function getHandledMessages(): iterable
     {
         yield PublishMessage::class => ['method' => 'handlePublishMessage'];
+        yield BatchPublishMessage::class => ['method' => 'handleBatchPublishMessage'];
         yield EmitMessage::class => ['method' => 'handleEmitMessage'];
     }
 
@@ -61,6 +64,20 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $mapping = $message->getMapping();
 
         $this->emitService->emit(new TypedMappingCollection($mapping->getDatasetEntityClassName(), [$mapping]));
+    }
+
+    public function handleBatchPublishMessage(BatchPublishMessage $message): void
+    {
+        $typedMappingCollections = [];
+
+        /** @var MappingInterface $mapping */
+        foreach ($message->getMappings() as $mapping) {
+            $typedMappingCollections[$mapping->getDatasetEntityClassName()][] = $mapping;
+        }
+
+        foreach ($typedMappingCollections as $type => $typedMappingCollection) {
+            $this->emitService->emit(new TypedMappingCollection($type, $typedMappingCollection));
+        }
     }
 
     public function handleEmitMessage(EmitMessage $message): void

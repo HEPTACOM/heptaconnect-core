@@ -2,9 +2,11 @@
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
+use Heptacom\HeptaConnect\Core\Component\Messenger\Message\BatchPublishMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -60,6 +62,11 @@ class Publisher implements PublisherInterface
         $this->messageBus->dispatch(new PublishMessage($mapping));
 
         return $mapping;
+    }
+
+    public function publishBatch(MappingCollection $mappings): void
+    {
+        $this->messageBus->dispatch(new BatchPublishMessage($mappings));
     }
 
     private function getMappingNodeId(
