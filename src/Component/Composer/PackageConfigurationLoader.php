@@ -7,18 +7,35 @@ use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\PackageInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
 {
     private ?string $composerJson;
 
-    public function __construct(?string $composerJson)
+    private CacheItemPoolInterface $cache;
+
+    public function __construct(?string $composerJson, CacheItemPoolInterface $cache)
     {
         $this->composerJson = $composerJson;
+        $this->cache = $cache;
     }
 
     public function getPackageConfigurations(): PackageConfigurationCollection
     {
+        $cacheKey = $this->getCacheKey();
+
+        if (\is_string($cacheKey)) {
+            $cacheItem = $this->cache->getItem(str_replace('\\', '-', self::class) . '-' . $cacheKey);
+
+            if ($cacheItem->isHit()) {
+                return $cacheItem->get();
+            }
+        } else {
+            $cacheItem = null;
+        }
+
         $factory = new Factory();
         $composer = $factory->createComposer(
             new NullIO(), $this->composerJson,
@@ -77,6 +94,22 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             }
         }
 
+        if ($cacheItem instanceof CacheItemInterface) {
+            $cacheItem->set($result);
+            $this->cache->save($cacheItem);
+        }
+
         return $result;
+    }
+
+    private function getCacheKey(): ?string
+    {
+        if (\is_file($this->composerJson)) {
+            return hash_file('md5', $this->composerJson);
+        } elseif (\is_string($this->composerJson)) {
+            return hash('md5', $this->composerJson);
+        } else {
+            return null;
+        }
     }
 }
