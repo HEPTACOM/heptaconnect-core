@@ -4,8 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
-use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
+use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
@@ -14,10 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryContract;
 
 class ExploreService implements ExploreServiceInterface
 {
@@ -29,22 +25,18 @@ class ExploreService implements ExploreServiceInterface
 
     private PublisherInterface $publisher;
 
-    private MappingRepositoryContract $mappingRepository;
-
-    private MappingNodeRepositoryContract $mappingNodeRepository;
+    private MappingServiceInterface $mappingService;
 
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
         PortalRegistryInterface $portalRegistry,
         PublisherInterface $publisher,
-        MappingRepositoryContract $mappingRepository,
-        MappingNodeRepositoryContract $mappingNodeRepository
+        MappingServiceInterface $mappingService
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
         $this->portalRegistry = $portalRegistry;
         $this->publisher = $publisher;
-        $this->mappingRepository = $mappingRepository;
-        $this->mappingNodeRepository = $mappingNodeRepository;
+        $this->mappingService = $mappingService;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
@@ -82,7 +74,7 @@ class ExploreService implements ExploreServiceInterface
                     continue;
                 }
 
-                $mappings[] = $this->getMapping($entity, $portalNodeKey, $externalId);
+                $mappings[] = $this->mappingService->get(\get_class($entity), $portalNodeKey, $externalId);
 
                 if (count($mappings) >= self::CHUNK_SIZE) {
                     $this->publisher->publishBatch(new MappingCollection($mappings));
@@ -111,55 +103,5 @@ class ExploreService implements ExploreServiceInterface
         }
 
         return \array_keys($types);
-    }
-
-    private function getMappingNodeId(
-        string $datasetEntityClassName,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $externalId
-    ): ?MappingNodeKeyInterface {
-        $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
-            $datasetEntityClassName,
-            $portalNodeKey,
-            $externalId
-        );
-
-        foreach ($ids as $id) {
-            return $id;
-        }
-
-        return null;
-    }
-
-    private function getMapping(
-        ?DatasetEntityInterface $entity,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $externalId
-    ) {
-        $datasetEntityClassName = \get_class($entity);
-
-        $mappingNodeId = $this->getMappingNodeId($datasetEntityClassName, $portalNodeKey, $externalId);
-        $mappingExists = $mappingNodeId instanceof MappingNodeKeyInterface;
-
-        if (!$mappingExists) {
-            $mappingNodeId = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey);
-        }
-
-        if (!$mappingNodeId instanceof MappingNodeKeyInterface) {
-            throw new MappingNodeNotCreatedException();
-        }
-
-        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeId)))
-            ->setExternalId($externalId);
-
-        if (!$mappingExists) {
-            $this->mappingRepository->create(
-                $mapping->getPortalNodeKey(),
-                $mapping->getMappingNodeKey(),
-                $mapping->getExternalId()
-            );
-        }
-
-        return $mapping;
     }
 }

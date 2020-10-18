@@ -11,6 +11,12 @@ interface MappingServiceInterface
 {
     public function addException(MappingInterface $mapping, \Throwable $exception): void;
 
+    public function get(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        string $externalId
+    ): MappingInterface;
+
     public function save(MappingInterface $mapping): void;
 
     public function reflect(MappingInterface $mapping, PortalNodeKeyInterface $portalNodeKey): MappingInterface;

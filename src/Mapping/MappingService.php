@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
+use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
@@ -59,6 +60,36 @@ class MappingService implements MappingServiceInterface
         }
 
         $this->mappingExceptionRepository->create($mappingKey, $exception);
+    }
+
+    public function get(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        string $externalId
+    ): MappingInterface {
+        $mappingNodeId = $this->getMappingNodeId($datasetEntityClassName, $portalNodeKey, $externalId);
+        $mappingExists = $mappingNodeId instanceof MappingNodeKeyInterface;
+
+        if (!$mappingExists) {
+            $mappingNodeId = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey);
+        }
+
+        if (!$mappingNodeId instanceof MappingNodeKeyInterface) {
+            throw new MappingNodeNotCreatedException();
+        }
+
+        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeId)))
+            ->setExternalId($externalId);
+
+        if (!$mappingExists) {
+            $this->mappingRepository->create(
+                $mapping->getPortalNodeKey(),
+                $mapping->getMappingNodeKey(),
+                $mapping->getExternalId()
+            );
+        }
+
+        return $mapping;
     }
 
     public function save(MappingInterface $mapping): void
@@ -163,5 +194,23 @@ class MappingService implements MappingServiceInterface
             $mapping->getMappingNodeKey(),
             $mapping->getExternalId()
         );
+    }
+
+    private function getMappingNodeId(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        string $externalId
+    ): ?MappingNodeKeyInterface {
+        $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
+            $datasetEntityClassName,
+            $portalNodeKey,
+            $externalId
+        );
+
+        foreach ($ids as $id) {
+            return $id;
+        }
+
+        return null;
     }
 }
