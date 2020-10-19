@@ -5,7 +5,9 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
+use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Support\DatasetEntityTracker;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
@@ -32,18 +34,22 @@ class EmitService implements EmitServiceInterface
 
     private array $emitterStackCache = [];
 
+    private MappingServiceInterface $mappingService;
+
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
         PortalRegistryInterface $portalRegistry,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        MappingServiceInterface $mappingService
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
         $this->messageBus = $messageBus;
         $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->mappingService = $mappingService;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -95,6 +101,15 @@ class EmitService implements EmitServiceInterface
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
                         try {
                             $trackedEntities = DatasetEntityTracker::retrieve();
+
+                            /** @var DatasetEntityInterface $trackedEntity */
+                            foreach ($trackedEntities->getIterator() as $trackedEntity) {
+                                if (!$trackedEntity instanceof DatasetEntityInterface || $trackedEntity->getPrimaryKey() === null) {
+                                    continue;
+                                }
+
+                                $this->mappingService->get(\get_class($trackedEntity), $portalNodeKey, $trackedEntity->getPrimaryKey());
+                            }
 
                             $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
                         } finally {

@@ -6,5 +6,5 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection
 
 interface ReceiveServiceInterface
 {
-    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void;
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities, callable $saveMappings): void;
 }

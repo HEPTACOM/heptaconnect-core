@@ -67,18 +67,18 @@ class MappingService implements MappingServiceInterface
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): MappingInterface {
-        $mappingNodeId = $this->getMappingNodeId($datasetEntityClassName, $portalNodeKey, $externalId);
-        $mappingExists = $mappingNodeId instanceof MappingNodeKeyInterface;
+        $mappingNodeKey = $this->getMappingNodeKey($datasetEntityClassName, $portalNodeKey, $externalId);
+        $mappingExists = $mappingNodeKey instanceof MappingNodeKeyInterface;
 
         if (!$mappingExists) {
-            $mappingNodeId = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey);
+            $mappingNodeKey = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey);
         }
 
-        if (!$mappingNodeId instanceof MappingNodeKeyInterface) {
+        if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
             throw new MappingNodeNotCreatedException();
         }
 
-        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeId)))
+        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
             ->setExternalId($externalId);
 
         if (!$mappingExists) {
@@ -152,11 +152,10 @@ class MappingService implements MappingServiceInterface
                 $mapping = $this->mappingRepository->read($mappingKey);
                 $portalNode = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
-                if (\array_key_exists($portalNode, $fromPortalExistences)) {
+                if (\array_key_exists($portalNode, $fromPortalExistences) && $fromPortalExistences[$portalNode] !== null) {
                     if ($fromPortalExistences[$portalNode] !== $mapping->getExternalId()) {
                         throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
                     }
-
                 } else {
                     $mappingsToCreate[] = $mapping;
                 }
@@ -196,7 +195,7 @@ class MappingService implements MappingServiceInterface
         );
     }
 
-    private function getMappingNodeId(
+    private function getMappingNodeKey(
         string $datasetEntityClassName,
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId

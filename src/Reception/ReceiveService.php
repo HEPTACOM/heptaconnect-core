@@ -3,7 +3,6 @@
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
@@ -18,8 +17,6 @@ use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
 {
-    private MappingServiceInterface $mappingService;
-
     private ReceiveContextInterface $receiveContext;
 
     private LoggerInterface $logger;
@@ -31,20 +28,18 @@ class ReceiveService implements ReceiveServiceInterface
     private array $receiverStackCache = [];
 
     public function __construct(
-        MappingServiceInterface $mappingService,
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
         PortalRegistryInterface $portalRegistry,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->mappingService = $mappingService;
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
         $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
-    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities, callable $saveMappings): void
     {
         $receivingPortalNodes = [];
         $entityClassName = $mappedDatasetEntities->getType();
@@ -94,7 +89,7 @@ class ReceiveService implements ReceiveServiceInterface
                 try {
                     /** @var MappingInterface $mapping */
                     foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
-                        $this->mappingService->save($mapping);
+                        $saveMappings($mapping->getPortalNodeKey());
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
