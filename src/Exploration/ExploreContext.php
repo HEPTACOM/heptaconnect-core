@@ -37,6 +37,11 @@ class ExploreContext implements ExploreContextInterface
         $this->resourceLockFacade = $resourceLockFacade;
     }
 
+    public function getPortalNodeKey(): PortalNodeKeyInterface
+    {
+        return $this->portalNodeKey;
+    }
+
     public function getPortal(): PortalContract
     {
         return $this->portalRegistry->getPortal($this->portalNodeKey);

@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ReceiveContext implements ReceiveContextInterface
 {
@@ -37,6 +38,11 @@ class ReceiveContext implements ReceiveContextInterface
         $this->portalRegistry = $portalRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLockFacade = new ResourceLockFacade($resourceLocking);
+    }
+
+    public function getPortalNodeKey(MappingInterface $mapping): PortalNodeKeyInterface
+    {
+        return $mapping->getPortalNodeKey();
     }
 
     public function getConfig(MappingInterface $mapping): ?array

@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingCo
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class EmitContext implements EmitContextInterface
 {
@@ -32,6 +33,11 @@ class EmitContext implements EmitContextInterface
         $this->portalRegistry = $portalRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLockFacade = new ResourceLockFacade($resourceLocking);
+    }
+
+    public function getPortalNodeKey(MappingInterface $mapping): PortalNodeKeyInterface
+    {
+        return $mapping->getPortalNodeKey();
     }
 
     public function getConfig(MappingInterface $mapping): ?array
