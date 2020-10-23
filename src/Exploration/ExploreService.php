@@ -46,12 +46,14 @@ class ExploreService implements ExploreServiceInterface
 
         $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
 
-        $explorers = $portal->getExplorers();
+        $explorers = new ExplorerCollection();
 
         /** @var PortalExtensionContract $portalExtension */
         foreach ($portalExtensions as $portalExtension) {
             $explorers->push($portalExtension->getExplorerDecorators());
         }
+
+        $explorers->push($portal->getExplorers());
 
         $mappings = [];
 
