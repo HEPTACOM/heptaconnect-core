@@ -64,6 +64,26 @@ class PortalStorage implements PortalStorageInterface
         );
     }
 
+    public function list(): iterable
+    {
+        foreach ($this->portalStorage->list($this->portalNodeKey) as $key => $item) {
+            $value = $item['value'];
+            $type = $item['type'];
+
+            $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
+
+            if (!$denormalizer instanceof DenormalizerInterface) {
+                continue;
+            }
+
+            if (!$denormalizer->supportsDenormalization($value, $type)) {
+                continue;
+            }
+
+            yield $key => $denormalizer->denormalize($value, $type);
+        }
+    }
+
     public function has(string $key): bool
     {
         return $this->portalStorage->has($this->portalNodeKey, $key);
