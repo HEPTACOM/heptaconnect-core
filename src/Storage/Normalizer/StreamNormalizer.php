@@ -35,7 +35,7 @@ class StreamNormalizer implements NormalizerInterface
             throw new InvalidArgumentException();
         }
 
-        $filename = Uuid::uuid4()->getHex();
+        $filename = $context['mediaId'] ?? Uuid::uuid4()->getHex();
         $stream = $object->copy()->detach();
 
         $this->filesystem->putStream(self::STORAGE_LOCATION . '/' . $filename, $stream);
