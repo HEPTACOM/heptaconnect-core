@@ -47,6 +47,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         MappingServiceInterface $mappingService,
         MappingNodeRepositoryContract $mappingNodeRepository
     ) {
+        DatasetEntityTracker::deny(ReflectionMapping::class);
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
