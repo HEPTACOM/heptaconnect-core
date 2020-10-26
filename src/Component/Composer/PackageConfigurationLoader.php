@@ -6,7 +6,7 @@ use Composer\Autoload\ClassMapGenerator;
 use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
-use Composer\Package\PackageInterface;
+use Composer\Package\CompletePackageInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -45,10 +45,11 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         );
         $result = new PackageConfigurationCollection();
 
+        /** @var CompletePackageInterface $packageInstance */
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             $config = new PackageConfiguration();
             $heptaconnectKeywords = \array_filter(
-                (array) ($package['keywords'] ?? []),
+                $packageInstance->getKeywords() ?? [],
                 fn (string $k): bool => str_starts_with($k, 'heptaconnect-')
             );
 
@@ -56,10 +57,10 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 continue;
             }
 
-            $config->setName((string) $package['name']);
+            $config->setName((string) $packageInstance->getName());
             $config->setTags(new StringCollection($heptaconnectKeywords));
 
-            $extra = (array) ($package['extra'] ?? []);
+            $extra = $packageInstance->getExtra() ?? [];
             $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
             if (\count($heptaconnect) > 0) {
@@ -67,7 +68,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 $config->setConfiguration($heptaconnect);
             }
 
-            $classLoader = $composer->getAutoloadGenerator()->createLoader((array) ($package['autoload'] ?? []));
+            $classLoader = $composer->getAutoloadGenerator()->createLoader($packageInstance->getAutoload() ?? []);
 
             foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
                 foreach ($dirs as $dir) {
@@ -103,7 +104,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     }
 
     /**
-     * @return iterable<\Composer\Package\PackageInterface>
+     * @return iterable<\Composer\Package\CompletePackageInterface>
      */
     private function iteratePackages(Composer $composer): iterable
     {
@@ -115,12 +116,14 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             foreach ($packageLockData as $package) {
                 $packageInstance = $composer->getLocker()->getLockedRepository()->findPackage($package['name'], $package['version']);
 
-                if (!$packageInstance instanceof PackageInterface) {
+                if (!$packageInstance instanceof CompletePackageInterface) {
                     continue;
                 }
 
                 yield $packageInstance;
             }
         }
+
+        yield $composer->getPackage();
     }
 }
