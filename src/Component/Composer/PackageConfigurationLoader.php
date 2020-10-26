@@ -3,6 +3,7 @@
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
 use Composer\Autoload\ClassMapGenerator;
+use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\PackageInterface;
@@ -44,54 +45,42 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         );
         $result = new PackageConfigurationCollection();
 
-        if ($composer->getLocker()->isLocked()) {
-            $packageLockData = (array) ($composer->getLocker()->getLockData()['packages'] ?? []);
-            $packageLockData = \array_filter($packageLockData, 'is_array');
+        foreach ($this->iteratePackages($composer) as $packageInstance) {
+            $config = new PackageConfiguration();
+            $heptaconnectKeywords = \array_filter(
+                (array) ($package['keywords'] ?? []),
+                fn (string $k): bool => str_starts_with($k, 'heptaconnect-')
+            );
 
-            /** @var array $package */
-            foreach ($packageLockData as $package) {
-                $packageInstance = $composer->getLocker()->getLockedRepository()->findPackage($package['name'], $package['version']);
+            if (empty($heptaconnectKeywords)) {
+                continue;
+            }
 
-                if (!$packageInstance instanceof PackageInterface) {
-                    continue;
-                }
+            $config->setName((string) $package['name']);
+            $config->setTags(new StringCollection($heptaconnectKeywords));
 
-                $config = new PackageConfiguration();
-                $heptaconnectKeywords = \array_filter(
-                    (array) ($package['keywords'] ?? []),
-                    fn (string $k): bool => str_starts_with($k, 'heptaconnect-')
-                );
+            $extra = (array) ($package['extra'] ?? []);
+            $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
-                if (empty($heptaconnectKeywords)) {
-                    continue;
-                }
+            if (\count($heptaconnect) > 0) {
+                /* @var array<array-key, string> $keywords */
+                $config->setConfiguration($heptaconnect);
+            }
 
-                $config->setName((string) $package['name']);
-                $config->setTags(new StringCollection($heptaconnectKeywords));
+            $classLoader = $composer->getAutoloadGenerator()->createLoader((array) ($package['autoload'] ?? []));
 
-                $extra = (array) ($package['extra'] ?? []);
-                $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
+            foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
+                foreach ($dirs as $dir) {
+                    $installPath = $composer->getInstallationManager()->getInstallPath($packageInstance);
+                    $classMap = ClassMapGenerator::createMap($installPath.\DIRECTORY_SEPARATOR.$dir);
 
-                if (\count($heptaconnect) > 0) {
-                    /* @var array<array-key, string> $keywords */
-                    $config->setConfiguration($heptaconnect);
-                }
-
-                $classLoader = $composer->getAutoloadGenerator()->createLoader((array) ($package['autoload'] ?? []));
-
-                foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
-                    foreach ($dirs as $dir) {
-                        $installPath = $composer->getInstallationManager()->getInstallPath($packageInstance);
-                        $classMap = ClassMapGenerator::createMap($installPath.\DIRECTORY_SEPARATOR.$dir);
-
-                        foreach ($classMap as $class => $file) {
-                            $config->getAutoloadedFiles()->addClass($class, $file);
-                        }
+                    foreach ($classMap as $class => $file) {
+                        $config->getAutoloadedFiles()->addClass($class, $file);
                     }
                 }
-
-                $result->push([$config]);
             }
+
+            $result->push([$config]);
         }
 
         if ($cacheItem instanceof CacheItemInterface) {
@@ -110,6 +99,28 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             return hash('md5', $this->composerJson);
         } else {
             return null;
+        }
+    }
+
+    /**
+     * @return iterable<\Composer\Package\PackageInterface>
+     */
+    private function iteratePackages(Composer $composer): iterable
+    {
+        if ($composer->getLocker()->isLocked()) {
+            $packageLockData = (array) ($composer->getLocker()->getLockData()['packages'] ?? []);
+            $packageLockData = \array_filter($packageLockData, 'is_array');
+
+            /** @var array $package */
+            foreach ($packageLockData as $package) {
+                $packageInstance = $composer->getLocker()->getLockedRepository()->findPackage($package['name'], $package['version']);
+
+                if (!$packageInstance instanceof PackageInterface) {
+                    continue;
+                }
+
+                yield $packageInstance;
+            }
         }
     }
 }
