@@ -7,6 +7,7 @@ use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\CompletePackageInterface;
+use Composer\Package\RootPackageInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -38,12 +39,19 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         }
 
         $factory = new Factory();
-        $composer = $factory->createComposer(
-            new NullIO(), $this->composerJson,
-            false,
-            \is_null($this->composerJson) ? null : \dirname($this->composerJson)
-        );
+        $workingDir = null;
+
+        if (!\is_null($this->composerJson)) {
+            $workingDir = \dirname($this->composerJson);
+
+            if (!@\is_dir($workingDir.\DIRECTORY_SEPARATOR.'vendor')) {
+                $workingDir = null;
+            }
+        }
+
+        $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
         $result = new PackageConfigurationCollection();
+        $workingDir ??= \getcwd();
 
         /** @var CompletePackageInterface $packageInstance */
         foreach ($this->iteratePackages($composer) as $packageInstance) {
@@ -68,17 +76,8 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 $config->setConfiguration($heptaconnect);
             }
 
-            $classLoader = $composer->getAutoloadGenerator()->createLoader($packageInstance->getAutoload() ?? []);
-
-            foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
-                foreach ($dirs as $dir) {
-                    $installPath = $composer->getInstallationManager()->getInstallPath($packageInstance);
-                    $classMap = ClassMapGenerator::createMap($installPath.\DIRECTORY_SEPARATOR.$dir);
-
-                    foreach ($classMap as $class => $file) {
-                        $config->getAutoloadedFiles()->addClass($class, $file);
-                    }
-                }
+            foreach ($this->iterateClassMaps($composer, $packageInstance, $workingDir) as $class => $file) {
+                $config->getAutoloadedFiles()->addClass($class, $file);
             }
 
             $result->push([$config]);
@@ -125,5 +124,33 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         }
 
         yield $composer->getPackage();
+    }
+
+    /**
+     * @psalm-return iterable<class-string, string>
+     */
+    private function iterateClassMaps(
+        Composer $composer,
+        CompletePackageInterface $package,
+        string $workingDir
+    ): iterable {
+        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload() ?? []);
+        $installPath = $composer->getInstallationManager()->getInstallPath($package);
+
+        foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
+            foreach ($dirs as $dir) {
+                if (\is_dir($absolute = $installPath.\DIRECTORY_SEPARATOR.$dir)) {
+                    yield from ClassMapGenerator::createMap($absolute);
+                } else {
+                    // TODO log. This is a weird case
+                }
+
+                if ($package instanceof RootPackageInterface
+                    && !\is_null($workingDir)
+                    && \is_dir($absolute = $workingDir.\DIRECTORY_SEPARATOR.$dir)) {
+                    yield from ClassMapGenerator::createMap($absolute);
+                }
+            }
+        }
     }
 }
