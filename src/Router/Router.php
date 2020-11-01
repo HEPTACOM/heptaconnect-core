@@ -102,7 +102,11 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
         foreach ($routeIds as $routeId) {
             $route = $this->routeRepository->read($routeId);
-            $targetMapping = $this->mappingService->reflect($mapping, $route->getTargetKey());
+            $targetMapping = $this->mappingService->reflect($this->mappingService->get(
+                $mapping->getDatasetEntityClassName(),
+                $mapping->getPortalNodeKey(),
+                $mapping->getExternalId()
+            ), $route->getTargetKey());
 
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
 
