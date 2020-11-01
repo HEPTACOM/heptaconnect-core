@@ -12,6 +12,8 @@ class StreamNormalizer implements NormalizerInterface
 {
     public const STORAGE_LOCATION = '42c5acf20a7011eba428f754dbb80254';
 
+    public const NS_FILENAME = '048a23d3ac504a67a477da1d098090b0';
+
     private FilesystemInterface $filesystem;
 
     public function __construct(FilesystemInterface $filesystem)
@@ -35,7 +37,14 @@ class StreamNormalizer implements NormalizerInterface
             throw new InvalidArgumentException();
         }
 
-        $filename = $context['mediaId'] ?? Uuid::uuid4()->getHex();
+        $mediaId = $context['mediaId'] ?? null;
+
+        if ($mediaId === null) {
+            $filename = Uuid::uuid4()->getHex();
+        } else {
+            $filename = Uuid::uuid5(self::NS_FILENAME, $mediaId)->getHex();
+        }
+
         $stream = $object->copy()->detach();
 
         $this->filesystem->putStream(self::STORAGE_LOCATION . '/' . $filename, $stream);
