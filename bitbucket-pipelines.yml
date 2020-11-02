@@ -15,8 +15,35 @@ definitions:
                     - .build/**
                     - vendor/**
                     - composer.lock
+        -   step: &github-keyword-gate-step
+                <<: *default-step
+                name: Github Keyword Gate
+                script:
+                    - 'test $(git --no-pager log --full-history "--grep=${GITHUB_GREP_DENY_PATTERN}" | wc -l) -eq 0'
+                after-script:
+                    - 'test ${BITBUCKET_EXIT_CODE} -eq 0 || git --no-pager log --full-history "--grep=${GITHUB_GREP_DENY_PATTERN}"'
 
 pipelines:
+    branches:
+        master:
+            -   step: *github-keyword-gate-step
+            -   step:
+                    <<: *default-step
+                    name: Mirror to Github
+                    script:
+                        - git fetch --unshallow origin
+                        - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
+                        - git push --force github master
+
+    tags:
+        '*':
+            -   step: *github-keyword-gate-step
+            -   step:
+                    name: Mirror tags to Github
+                    script:
+                        - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
+                        - git push --force github tag $BITBUCKET_TAG
+
     default:
         -   step:
                 <<: *default-step
