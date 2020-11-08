@@ -4,6 +4,7 @@ namespace Heptacom\HeptaConnect\Core\Mapping\Contract;
 
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -16,6 +17,8 @@ interface MappingServiceInterface
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): MappingInterface;
+
+    public function ensurePersistence(MappingComponentCollection $mappingComponentCollection): void;
 
     public function save(MappingInterface $mapping): void;
 

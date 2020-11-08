@@ -14,6 +14,8 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -101,6 +103,7 @@ class EmitService implements EmitServiceInterface
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
                         try {
                             $trackedEntities = DatasetEntityTracker::retrieve();
+                            $mappingsToEnsure = new MappingComponentCollection();
 
                             /** @var DatasetEntityInterface $trackedEntity */
                             foreach ($trackedEntities->getIterator() as $trackedEntity) {
@@ -108,9 +111,14 @@ class EmitService implements EmitServiceInterface
                                     continue;
                                 }
 
-                                $this->mappingService->get(\get_class($trackedEntity), $portalNodeKey, $trackedEntity->getPrimaryKey());
+                                $mappingsToEnsure->push([new MappingComponentStruct(
+                                    $portalNodeKey,
+                                    \get_class($trackedEntity),
+                                    $trackedEntity->getPrimaryKey()
+                                )]);
                             }
 
+                            $this->mappingService->ensurePersistence($mappingsToEnsure);
                             $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
                         } finally {
                             DatasetEntityTracker::listen();
