@@ -118,6 +118,7 @@ class MappingService implements MappingServiceInterface
                     continue;
                 }
 
+                // TODO check if filtering is faster than new
                 $prePayload->push(\array_map(
                     static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $datasetEntityClassName, $externalId),
                     $missingExternalIds
