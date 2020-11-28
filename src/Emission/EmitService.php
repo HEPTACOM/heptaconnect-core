@@ -97,12 +97,12 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterStackInterface $stack */
             foreach ($stacks as $stack) {
                 try {
-                    DatasetEntityTracker::listen();
+                    DatasetEntityTracker::instance()->listen();
 
                     /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
                         try {
-                            $trackedEntities = DatasetEntityTracker::retrieve();
+                            $trackedEntities = DatasetEntityTracker::instance()->retrieve();
                             $mappingsToEnsure = new MappingComponentCollection();
 
                             /** @var DatasetEntityInterface $trackedEntity */
@@ -121,7 +121,7 @@ class EmitService implements EmitServiceInterface
                             $this->mappingService->ensurePersistence($mappingsToEnsure);
                             $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
                         } finally {
-                            DatasetEntityTracker::listen();
+                            DatasetEntityTracker::instance()->listen();
                         }
                     }
                 } catch (\Throwable $exception) {
@@ -132,7 +132,7 @@ class EmitService implements EmitServiceInterface
                         'exception' => $exception,
                     ]);
                 } finally {
-                    DatasetEntityTracker::retrieve();
+                    DatasetEntityTracker::instance()->retrieve();
                 }
             }
 

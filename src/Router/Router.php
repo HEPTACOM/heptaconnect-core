@@ -47,7 +47,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         MappingServiceInterface $mappingService,
         MappingNodeRepositoryContract $mappingNodeRepository
     ) {
-        DatasetEntityTracker::deny(ReflectionMapping::class);
+        DatasetEntityTracker::instance()->deny(ReflectionMapping::class);
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
@@ -111,9 +111,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
 
             $this->reflectTrackedEntities($trackedEntities, $route->getTargetKey());
-            DatasetEntityTracker::listen();
+            DatasetEntityTracker::instance()->listen();
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
-            $receivedEntityData[$entityClassName][] = DatasetEntityTracker::retrieve()->filter(
+            $receivedEntityData[$entityClassName][] = DatasetEntityTracker::instance()->retrieve()->filter(
                 fn (DatasetEntityInterface $entity) => !$entity instanceof ReflectionMapping
             );
 
