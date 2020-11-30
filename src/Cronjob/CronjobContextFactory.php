@@ -7,6 +7,7 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 
 class CronjobContextFactory
 {
@@ -16,14 +17,18 @@ class CronjobContextFactory
 
     private PortalStorageFactory $portalStorageFactory;
 
+    private ResourceLockingContract $resourceLocking;
+
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalRegistryInterface $portalRegistry,
-        PortalStorageFactory $portalStorageFactory
+        PortalStorageFactory $portalStorageFactory,
+        ResourceLockingContract $resourceLocking
     ) {
         $this->configurationService = $configurationService;
         $this->portalRegistry = $portalRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
+        $this->resourceLocking = $resourceLocking;
     }
 
     public function createContext(CronjobInterface $cronjob): CronjobContextInterface
@@ -32,6 +37,8 @@ class CronjobContextFactory
             $this->configurationService,
             $this->portalRegistry,
             $this->portalStorageFactory,
+            $this->resourceLocking,
+            $cronjob->getPortalNodeKey(),
             $cronjob
         );
     }

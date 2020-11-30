@@ -7,7 +7,6 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
-use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -36,11 +35,11 @@ class StatusReportingContextFactory implements StatusReportingContextFactoryInte
     public function factory(PortalNodeKeyInterface $portalNodeKey): StatusReportingContextInterface
     {
         return new StatusReportingContext(
-            $this->portalRegistry,
             $this->configurationService,
+            $this->portalRegistry,
             $this->portalStorageFactory,
+            $this->resourceLocking,
             $portalNodeKey,
-            new ResourceLockFacade($this->resourceLocking)
         );
     }
 }

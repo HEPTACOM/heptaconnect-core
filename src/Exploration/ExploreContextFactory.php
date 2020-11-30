@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
-use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ExploreContextFactory implements ExploreContextFactoryInterface
@@ -36,11 +35,11 @@ class ExploreContextFactory implements ExploreContextFactoryInterface
     public function factory(PortalNodeKeyInterface $portalNodeKey): ExploreContextInterface
     {
         return new ExploreContext(
-            $this->portalRegistry,
             $this->configurationService,
+            $this->portalRegistry,
             $this->portalStorageFactory,
-            $portalNodeKey,
-            new ResourceLockFacade($this->resourceLocking)
+            $this->resourceLocking,
+            $portalNodeKey
         );
     }
 }

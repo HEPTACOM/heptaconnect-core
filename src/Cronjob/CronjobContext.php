@@ -3,52 +3,38 @@
 namespace Heptacom\HeptaConnect\Core\Cronjob;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
+use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-class CronjobContext implements CronjobContextInterface
+class CronjobContext extends AbstractPortalNodeContext implements CronjobContextInterface
 {
-    private ConfigurationServiceInterface $configurationService;
-
-    private PortalRegistryInterface $portalRegistry;
-
-    private PortalStorageFactory $portalStorageFactory;
-
     private CronjobInterface $cronjob;
 
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalRegistryInterface $portalRegistry,
         PortalStorageFactory $portalStorageFactory,
+        ResourceLockingContract $resourceLocking,
+        PortalNodeKeyInterface $portalNodeKey,
         CronjobInterface $cronjob
     ) {
-        $this->configurationService = $configurationService;
-        $this->portalRegistry = $portalRegistry;
-        $this->portalStorageFactory = $portalStorageFactory;
+        parent::__construct(
+            $configurationService,
+            $portalRegistry,
+            $portalStorageFactory,
+            $resourceLocking,
+            $portalNodeKey
+        );
         $this->cronjob = $cronjob;
-    }
-
-    public function getPortal(): PortalContract
-    {
-        return $this->portalRegistry->getPortal($this->cronjob->getPortalNodeKey());
-    }
-
-    public function getConfig(): ?array
-    {
-        return $this->configurationService->getPortalNodeConfiguration($this->cronjob->getPortalNodeKey());
     }
 
     public function getCronjob(): CronjobInterface
     {
         return $this->cronjob;
-    }
-
-    public function getStorage(): PortalStorageInterface
-    {
-        return $this->portalStorageFactory->createPortalStorage($this->cronjob->getPortalNodeKey());
     }
 }
