@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Support\DatasetEntityTracker;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
@@ -38,13 +38,16 @@ class EmitService implements EmitServiceInterface
 
     private MappingServiceInterface $mappingService;
 
+    private DatasetEntityTrackerContract $datasetEntityTracker;
+
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
         PortalRegistryInterface $portalRegistry,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        MappingServiceInterface $mappingService
+        MappingServiceInterface $mappingService,
+        DatasetEntityTrackerContract $datasetEntityTracker
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
@@ -52,6 +55,7 @@ class EmitService implements EmitServiceInterface
         $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->mappingService = $mappingService;
+        $this->datasetEntityTracker = $datasetEntityTracker;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -97,12 +101,12 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterStackInterface $stack */
             foreach ($stacks as $stack) {
                 try {
-                    DatasetEntityTracker::instance()->listen();
+                    $this->datasetEntityTracker->listen();
 
                     /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
                         try {
-                            $trackedEntities = DatasetEntityTracker::instance()->retrieve();
+                            $trackedEntities = $this->datasetEntityTracker->retrieve();
                             $mappingsToEnsure = new MappingComponentCollection();
 
                             /** @var DatasetEntityInterface $trackedEntity */
@@ -121,7 +125,7 @@ class EmitService implements EmitServiceInterface
                             $this->mappingService->ensurePersistence($mappingsToEnsure);
                             $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
                         } finally {
-                            DatasetEntityTracker::instance()->listen();
+                            $this->datasetEntityTracker->listen();
                         }
                     }
                 } catch (\Throwable $exception) {
@@ -132,7 +136,7 @@ class EmitService implements EmitServiceInterface
                         'exception' => $exception,
                     ]);
                 } finally {
-                    DatasetEntityTracker::instance()->retrieve();
+                    $this->datasetEntityTracker->retrieve();
                 }
             }
 

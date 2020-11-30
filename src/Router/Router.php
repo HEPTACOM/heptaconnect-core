@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Core\Mapping\Support\ReflectionMapping;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntity;
 use Heptacom\HeptaConnect\Dataset\Base\Support\DatasetEntityTracker;
 use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
@@ -40,20 +41,24 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private MappingNodeRepositoryContract $mappingNodeRepository;
 
+    private DatasetEntityTrackerContract $datasetEntityTracker;
+
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
         RouteRepositoryContract $routeRepository,
         MappingServiceInterface $mappingService,
-        MappingNodeRepositoryContract $mappingNodeRepository
+        MappingNodeRepositoryContract $mappingNodeRepository,
+        DatasetEntityTrackerContract $datasetEntityTracker
     ) {
-        DatasetEntityTracker::instance()->deny(ReflectionMapping::class);
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
         $this->routeRepository = $routeRepository;
         $this->mappingService = $mappingService;
         $this->mappingNodeRepository = $mappingNodeRepository;
+        $this->datasetEntityTracker = $datasetEntityTracker;
+        $this->datasetEntityTracker->deny(ReflectionMapping::class);
     }
 
     public static function getHandledMessages(): iterable
@@ -111,9 +116,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
 
             $this->reflectTrackedEntities($trackedEntities, $route->getTargetKey());
-            DatasetEntityTracker::instance()->listen();
+            $this->datasetEntityTracker->listen();
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
-            $receivedEntityData[$entityClassName][] = DatasetEntityTracker::instance()->retrieve()->filter(
+            $receivedEntityData[$entityClassName][] = $this->datasetEntityTracker->retrieve()->filter(
                 fn (DatasetEntityInterface $entity) => !$entity instanceof ReflectionMapping
             );
 
