@@ -33,7 +33,8 @@ cs-phpstan: vendor .build
 
 .PHONY: cs-psalm
 cs-psalm: vendor .build
-	$(PHP) vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
+	# Bug in psalm expects the cache directory to be in the project parent but is the config parent (https://github.com/vimeo/psalm/pull/3421)
+	cd dev-ops && $(PHP) ../vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
 
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor
