@@ -22,52 +22,67 @@ definitions:
                     - 'test $(git --no-pager log --full-history "--grep=${GITHUB_GREP_DENY_PATTERN}" | wc -l) -eq 0'
                 after-script:
                     - 'test ${BITBUCKET_EXIT_CODE} -eq 0 || git --no-pager log --full-history "--grep=${GITHUB_GREP_DENY_PATTERN}"'
-
-pipelines:
-    branches:
-        master:
-            -   step: *github-keyword-gate-step
-            -   step:
-                    <<: *default-step
-                    name: Mirror to Github
-                    script:
-                        - git fetch --unshallow origin
-                        - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
-                        - git push --force github master
-
-    tags:
-        '*':
-            -   step: *github-keyword-gate-step
-            -   step:
-                    name: Mirror tags to Github
-                    script:
-                        - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
-                        - git push --force github tag $BITBUCKET_TAG
-
-    default:
-        -   step:
+        -   step: &github-mirror-branch
+                <<: *default-step
+                name: Mirror to Github
+                script:
+                    - git fetch --unshallow origin
+                    - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
+                    - git push --force github ${BITBUCKET_BRANCH}
+        -   step: &github-mirror-tag
+                <<: *default-step
+                name: Mirror tags to Github
+                script:
+                    - git remote add github "git@github.com:HEPTACOM/${BITBUCKET_REPO_SLUG}.git"
+                    - git push --force github tag $BITBUCKET_TAG
+        -   step: &composer-install
                 <<: *default-step
                 name: Install
                 script:
                     - composer-repository
                     - make vendor
-        -   step:
+        -   step: &test-unit
                 <<: *default-step
-                name: Unit test
+                name: Unit tests
                 script:
                     - make test
-        -   step:
+        -   step: &test-coverage
                 <<: *default-step
                 name: Unit test coverage
                 script:
                     - make coverage
-        -   step:
+        -   step: &test-code-style
                 <<: *default-step
                 name: Code style and static code analysis
                 script:
                     - make cs
-        -   step:
+        -   step: &test-infection
                 <<: *default-step
                 name: Unit test infection detection
                 script:
                     - make infection
+
+pipelines:
+    branches:
+        master:
+            -   step: *github-keyword-gate-step
+            -   step: *github-mirror-branch
+            -   step: *composer-install
+            -   parallel:
+                -   step: *test-unit
+                -   step: *test-coverage
+                -   step: *test-code-style
+                -   step: *test-infection
+
+    tags:
+        '*':
+            -   step: *github-keyword-gate-step
+            -   step: *github-mirror-tag
+
+    default:
+        -   step: *composer-install
+        -   parallel:
+            -   step: *test-unit
+            -   step: *test-coverage
+            -   step: *test-code-style
+            -   step: *test-infection
