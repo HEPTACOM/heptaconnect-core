@@ -5,6 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Cronjob;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
@@ -20,6 +21,7 @@ class CronjobContext extends AbstractPortalNodeContext implements CronjobContext
         PortalRegistryInterface $portalRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         PortalNodeKeyInterface $portalNodeKey,
         CronjobInterface $cronjob
     ) {
@@ -28,6 +30,7 @@ class CronjobContext extends AbstractPortalNodeContext implements CronjobContext
             $portalRegistry,
             $portalStorageFactory,
             $resourceLocking,
+            $portalStackServiceContainerFactory,
             $portalNodeKey
         );
         $this->cronjob = $cronjob;

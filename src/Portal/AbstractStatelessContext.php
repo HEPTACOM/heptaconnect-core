@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\StatelessContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Container\ContainerInterface;
 
 abstract class AbstractStatelessContext implements StatelessContextInterface
 {
@@ -25,18 +26,22 @@ abstract class AbstractStatelessContext implements StatelessContextInterface
 
     private ResourceLockFacade $resourceLockFacade;
 
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
+
     public function __construct(
         MappingServiceInterface $mappingService,
         ConfigurationServiceInterface $configurationService,
         PortalRegistryInterface $portalRegistry,
         PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking
+        ResourceLockingContract $resourceLocking,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->mappingService = $mappingService;
         $this->configurationService = $configurationService;
         $this->portalRegistry = $portalRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLockFacade = new ResourceLockFacade($resourceLocking);
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function getConfig(MappingInterface $mapping): ?array
@@ -62,6 +67,11 @@ abstract class AbstractStatelessContext implements StatelessContextInterface
     public function getPortal(MappingInterface $mapping): PortalContract
     {
         return $this->portalRegistry->getPortal($mapping->getPortalNodeKey());
+    }
+
+    public function getContainer(MappingInterface $mapping): ContainerInterface
+    {
+        return $this->portalStackServiceContainerFactory->create($mapping->getPortalNodeKey());
     }
 
     public function markAsFailed(MappingInterface $mapping, \Throwable $throwable): void

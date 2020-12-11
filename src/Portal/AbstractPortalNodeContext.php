@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Container\ContainerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
@@ -21,6 +22,8 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 
     private ResourceLockFacade $resourceLockFacade;
 
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
+
     private PortalNodeKeyInterface $portalNodeKey;
 
     public function __construct(
@@ -28,12 +31,14 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
         PortalRegistryInterface $portalRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         PortalNodeKeyInterface $portalNodeKey
     ) {
         $this->configurationService = $configurationService;
         $this->portalRegistry = $portalRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLockFacade = new ResourceLockFacade($resourceLocking);
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->portalNodeKey = $portalNodeKey;
     }
 
@@ -60,5 +65,10 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
     public function getStorage(): PortalStorageInterface
     {
         return $this->portalStorageFactory->createPortalStorage($this->portalNodeKey);
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        return $this->portalStackServiceContainerFactory->create($this->portalNodeKey);
     }
 }
