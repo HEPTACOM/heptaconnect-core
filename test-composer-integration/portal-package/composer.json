@@ -8,7 +8,7 @@
     ],
     "require": {
         "php": ">=7.4",
-        "heptacom/heptaconnect-portal-base": ">=1"
+        "heptacom/heptaconnect-portal-base": "@stable"
     },
     "autoload": {
         "psr-4": {
