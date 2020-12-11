@@ -16,12 +16,13 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Heptacom\HeptaConnect\Core\Portal\PortalFactory
+ * @covers \Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\InaccessableConstructorOnInstantionException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException
+ * @covers \Heptacom\HeptaConnect\Core\Portal\PortalFactory
  */
 class PortalFactoryTest extends TestCase
 {

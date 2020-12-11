@@ -13,9 +13,11 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration
+ * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationClassMap
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection
  * @covers \Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader
  * @covers \Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader
+ * @covers \Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract
  * @covers \Heptacom\HeptaConnect\Core\Portal\PortalFactory
  */
 class ComposerPortalLoaderTest extends TestCase
