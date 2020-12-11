@@ -3,7 +3,6 @@
 namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\ReceiveService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
@@ -16,6 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -31,24 +31,28 @@ class ReceiveServiceTest extends TestCase
     public function testReceiveCount(int $count): void
     {
         $receiveContext = $this->createMock(ReceiveContextInterface::class);
-        $mappingService = $this->createMock(MappingServiceInterface::class);
 
         $logger = $this->createMock(LoggerInterface::class);
 
         $portalRegistry = $this->createMock(PortalRegistryInterface::class);
 
         $mapping = $this->createMock(MappingInterface::class);
-        $mapping->expects(static::exactly($count))
+        $mapping->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
-        $mappedDatasetEntity->expects(static::exactly($count * 2))
+        $mappedDatasetEntity->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalRegistry);
-        $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
+        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
+
+        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $receiveService->receive(
+            new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
+            static function (): void {}
+        );
     }
 
     /**
@@ -56,8 +60,7 @@ class ReceiveServiceTest extends TestCase
      */
     public function testMissingReceiver(int $count): void
     {
-        $emitContext = $this->createMock(ReceiveContextInterface::class);
-        $mappingService = $this->createMock(MappingServiceInterface::class);
+        $receiveContext = $this->createMock(ReceiveContextInterface::class);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($count > 0 ? static::atLeastOnce() : static::never())
@@ -90,8 +93,13 @@ class ReceiveServiceTest extends TestCase
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $emitContext, $logger, $portalRegistry);
-        $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
+        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
+
+        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $receiveService->receive(
+            new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
+            static function (): void {}
+        );
     }
 
     /**
@@ -100,7 +108,6 @@ class ReceiveServiceTest extends TestCase
     public function testReceiverFailing(int $count): void
     {
         $receiveContext = $this->createMock(ReceiveContextInterface::class);
-        $mappingService = $this->createMock(MappingServiceInterface::class);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($count > 0 ? static::atLeastOnce() : static::never())
@@ -133,8 +140,13 @@ class ReceiveServiceTest extends TestCase
             ->method('getMapping')
             ->willReturn($mapping);
 
-        $emitService = new ReceiveService($mappingService, $receiveContext, $logger, $portalRegistry);
-        $emitService->receive(new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)));
+        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
+
+        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $receiveService->receive(
+            new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
+            static function (): void {}
+        );
     }
 
     /**

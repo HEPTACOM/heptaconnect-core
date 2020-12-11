@@ -9,6 +9,8 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use HeptacomFixture\Portal\A\Portal;
 use HeptacomFixture\Portal\Extension\PortalExtension;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -27,8 +29,13 @@ class ComposerPortalLoaderTest extends TestCase
         require_once __DIR__.'/../test-composer-integration/portal-package/src/Portal.php';
         require_once __DIR__.'/../test-composer-integration/portal-package-extension/src/PortalExtension.php';
 
+        $poolItem = $this->createMock(CacheItemInterface::class);
+        $poolItem->method('isHit')->willReturn(false);
+        $cachePool = $this->createMock(CacheItemPoolInterface::class);
+        $cachePool->method('getItem')->willReturn($poolItem);
+
         $loader = new ComposerPortalLoader(
-            new PackageConfigurationLoader(__DIR__.'/../test-composer-integration/composer.json'),
+            new PackageConfigurationLoader(__DIR__.'/../test-composer-integration/composer.json', $cachePool),
             new PortalFactory(),
             $this->createMock(LoggerInterface::class)
         );
