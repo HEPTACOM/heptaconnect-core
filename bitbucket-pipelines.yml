@@ -69,10 +69,10 @@ pipelines:
             -   step: *github-mirror-branch
             -   step: *composer-install
             -   parallel:
-                -   step: *test-unit
-                -   step: *test-coverage
-                -   step: *test-code-style
-                -   step: *test-infection
+                    -   step: *test-unit
+                    -   step: *test-coverage
+                    -   step: *test-code-style
+                    -   step: *test-infection
 
     tags:
         '*':
@@ -82,7 +82,7 @@ pipelines:
     default:
         -   step: *composer-install
         -   parallel:
-            -   step: *test-unit
-            -   step: *test-coverage
-            -   step: *test-code-style
-            -   step: *test-infection
+                -   step: *test-unit
+                -   step: *test-coverage
+                -   step: *test-code-style
+                -   step: *test-infection
