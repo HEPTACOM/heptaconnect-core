@@ -8,21 +8,18 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
 use Heptacom\HeptaConnect\Core\Mapping\Support\ReflectionMapping;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
-use Heptacom\HeptaConnect\Dataset\Base\DatasetEntity;
-use Heptacom\HeptaConnect\Dataset\Base\Support\DatasetEntityTracker;
-use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
@@ -43,13 +40,16 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private DatasetEntityTrackerContract $datasetEntityTracker;
 
+    private EntityMapperContract $entityMapper;
+
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
         RouteRepositoryContract $routeRepository,
         MappingServiceInterface $mappingService,
         MappingNodeRepositoryContract $mappingNodeRepository,
-        DatasetEntityTrackerContract $datasetEntityTracker
+        DatasetEntityTrackerContract $datasetEntityTracker,
+        EntityMapperContract $entityMapper
     ) {
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
@@ -59,6 +59,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->mappingNodeRepository = $mappingNodeRepository;
         $this->datasetEntityTracker = $datasetEntityTracker;
         $this->datasetEntityTracker->deny(ReflectionMapping::class);
+        $this->entityMapper = $entityMapper;
     }
 
     public static function getHandledMessages(): iterable
@@ -101,7 +102,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $mapping->getDatasetEntityClassName()
         );
 
-        $trackedEntities = $this->getTrackedEntities($portalNodeKey, $message->getTrackedEntities());
+        $trackedEntities = $this->entityMapper->mapEntities($message->getTrackedEntities(), $portalNodeKey);
         $typedMappedDatasetEntityCollections = [];
         $receivedEntityData = [];
 
@@ -170,29 +171,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 }
             );
         }
-    }
-
-    private function getTrackedEntities(
-        PortalNodeKeyInterface $portalNodeKey,
-        TrackedEntityCollection $trackedEntities
-    ): MappedDatasetEntityCollection {
-        $mappedDatasetEntities = \array_map(function (DatasetEntity $entity) use ($portalNodeKey): MappedDatasetEntityStruct {
-            $dataType = \get_class($entity);
-            $primaryKey = $entity->getPrimaryKey();
-
-            if ($primaryKey !== null) {
-                $mappingNodeKey = [...$this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId($dataType, $portalNodeKey, $primaryKey)][0] ?? null;
-            }
-
-            $mappingNodeKey ??= $this->mappingNodeRepository->create($dataType, $portalNodeKey);
-            $mappingNode = $this->mappingNodeRepository->read($mappingNodeKey);
-
-            $mapping = (new MappingStruct($portalNodeKey, $mappingNode))->setExternalId($primaryKey);
-
-            return new MappedDatasetEntityStruct($mapping, $entity);
-        }, iterable_to_array($trackedEntities));
-
-        return new MappedDatasetEntityCollection($mappedDatasetEntities);
     }
 
     private function reflectTrackedEntities(
