@@ -95,7 +95,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $mappedDatasetEntityStruct = $message->getMappedDatasetEntityStruct();
         $mapping = $mappedDatasetEntityStruct->getMapping();
         $portalNodeKey = $mapping->getPortalNodeKey();
-        $entityClassName = $mapping->getDatasetEntityClassName();
 
         $routeIds = $this->routeRepository->listBySourceAndEntityType(
             $portalNodeKey,
@@ -103,7 +102,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         );
 
         $trackedEntities = $this->entityMapper->mapEntities($message->getTrackedEntities(), $portalNodeKey);
-        $typedMappedDatasetEntityCollections = [];
+        $typedMappedDatasetEntityCollection = new TypedMappedDatasetEntityCollection($mapping->getDatasetEntityClassName());
         $receivedEntityData = [];
 
         foreach ($routeIds as $routeId) {
@@ -114,12 +113,10 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 $mapping->getExternalId()
             ), $route->getTargetKey());
 
-            $typedMappedDatasetEntityCollections[$entityClassName] ??= new TypedMappedDatasetEntityCollection($entityClassName);
-
             $this->reflectTrackedEntities($trackedEntities, $route->getTargetKey());
             $this->datasetEntityTracker->listen();
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
-            $receivedEntityData[$entityClassName][] = $this->datasetEntityTracker->retrieve()->filter(
+            $receivedEntityData[] = $this->datasetEntityTracker->retrieve()->filter(
                 fn (DatasetEntityInterface $entity) => !$entity instanceof ReflectionMapping
             );
 
@@ -128,49 +125,45 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 $trackedEntity->getDatasetEntity()->unattach(ReflectionMapping::class);
             }
 
-            $typedMappedDatasetEntityCollections[$entityClassName]->push([
+            $typedMappedDatasetEntityCollection->push([
                 new MappedDatasetEntityStruct($targetMapping, $datasetEntity),
             ]);
         }
 
-        foreach ($typedMappedDatasetEntityCollections as $entityClassName => $typedMappedDatasetEntityCollection) {
-            $receivedDataCollection = $receivedEntityData[$entityClassName];
-
-            $this->receiveService->receive(
-                $typedMappedDatasetEntityCollection,
-                function (PortalNodeKeyInterface $targetPortalNodeKey) use ($receivedDataCollection) {
-                    foreach ($receivedDataCollection as $receivedEntities) {
-                        foreach ($receivedEntities as $receivedEntity) {
-                            if (!$receivedEntity instanceof DatasetEntityInterface
-                                || $receivedEntity->getPrimaryKey() === null) {
-                                continue;
-                            }
-
-                            $original = $receivedEntity->getAttachment(ReflectionMapping::class);
-
-                            if (!$original instanceof ReflectionMapping) {
-                                continue;
-                            }
-
-                            $receivedMapping = $this->mappingService->get(
-                                \get_class($receivedEntity),
-                                $targetPortalNodeKey,
-                                $receivedEntity->getPrimaryKey()
-                            );
-
-                            if ($receivedMapping->getMappingNodeKey()->equals($original->getMappingNodeKey())) {
-                                continue;
-                            }
-
-                            $this->mappingService->merge(
-                                $receivedMapping->getMappingNodeKey(),
-                                $original->getMappingNodeKey()
-                            );
+        $this->receiveService->receive(
+            $typedMappedDatasetEntityCollection,
+            function (PortalNodeKeyInterface $targetPortalNodeKey) use ($receivedEntityData) {
+                foreach ($receivedEntityData as $receivedEntities) {
+                    foreach ($receivedEntities as $receivedEntity) {
+                        if (!$receivedEntity instanceof DatasetEntityInterface
+                            || $receivedEntity->getPrimaryKey() === null) {
+                            continue;
                         }
+
+                        $original = $receivedEntity->getAttachment(ReflectionMapping::class);
+
+                        if (!$original instanceof ReflectionMapping || $original->getPrimaryKey() === null) {
+                            continue;
+                        }
+
+                        $receivedMapping = $this->mappingService->get(
+                            \get_class($receivedEntity),
+                            $targetPortalNodeKey,
+                            $receivedEntity->getPrimaryKey()
+                        );
+
+                        if ($receivedMapping->getMappingNodeKey()->equals($original->getMappingNodeKey())) {
+                            continue;
+                        }
+
+                        $this->mappingService->merge(
+                            $receivedMapping->getMappingNodeKey(),
+                            $original->getMappingNodeKey()
+                        );
                     }
                 }
-            );
-        }
+            }
+        );
     }
 
     private function reflectTrackedEntities(
