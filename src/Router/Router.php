@@ -22,6 +22,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\ShopwareDal\EntityReflector;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
@@ -42,6 +43,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private EntityMapperContract $entityMapper;
 
+    private EntityReflector $entityReflector;
+
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
@@ -49,7 +52,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
         MappingServiceInterface $mappingService,
         MappingNodeRepositoryContract $mappingNodeRepository,
         DatasetEntityTrackerContract $datasetEntityTracker,
-        EntityMapperContract $entityMapper
+        EntityMapperContract $entityMapper,
+        EntityReflector $entityReflector
     ) {
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
@@ -60,6 +64,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->datasetEntityTracker = $datasetEntityTracker;
         $this->datasetEntityTracker->deny(ReflectionMapping::class);
         $this->entityMapper = $entityMapper;
+        $this->entityReflector = $entityReflector;
     }
 
     public static function getHandledMessages(): iterable
@@ -113,7 +118,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 $mapping->getExternalId()
             ), $route->getTargetKey());
 
-            $this->reflectTrackedEntities($trackedEntities, $route->getTargetKey());
+            $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
             $this->datasetEntityTracker->listen();
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
             $receivedEntityData[] = $this->datasetEntityTracker->retrieve()->filter(
@@ -164,26 +169,5 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 }
             }
         );
-    }
-
-    private function reflectTrackedEntities(
-        MappedDatasetEntityCollection $trackedEntities,
-        PortalNodeKeyInterface $portalNodeKey
-    ): void {
-        /** @var MappedDatasetEntityStruct $trackedEntity */
-        foreach ($trackedEntities as $trackedEntity) {
-            $sourceMapping = $trackedEntity->getMapping();
-            $targetMapping = $this->mappingService->reflect($sourceMapping, $portalNodeKey);
-
-            $reflectionMapping = (new ReflectionMapping())
-                ->setPortalNodeKey($sourceMapping->getPortalNodeKey())
-                ->setMappingNodeKey($sourceMapping->getMappingNodeKey())
-                ->setDatasetEntityClassName($sourceMapping->getDatasetEntityClassName())
-                ->setExternalId($sourceMapping->getExternalId())
-            ;
-
-            $trackedEntity->getDatasetEntity()->attach($reflectionMapping);
-            $trackedEntity->getDatasetEntity()->setPrimaryKey($targetMapping->getExternalId());
-        }
     }
 }
