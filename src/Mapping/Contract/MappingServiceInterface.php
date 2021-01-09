@@ -18,6 +18,19 @@ interface MappingServiceInterface
         string $externalId
     ): MappingInterface;
 
+    /**
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     *
+     * @return MappingInterface[]
+     *
+     * @psalm-return iterable<string, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface>
+     */
+    public function getListByExternalIds(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        array $externalIds
+    ): iterable;
+
     public function ensurePersistence(MappingComponentCollection $mappingComponentCollection): void;
 
     public function save(MappingInterface $mapping): void;

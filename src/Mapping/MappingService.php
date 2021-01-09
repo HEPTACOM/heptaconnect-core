@@ -97,6 +97,56 @@ class MappingService implements MappingServiceInterface
         return $mapping;
     }
 
+    public function getListByExternalIds(
+        string $datasetEntityClassName,
+        PortalNodeKeyInterface $portalNodeKey,
+        array $externalIds
+    ): iterable {
+        $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
+            $datasetEntityClassName,
+            $portalNodeKey,
+            $externalIds
+        );
+        $newExternalIds = $externalIds;
+
+        foreach ($mappingNodeKeys as $mappedExternalId => $mappingNodeKey) {
+            if (($match = \array_search($mappedExternalId, $newExternalIds, true)) !== false) {
+                unset($newExternalIds[$match]);
+                yield $mappedExternalId => (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))->setExternalId($mappedExternalId);
+            }
+        }
+
+        $newMappingNodeKeys = $this->mappingNodeRepository->createList($datasetEntityClassName, $portalNodeKey, \count($newExternalIds));
+        $newMappingNodeKeysIterator = $newMappingNodeKeys->getIterator();
+        $createPayload = new MappingCollection();
+
+        foreach ($newExternalIds as $newExternalId) {
+            if (!$newMappingNodeKeysIterator->valid()) {
+                break;
+            }
+
+            $mappingNodeKey = $newMappingNodeKeysIterator->current();
+
+            if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
+                continue;
+            }
+
+            $createPayload->push([
+                (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
+                    ->setExternalId($newExternalId)
+            ]);
+
+            $newMappingNodeKeysIterator->next();
+        }
+
+        $this->mappingRepository->createList($createPayload);
+
+        /** @var MappingStruct $mapping */
+        foreach ($createPayload as $mapping) {
+            yield from $mapping->getExternalId() => $mapping;
+        }
+    }
+
     public function ensurePersistence(MappingComponentCollection $mappingComponentCollection): void
     {
         $prePayload = new MappingComponentCollection();
