@@ -143,7 +143,7 @@ class MappingService implements MappingServiceInterface
 
         /** @var MappingStruct $mapping */
         foreach ($createPayload as $mapping) {
-            yield from $mapping->getExternalId() => $mapping;
+            yield $mapping->getExternalId() => $mapping;
         }
     }
 

@@ -14,7 +14,6 @@ use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
@@ -138,6 +137,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->receiveService->receive(
             $typedMappedDatasetEntityCollection,
             function (PortalNodeKeyInterface $targetPortalNodeKey) use ($receivedEntityData) {
+                $originalReflectionMappingsByType = [];
+
                 foreach ($receivedEntityData as $receivedEntities) {
                     foreach ($receivedEntities as $receivedEntity) {
                         if (!$receivedEntity instanceof DatasetEntityInterface
@@ -151,11 +152,20 @@ class Router implements RouterInterface, MessageSubscriberInterface
                             continue;
                         }
 
-                        $receivedMapping = $this->mappingService->get(
-                            \get_class($receivedEntity),
-                            $targetPortalNodeKey,
-                            $receivedEntity->getPrimaryKey()
-                        );
+                        $originalReflectionMappingsByType[\get_class($receivedEntity)][$receivedEntity->getPrimaryKey()] = $original;
+                    }
+                }
+
+                foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
+                    $externalIds = \array_keys($originalReflectionMappings);
+                    $receivedMappingsIterable = $this->mappingService->getAllByExternalIds(
+                        $datasetEntityType,
+                        $targetPortalNodeKey,
+                        $externalIds
+                    );
+
+                    foreach ($receivedMappingsIterable as $externalId => $receivedMapping) {
+                        $original = $originalReflectionMappings[$externalId];
 
                         if ($receivedMapping->getMappingNodeKey()->equals($original->getMappingNodeKey())) {
                             continue;
