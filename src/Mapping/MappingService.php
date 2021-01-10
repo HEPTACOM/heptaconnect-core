@@ -20,6 +20,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryCont
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
+use Psr\Log\LoggerInterface;
 
 class MappingService implements MappingServiceInterface
 {
@@ -31,40 +32,56 @@ class MappingService implements MappingServiceInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         MappingRepositoryContract $mappingRepository,
         MappingExceptionRepositoryContract $mappingExceptionRepository,
         MappingNodeRepositoryContract $mappingNodeRepository,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        LoggerInterface $logger
     ) {
         $this->mappingRepository = $mappingRepository;
         $this->mappingExceptionRepository = $mappingExceptionRepository;
         $this->mappingNodeRepository = $mappingNodeRepository;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->logger = $logger;
     }
 
     public function addException(MappingInterface $mapping, \Throwable $exception): void
     {
-        $mappingKeys = $this->mappingRepository->listByNodes(
-            $mapping->getMappingNodeKey(),
-            $mapping->getPortalNodeKey()
-        );
-        $mappingKey = null;
-
-        foreach ($mappingKeys as $mappingKey) {
-            $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
-            break;
-        }
-
-        if (!$mappingKey instanceof MappingKeyInterface) {
-            $mappingKey = $this->mappingRepository->create(
-                $mapping->getPortalNodeKey(),
+        try {
+            $mappingKeys = $this->mappingRepository->listByNodes(
                 $mapping->getMappingNodeKey(),
-                $mapping->getExternalId()
+                $mapping->getPortalNodeKey()
             );
-        }
+            $mappingKey = null;
 
-        $this->mappingExceptionRepository->create($mappingKey, $exception);
+            foreach ($mappingKeys as $mappingKey) {
+                $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
+                break;
+            }
+
+            if (!$mappingKey instanceof MappingKeyInterface) {
+                $mappingKey = $this->mappingRepository->create(
+                    $mapping->getPortalNodeKey(),
+                    $mapping->getMappingNodeKey(),
+                    $mapping->getExternalId()
+                );
+            }
+
+            $this->mappingExceptionRepository->create($mappingKey, $exception);
+        } catch (\Throwable $throwable) {
+            $this->logger->error('MAPPING_EXCEPTION', [
+                'exception' => $exception,
+                'mappingKey' => $mappingKey ? $this->storageKeyGenerator->serialize($mappingKey) : null,
+                'mappingNodeKey' => $this->storageKeyGenerator->serialize($mapping->getMappingNodeKey()),
+                'portalNodeKey' => $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()),
+                'externalId' => $mapping->getExternalId(),
+                'mapping' => $mapping,
+                'outerException' => $throwable,
+            ]);
+        }
     }
 
     public function get(
