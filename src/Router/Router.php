@@ -148,7 +148,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
                         $original = $receivedEntity->getAttachment(ReflectionMapping::class);
 
-                        if (!$original instanceof ReflectionMapping || $original->getPrimaryKey() === null) {
+                        if (!$original instanceof ReflectionMapping || $original->getExternalId() === null) {
                             continue;
                         }
 

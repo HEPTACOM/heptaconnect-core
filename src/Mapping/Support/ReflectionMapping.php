@@ -17,6 +17,10 @@ class ReflectionMapping extends DatasetEntity implements MappingInterface
 
     protected ?string $datasetEntityClassName = null;
 
+    public function getPrimaryKey(): ?string
+    {
+        return $this->getExternalId();
+    }
 
     public function getExternalId(): ?string
     {
