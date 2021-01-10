@@ -158,7 +158,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
                 foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
                     $externalIds = \array_keys($originalReflectionMappings);
-                    $receivedMappingsIterable = $this->mappingService->getAllByExternalIds(
+                    $receivedMappingsIterable = $this->mappingService->getListByExternalIds(
                         $datasetEntityType,
                         $targetPortalNodeKey,
                         $externalIds
