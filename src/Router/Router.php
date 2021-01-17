@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Support\ReflectionMapping;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
@@ -19,9 +18,10 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
-use Heptacom\HeptaConnect\Storage\ShopwareDal\EntityReflector;
+use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
@@ -42,7 +42,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private EntityMapperContract $entityMapper;
 
-    private EntityReflector $entityReflector;
+    private EntityReflectorContract $entityReflector;
 
     public function __construct(
         EmitServiceInterface $emitService,
@@ -52,7 +52,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         MappingNodeRepositoryContract $mappingNodeRepository,
         DatasetEntityTrackerContract $datasetEntityTracker,
         EntityMapperContract $entityMapper,
-        EntityReflector $entityReflector
+        EntityReflectorContract $entityReflector
     ) {
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
@@ -61,7 +61,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->mappingService = $mappingService;
         $this->mappingNodeRepository = $mappingNodeRepository;
         $this->datasetEntityTracker = $datasetEntityTracker;
-        $this->datasetEntityTracker->deny(ReflectionMapping::class);
+        $this->datasetEntityTracker->deny(PrimaryKeySharingMappingStruct::class);
         $this->entityMapper = $entityMapper;
         $this->entityReflector = $entityReflector;
     }
@@ -121,12 +121,12 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $this->datasetEntityTracker->listen();
             $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
             $receivedEntityData[] = $this->datasetEntityTracker->retrieve()->filter(
-                fn (DatasetEntityInterface $entity) => !$entity instanceof ReflectionMapping
+                fn (DatasetEntityInterface $entity) => !$entity instanceof PrimaryKeySharingMappingStruct
             );
 
             /** @var MappedDatasetEntityStruct $trackedEntity */
             foreach ($trackedEntities as $trackedEntity) {
-                $trackedEntity->getDatasetEntity()->unattach(ReflectionMapping::class);
+                $trackedEntity->getDatasetEntity()->unattach(PrimaryKeySharingMappingStruct::class);
             }
 
             $typedMappedDatasetEntityCollection->push([
@@ -146,9 +146,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
                             continue;
                         }
 
-                        $original = $receivedEntity->getAttachment(ReflectionMapping::class);
+                        $original = $receivedEntity->getAttachment(PrimaryKeySharingMappingStruct::class);
 
-                        if (!$original instanceof ReflectionMapping || $original->getExternalId() === null) {
+                        if (!$original instanceof PrimaryKeySharingMappingStruct || $original->getExternalId() === null) {
                             continue;
                         }
 
