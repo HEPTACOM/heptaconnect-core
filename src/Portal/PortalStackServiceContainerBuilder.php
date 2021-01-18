@@ -24,6 +24,8 @@ class PortalStackServiceContainerBuilder
             $services[\get_class($portalExtension)] = $portalExtension;
         }
 
+        $services[DeepCloneContract::class] ??= new DeepCloneContract();
+
         return new PortalStackServiceContainer($services);
     }
 }
