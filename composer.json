@@ -25,7 +25,6 @@
         "heptacom/heptaconnect-dataset-base": ">=0.0.1",
         "heptacom/heptaconnect-portal-base": ">=0.0.1",
         "heptacom/heptaconnect-storage-base": ">=0.0.1",
-        "myclabs/deep-copy": "^1.10",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
         "psr/http-message": "^1.0",
