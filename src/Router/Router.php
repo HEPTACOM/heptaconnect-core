@@ -21,6 +21,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
@@ -44,6 +45,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private EntityReflectorContract $entityReflector;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
@@ -52,7 +55,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
         MappingNodeRepositoryContract $mappingNodeRepository,
         DatasetEntityTrackerContract $datasetEntityTracker,
         EntityMapperContract $entityMapper,
-        EntityReflectorContract $entityReflector
+        EntityReflectorContract $entityReflector,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
@@ -64,6 +68,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->datasetEntityTracker->deny(PrimaryKeySharingMappingStruct::class);
         $this->entityMapper = $entityMapper;
         $this->entityReflector = $entityReflector;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public static function getHandledMessages(): iterable
@@ -104,6 +109,20 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $portalNodeKey,
             $mapping->getDatasetEntityClassName()
         );
+
+        $routeIds = iterable_to_array($routeIds);
+
+        if (\count($routeIds) === 0) {
+            $portalNodeId = $this->storageKeyGenerator->serialize($portalNodeKey);
+
+            // TODO: add custom type for exception
+            throw new \Exception(\sprintf(\implode(PHP_EOL, [
+                'Message is not routed. Add a route and re-explore this entity.',
+                'source portal: %s',
+                'data type: %s',
+                'external id: $s',
+            ]), $portalNodeId, $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
+        }
 
         $trackedEntities = $this->entityMapper->mapEntities($message->getTrackedEntities(), $portalNodeKey);
         $typedMappedDatasetEntityCollection = new TypedMappedDatasetEntityCollection($mapping->getDatasetEntityClassName());
