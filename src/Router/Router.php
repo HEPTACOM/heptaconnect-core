@@ -156,6 +156,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->receiveService->receive(
             $typedMappedDatasetEntityCollection,
             function (PortalNodeKeyInterface $targetPortalNodeKey) use ($receivedEntityData) {
+                $exceptions = [];
                 $originalReflectionMappingsByType = [];
 
                 foreach ($receivedEntityData as $receivedEntities) {
@@ -190,11 +191,19 @@ class Router implements RouterInterface, MessageSubscriberInterface
                             continue;
                         }
 
-                        $this->mappingService->merge(
-                            $receivedMapping->getMappingNodeKey(),
-                            $original->getMappingNodeKey()
-                        );
+                        try {
+                            $this->mappingService->merge(
+                                $receivedMapping->getMappingNodeKey(),
+                                $original->getMappingNodeKey()
+                            );
+                        } catch (\Throwable $exception) {
+                            $exceptions[] = $exception;
+                        }
                     }
+                }
+
+                if ($exceptions) {
+                    throw new CumulativeMappingException('Errors occured while merging mapping nodes.', ...$exceptions);
                 }
             }
         );
