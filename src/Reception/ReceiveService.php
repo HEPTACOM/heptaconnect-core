@@ -104,7 +104,7 @@ class ReceiveService implements ReceiveServiceInterface
     }
 
     /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\ReceiverStackInterface>
+     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface>
      */
     private function getReceiverStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
     {

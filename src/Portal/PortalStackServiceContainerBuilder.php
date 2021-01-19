@@ -6,6 +6,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
+use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 
 class PortalStackServiceContainerBuilder
 {
@@ -25,6 +26,7 @@ class PortalStackServiceContainerBuilder
         }
 
         $services[DeepCloneContract::class] ??= new DeepCloneContract();
+        $services[DeepObjectIteratorContract::class] ??= new DeepObjectIteratorContract();
 
         return new PortalStackServiceContainer($services);
     }
