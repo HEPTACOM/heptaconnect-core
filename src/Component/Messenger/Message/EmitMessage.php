@@ -9,21 +9,13 @@ class EmitMessage
 {
     private MappedDatasetEntityStruct $mappedDatasetEntityStruct;
 
-    private TrackedEntityCollection $trackedEntities;
-
-    public function __construct(MappedDatasetEntityStruct $mappedDatasetEntityStruct, TrackedEntityCollection $trackedEntities)
+    public function __construct(MappedDatasetEntityStruct $mappedDatasetEntityStruct)
     {
         $this->mappedDatasetEntityStruct = $mappedDatasetEntityStruct;
-        $this->trackedEntities = $trackedEntities;
     }
 
     public function getMappedDatasetEntityStruct(): MappedDatasetEntityStruct
     {
         return $this->mappedDatasetEntityStruct;
-    }
-
-    public function getTrackedEntities(): TrackedEntityCollection
-    {
-        return $this->trackedEntities;
     }
 }

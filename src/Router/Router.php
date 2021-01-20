@@ -13,8 +13,11 @@ use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -131,7 +134,29 @@ class Router implements RouterInterface, MessageSubscriberInterface
             ]), $portalNodeId, $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
         }
 
-        $trackedEntities = $this->entityMapper->mapEntities($message->getTrackedEntities(), $portalNodeKey);
+        $trackedEntities = new TrackedEntityCollection($this->objectIterator->iterate($mappedDatasetEntityStruct->getDatasetEntity()));
+        $mappingsToEnsure = new MappingComponentCollection();
+
+        /** @var DatasetEntityInterface $trackedEntity */
+        foreach ($trackedEntities->getIterator() as $trackedEntity) {
+            if (!$trackedEntity instanceof DatasetEntityInterface || $trackedEntity->getPrimaryKey() === null) {
+                continue;
+            }
+
+            $mappingsToEnsure->push([new MappingComponentStruct(
+                $portalNodeKey,
+                \get_class($trackedEntity),
+                $trackedEntity->getPrimaryKey()
+            )]);
+        }
+
+        $this->mappingService->ensurePersistence($mappingsToEnsure);
+
+        $trackedEntities = $this->entityMapper->mapEntities(
+            $trackedEntities,
+            $portalNodeKey
+        );
+
         $typedMappedDatasetEntityCollection = new TypedMappedDatasetEntityCollection($mapping->getDatasetEntityClassName());
         $receivedEntityData = [];
 

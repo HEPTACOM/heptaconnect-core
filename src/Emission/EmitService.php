@@ -7,15 +7,11 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -38,16 +34,13 @@ class EmitService implements EmitServiceInterface
 
     private MappingServiceInterface $mappingService;
 
-    private DatasetEntityTrackerContract $datasetEntityTracker;
-
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
         PortalRegistryInterface $portalRegistry,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        MappingServiceInterface $mappingService,
-        DatasetEntityTrackerContract $datasetEntityTracker
+        MappingServiceInterface $mappingService
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
@@ -55,7 +48,6 @@ class EmitService implements EmitServiceInterface
         $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->mappingService = $mappingService;
-        $this->datasetEntityTracker = $datasetEntityTracker;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -101,32 +93,9 @@ class EmitService implements EmitServiceInterface
             /** @var EmitterStackInterface $stack */
             foreach ($stacks as $stack) {
                 try {
-                    $this->datasetEntityTracker->listen();
-
                     /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
                     foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
-                        try {
-                            $trackedEntities = $this->datasetEntityTracker->retrieve();
-                            $mappingsToEnsure = new MappingComponentCollection();
-
-                            /** @var DatasetEntityInterface $trackedEntity */
-                            foreach ($trackedEntities->getIterator() as $trackedEntity) {
-                                if (!$trackedEntity instanceof DatasetEntityInterface || $trackedEntity->getPrimaryKey() === null) {
-                                    continue;
-                                }
-
-                                $mappingsToEnsure->push([new MappingComponentStruct(
-                                    $portalNodeKey,
-                                    \get_class($trackedEntity),
-                                    $trackedEntity->getPrimaryKey()
-                                )]);
-                            }
-
-                            $this->mappingService->ensurePersistence($mappingsToEnsure);
-                            $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct, $trackedEntities));
-                        } finally {
-                            $this->datasetEntityTracker->listen();
-                        }
+                        $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
                     }
                 } catch (\Throwable $exception) {
                     $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
@@ -135,8 +104,6 @@ class EmitService implements EmitServiceInterface
                         'stack' => $stack,
                         'exception' => $exception,
                     ]);
-                } finally {
-                    $this->datasetEntityTracker->retrieve();
                 }
             }
 
