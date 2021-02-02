@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
@@ -48,16 +47,13 @@ class EmitServiceTest extends TestCase
 
         $mappingService = $this->createMock(MappingServiceInterface::class);
 
-        $datasetEntityTracker = $this->createMock(DatasetEntityTrackerContract::class);
-
         $emitService = new EmitService(
             $emitContext,
             $logger,
             $messageBus,
             $portalRegistry,
             $storageKeyGenerator,
-            $mappingService,
-            $datasetEntityTracker
+            $mappingService
         );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
@@ -98,16 +94,13 @@ class EmitServiceTest extends TestCase
 
         $mappingService = $this->createMock(MappingServiceInterface::class);
 
-        $datasetEntityTracker = $this->createMock(DatasetEntityTrackerContract::class);
-
         $emitService = new EmitService(
             $emitContext,
             $logger,
             $messageBus,
             $portalRegistry,
             $storageKeyGenerator,
-            $mappingService,
-            $datasetEntityTracker
+            $mappingService
         );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
@@ -148,16 +141,13 @@ class EmitServiceTest extends TestCase
 
         $mappingService = $this->createMock(MappingServiceInterface::class);
 
-        $datasetEntityTracker = $this->createMock(DatasetEntityTrackerContract::class);
-
         $emitService = new EmitService(
             $emitContext,
             $logger,
             $messageBus,
             $portalRegistry,
             $storageKeyGenerator,
-            $mappingService,
-            $datasetEntityTracker
+            $mappingService
         );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
