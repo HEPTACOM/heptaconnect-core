@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface;
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
     /**
-     * @psalm-var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     * @psalm-var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
      */
     private string $datasetEntityClassName;
 
@@ -18,7 +18,7 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
     private ?string $foreignKey = null;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
      */
     public function __construct(string $datasetEntityClassName)
     {

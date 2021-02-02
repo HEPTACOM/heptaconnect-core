@@ -6,7 +6,7 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterfa
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
@@ -64,9 +64,9 @@ class ExploreService implements ExploreServiceInterface
 
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
 
-            /** @var DatasetEntityInterface|null $entity */
+            /** @var DatasetEntityContract|null $entity */
             foreach ($explorerStack->next($context) as $entity) {
-                if (!$entity instanceof DatasetEntityInterface) {
+                if (!$entity instanceof DatasetEntityContract) {
                     continue;
                 }
 
@@ -92,7 +92,7 @@ class ExploreService implements ExploreServiceInterface
     }
 
     /**
-     * @psalm-return array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>>
+     * @psalm-return array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>>
      *
      * @return array|string[]
      */

@@ -10,12 +10,12 @@ class MappingNodeStruct implements MappingNodeStructInterface
     private MappingNodeKeyInterface $id;
 
     /**
-     * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
+     * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
     private string $datasetEntityClassName;
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
      */
     public function __construct(MappingNodeKeyInterface $id, string $datasetEntityClassName)
     {
@@ -36,7 +36,7 @@ class MappingNodeStruct implements MappingNodeStructInterface
     }
 
     /**
-     * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface>
+     * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
     public function getDatasetEntityClassName(): string
     {
@@ -44,7 +44,7 @@ class MappingNodeStruct implements MappingNodeStructInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface> $datasetEntityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
      */
     public function setDatasetEntityClassName(string $datasetEntityClassName): self
     {

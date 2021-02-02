@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
@@ -126,9 +126,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $trackedEntities = new TrackedEntityCollection($this->objectIterator->iterate($mappedDatasetEntityStruct->getDatasetEntity()));
         $mappingsToEnsure = new MappingComponentCollection();
 
-        /** @var DatasetEntityInterface $trackedEntity */
+        /** @var DatasetEntityContract $trackedEntity */
         foreach ($trackedEntities->getIterator() as $trackedEntity) {
-            if (!$trackedEntity instanceof DatasetEntityInterface || $trackedEntity->getPrimaryKey() === null) {
+            if (!$trackedEntity instanceof DatasetEntityContract || $trackedEntity->getPrimaryKey() === null) {
                 continue;
             }
 
@@ -162,7 +162,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
             $receivedEntityData[] = \array_filter(
                 iterable_to_array($this->objectIterator->iterate($datasetEntity)),
-                fn (DatasetEntityInterface $entity) => !$entity instanceof PrimaryKeySharingMappingStruct
+                fn (DatasetEntityContract $entity) => !$entity instanceof PrimaryKeySharingMappingStruct
             );
 
             /** @var MappedDatasetEntityStruct $trackedEntity */
@@ -176,7 +176,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         }
 
         foreach ($this->objectIterator->iterate($typedMappedDatasetEntityCollection) as $object) {
-            if (!$object instanceof DatasetEntityInterface) {
+            if (!$object instanceof DatasetEntityContract) {
                 continue;
             }
 
@@ -194,7 +194,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
                 foreach ($receivedEntityData as $receivedEntities) {
                     foreach ($receivedEntities as $receivedEntity) {
-                        if (!$receivedEntity instanceof DatasetEntityInterface
+                        if (!$receivedEntity instanceof DatasetEntityContract
                             || $receivedEntity->getPrimaryKey() === null) {
                             continue;
                         }
