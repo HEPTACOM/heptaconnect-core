@@ -2,7 +2,6 @@
 
 namespace Heptacom\HeptaConnect\Core\Router;
 
-use DeepCopy\DeepCopy;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\BatchPublishMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
@@ -12,7 +11,6 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityTrackerContract;
 use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
@@ -32,8 +30,6 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
 {
-    private DeepCopy $deepCopy;
-
     private EmitServiceInterface $emitService;
 
     private ReceiveServiceInterface $receiveService;
@@ -43,8 +39,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
     private MappingServiceInterface $mappingService;
 
     private MappingNodeRepositoryContract $mappingNodeRepository;
-
-    private DatasetEntityTrackerContract $datasetEntityTracker;
 
     private EntityMapperContract $entityMapper;
 
@@ -60,20 +54,15 @@ class Router implements RouterInterface, MessageSubscriberInterface
         RouteRepositoryContract $routeRepository,
         MappingServiceInterface $mappingService,
         MappingNodeRepositoryContract $mappingNodeRepository,
-        DatasetEntityTrackerContract $datasetEntityTracker,
         EntityMapperContract $entityMapper,
         EntityReflectorContract $entityReflector,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        // TODO replace with deep clone from DI
-        $this->deepCopy = new DeepCopy();
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
         $this->routeRepository = $routeRepository;
         $this->mappingService = $mappingService;
         $this->mappingNodeRepository = $mappingNodeRepository;
-        $this->datasetEntityTracker = $datasetEntityTracker;
-        $this->datasetEntityTracker->deny(PrimaryKeySharingMappingStruct::class);
         $this->entityMapper = $entityMapper;
         $this->entityReflector = $entityReflector;
         $this->storageKeyGenerator = $storageKeyGenerator;
@@ -169,9 +158,10 @@ class Router implements RouterInterface, MessageSubscriberInterface
             ), $route->getTargetKey());
 
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
-            $this->datasetEntityTracker->listen();
-            $datasetEntity = $this->deepCopy->copy($mappedDatasetEntityStruct->getDatasetEntity());
-            $receivedEntityData[] = $this->datasetEntityTracker->retrieve()->filter(
+
+            $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
+            $receivedEntityData[] = \array_filter(
+                iterable_to_array($this->objectIterator->iterate($datasetEntity)),
                 fn (DatasetEntityInterface $entity) => !$entity instanceof PrimaryKeySharingMappingStruct
             );
 
