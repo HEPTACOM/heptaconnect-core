@@ -162,7 +162,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
             $receivedEntityData[] = \array_filter(
                 iterable_to_array($this->objectIterator->iterate($datasetEntity)),
-                fn (DatasetEntityContract $entity) => !$entity instanceof PrimaryKeySharingMappingStruct
+                fn ($entity) => $entity instanceof DatasetEntityContract
             );
 
             /** @var MappedDatasetEntityStruct $trackedEntity */
