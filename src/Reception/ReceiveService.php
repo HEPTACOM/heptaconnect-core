@@ -113,11 +113,15 @@ class ReceiveService implements ReceiveServiceInterface
         if (!isset($this->receiverStackCache[$cacheKey])) {
             $portal = $this->portalRegistry->getPortal($portalNodeKey);
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $receivers = $portal->getReceivers()->bySupport($entityClassName);
-            $receiverDecorators = $portalExtensions->getReceiverDecorators()->bySupport($entityClassName);
+            $receivers = iterable_to_array($portal->getReceivers()->bySupport($entityClassName));
+            $receiverDecorators = iterable_to_array($portalExtensions->getReceiverDecorators()->bySupport($entityClassName));
 
-            foreach ($receivers as $receiver) {
-                $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators, $receiver]);
+            if ($receivers) {
+                foreach ($receivers as $receiver) {
+                    $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators, $receiver]);
+                }
+            } elseif ($receiverDecorators) {
+                $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators]);
             }
         }
 
