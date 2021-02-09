@@ -165,11 +165,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 fn ($entity) => $entity instanceof DatasetEntityContract
             );
 
-            /** @var MappedDatasetEntityStruct $trackedEntity */
-            foreach ($trackedEntities as $trackedEntity) {
-                $trackedEntity->getDatasetEntity()->unattach(PrimaryKeySharingMappingStruct::class);
-            }
-
             $typedMappedDatasetEntityCollection->push([
                 new MappedDatasetEntityStruct($targetMapping, $datasetEntity),
             ]);
