@@ -121,11 +121,15 @@ class EmitService implements EmitServiceInterface
         if (!isset($this->emitterStackCache[$cacheKey])) {
             $portal = $this->portalRegistry->getPortal($portalNodeKey);
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $emitters = $portal->getEmitters()->bySupport($entityClassName);
-            $emitterDecorators = $portalExtensions->getEmitterDecorators()->bySupport($entityClassName);
+            $emitters = iterable_to_array($portal->getEmitters()->bySupport($entityClassName));
+            $emitterDecorators = iterable_to_array($portalExtensions->getEmitterDecorators()->bySupport($entityClassName));
 
-            foreach ($emitters as $emitter) {
-                $this->emitterStackCache[$cacheKey][] = new EmitterStack([...$emitterDecorators, $emitter]);
+            if ($emitters) {
+                foreach ($emitters as $emitter) {
+                    $this->emitterStackCache[$cacheKey][] = new EmitterStack([...$emitterDecorators, $emitter]);
+                }
+            } elseif ($emitterDecorators) {
+                $this->emitterStackCache[$cacheKey][] = new EmitterStack([...$emitterDecorators]);
             }
         }
 
