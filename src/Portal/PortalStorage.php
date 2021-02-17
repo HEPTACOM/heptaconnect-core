@@ -45,7 +45,13 @@ class PortalStorage implements PortalStorageInterface
             return null;
         }
 
-        return $denormalizer->denormalize($value, $type);
+        $result = $denormalizer->denormalize($value, $type);
+
+        if ($result === null) {
+            $this->portalStorage->unset($this->portalNodeKey, $key);
+        }
+
+        return $result;
     }
 
     public function set(string $key, $value): void

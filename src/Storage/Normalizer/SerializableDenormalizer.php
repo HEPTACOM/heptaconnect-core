@@ -18,7 +18,18 @@ class SerializableDenormalizer implements DenormalizerInterface
             throw new InvalidArgumentException();
         }
 
-        return \unserialize($data);
+        try {
+            $unserialize_callback_func = \ini_get('unserialize_callback_func');
+            \ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeClass');
+
+            $result = \unserialize($data);
+        } catch (\Throwable $exception) {
+            return null;
+        } finally {
+            \ini_set('unserialize_callback_func', $unserialize_callback_func);
+        }
+
+        return $result;
     }
 
     public function supportsDenormalization($data, $type, $format = null)
@@ -26,5 +37,10 @@ class SerializableDenormalizer implements DenormalizerInterface
         return $type === $this->getType()
             && \is_string($data)
             && (\unserialize($data) !== false || $data === 'b:0;');
+    }
+
+    public static function handleUnserializeClass(): void
+    {
+        throw new \Exception();
     }
 }
