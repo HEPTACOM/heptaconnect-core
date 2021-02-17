@@ -141,6 +141,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
         $this->mappingService->ensurePersistence($mappingsToEnsure);
 
+        // TODO: improve performance
         $trackedEntities = $this->entityMapper->mapEntities(
             $trackedEntities,
             $portalNodeKey
@@ -157,6 +158,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 $mapping->getExternalId()
             ), $route->getTargetKey());
 
+            // TODO: improve performance
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
 
             $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
