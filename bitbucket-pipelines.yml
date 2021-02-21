@@ -18,6 +18,9 @@ definitions:
                     - .build/**
                     - vendor/**
                     - composer.lock
+                after-script:
+                    - cp -a .build test-results
+                    - find test-results -type f -name '*.xml' -exec sed -i .bak -e "s|`pwd`/||" {} +
         -   step: &github-keyword-gate-step
                 <<: *default-step
                 name: Github Keyword Gate
