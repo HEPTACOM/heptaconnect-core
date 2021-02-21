@@ -50,21 +50,25 @@ definitions:
                 <<: *default-step
                 name: Unit tests
                 script:
+                    - composer-repository
                     - make test
         -   step: &test-coverage
                 <<: *default-step
                 name: Unit test coverage
                 script:
+                    - composer-repository
                     - make coverage
         -   step: &test-code-style
                 <<: *default-step
                 name: Code style and static code analysis
                 script:
+                    - composer-repository
                     - make cs
         -   step: &test-infection
                 <<: *default-step
                 name: Unit test infection detection
                 script:
+                    - composer-repository
                     - make infection
 
 pipelines:
