@@ -73,7 +73,7 @@ infection: vendor .build
 
 .PHONY: test
 test: vendor .build
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml -log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
 
 .PHONY: composer-update
 composer-update:
