@@ -34,11 +34,13 @@
         "symfony/serializer": "^4.0"
     },
     "require-dev": {
+        "dq5studios/psalm-junit": ">=2",
         "ergebnis/composer-normalize": ">=2.7",
         "friendsofphp/php-cs-fixer": ">=2",
         "icanhazstring/composer-unused": ">=0.7",
-        "infection/infection": ">=0.15",
+        "infection/infection": ">=0.21",
         "maglnet/composer-require-checker": ">=2",
+        "mavimo/phpstan-junit": ">=0.3",
         "phpstan/extension-installer": ">=1",
         "phpstan/phpstan": ">=0.12",
         "phpstan/phpstan-deprecation-rules": ">=0.12",

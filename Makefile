@@ -26,10 +26,11 @@ cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused cs-c
 .PHONY: cs-fixer-dry-run
 cs-fixer-dry-run: vendor .build
 	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
+	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --format junit > .build/php-cs-fixer.junit.xml
 
 .PHONY: cs-phpstan
 cs-phpstan: vendor .build
-	$(PHP) vendor/bin/phpstan analyse -c dev-ops/phpstan.neon
+	$(PHP) vendor/bin/phpstan analyse -c dev-ops/phpstan.neon --error-format=junit
 
 .PHONY: cs-psalm
 cs-psalm: vendor .build
@@ -70,7 +71,7 @@ infection: test-setup-fixture run-infection test-clean-fixture
 run-infection: vendor .build
 	# Can be simplified when infection/infection#1283 is resolved
 	[[ -d .build/phpunit-logs ]] || mkdir -p .build/.phpunit-coverage
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-xml=.build/.phpunit-coverage/xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-xml=.build/.phpunit-coverage/index.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
 	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json --coverage=../.build/.phpunit-coverage --show-mutations --no-interaction
 
 .PHONY: test
@@ -78,7 +79,7 @@ test: test-setup-fixture run-phpunit test-clean-fixture
 
 .PHONY: run-phpunit
 run-phpunit: vendor .build
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml
+	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
 
 .PHONY: composer-update
 composer-update:
