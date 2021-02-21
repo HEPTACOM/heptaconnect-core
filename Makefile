@@ -26,6 +26,7 @@ cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused cs-c
 .PHONY: cs-fixer-dry-run
 cs-fixer-dry-run: vendor .build
 	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
+	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --format junit > .build/php-cs-fixer.junit.xml
 
 .PHONY: cs-phpstan
 cs-phpstan: vendor .build
