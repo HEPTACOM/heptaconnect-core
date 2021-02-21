@@ -1,4 +1,4 @@
-image: heptacom/heptaconnect-pipeline:php74-latest
+image: heptacom/heptaconnect-pipeline:php74-4.0.0
 
 definitions:
     services:
