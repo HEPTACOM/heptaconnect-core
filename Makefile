@@ -76,7 +76,7 @@ test: vendor .build
 
 .PHONY: composer-update
 composer-update:
-	$(COMPOSER) update
+	[[ -f vendor/autoload.php && -n "${CI}" ]] || $(COMPOSER) update
 
 vendor: composer-update
 
