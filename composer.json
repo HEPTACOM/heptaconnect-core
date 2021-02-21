@@ -27,6 +27,7 @@
         "icanhazstring/composer-unused": ">=0.7",
         "infection/infection": ">=0.21",
         "maglnet/composer-require-checker": ">=2",
+        "mavimo/phpstan-junit": ">=0.3",
         "phpstan/extension-installer": ">=1",
         "phpstan/phpstan": ">=0.12",
         "phpstan/phpstan-deprecation-rules": ">=0.12",

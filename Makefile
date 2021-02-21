@@ -29,7 +29,7 @@ cs-fixer-dry-run: vendor .build
 
 .PHONY: cs-phpstan
 cs-phpstan: vendor .build
-	$(PHP) vendor/bin/phpstan analyse -c dev-ops/phpstan.neon
+	$(PHP) vendor/bin/phpstan analyse -c dev-ops/phpstan.neon --error-format=junit
 
 .PHONY: cs-psalm
 cs-psalm: vendor .build
