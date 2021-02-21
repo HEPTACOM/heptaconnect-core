@@ -12,6 +12,11 @@
 
     <plugins>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin" />
+        <pluginClass class="DQ5Studios\PsalmJunit\Plugin">
+            <always/>
+            <showInfo>false</showInfo>
+            <filepath>../.build/psalm.junit.xml</filepath>
+        </pluginClass>
     </plugins>
 
     <projectFiles>
