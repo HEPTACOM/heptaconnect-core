@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
@@ -29,7 +30,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         $cacheKey = $this->getCacheKey();
 
         if (\is_string($cacheKey)) {
-            $cacheItem = $this->cache->getItem(str_replace('\\', '-', self::class) . '-' . $cacheKey);
+            $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class).'-'.$cacheKey);
 
             if ($cacheItem->isHit()) {
                 return $cacheItem->get();
@@ -94,12 +95,12 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     private function getCacheKey(): ?string
     {
         if (\is_file($this->composerJson)) {
-            return hash_file('md5', $this->composerJson);
+            return \hash_file('md5', $this->composerJson);
         } elseif (\is_string($this->composerJson)) {
-            return hash('md5', $this->composerJson);
-        } else {
-            return null;
+            return \hash('md5', $this->composerJson);
         }
+
+        return null;
     }
 
     /**
@@ -141,9 +142,8 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             foreach ($dirs as $dir) {
                 if (\is_dir($absolute = $installPath.\DIRECTORY_SEPARATOR.$dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
-                } else {
-                    // TODO log. This is a weird case
                 }
+                // TODO log. This is a weird case
 
                 if ($package instanceof RootPackageInterface
                     && !\is_null($workingDir)

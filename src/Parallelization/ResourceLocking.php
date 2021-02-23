@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Parallelization;
 
@@ -59,6 +60,6 @@ class ResourceLocking extends ResourceLockingContract
             }
         }
 
-        return $prefix . $resourceKey;
+        return $prefix.$resourceKey;
     }
 }

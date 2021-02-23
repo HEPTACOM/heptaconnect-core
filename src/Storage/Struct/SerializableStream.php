@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Struct;
 
@@ -14,42 +15,42 @@ class SerializableStream implements StreamInterface
         $this->stream = $stream;
     }
 
+    public function __toString()
+    {
+        return $this->stream->__toString();
+    }
+
     public function copy(): StreamInterface
     {
         $streamFactory = Psr17FactoryDiscovery::findStreamFactory();
 
         // COPY FOR EXTERNAL
         $oldInternal = $this->stream->detach();
-        $oldInternalPosition = ftell($oldInternal);
-        $oldInternalIsSeekable = stream_get_meta_data($oldInternal)['seekable'] ?? false;
-        $newExternal = fopen('php://temp', 'rb+');
+        $oldInternalPosition = \ftell($oldInternal);
+        $oldInternalIsSeekable = \stream_get_meta_data($oldInternal)['seekable'] ?? false;
+        $newExternal = \fopen('php://temp', 'rb+');
 
-        stream_copy_to_stream($oldInternal, $newExternal);
-        rewind($newExternal);
+        \stream_copy_to_stream($oldInternal, $newExternal);
+        \rewind($newExternal);
 
         // RECOVER INTERNAL
         if ($oldInternalIsSeekable) {
-            fseek($oldInternal, $oldInternalPosition);
+            \fseek($oldInternal, $oldInternalPosition);
             $newInternal = $oldInternal;
         } else {
-            fclose($oldInternal);
+            \fclose($oldInternal);
 
-            $newInternal = fopen('php://temp', 'rb+');
+            $newInternal = \fopen('php://temp', 'rb+');
 
-            stream_copy_to_stream($newExternal, $newInternal);
-            rewind($newInternal);
-            rewind($newExternal);
+            \stream_copy_to_stream($newExternal, $newInternal);
+            \rewind($newInternal);
+            \rewind($newExternal);
         }
 
         // SET STATES
         $this->stream = $streamFactory->createStreamFromResource($newInternal);
 
         return $streamFactory->createStreamFromResource($newExternal);
-    }
-
-    public function __toString()
-    {
-        return $this->stream->__toString();
     }
 
     public function close()
@@ -82,7 +83,7 @@ class SerializableStream implements StreamInterface
         return $this->stream->isSeekable();
     }
 
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = \SEEK_SET)
     {
         return $this->stream->seek($offset, $whence);
     }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Test\Portal;
 
@@ -23,7 +24,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
         $container = $builder->build($this->getPortalContract(static fn (array $s): array => \array_merge($s, [
             'test_service' => new \stdClass(),
         ])), new PortalExtensionCollection([
-            $this->getPortalExtensionContract(static fn (array $s): array => $s)
+            $this->getPortalExtensionContract(static fn (array $s): array => $s),
         ]));
 
         static::assertTrue($container->has('test_service'));
@@ -60,7 +61,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
 
     protected function getPortalContract(callable $serviceToService): PortalContract
     {
-        return new class ($serviceToService) extends PortalContract {
+        return new class($serviceToService) extends PortalContract {
             /**
              * @var callable
              */
@@ -80,7 +81,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
 
     protected function getPortalExtensionContract(callable $serviceToService): PortalExtensionContract
     {
-        return new class ($serviceToService) extends PortalExtensionContract {
+        return new class($serviceToService) extends PortalExtensionContract {
             /**
              * @var callable
              */

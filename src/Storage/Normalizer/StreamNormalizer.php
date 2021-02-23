@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
@@ -47,10 +48,10 @@ class StreamNormalizer implements NormalizerInterface
 
         $stream = $object->copy()->detach();
 
-        $this->filesystem->putStream(self::STORAGE_LOCATION . '/' . $filename, $stream);
+        $this->filesystem->putStream(self::STORAGE_LOCATION.'/'.$filename, $stream);
 
-        if (is_resource($stream)) {
-            fclose($stream);
+        if (\is_resource($stream)) {
+            \fclose($stream);
         }
 
         return $filename;

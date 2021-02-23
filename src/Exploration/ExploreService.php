@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
@@ -79,7 +80,7 @@ class ExploreService implements ExploreServiceInterface
                 // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
                 $mappings[] = $this->mappingService->get(\get_class($entity), $portalNodeKey, $externalId);
 
-                if (count($mappings) >= self::CHUNK_SIZE) {
+                if (\count($mappings) >= self::CHUNK_SIZE) {
                     $this->publisher->publishBatch(new MappingCollection($mappings));
                     $mappings = [];
                 }

@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
@@ -150,7 +151,7 @@ class MappingService implements MappingServiceInterface
 
             $createPayload->push([
                 (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
-                    ->setExternalId($newExternalId)
+                    ->setExternalId($newExternalId),
             ]);
 
             $newMappingNodeKeysIterator->next();
@@ -199,7 +200,7 @@ class MappingService implements MappingServiceInterface
         $prePayloadIterator = $prePayload->getIterator();
         $nodesIterator = $nodes->getIterator();
 
-        for (;$prePayloadIterator->valid() && $nodesIterator->valid(); $prePayloadIterator->next(), $nodesIterator->next()) {
+        for (; $prePayloadIterator->valid() && $nodesIterator->valid(); $prePayloadIterator->next(), $nodesIterator->next()) {
             /** @var MappingComponentStructContract $prePayloadItem */
             $prePayloadItem = $prePayloadIterator->current();
             /** @var MappingNodeKeyInterface $nodesItemKey */
@@ -225,6 +226,7 @@ class MappingService implements MappingServiceInterface
 
         foreach ($mappingKeys as $mappingKey) {
             $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
+
             return;
         }
 

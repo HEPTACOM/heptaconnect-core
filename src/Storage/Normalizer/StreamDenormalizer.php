@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
@@ -28,7 +29,7 @@ class StreamDenormalizer implements DenormalizerInterface
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         return new SerializableStream($this->streamFactory->createStreamFromResource(
-            $this->filesystem->readStream(StreamNormalizer::STORAGE_LOCATION . '/' . $data)
+            $this->filesystem->readStream(StreamNormalizer::STORAGE_LOCATION.'/'.$data)
         ));
     }
 
