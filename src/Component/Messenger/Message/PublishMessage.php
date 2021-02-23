@@ -2,19 +2,8 @@
 
 namespace Heptacom\HeptaConnect\Core\Component\Messenger\Message;
 
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 
-class PublishMessage
+class PublishMessage extends MappingComponentStruct
 {
-    private MappingInterface $mapping;
-
-    public function __construct(MappingInterface $mapping)
-    {
-        $this->mapping = $mapping;
-    }
-
-    public function getMapping(): MappingInterface
-    {
-        return $this->mapping;
-    }
 }
