@@ -80,7 +80,11 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     public function handlePublishMessage(PublishMessage $message): void
     {
-        $mapping = $message->getMapping();
+        $mapping = $this->mappingService->get(
+            $message->getDatasetEntityClassName(),
+            $message->getPortalNodeKey(),
+            $message->getExternalId()
+        );
 
         $this->emitService->emit(new TypedMappingCollection($mapping->getDatasetEntityClassName(), [$mapping]));
     }
