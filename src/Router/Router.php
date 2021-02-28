@@ -230,6 +230,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
                     }
                 }
 
+                // FIXME: something in this loop is terribly slow
                 foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
                     $externalIds = \array_map('strval', \array_keys($originalReflectionMappings));
                     $receivedMappingsIterable = $this->mappingService->getListByExternalIds(
