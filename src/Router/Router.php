@@ -123,6 +123,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             throw new \Exception(\sprintf(\implode(\PHP_EOL, ['Message is not routed. Add a route and re-explore this entity.', 'source portal: %s', 'data type: %s', 'external id: $s']), $portalNodeId, $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
         }
 
+        // FIXME: This is slow
         $trackedEntities = new TrackedEntityCollection($this->objectIterator->iterate($mappedDatasetEntityStruct->getDatasetEntity()));
         $mappingsToEnsure = new MappingComponentCollection();
 
