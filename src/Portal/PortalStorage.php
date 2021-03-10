@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
+use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 
 class PortalStorage implements PortalStorageInterface
 {
@@ -34,7 +35,14 @@ class PortalStorage implements PortalStorageInterface
             return null;
         }
 
-        $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
+        try {
+            $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
+        } catch (NotFoundException $exception) {
+            $this->portalStorage->unset($this->portalNodeKey, $key);
+
+            return null;
+        }
+
         $type = $this->portalStorage->getType($this->portalNodeKey, $key);
         $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
 
@@ -55,7 +63,7 @@ class PortalStorage implements PortalStorageInterface
         return $result;
     }
 
-    public function set(string $key, $value): void
+    public function set(string $key, $value, ?\DateInterval $ttl = null): void
     {
         $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
@@ -67,7 +75,8 @@ class PortalStorage implements PortalStorageInterface
             $this->portalNodeKey,
             $key,
             (string) $normalizer->normalize($value),
-            $normalizer->getType()
+            $normalizer->getType(),
+            $ttl
         );
     }
 
