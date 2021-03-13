@@ -22,20 +22,23 @@ class StatusReportingContextFactory implements StatusReportingContextFactoryInte
 
     private ResourceLockingContract $resourceLocking;
 
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
+    private PortalStackServiceContainerFactory $containerFactory;
 
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         ConfigurationServiceInterface $configurationService,
         PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        ResourceLockingContract $resourceLocking
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->configurationService = $configurationService;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLocking = $resourceLocking;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
+    }
+
+    public function setContainerFactory(PortalStackServiceContainerFactory $containerFactory): void
+    {
+        $this->containerFactory = $containerFactory;
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): StatusReportingContextInterface
@@ -45,7 +48,7 @@ class StatusReportingContextFactory implements StatusReportingContextFactoryInte
             $this->portalRegistry,
             $this->portalStorageFactory,
             $this->resourceLocking,
-            $this->portalStackServiceContainerFactory,
+            $this->containerFactory,
             $portalNodeKey,
         );
     }

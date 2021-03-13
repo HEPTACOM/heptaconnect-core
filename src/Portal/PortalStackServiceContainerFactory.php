@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 
@@ -15,16 +16,20 @@ class PortalStackServiceContainerFactory
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    private StatusReportingContextFactoryInterface $statusReportingContextFactory;
+
     private array $portalContainers = [];
 
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         PortalStackServiceContainerBuilder $portalStackServiceContainerBuilder,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        StatusReportingContextFactoryInterface $statusReportingContextFactory
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->portalStackServiceContainerBuilder = $portalStackServiceContainerBuilder;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->statusReportingContextFactory = $statusReportingContextFactory;
     }
 
     public function create(PortalNodeKeyInterface $portalNodeKey): PortalStackServiceContainer
@@ -36,9 +41,12 @@ class PortalStackServiceContainerFactory
             return $result;
         }
 
+        $context = $this->statusReportingContextFactory->factory($portalNodeKey);
+
         $result = $this->portalStackServiceContainerBuilder->build(
             $this->portalRegistry->getPortal($portalNodeKey),
-            $this->portalRegistry->getPortalExtensions($portalNodeKey)
+            $this->portalRegistry->getPortalExtensions($portalNodeKey),
+            $context
         );
         $this->portalContainers[$key] = $result;
 
