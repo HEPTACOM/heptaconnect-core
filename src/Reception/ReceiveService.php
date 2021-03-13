@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
@@ -99,6 +100,14 @@ class ReceiveService implements ReceiveServiceInterface
                         'stack' => $stack,
                         'exception' => $exception,
                     ]);
+
+                    if ($exception instanceof CumulativeMappingException) {
+                        foreach ($exception->getExceptions() as $innerException) {
+                            $this->logger->critical(LogMessage::RECEIVE_NO_THROW().'_INNER', [
+                                'exception' => $innerException,
+                            ]);
+                        }
+                    }
                 }
             }
         }

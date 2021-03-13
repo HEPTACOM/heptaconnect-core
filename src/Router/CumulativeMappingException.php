@@ -17,4 +17,12 @@ class CumulativeMappingException extends \Exception
         $this->exceptions = $exceptions;
         parent::__construct($message);
     }
+
+    /**
+     * @return Throwable[]
+     */
+    public function getExceptions(): array
+    {
+        return $this->exceptions;
+    }
 }
