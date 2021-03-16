@@ -87,6 +87,8 @@ class ExploreService implements ExploreServiceInterface
                         $this->publisher->publishBatch(new MappingCollection($mappings));
                         $mappings = [];
                     }
+                } else {
+                    // TODO: log this
                 }
             }
         }
