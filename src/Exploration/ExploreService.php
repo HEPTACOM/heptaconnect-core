@@ -72,18 +72,16 @@ class ExploreService implements ExploreServiceInterface
 
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
 
-            /** @var DatasetEntityContract|null $entity */
-            foreach ($explorerStack->next($context) as $externalId => $entity) {
+            /** @var DatasetEntityContract|string|int|null $entity */
+            foreach ($explorerStack->next($context) as $entity) {
                 if ($entity instanceof DatasetEntityContract && ($primaryKey = $entity->getPrimaryKey()) !== null) {
-                    $externalId = $primaryKey;
-
-                    $mapping = $this->mappingService->get($supportedType, $portalNodeKey, $externalId);
+                    $mapping = $this->mappingService->get($supportedType, $portalNodeKey, $primaryKey);
                     $mappedDatasetEntityStruct = new MappedDatasetEntityStruct($mapping, $entity);
 
                     $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
-                } else {
+                } elseif (\is_string($entity) || \is_int($entity)) {
                     // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
-                    $mappings[] = $this->mappingService->get($supportedType, $portalNodeKey, $externalId);
+                    $mappings[] = $this->mappingService->get($supportedType, $portalNodeKey, (string) $entity);
 
                     if (\count($mappings) >= self::CHUNK_SIZE) {
                         $this->publisher->publishBatch(new MappingCollection($mappings));
