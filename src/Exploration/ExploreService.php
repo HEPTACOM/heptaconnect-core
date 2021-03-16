@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
+use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
@@ -11,10 +12,12 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class ExploreService implements ExploreServiceInterface
 {
@@ -28,16 +31,20 @@ class ExploreService implements ExploreServiceInterface
 
     private MappingServiceInterface $mappingService;
 
+    private MessageBusInterface $messageBus;
+
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
         PortalRegistryInterface $portalRegistry,
         PublisherInterface $publisher,
-        MappingServiceInterface $mappingService
+        MappingServiceInterface $mappingService,
+        MessageBusInterface $messageBus
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
         $this->portalRegistry = $portalRegistry;
         $this->publisher = $publisher;
         $this->mappingService = $mappingService;
+        $this->messageBus = $messageBus;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
@@ -59,30 +66,29 @@ class ExploreService implements ExploreServiceInterface
         $mappings = [];
 
         foreach (self::getSupportedTypes($explorers) as $supportedType) {
-            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes)) {
+            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
                 continue;
             }
 
             $explorerStack = new ExplorerStack($explorers->bySupport($supportedType));
 
             /** @var DatasetEntityContract|null $entity */
-            foreach ($explorerStack->next($context) as $entity) {
-                if (!$entity instanceof DatasetEntityContract) {
-                    continue;
-                }
+            foreach ($explorerStack->next($context) as $externalId => $entity) {
+                if ($entity instanceof DatasetEntityContract && ($primaryKey = $entity->getPrimaryKey()) !== null) {
+                    $externalId = $primaryKey;
 
-                $externalId = $entity->getPrimaryKey();
+                    $mapping = $this->mappingService->get($supportedType, $portalNodeKey, $externalId);
+                    $mappedDatasetEntityStruct = new MappedDatasetEntityStruct($mapping, $entity);
 
-                if ($externalId === null) {
-                    continue;
-                }
+                    $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
+                } else {
+                    // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
+                    $mappings[] = $this->mappingService->get($supportedType, $portalNodeKey, $externalId);
 
-                // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
-                $mappings[] = $this->mappingService->get(\get_class($entity), $portalNodeKey, $externalId);
-
-                if (\count($mappings) >= self::CHUNK_SIZE) {
-                    $this->publisher->publishBatch(new MappingCollection($mappings));
-                    $mappings = [];
+                    if (\count($mappings) >= self::CHUNK_SIZE) {
+                        $this->publisher->publishBatch(new MappingCollection($mappings));
+                        $mappings = [];
+                    }
                 }
             }
         }
