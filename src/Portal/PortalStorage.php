@@ -29,10 +29,10 @@ class PortalStorage implements PortalStorageInterface
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    public function get(string $key)
+    public function get(string $key, $default = null)
     {
         if (!$this->portalStorage->has($this->portalNodeKey, $key)) {
-            return null;
+            return $default;
         }
 
         try {
@@ -40,18 +40,18 @@ class PortalStorage implements PortalStorageInterface
         } catch (NotFoundException $exception) {
             $this->portalStorage->unset($this->portalNodeKey, $key);
 
-            return null;
+            return $default;
         }
 
         $type = $this->portalStorage->getType($this->portalNodeKey, $key);
         $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
 
         if (!$denormalizer instanceof DenormalizerInterface) {
-            return null;
+            return $default;
         }
 
         if (!$denormalizer->supportsDenormalization($value, $type)) {
-            return null;
+            return $default;
         }
 
         $result = $denormalizer->denormalize($value, $type);
