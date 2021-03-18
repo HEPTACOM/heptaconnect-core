@@ -9,9 +9,17 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Psr\Log\LoggerInterface;
 
 class PortalStackServiceContainerBuilder
 {
+    private LoggerInterface $logger;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function build(
         PortalContract $portal,
         PortalExtensionCollection $portalExtensions,
@@ -20,7 +28,7 @@ class PortalStackServiceContainerBuilder
         $services = $portal->getServices() + [
             'portal' => $portal,
             \get_class($portal) => $portal,
-            'context' => $context,
+            PortalNodeContextInterface::class => $context,
         ];
 
         /** @var PortalExtensionContract $portalExtension */
@@ -33,6 +41,7 @@ class PortalStackServiceContainerBuilder
 
         $services[DeepCloneContract::class] ??= new DeepCloneContract();
         $services[DeepObjectIteratorContract::class] ??= new DeepObjectIteratorContract();
+        $services[LoggerInterface::class] ??= $this->logger;
 
         return new PortalStackServiceContainer($services);
     }
