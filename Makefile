@@ -77,6 +77,9 @@ infection: vendor .build
 test: vendor .build
 	$(PHPUNIT) --log-junit=.build/.phpunit-coverage/infection.junit.xml
 
+test/%Test.php: vendor
+	$(PHPUNIT) "$@"
+
 .PHONY: composer-update
 composer-update:
 	[[ -f vendor/autoload.php && -n "${CI}" ]] || $(COMPOSER) update
