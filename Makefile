@@ -1,6 +1,8 @@
 SHELL := /bin/bash
 PHP := $(shell which php) $(PHP_EXTRA_ARGS)
 COMPOSER := $(PHP) $(shell which composer)
+PHPUNIT_EXTRA_ARGS := --config=test/phpunit.xml
+PHPUNIT := $(PHP) vendor/bin/phpunit $(PHPUNIT_EXTRA_ARGS)
 JQ := $(shell which jq)
 JSON_FILES := $(shell find . -name '*.json' -not -path './vendor/*')
 
@@ -18,7 +20,7 @@ it: cs-fix-composer-normalize csfix cs test
 
 .PHONY: coverage
 coverage: vendor .build test-refresh-fixture
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-text
+	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
 cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-soft-require cs-composer-unused cs-composer-normalize cs-json
@@ -71,7 +73,7 @@ infection: test-setup-fixture run-infection test-clean-fixture
 run-infection: vendor .build
 	# Can be simplified when infection/infection#1283 is resolved
 	[[ -d .build/phpunit-logs ]] || mkdir -p .build/.phpunit-coverage
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --coverage-xml=.build/.phpunit-coverage/index.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHPUNIT) --coverage-xml=.build/.phpunit-coverage/index.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
 	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json --coverage=../.build/.phpunit-coverage --show-mutations --no-interaction
 
 .PHONY: test
@@ -79,7 +81,10 @@ test: test-setup-fixture run-phpunit test-clean-fixture
 
 .PHONY: run-phpunit
 run-phpunit: vendor .build
-	$(PHP) vendor/bin/phpunit --config=test/phpunit.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHPUNIT) --log-junit=.build/.phpunit-coverage/infection.junit.xml
+
+test/%Test.php: vendor
+	$(PHPUNIT) "$@"
 
 .PHONY: composer-update
 composer-update:
