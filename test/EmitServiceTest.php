@@ -4,17 +4,15 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Emission\EmitService;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
+use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -31,30 +29,26 @@ class EmitServiceTest extends TestCase
      */
     public function testEmitCount(int $count): void
     {
-        $emitContext = $this->createMock(EmitContextInterface::class);
-
-        $logger = $this->createMock(LoggerInterface::class);
-
-        $messageBus = $this->createMock(MessageBusInterface::class);
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
-
-        $mappingService = $this->createMock(MappingServiceInterface::class);
+        $stack = new EmitterStack([]);
+        $stackBuilder = $this->createMock(EmitterStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(true);
+        $stackBuilderFactory = $this->createMock(EmitterStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createEmitterStackBuilder')->willReturn($stackBuilder);
 
         $emitService = new EmitService(
-            $emitContext,
-            $logger,
-            $messageBus,
-            $portalRegistry,
-            $storageKeyGenerator,
-            $mappingService
+            $this->createMock(EmitContextInterface::class),
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(MessageBusInterface::class),
+            $this->createMock(StorageKeyGeneratorContract::class),
+            $stackBuilderFactory,
         );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
@@ -71,38 +65,27 @@ class EmitServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::EMIT_NO_EMITTER_FOR_TYPE());
 
-        $messageBus = $this->createMock(MessageBusInterface::class);
-
-        $portal = $this->createMock(PortalContract::class);
-        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getEmitters')
-            ->willReturn(new EmitterCollection());
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortal')
-            ->willReturn($portal);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalExtensions')
-            ->willReturn(new PortalExtensionCollection());
-
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
-
-        $mappingService = $this->createMock(MappingServiceInterface::class);
+        $stack = new EmitterStack([]);
+        $stackBuilder = $this->createMock(EmitterStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(true);
+        $stackBuilderFactory = $this->createMock(EmitterStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createEmitterStackBuilder')->willReturn($stackBuilder);
 
         $emitService = new EmitService(
             $emitContext,
             $logger,
-            $messageBus,
-            $portalRegistry,
-            $storageKeyGenerator,
-            $mappingService
-        );
+            $this->createMock(MessageBusInterface::class),
+            $this->createMock(StorageKeyGeneratorContract::class),
+            $stackBuilderFactory,
+    );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 
@@ -118,37 +101,26 @@ class EmitServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::EMIT_NO_THROW());
 
-        $messageBus = $this->createMock(MessageBusInterface::class);
-
-        $portal = $this->createMock(PortalContract::class);
-        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getEmitters')
-            ->willReturn(new EmitterCollection([new ThrowEmitter()]));
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortal')
-            ->willReturn($portal);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalExtensions')
-            ->willReturn(new PortalExtensionCollection());
-
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
-
-        $mappingService = $this->createMock(MappingServiceInterface::class);
+        $stack = new EmitterStack([new ThrowEmitter()]);
+        $stackBuilder = $this->createMock(EmitterStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(false);
+        $stackBuilderFactory = $this->createMock(EmitterStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createEmitterStackBuilder')->willReturn($stackBuilder);
 
         $emitService = new EmitService(
             $emitContext,
             $logger,
-            $messageBus,
-            $portalRegistry,
-            $storageKeyGenerator,
-            $mappingService
+            $this->createMock(MessageBusInterface::class),
+            $this->createMock(StorageKeyGeneratorContract::class),
+            $stackBuilderFactory,
         );
         $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }

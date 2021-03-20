@@ -6,11 +6,9 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
@@ -27,28 +25,27 @@ class EmitService implements EmitServiceInterface
 
     private MessageBusInterface $messageBus;
 
-    private PortalRegistryInterface $portalRegistry;
-
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
-    private array $emitterStackCache = [];
+    /**
+     * @var array<array-key, EmitterStackBuilderInterface>
+     */
+    private array $emitterStackBuilderCache = [];
 
-    private MappingServiceInterface $mappingService;
+    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
     public function __construct(
         EmitContextInterface $emitContext,
         LoggerInterface $logger,
         MessageBusInterface $messageBus,
-        PortalRegistryInterface $portalRegistry,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        MappingServiceInterface $mappingService
+        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory
     ) {
         $this->emitContext = $emitContext;
         $this->logger = $logger;
         $this->messageBus = $messageBus;
-        $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->mappingService = $mappingService;
+        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
     }
 
     public function emit(TypedMappingCollection $mappings): void
@@ -69,20 +66,9 @@ class EmitService implements EmitServiceInterface
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface> $mappingsForPortalNode */
             $mappingsForPortalNode = iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
+            $stackBuilder = $this->getEmitterStacks($portalNodeKey, $entityClassName);
 
-            try {
-                $stacks = $this->getEmitterStacks($portalNodeKey, $entityClassName);
-            } catch (\Throwable $exception) {
-                $this->logger->critical(LogMessage::EMIT_NO_STACKS(), [
-                    'type' => $entityClassName,
-                    'portalNodeKey' => $portalNodeKey,
-                    'exception' => $exception,
-                ]);
-
-                continue;
-            }
-
-            if (empty($stacks)) {
+            if ($stackBuilder->isEmpty()) {
                 $this->logger->critical(LogMessage::EMIT_NO_EMITTER_FOR_TYPE(), [
                     'type' => $entityClassName,
                     'portalNodeKey' => $portalNodeKey,
@@ -91,52 +77,31 @@ class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            /** @var EmitterStackInterface $stack */
-            foreach ($stacks as $stack) {
-                try {
-                    /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
-                    foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
-                        $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
-                    }
-                } catch (\Throwable $exception) {
-                    $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
-                        'type' => $entityClassName,
-                        'portalNodeKey' => $portalNodeKey,
-                        'stack' => $stack,
-                        'exception' => $exception,
-                    ]);
-                }
-            }
+            $stack = $stackBuilder->build();
 
-            unset($stacks);
+            try {
+                /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
+                foreach ($stack->next($mappingsForPortalNode, $this->emitContext) as $mappedDatasetEntityStruct) {
+                    $this->messageBus->dispatch(new EmitMessage($mappedDatasetEntityStruct));
+                }
+            } catch (\Throwable $exception) {
+                $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
+                    'type' => $entityClassName,
+                    'portalNodeKey' => $portalNodeKey,
+                    'stack' => $stack,
+                    'exception' => $exception,
+                ]);
+            }
         }
     }
 
-    /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface>
-     */
-    private function getEmitterStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
+    private function getEmitterStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): EmitterStackBuilderInterface
     {
         $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]));
 
-        if (!isset($this->emitterStackCache[$cacheKey])) {
-            $portal = $this->portalRegistry->getPortal($portalNodeKey);
-            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $emitters = iterable_to_array($portal->getEmitters()->bySupport($entityClassName));
-            $emitterDecorators = iterable_to_array($portalExtensions->getEmitterDecorators()->bySupport($entityClassName));
-
-            if ($emitters) {
-                foreach ($emitters as $emitter) {
-                    $this->emitterStackCache[$cacheKey][] = new EmitterStack([...$emitterDecorators, $emitter]);
-                }
-            } elseif ($emitterDecorators) {
-                $this->emitterStackCache[$cacheKey][] = new EmitterStack([...$emitterDecorators]);
-            }
-        }
-
-        return \array_map(
-            fn (EmitterStackInterface $emitterStack) => clone $emitterStack,
-            $this->emitterStackCache[$cacheKey] ??= []
-        );
+        return $this->emitterStackBuilderCache[$cacheKey] ??= $this->emitterStackBuilderFactory
+            ->createEmitterStackBuilder($portalNodeKey, $entityClassName)
+            ->pushSource()
+            ->pushDecorators();
     }
 }
