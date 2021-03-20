@@ -6,8 +6,10 @@ namespace Heptacom\HeptaConnect\Core\Test\Portal;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 /**
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotFoundException
@@ -20,12 +22,18 @@ class PortalStackServiceContainerBuilderTest extends TestCase
 {
     public function testServiceRetrieval(): void
     {
-        $builder = new PortalStackServiceContainerBuilder();
-        $container = $builder->build($this->getPortalContract(static fn (array $s): array => \array_merge($s, [
-            'test_service' => new \stdClass(),
-        ])), new PortalExtensionCollection([
-            $this->getPortalExtensionContract(static fn (array $s): array => $s),
-        ]));
+        $builder = new PortalStackServiceContainerBuilder(
+            $this->createMock(LoggerInterface::class)
+        );
+        $container = $builder->build($this->getPortalContract(
+            static fn (array $s): array => \array_merge($s, [
+                'test_service' => new \stdClass(),
+            ])),
+            new PortalExtensionCollection([
+                $this->getPortalExtensionContract(static fn (array $s): array => $s),
+            ]),
+            $this->createMock(PortalNodeContextInterface::class)
+        );
 
         static::assertTrue($container->has('test_service'));
         static::assertInstanceOf(\stdClass::class, $container->get('test_service'));
@@ -33,23 +41,29 @@ class PortalStackServiceContainerBuilderTest extends TestCase
 
     public function testServiceDecoratedRetrieval(): void
     {
-        $builder = new PortalStackServiceContainerBuilder();
-        $container = $builder->build($this->getPortalContract(static fn (array $s): array => \array_merge($s, [
-            'test_service' => (object) [
-                'value' => 17,
-            ],
-        ])), new PortalExtensionCollection([
-            $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
+        $builder = new PortalStackServiceContainerBuilder(
+            $this->createMock(LoggerInterface::class)
+        );
+        $container = $builder->build(
+            $this->getPortalContract(static fn (array $s): array => \array_merge($s, [
                 'test_service' => (object) [
-                    'value' => $s['test_service']->value + 8,
+                    'value' => 17,
                 ],
             ])),
-            $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
-                'test_service' => (object) [
-                    'value' => $s['test_service']->value * 5,
-                ],
-            ])),
-        ]));
+            new PortalExtensionCollection([
+                $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
+                    'test_service' => (object) [
+                        'value' => $s['test_service']->value + 8,
+                    ],
+                ])),
+                $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
+                    'test_service' => (object) [
+                        'value' => $s['test_service']->value * 5,
+                    ],
+                ])),
+            ]),
+            $this->createMock(PortalNodeContextInterface::class)
+        );
 
         static::assertTrue($container->has('test_service'));
 
