@@ -15,10 +15,8 @@ class ThrowEmitter extends EmitterContract
         throw new \RuntimeException();
     }
 
-    public function supports(): array
+    public function supports(): string
     {
-        return [
-            FooBarEntity::class,
-        ];
+        return FooBarEntity::class;
     }
 }

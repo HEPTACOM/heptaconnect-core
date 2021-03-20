@@ -41,10 +41,8 @@ class FooBarEmitter extends EmitterContract
         yield from $stack->next($mappings, $context);
     }
 
-    public function supports(): array
+    public function supports(): string
     {
-        return [
-            FooBarEntity::class,
-        ];
+        return FooBarEntity::class;
     }
 }

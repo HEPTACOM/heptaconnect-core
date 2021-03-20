@@ -27,10 +27,8 @@ class FooBarReceiver extends ReceiverContract
         yield from $stack->next($mappedDatasetEntities, $context);
     }
 
-    public function supports(): array
+    public function supports(): string
     {
-        return [
-            FooBarEntity::class,
-        ];
+        return FooBarEntity::class;
     }
 }
