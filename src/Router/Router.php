@@ -8,6 +8,8 @@ use Heptacom\HeptaConnect\Core\Component\Messenger\Message\EmitMessage;
 use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
+use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
+use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
@@ -153,11 +155,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
         foreach ($routeIds as $routeId) {
             $route = $this->routeRepository->read($routeId);
-            $targetMapping = $this->mappingService->reflect($this->mappingService->get(
-                $mapping->getDatasetEntityClassName(),
-                $mapping->getPortalNodeKey(),
-                $mapping->getExternalId()
-            ), $route->getTargetKey());
 
             // TODO: improve performance
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
@@ -167,6 +164,11 @@ class Router implements RouterInterface, MessageSubscriberInterface
                 iterable_to_array($this->objectIterator->iterate($datasetEntity)),
                 fn ($entity) => $entity instanceof DatasetEntityContract
             );
+
+            $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
+                $mapping->getMappingNodeKey(),
+                $mapping->getDatasetEntityClassName()
+            )))->setExternalId($datasetEntity->getPrimaryKey());
 
             $typedMappedDatasetEntityCollection->push([
                 new MappedDatasetEntityStruct($targetMapping, $datasetEntity),
