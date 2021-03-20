@@ -40,8 +40,9 @@ class DirectEmitter extends EmitterContract
 
     protected function run(MappingInterface $mapping, EmitContextInterface $context): ?DatasetEntityContract
     {
+        /** @var MappedDatasetEntityStruct $match */
         foreach ($this->mappedEntities->filter($this->matchesMapping($mapping)) as $match) {
-            return $match;
+            return $match->getDatasetEntity();
         }
 
         return null;
