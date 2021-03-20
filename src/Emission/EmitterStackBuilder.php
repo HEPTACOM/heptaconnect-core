@@ -45,6 +45,14 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
         $this->entityClassName = $entityClassName;
     }
 
+    public function push(EmitterContract $emitter): self
+    {
+        // TODO add supports check
+        $this->emitters[] = $emitter;
+
+        return $this;
+    }
+
     public function pushSource(): self
     {
         $lastEmitter = null;
