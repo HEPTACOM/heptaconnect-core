@@ -3,15 +3,17 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
+use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Log\LoggerInterface;
 
 class ExploreService implements ExploreServiceInterface
 {
@@ -21,23 +23,29 @@ class ExploreService implements ExploreServiceInterface
 
     private ExplorationActorInterface $explorationActor;
 
+    private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory;
+
+    private LoggerInterface $logger;
+
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
         PortalRegistryInterface $portalRegistry,
-        ExplorationActorInterface $explorationActor
+        ExplorationActorInterface $explorationActor,
+        ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
+        LoggerInterface $logger
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
         $this->portalRegistry = $portalRegistry;
         $this->explorationActor = $explorationActor;
+        $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
+        $this->logger = $logger;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
-
         $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-
         $explorers = new ExplorerCollection();
 
         /** @var PortalExtensionContract $portalExtension */
@@ -52,11 +60,20 @@ class ExploreService implements ExploreServiceInterface
                 continue;
             }
 
-            $this->explorationActor->performExploration(
-                $supportedType,
-                new ExplorerStack($explorers->bySupport($supportedType)),
-                $context
-            );
+            $builder = $this->explorerStackBuilderFactory
+                ->createExplorerStackBuilder($portalNodeKey, $supportedType)
+                ->pushSource()
+                ->pushDecorators();
+
+            if ($builder->isEmpty()) {
+                $this->logger->critical(LogMessage::EXPLORE_NO_EXPLORER_FOR_TYPE(), [
+                    'type' => $supportedType,
+                ]);
+
+                continue;
+            }
+
+            $this->explorationActor->performExploration($supportedType, $builder->build(), $context);
         }
     }
 
