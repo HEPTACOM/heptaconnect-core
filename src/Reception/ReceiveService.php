@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -29,19 +27,23 @@ class ReceiveService implements ReceiveServiceInterface
 
     private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
 
+    private ReceptionActorInterface $receptionActor;
+
     public function __construct(
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory
+        ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
+        ReceptionActorInterface $receptionActor
     ) {
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
+        $this->receptionActor = $receptionActor;
     }
 
-    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities, callable $saveMappings): void
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void
     {
         $receivingPortalNodes = [];
         $entityClassName = $mappedDatasetEntities->getType();
@@ -76,36 +78,7 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            try {
-                /** @var MappingInterface $mapping */
-                foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
-                    $saveMappings($mapping->getPortalNodeKey());
-                }
-            } catch (\Throwable $exception) {
-                $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                    'type' => $entityClassName,
-                    'portalNodeKey' => $portalNodeKey,
-                    'stack' => $stack,
-                    'exception' => $exception,
-                ]);
-
-                if ($exception instanceof CumulativeMappingException) {
-                    foreach ($exception->getExceptions() as $innerException) {
-                        $errorContext = [];
-
-                        if ($innerException instanceof MappingNodeAreUnmergableException) {
-                            $errorContext = [
-                                'fromNode' => $innerException->getFrom(),
-                                'intoNode' => $innerException->getInto(),
-                            ];
-                        }
-
-                        $this->logger->critical(LogMessage::RECEIVE_NO_THROW().'_INNER', [
-                            'exception' => $innerException,
-                        ] + $errorContext);
-                    }
-                }
-            }
+            $this->receptionActor->performReception($mappedDatasetEntitiesForPortalNode, $stack, $this->receiveContext);
         }
     }
 

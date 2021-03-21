@@ -11,7 +11,6 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
 use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\Contract\RouterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
@@ -21,14 +20,11 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class Router implements RouterInterface, MessageSubscriberInterface
@@ -40,8 +36,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
     private RouteRepositoryContract $routeRepository;
 
     private MappingServiceInterface $mappingService;
-
-    private MappingNodeRepositoryContract $mappingNodeRepository;
 
     private EntityMapperContract $entityMapper;
 
@@ -56,21 +50,19 @@ class Router implements RouterInterface, MessageSubscriberInterface
         ReceiveServiceInterface $receiveService,
         RouteRepositoryContract $routeRepository,
         MappingServiceInterface $mappingService,
-        MappingNodeRepositoryContract $mappingNodeRepository,
         EntityMapperContract $entityMapper,
         EntityReflectorContract $entityReflector,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        DeepObjectIteratorContract $deepObjectIterator
     ) {
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
         $this->routeRepository = $routeRepository;
         $this->mappingService = $mappingService;
-        $this->mappingNodeRepository = $mappingNodeRepository;
         $this->entityMapper = $entityMapper;
         $this->entityReflector = $entityReflector;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        // TODO get from DI
-        $this->objectIterator = new DeepObjectIteratorContract();
+        $this->objectIterator = $deepObjectIterator;
     }
 
     public static function getHandledMessages(): iterable
@@ -151,7 +143,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
         );
 
         $typedMappedDatasetEntityCollection = new TypedMappedDatasetEntityCollection($mapping->getDatasetEntityClassName());
-        $receivedEntityData = [];
 
         foreach ($routeIds as $routeId) {
             $route = $this->routeRepository->read($routeId);
@@ -160,11 +151,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
 
             $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
-            $receivedEntityData[] = \array_filter(
-                iterable_to_array($this->objectIterator->iterate($datasetEntity)),
-                fn ($entity) => $entity instanceof DatasetEntityContract
-            );
-
             $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
                 $mapping->getMappingNodeKey(),
                 $mapping->getDatasetEntityClassName()
@@ -175,95 +161,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
             ]);
         }
 
-        foreach ($this->objectIterator->iterate($typedMappedDatasetEntityCollection) as $object) {
-            if (!$object instanceof DatasetEntityContract) {
-                continue;
-            }
-
-            $attachable = new PrimaryKeyChangesAttachable(\get_class($object));
-            $attachable->setForeignKey($object->getPrimaryKey());
-            $object->attach($attachable);
-        }
-
-        $this->receiveService->receive(
-            $typedMappedDatasetEntityCollection,
-            function (PortalNodeKeyInterface $targetPortalNodeKey) use ($receivedEntityData) {
-                $exceptions = [];
-                $originalReflectionMappingsByType = [];
-                $keyChangesByType = [];
-
-                foreach ($receivedEntityData as $receivedEntities) {
-                    foreach ($receivedEntities as $receivedEntity) {
-                        if (!$receivedEntity instanceof DatasetEntityContract
-                            || $receivedEntity->getPrimaryKey() === null) {
-                            continue;
-                        }
-
-                        $receivedEntityType = \get_class($receivedEntity);
-                        $primaryKeyChanges = $receivedEntity->getAttachment(PrimaryKeyChangesAttachable::class);
-
-                        if ($primaryKeyChanges instanceof PrimaryKeyChangesAttachable
-                            && !\is_null($primaryKeyChanges->getFirstForeignKey())
-                            && !\is_null($primaryKeyChanges->getForeignKey())
-                            && $primaryKeyChanges->getFirstForeignKey() !== $primaryKeyChanges->getForeignKey()) {
-                            $keyChangesByType[$receivedEntityType][$primaryKeyChanges->getFirstForeignKey()] = $primaryKeyChanges->getForeignKey();
-                        }
-
-                        $original = $receivedEntity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-                        if (!$original instanceof PrimaryKeySharingMappingStruct || $original->getExternalId() === null) {
-                            continue;
-                        }
-
-                        $originalReflectionMappingsByType[$receivedEntityType][$receivedEntity->getPrimaryKey()] = $original;
-                    }
-                }
-
-                // TODO log these uncommon cases
-                foreach ($keyChangesByType as $datasetEntityType => $keyChanges) {
-                    $oldMatchesIterable = $this->mappingService->getListByExternalIds(
-                        $datasetEntityType,
-                        $targetPortalNodeKey,
-                        \array_keys($keyChanges)
-                    );
-
-                    foreach ($oldMatchesIterable as $oldKey => $mapping) {
-                        $mapping->setExternalId($keyChanges[$oldKey]);
-                        $this->mappingService->save($mapping);
-                    }
-                }
-
-                // FIXME: something in this loop is terribly slow
-                foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
-                    $externalIds = \array_map('strval', \array_keys($originalReflectionMappings));
-                    $receivedMappingsIterable = $this->mappingService->getListByExternalIds(
-                        $datasetEntityType,
-                        $targetPortalNodeKey,
-                        $externalIds
-                    );
-
-                    foreach ($receivedMappingsIterable as $externalId => $receivedMapping) {
-                        $original = $originalReflectionMappings[$externalId];
-
-                        if ($receivedMapping->getMappingNodeKey()->equals($original->getMappingNodeKey())) {
-                            continue;
-                        }
-
-                        try {
-                            $this->mappingService->merge(
-                                $receivedMapping->getMappingNodeKey(),
-                                $original->getMappingNodeKey()
-                            );
-                        } catch (\Throwable $exception) {
-                            $exceptions[] = $exception;
-                        }
-                    }
-                }
-
-                if ($exceptions) {
-                    throw new CumulativeMappingException('Errors occured while merging mapping nodes.', ...$exceptions);
-                }
-            }
-        );
+        $this->receiveService->receive($typedMappedDatasetEntityCollection);
     }
 }

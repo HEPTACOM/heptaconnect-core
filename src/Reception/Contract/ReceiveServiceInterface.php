@@ -7,8 +7,5 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection
 
 interface ReceiveServiceInterface
 {
-    /**
-     * @todo simplify saving of mappings / replace callback with return value
-     */
-    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities, callable $saveMappings): void;
+    public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities): void;
 }
