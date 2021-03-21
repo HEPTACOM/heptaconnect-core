@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
@@ -13,7 +13,6 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
@@ -24,22 +23,22 @@ class ReceiveService implements ReceiveServiceInterface
 
     private LoggerInterface $logger;
 
-    private PortalRegistryInterface $portalRegistry;
-
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     private array $receiverStackCache = [];
 
+    private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
+
     public function __construct(
         ReceiveContextInterface $receiveContext,
         LoggerInterface $logger,
-        PortalRegistryInterface $portalRegistry,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory
     ) {
         $this->receiveContext = $receiveContext;
         $this->logger = $logger;
-        $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
     }
 
     public function receive(TypedMappedDatasetEntityCollection $mappedDatasetEntities, callable $saveMappings): void
@@ -66,19 +65,9 @@ class ReceiveService implements ReceiveServiceInterface
                 $mappedDatasetEntitiesForPortalNode
             );
 
-            try {
-                $stacks = $this->getReceiverStacks($portalNodeKey, $entityClassName);
-            } catch (\Throwable $exception) {
-                $this->logger->critical(LogMessage::RECEIVE_NO_STACKS(), [
-                    'type' => $entityClassName,
-                    'portalNodeKey' => $portalNodeKey,
-                    'exception' => $exception,
-                ]);
+            $stack = $this->getReceiverStack($portalNodeKey, $entityClassName);
 
-                continue;
-            }
-
-            if (empty($stacks)) {
+            if (!$stack instanceof ReceiverStackInterface) {
                 $this->logger->critical(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE(), [
                     'type' => $entityClassName,
                     'portalNodeKey' => $portalNodeKey,
@@ -87,67 +76,59 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            /** @var ReceiverStackInterface $stack */
-            foreach ($stacks as $stack) {
-                try {
-                    /** @var MappingInterface $mapping */
-                    foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
-                        $saveMappings($mapping->getPortalNodeKey());
-                    }
-                } catch (\Throwable $exception) {
-                    $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                        'type' => $entityClassName,
-                        'portalNodeKey' => $portalNodeKey,
-                        'stack' => $stack,
-                        'exception' => $exception,
-                    ]);
+            try {
+                /** @var MappingInterface $mapping */
+                foreach ($stack->next($mappedDatasetEntitiesForPortalNode, $this->receiveContext) as $mapping) {
+                    $saveMappings($mapping->getPortalNodeKey());
+                }
+            } catch (\Throwable $exception) {
+                $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
+                    'type' => $entityClassName,
+                    'portalNodeKey' => $portalNodeKey,
+                    'stack' => $stack,
+                    'exception' => $exception,
+                ]);
 
-                    if ($exception instanceof CumulativeMappingException) {
-                        foreach ($exception->getExceptions() as $innerException) {
-                            $errorContext = [];
+                if ($exception instanceof CumulativeMappingException) {
+                    foreach ($exception->getExceptions() as $innerException) {
+                        $errorContext = [];
 
-                            if ($innerException instanceof MappingNodeAreUnmergableException) {
-                                $errorContext = [
-                                    'fromNode' => $innerException->getFrom(),
-                                    'intoNode' => $innerException->getInto(),
-                                ];
-                            }
-
-                            $this->logger->critical(LogMessage::RECEIVE_NO_THROW().'_INNER', [
-                                'exception' => $innerException,
-                            ] + $errorContext);
+                        if ($innerException instanceof MappingNodeAreUnmergableException) {
+                            $errorContext = [
+                                'fromNode' => $innerException->getFrom(),
+                                'intoNode' => $innerException->getInto(),
+                            ];
                         }
+
+                        $this->logger->critical(LogMessage::RECEIVE_NO_THROW().'_INNER', [
+                            'exception' => $innerException,
+                        ] + $errorContext);
                     }
                 }
             }
         }
     }
 
-    /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface>
-     */
-    private function getReceiverStacks(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): array
+    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): ?ReceiverStackInterface
     {
-        $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]));
+        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]);
 
-        if (!isset($this->receiverStackCache[$cacheKey])) {
-            $portal = $this->portalRegistry->getPortal($portalNodeKey);
-            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $receivers = iterable_to_array($portal->getReceivers()->bySupport($entityClassName));
-            $receiverDecorators = iterable_to_array($portalExtensions->getReceiverDecorators()->bySupport($entityClassName));
+        if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
+            $builder = $this->receiverStackBuilderFactory
+                ->createReceiverStackBuilder($portalNodeKey, $entityClassName)
+                ->pushSource()
+                // TODO break when source is already empty
+                ->pushDecorators();
 
-            if ($receivers) {
-                foreach ($receivers as $receiver) {
-                    $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators, $receiver]);
-                }
-            } elseif ($receiverDecorators) {
-                $this->receiverStackCache[$cacheKey][] = new ReceiverStack([...$receiverDecorators]);
-            }
+            $this->receiverStackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
         }
 
-        return \array_map(
-            fn (ReceiverStackInterface $receiverStack) => clone $receiverStack,
-            $this->receiverStackCache[$cacheKey] ??= []
-        );
+        $result = $this->receiverStackCache[$cacheKey];
+
+        if ($result instanceof ReceiverStackInterface) {
+            return clone $result;
+        }
+
+        return null;
     }
 }

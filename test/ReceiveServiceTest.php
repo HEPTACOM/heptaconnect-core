@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Test;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Reception\ReceiveService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
@@ -12,9 +13,9 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
+use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use PHPUnit\Framework\TestCase;
@@ -32,11 +33,7 @@ class ReceiveServiceTest extends TestCase
     public function testReceiveCount(int $count): void
     {
         $receiveContext = $this->createMock(ReceiveContextInterface::class);
-
         $logger = $this->createMock(LoggerInterface::class);
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($count > 0 ? static::atLeastOnce() : static::never())
             ->method('getDatasetEntityClassName')
@@ -49,7 +46,16 @@ class ReceiveServiceTest extends TestCase
 
         $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
 
-        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $stack = new ReceiverStack([]);
+        $stackBuilder = $this->createMock(ReceiverStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(true);
+        $stackBuilderFactory = $this->createMock(ReceiverStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createReceiverStackBuilder')->willReturn($stackBuilder);
+
+        $receiveService = new ReceiveService($receiveContext, $logger, $storageKeyGenerator, $stackBuilderFactory);
         $receiveService->receive(
             new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
             static function (): void {}
@@ -68,18 +74,14 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_RECEIVER_FOR_TYPE());
 
-        $portal = $this->createMock(PortalContract::class);
-        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getReceivers')
-            ->willReturn(new ReceiverCollection());
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortal')
-            ->willReturn($portal);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalExtensions')
-            ->willReturn(new PortalExtensionCollection());
+        $stack = new ReceiverStack([]);
+        $stackBuilder = $this->createMock(ReceiverStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(true);
+        $stackBuilderFactory = $this->createMock(ReceiverStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createReceiverStackBuilder')->willReturn($stackBuilder);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
@@ -96,7 +98,7 @@ class ReceiveServiceTest extends TestCase
 
         $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
 
-        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $receiveService = new ReceiveService($receiveContext, $logger, $storageKeyGenerator, $stackBuilderFactory);
         $receiveService->receive(
             new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
             static function (): void {}
@@ -115,18 +117,14 @@ class ReceiveServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::RECEIVE_NO_THROW());
 
-        $portal = $this->createMock(PortalContract::class);
-        $portal->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getReceivers')
-            ->willReturn(new ReceiverCollection([new ThrowReceiver()]));
-
-        $portalRegistry = $this->createMock(PortalRegistryInterface::class);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortal')
-            ->willReturn($portal);
-        $portalRegistry->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getPortalExtensions')
-            ->willReturn(new PortalExtensionCollection());
+        $stack = new ReceiverStack([new ThrowReceiver()]);
+        $stackBuilder = $this->createMock(ReceiverStackBuilderInterface::class);
+        $stackBuilder->method('build')->willReturn($stack);
+        $stackBuilder->method('pushSource')->willReturnSelf();
+        $stackBuilder->method('pushDecorators')->willReturnSelf();
+        $stackBuilder->method('isEmpty')->willReturn(false);
+        $stackBuilderFactory = $this->createMock(ReceiverStackBuilderFactoryInterface::class);
+        $stackBuilderFactory->method('createReceiverStackBuilder')->willReturn($stackBuilder);
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
@@ -143,7 +141,7 @@ class ReceiveServiceTest extends TestCase
 
         $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
 
-        $receiveService = new ReceiveService($receiveContext, $logger, $portalRegistry, $storageKeyGenerator);
+        $receiveService = new ReceiveService($receiveContext, $logger, $storageKeyGenerator, $stackBuilderFactory);
         $receiveService->receive(
             new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
             static function (): void {}
