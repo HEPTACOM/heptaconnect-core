@@ -79,7 +79,10 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function build(): EmitterStackInterface
     {
-        return new EmitterStack(\array_map(static fn (EmitterContract $e) => clone $e, $this->emitters));
+        return new EmitterStack(\array_map(
+            static fn (EmitterContract $e) => clone $e,
+            \array_reverse($this->emitters, false),
+        ));
     }
 
     public function isEmpty(): bool

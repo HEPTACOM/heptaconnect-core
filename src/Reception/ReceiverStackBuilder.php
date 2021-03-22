@@ -79,7 +79,10 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function build(): ReceiverStackInterface
     {
-        return new ReceiverStack(\array_map(static fn (ReceiverContract $e) => clone $e, $this->receivers));
+        return new ReceiverStack(\array_map(
+            static fn (ReceiverContract $e) => clone $e,
+            \array_reverse($this->receivers, false),
+        ));
     }
 
     public function isEmpty(): bool

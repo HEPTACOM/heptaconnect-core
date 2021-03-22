@@ -79,7 +79,10 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function build(): ExplorerStackInterface
     {
-        return new ExplorerStack(\array_map(static fn (ExplorerContract $e) => clone $e, $this->explorers));
+        return new ExplorerStack(\array_map(
+            static fn (ExplorerContract $e) => clone $e,
+            \array_reverse($this->explorers, false),
+        ));
     }
 
     public function isEmpty(): bool
