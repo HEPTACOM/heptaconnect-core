@@ -105,31 +105,32 @@ class ReceptionActor implements ReceptionActorInterface
         $originalReflectionMappingsByType = [];
         $keyChangesByType = [];
 
-        foreach ($receivedEntityData as $receivedEntities) {
-            foreach ($receivedEntities as $receivedEntity) {
-                if (!$receivedEntity instanceof DatasetEntityContract
-                    || $receivedEntity->getPrimaryKey() === null) {
-                    continue;
-                }
-
-                $receivedEntityType = \get_class($receivedEntity);
-                $primaryKeyChanges = $receivedEntity->getAttachment(PrimaryKeyChangesAttachable::class);
-
-                if ($primaryKeyChanges instanceof PrimaryKeyChangesAttachable
-                    && !\is_null($primaryKeyChanges->getFirstForeignKey())
-                    && !\is_null($primaryKeyChanges->getForeignKey())
-                    && $primaryKeyChanges->getFirstForeignKey() !== $primaryKeyChanges->getForeignKey()) {
-                    $keyChangesByType[$receivedEntityType][$primaryKeyChanges->getFirstForeignKey()] = $primaryKeyChanges->getForeignKey();
-                }
-
-                $original = $receivedEntity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-                if (!$original instanceof PrimaryKeySharingMappingStruct || $original->getExternalId() === null) {
-                    continue;
-                }
-
-                $originalReflectionMappingsByType[$receivedEntityType][$receivedEntity->getPrimaryKey()] = $original;
+        foreach ($this->deepObjectIterator->iterate($receivedEntityData) as $receivedEntity) {
+            if (!$receivedEntity instanceof DatasetEntityContract) {
+                continue;
             }
+
+            if ($receivedEntity->getPrimaryKey() === null) {
+                continue;
+            }
+
+            $receivedEntityType = \get_class($receivedEntity);
+            $primaryKeyChanges = $receivedEntity->getAttachment(PrimaryKeyChangesAttachable::class);
+
+            if ($primaryKeyChanges instanceof PrimaryKeyChangesAttachable
+                && !\is_null($primaryKeyChanges->getFirstForeignKey())
+                && !\is_null($primaryKeyChanges->getForeignKey())
+                && $primaryKeyChanges->getFirstForeignKey() !== $primaryKeyChanges->getForeignKey()) {
+                $keyChangesByType[$receivedEntityType][$primaryKeyChanges->getFirstForeignKey()] = $primaryKeyChanges->getForeignKey();
+            }
+
+            $original = $receivedEntity->getAttachment(PrimaryKeySharingMappingStruct::class);
+
+            if (!$original instanceof PrimaryKeySharingMappingStruct || $original->getExternalId() === null) {
+                continue;
+            }
+
+            $originalReflectionMappingsByType[$receivedEntityType][$receivedEntity->getPrimaryKey()] = $original;
         }
 
         // TODO log these uncommon cases
