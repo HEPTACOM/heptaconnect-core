@@ -157,6 +157,6 @@ class Router implements RouterInterface, MessageSubscriberInterface
             ]);
         }
 
-        $this->receiveService->receive($typedMappedDatasetEntityCollection);
+        $this->receiveService->receive($typedMappedDatasetEntityCollection); // TODO: move this into loop
     }
 }
