@@ -32,6 +32,7 @@ class ReceiverStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (MappedDatasetEntityCollection $m, ReceiveContextInterface $c, ReceiverStackInterface $s) use (&$calc): iterable {
                     $calc[] = 1;
+
                     return $s->next($m, $c);
                 }
             );
@@ -40,6 +41,7 @@ class ReceiverStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (MappedDatasetEntityCollection $m, ReceiveContextInterface $c, ReceiverStackInterface $s) use (&$calc): iterable {
                     $calc[] = 2;
+
                     return $s->next($m, $c);
                 }
             );

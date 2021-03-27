@@ -49,7 +49,7 @@ class ReceptionActor implements ReceptionActorInterface
 
         $entities = \array_map(
             static fn (MappedDatasetEntityStruct $m): DatasetEntityContract => $m->getDatasetEntity(),
-            \iterable_to_array($mappedDatasetEntities)
+            iterable_to_array($mappedDatasetEntities)
         );
 
         foreach ($this->deepObjectIterator->iterate($entities) as $object) {
