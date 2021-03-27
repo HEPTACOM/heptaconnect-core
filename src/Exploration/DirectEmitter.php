@@ -50,8 +50,7 @@ class DirectEmitter extends EmitterContract
 
     private function matchesMapping(MappingInterface $mapping): callable
     {
-        return static fn (MappedDatasetEntityStruct $m): bool =>
-            $mapping->getDatasetEntityClassName() === $m->getMapping()->getDatasetEntityClassName() &&
+        return static fn (MappedDatasetEntityStruct $m): bool => $mapping->getDatasetEntityClassName() === $m->getMapping()->getDatasetEntityClassName() &&
             $mapping->getPortalNodeKey()->equals($m->getMapping()->getPortalNodeKey()) &&
             $mapping->getExternalId() === $m->getMapping()->getExternalId();
     }

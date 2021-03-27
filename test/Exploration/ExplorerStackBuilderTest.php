@@ -31,6 +31,7 @@ class ExplorerStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (ExploreContextInterface $c, ExplorerStackInterface $s) use (&$calc): iterable {
                     $calc[] = 1;
+
                     return $s->next($c);
                 }
             );
@@ -39,6 +40,7 @@ class ExplorerStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (ExploreContextInterface $c, ExplorerStackInterface $s) use (&$calc): iterable {
                     $calc[] = 2;
+
                     return $s->next($c);
                 }
             );

@@ -32,6 +32,7 @@ class EmitterStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (MappingCollection $m, EmitContextInterface $c, EmitterStackInterface $s) use (&$calc): iterable {
                     $calc[] = 1;
+
                     return $s->next($m, $c);
                 }
             );
@@ -40,6 +41,7 @@ class EmitterStackBuilderTest extends TestCase
             ->willReturnCallback(
                 static function (MappingCollection $m, EmitContextInterface $c, EmitterStackInterface $s) use (&$calc): iterable {
                     $calc[] = 2;
+
                     return $s->next($m, $c);
                 }
             );
