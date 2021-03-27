@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 
 class EmitService implements EmitServiceInterface
 {
-    private EmitContextInterface $emitContext;
+    private EmitContextFactory $emitContextFactory;
 
     private LoggerInterface $logger;
 
@@ -28,18 +28,23 @@ class EmitService implements EmitServiceInterface
      */
     private array $emissionStackCache = [];
 
+    /**
+     * @var array<array-key, EmitContextInterface>
+     */
+    private array $emitContextCache = [];
+
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
     private EmissionActorInterface $emissionActor;
 
     public function __construct(
-        EmitContextInterface $emitContext,
+        EmitContextFactory $emitContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         EmissionActorInterface $emissionActor
     ) {
-        $this->emitContext = $emitContext;
+        $this->emitContextFactory = $emitContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
@@ -76,7 +81,7 @@ class EmitService implements EmitServiceInterface
             $mappingsForPortalNode = iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
 
-            $this->emissionActor->performEmission($mappingsForPortalNode, $stackBuilder, $this->emitContext);
+            $this->emissionActor->performEmission($mappingsForPortalNode, $stackBuilder, $this->getEmitContext($portalNodeKey));
         }
     }
 
@@ -101,5 +106,13 @@ class EmitService implements EmitServiceInterface
         }
 
         return null;
+    }
+
+    private function getEmitContext(PortalNodeKeyInterface $portalNodeKey): EmitContextInterface
+    {
+        $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey);
+        $this->emitContextCache[$cacheKey] ??= $this->emitContextFactory->createContext($portalNodeKey);
+
+        return clone $this->emitContextCache[$cacheKey];
     }
 }

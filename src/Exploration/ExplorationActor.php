@@ -6,10 +6,10 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
@@ -28,7 +28,7 @@ class ExplorationActor implements ExplorationActorInterface
 
     private EmissionActorInterface $emissionActor;
 
-    private EmitContextInterface $emitContext;
+    private EmitContextFactory $emitContextFactory;
 
     private PublisherInterface $publisher;
 
@@ -38,14 +38,14 @@ class ExplorationActor implements ExplorationActorInterface
         LoggerInterface $logger,
         MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor,
-        EmitContextInterface $emitContext,
+        EmitContextFactory $emitContextFactory,
         PublisherInterface $publisher,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory
     ) {
         $this->logger = $logger;
         $this->mappingService = $mappingService;
         $this->emissionActor = $emissionActor;
-        $this->emitContext = $emitContext;
+        $this->emitContextFactory = $emitContextFactory;
         $this->publisher = $publisher;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
     }
@@ -63,6 +63,8 @@ class ExplorationActor implements ExplorationActorInterface
             ->pushDecorators()
             ->build();
 
+        $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey());
+
         try {
             /** @var DatasetEntityContract|string|int|null $entity */
             foreach ($stack->next($context) as $entity) {
@@ -74,7 +76,7 @@ class ExplorationActor implements ExplorationActorInterface
                     $this->emissionActor->performEmission(
                         new TypedMappingCollection($entityClassName, [$mapping]),
                         clone $emissionStack,
-                        $this->emitContext,
+                        $emitContext,
                     );
                 } elseif (\is_string($entity) || \is_int($entity)) {
                     // TODO: use batch operations by using $this->mappingService->getListByExternalIds()

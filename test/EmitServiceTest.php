@@ -7,6 +7,7 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
+use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Emission\EmitService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
@@ -43,7 +44,7 @@ class EmitServiceTest extends TestCase
         $stackBuilderFactory->method('createEmitterStackBuilder')->willReturn($stackBuilder);
 
         $emitService = new EmitService(
-            $this->createMock(EmitContextInterface::class),
+            $this->createMock(EmitContextFactory::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(StorageKeyGeneratorContract::class),
             $stackBuilderFactory,
@@ -58,6 +59,9 @@ class EmitServiceTest extends TestCase
     public function testMissingEmitter(int $count): void
     {
         $emitContext = $this->createMock(EmitContextInterface::class);
+
+        $emitContextFactory = $this->createMock(EmitContextFactory::class);
+        $emitContextFactory->method('createContext')->willReturn($emitContext);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($count > 0 ? static::atLeastOnce() : static::never())
@@ -79,7 +83,7 @@ class EmitServiceTest extends TestCase
         $stackBuilderFactory->method('createEmitterStackBuilder')->willReturn($stackBuilder);
 
         $emitService = new EmitService(
-            $emitContext,
+            $emitContextFactory,
             $logger,
             $this->createMock(StorageKeyGeneratorContract::class),
             $stackBuilderFactory,
