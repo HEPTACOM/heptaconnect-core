@@ -3,7 +3,7 @@
 
 This Contributor License Agreement ("CLA") documents the rights granted by Contributors to HEPTACOM GmbH. This Agreement will govern all Contributions made by the Contributor.
 
-This Agreement is between Heptacom GmbH, Kurfürstenallee 130, 28211 Bremen [Germany] ("HEPTACOM"), and the person [or entity] making a Contribution to this Software ("Contributor" and collectively with HEPTACOM, the "Parties").
+This Agreement is between Heptacom GmbH, Am Tabakquartier 62, 28197 Bremen [Germany] ("HEPTACOM"), and the person [or entity] making a Contribution to this Software ("Contributor" and collectively with HEPTACOM, the "Parties").
 
 ## __1. Definitions.__
 1.1 "**Contribution**" means any intellectual creation (software and / or documentation), including any revisions or additions to existing works submitted by the Contributor to a project and in which the Contributor has the rights of use and exploitation under copyright law.
