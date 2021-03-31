@@ -44,6 +44,7 @@ class PortalStackServiceContainer implements ContainerInterface
                 $this->services[$id] = $service;
             }
         } catch (\Throwable $throwable) {
+            // TODO: log error
             throw new ServiceNotInstantiable($id, $throwable);
         }
 
