@@ -65,9 +65,9 @@ class EmitService implements EmitServiceInterface
             }
 
             $emittingPortalNodes[] = $portalNodeKey;
-            $stackBuilder = $this->getEmitterStack($portalNodeKey, $entityClassName);
+            $stack = $this->getEmitterStack($portalNodeKey, $entityClassName);
 
-            if (!$stackBuilder instanceof EmitterStackInterface) {
+            if (!$stack instanceof EmitterStackInterface) {
                 $this->logger->critical(LogMessage::EMIT_NO_EMITTER_FOR_TYPE(), [
                     'type' => $entityClassName,
                     'portalNodeKey' => $portalNodeKey,
@@ -81,7 +81,7 @@ class EmitService implements EmitServiceInterface
             $mappingsForPortalNode = iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
 
-            $this->emissionActor->performEmission($mappingsForPortalNode, $stackBuilder, $this->getEmitContext($portalNodeKey));
+            $this->emissionActor->performEmission($mappingsForPortalNode, $stack, $this->getEmitContext($portalNodeKey));
         }
     }
 
