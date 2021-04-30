@@ -11,12 +11,16 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 {
     private PortalRegistryInterface $portalRegistry;
 
     private PortalNodeKeyInterface $portalNodeKey;
+
+    private LoggerInterface $logger;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
@@ -37,18 +41,32 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
      */
     public function __construct(
         PortalRegistryInterface $portalRegistry,
+        LoggerInterface $logger,
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ) {
         $this->portalRegistry = $portalRegistry;
+        $this->logger = $logger;
         $this->portalNodeKey = $portalNodeKey;
         $this->entityClassName = $entityClassName;
     }
 
     public function push(ExplorerContract $explorer): self
     {
-        // TODO add supports check
-        $this->explorers[] = $explorer;
+        if (\is_a($this->entityClassName, $explorer->supports(), true)) {
+            $this->logger->debug(\sprintf(
+                'ExplorerStackBuilder: Pushed %s as arbitrary explorer.',
+                \get_class($explorer)
+            ));
+
+            $this->explorers[] = $explorer;
+        } else {
+            $this->logger->debug(\sprintf(
+                'ExplorerStackBuilder: Tried to push %s as arbitrary explorer, but it does not support type %s.',
+                \get_class($explorer),
+                $this->entityClassName,
+            ));
+        }
 
         return $this;
     }
@@ -62,6 +80,11 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         }
 
         if ($lastExplorer instanceof ExplorerContract) {
+            $this->logger->debug(\sprintf(
+                'ExplorerStackBuilder: Pushed %s as source explorer.',
+                \get_class($lastExplorer)
+            ));
+
             $this->explorers[] = $lastExplorer;
         }
 
@@ -71,6 +94,11 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->getPortalExtensions()->getExplorerDecorators()->bySupport($this->entityClassName) as $explorer) {
+            $this->logger->debug(\sprintf(
+                'ExplorerStackBuilder: Pushed %s as decorator explorer.',
+                \get_class($explorer)
+            ));
+
             $this->explorers[] = $explorer;
         }
 
@@ -79,10 +107,18 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function build(): ExplorerStackInterface
     {
-        return new ExplorerStack(\array_map(
+        $explorerStack = new ExplorerStack(\array_map(
             static fn (ExplorerContract $e) => clone $e,
             \array_reverse($this->explorers, false),
         ));
+
+        if ($explorerStack instanceof LoggerAwareInterface) {
+            $explorerStack->setLogger($this->logger);
+        }
+
+        $this->logger->debug('ExplorerStackBuilder: Built explorer stack.');
+
+        return $explorerStack;
     }
 
     public function isEmpty(): bool

@@ -11,10 +11,14 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 class EmitterStackBuilder implements EmitterStackBuilderInterface
 {
     private PortalRegistryInterface $portalRegistry;
+
+    private LoggerInterface $logger;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
@@ -37,18 +41,32 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
      */
     public function __construct(
         PortalRegistryInterface $portalRegistry,
+        LoggerInterface $logger,
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ) {
         $this->portalRegistry = $portalRegistry;
+        $this->logger = $logger;
         $this->portalNodeKey = $portalNodeKey;
         $this->entityClassName = $entityClassName;
     }
 
     public function push(EmitterContract $emitter): self
     {
-        // TODO add supports check
-        $this->emitters[] = $emitter;
+        if (\is_a($this->entityClassName, $emitter->supports(), true)) {
+            $this->logger->debug(\sprintf(
+                'EmitterStackBuilder: Pushed %s as arbitrary emitter.',
+                \get_class($emitter)
+            ));
+
+            $this->emitters[] = $emitter;
+        } else {
+            $this->logger->debug(\sprintf(
+                'EmitterStackBuilder: Tried to push %s as arbitrary emitter, but it does not support type %s.',
+                \get_class($emitter),
+                $this->entityClassName,
+            ));
+        }
 
         return $this;
     }
@@ -62,6 +80,11 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
         }
 
         if ($lastEmitter instanceof EmitterContract) {
+            $this->logger->debug(\sprintf(
+                'EmitterStackBuilder: Pushed %s as source emitter.',
+                \get_class($lastEmitter)
+            ));
+
             $this->emitters[] = $lastEmitter;
         }
 
@@ -71,6 +94,11 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->getPortalExtensions()->getEmitterDecorators()->bySupport($this->entityClassName) as $emitter) {
+            $this->logger->debug(\sprintf(
+                'EmitterStackBuilder: Pushed %s as decorator emitter.',
+                \get_class($emitter)
+            ));
+
             $this->emitters[] = $emitter;
         }
 
@@ -79,10 +107,18 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function build(): EmitterStackInterface
     {
-        return new EmitterStack(\array_map(
+        $emitterStack = new EmitterStack(\array_map(
             static fn (EmitterContract $e) => clone $e,
             \array_reverse($this->emitters, false),
         ));
+
+        if ($emitterStack instanceof LoggerAwareInterface) {
+            $emitterStack->setLogger($this->logger);
+        }
+
+        $this->logger->debug('EmitterStackBuilder: Built emitter stack.');
+
+        return $emitterStack;
     }
 
     public function isEmpty(): bool

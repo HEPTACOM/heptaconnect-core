@@ -7,20 +7,24 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryI
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterface
 {
     private PortalRegistryInterface $portalRegistry;
 
-    public function __construct(PortalRegistryInterface $portalRegistry)
+    private LoggerInterface $logger;
+
+    public function __construct(PortalRegistryInterface $portalRegistry, LoggerInterface $logger)
     {
         $this->portalRegistry = $portalRegistry;
+        $this->logger = $logger;
     }
 
     public function createExplorerStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ): ExplorerStackBuilderInterface {
-        return new ExplorerStackBuilder($this->portalRegistry, $portalNodeKey, $entityClassName);
+        return new ExplorerStackBuilder($this->portalRegistry, $this->logger, $portalNodeKey, $entityClassName);
     }
 }

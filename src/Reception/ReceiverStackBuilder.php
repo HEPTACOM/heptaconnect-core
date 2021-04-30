@@ -11,10 +11,14 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface;
 
 class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 {
     private PortalRegistryInterface $portalRegistry;
+
+    private LoggerInterface $logger;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
@@ -37,18 +41,32 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
      */
     public function __construct(
         PortalRegistryInterface $portalRegistry,
+        LoggerInterface $logger,
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->portalNodeKey = $portalNodeKey;
         $this->entityClassName = $entityClassName;
+        $this->logger = $logger;
     }
 
     public function push(ReceiverContract $receiver): self
     {
-        // TODO add supports check
-        $this->receivers[] = $receiver;
+        if (\is_a($this->entityClassName, $receiver->supports(), true)) {
+            $this->logger->debug(\sprintf(
+                'ReceiverStackBuilder: Pushed %s as arbitrary receiver.',
+                \get_class($receiver)
+            ));
+
+            $this->receivers[] = $receiver;
+        } else {
+            $this->logger->debug(\sprintf(
+                'ReceiverStackBuilder: Tried to push %s as arbitrary receiver, but it does not support type %s.',
+                \get_class($receiver),
+                $this->entityClassName,
+            ));
+        }
 
         return $this;
     }
@@ -62,6 +80,11 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         }
 
         if ($lastReceiver instanceof ReceiverContract) {
+            $this->logger->debug(\sprintf(
+                'ReceiverStackBuilder: Pushed %s as source receiver.',
+                \get_class($lastReceiver)
+            ));
+
             $this->receivers[] = $lastReceiver;
         }
 
@@ -71,6 +94,11 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->getPortalExtensions()->getReceiverDecorators()->bySupport($this->entityClassName) as $receiver) {
+            $this->logger->debug(\sprintf(
+                'ReceiverStackBuilder: Pushed %s as decorator receiver.',
+                \get_class($receiver)
+            ));
+
             $this->receivers[] = $receiver;
         }
 
@@ -79,10 +107,18 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function build(): ReceiverStackInterface
     {
-        return new ReceiverStack(\array_map(
+        $receiverStack = new ReceiverStack(\array_map(
             static fn (ReceiverContract $e) => clone $e,
             \array_reverse($this->receivers, false),
         ));
+
+        if ($receiverStack instanceof LoggerAwareInterface) {
+            $receiverStack->setLogger($this->logger);
+        }
+
+        $this->logger->debug('ReceiverStackBuilder: Built receiver stack.');
+
+        return $receiverStack;
     }
 
     public function isEmpty(): bool
