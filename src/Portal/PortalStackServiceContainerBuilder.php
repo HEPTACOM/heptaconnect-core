@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -29,6 +31,8 @@ class PortalStackServiceContainerBuilder
             'portal' => $portal,
             \get_class($portal) => $portal,
             PortalNodeContextInterface::class => $context,
+            PortalStorageInterface::class => $context->getStorage(),
+            ResourceLockFacade::class => $context->getResourceLocker(),
         ];
 
         /** @var PortalExtensionContract $portalExtension */
