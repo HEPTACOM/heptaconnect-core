@@ -260,13 +260,13 @@ class MappingService implements MappingServiceInterface
                 throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
             }
 
-            $fromPortalExistences = [];
+            $intoPortalExistences = [];
 
             foreach ($this->mappingRepository->listByMappingNode($mergeInto) as $mappingKey) {
                 $mapping = $this->mappingRepository->read($mappingKey);
                 $portalNode = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
-                $fromPortalExistences[$portalNode] = $mapping->getExternalId();
+                $intoPortalExistences[$portalNode] = $mapping->getExternalId();
             }
 
             /** @var MappingInterface[] $mappingsToCreate */
@@ -278,8 +278,8 @@ class MappingService implements MappingServiceInterface
                 $mapping = $this->mappingRepository->read($mappingKey);
                 $portalNode = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
-                if (\array_key_exists($portalNode, $fromPortalExistences) && $fromPortalExistences[$portalNode] !== null) {
-                    if ($fromPortalExistences[$portalNode] !== $mapping->getExternalId()) {
+                if (\array_key_exists($portalNode, $intoPortalExistences) && $intoPortalExistences[$portalNode] !== null) {
+                    if ($intoPortalExistences[$portalNode] !== $mapping->getExternalId()) {
                         throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
                     }
                 } else {
