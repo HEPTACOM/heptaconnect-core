@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
@@ -17,9 +18,12 @@ class PortalStackServiceContainerBuilder
 {
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger)
+    private NormalizationRegistry $normalizationRegistry;
+
+    public function __construct(LoggerInterface $logger, NormalizationRegistry $normalizationRegistry)
     {
         $this->logger = $logger;
+        $this->normalizationRegistry = $normalizationRegistry;
     }
 
     public function build(
@@ -46,6 +50,7 @@ class PortalStackServiceContainerBuilder
         $services[DeepCloneContract::class] ??= new DeepCloneContract();
         $services[DeepObjectIteratorContract::class] ??= new DeepObjectIteratorContract();
         $services[LoggerInterface::class] ??= $this->logger;
+        $services[NormalizationRegistry::class] ??= $this->normalizationRegistry;
 
         return new PortalStackServiceContainer($services);
     }
