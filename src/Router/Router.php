@@ -25,7 +25,11 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class Router implements RouterInterface, MessageSubscriberInterface
 {
@@ -45,6 +49,10 @@ class Router implements RouterInterface, MessageSubscriberInterface
 
     private DeepObjectIteratorContract $objectIterator;
 
+    private MessageBusInterface $messageBus;
+
+    private LockFactory $lockFactory;
+
     public function __construct(
         EmitServiceInterface $emitService,
         ReceiveServiceInterface $receiveService,
@@ -53,7 +61,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
         EntityMapperContract $entityMapper,
         EntityReflectorContract $entityReflector,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        DeepObjectIteratorContract $deepObjectIterator
+        DeepObjectIteratorContract $deepObjectIterator,
+        MessageBusInterface $messageBus,
+        LockFactory $lockFactory
     ) {
         $this->emitService = $emitService;
         $this->receiveService = $receiveService;
@@ -63,6 +73,8 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->entityReflector = $entityReflector;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->objectIterator = $deepObjectIterator;
+        $this->messageBus = $messageBus;
+        $this->lockFactory = $lockFactory;
     }
 
     public static function getHandledMessages(): iterable
@@ -143,20 +155,37 @@ class Router implements RouterInterface, MessageSubscriberInterface
         foreach ($routeIds as $routeId) {
             $route = $this->routeRepository->read($routeId);
 
-            // TODO: improve performance
-            $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
+            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \join('_', [
+                $this->storageKeyGenerator->serialize($route->getSourceKey()),
+                $this->storageKeyGenerator->serialize($route->getTargetKey()),
+                $this->storageKeyGenerator->serialize($mapping->getMappingNodeKey()),
+            ]));
 
-            $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
-            $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
-                $mapping->getMappingNodeKey(),
-                $mapping->getDatasetEntityClassName()
-            )))->setExternalId($datasetEntity->getPrimaryKey());
+            if (!$lock->acquire()) {
+                // Re-dispatch message and delay it by 60 seconds
+                $this->messageBus->dispatch(Envelope::wrap($message)->with(new DelayStamp(60000)));
 
-            $typedMappedDatasetEntityCollection->push([
-                new MappedDatasetEntityStruct($targetMapping, $datasetEntity),
-            ]);
+                continue;
+            }
+
+            try {
+                // TODO: improve performance
+                $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
+
+                $datasetEntity = $mappedDatasetEntityStruct->getDatasetEntity();
+                $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
+                    $mapping->getMappingNodeKey(),
+                    $mapping->getDatasetEntityClassName()
+                )))->setExternalId($datasetEntity->getPrimaryKey());
+
+                $typedMappedDatasetEntityCollection->push([
+                    new MappedDatasetEntityStruct($targetMapping, $datasetEntity),
+                ]);
+
+                $this->receiveService->receive($typedMappedDatasetEntityCollection);
+            } finally {
+                $lock->release();
+            }
         }
-
-        $this->receiveService->receive($typedMappedDatasetEntityCollection); // TODO: move this into loop
     }
 }
