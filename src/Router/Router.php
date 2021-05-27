@@ -126,7 +126,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $portalNodeId = $this->storageKeyGenerator->serialize($portalNodeKey);
 
             // TODO: add custom type for exception
-            throw new \Exception(\sprintf(\implode(\PHP_EOL, ['Message is not routed. Add a route and re-explore this entity.', 'source portal: %s', 'data type: %s', 'external id: $s']), $portalNodeId, $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
+            throw new \Exception(\sprintf(\implode(\PHP_EOL, ['Message is not routed. Add a route and re-explore this entity.', 'source portal: %s', 'data type: %s', 'external id: %s']), $portalNodeId, $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
         }
 
         // FIXME: This is slow
