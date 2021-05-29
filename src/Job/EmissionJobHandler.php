@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 
-class PublishJobHandler
+class EmissionJobHandler
 {
     private MappingServiceInterface $mappingService;
 

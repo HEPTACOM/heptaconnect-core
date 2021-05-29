@@ -4,14 +4,14 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract;
-use Heptacom\HeptaConnect\Core\Job\Type\Publish;
+use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 
 class DelegatingJobActor extends DelegatingJobActorContract
 {
-    private PublishJobHandler $publishJobHandler;
+    private EmissionJobHandler $publishJobHandler;
 
-    public function __construct(PublishJobHandler $publishJobHandler)
+    public function __construct(EmissionJobHandler $publishJobHandler)
     {
         $this->publishJobHandler = $publishJobHandler;
     }
@@ -19,7 +19,7 @@ class DelegatingJobActor extends DelegatingJobActorContract
     public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): void
     {
         switch ($type) {
-            case Publish::TYPE:
+            case Emission::TYPE:
                 $this->publishJobHandler->publish($mapping);
                 break;
         }

@@ -5,7 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
-use Heptacom\HeptaConnect\Core\Job\Type\Publish;
+use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
@@ -27,7 +27,7 @@ class Publisher implements PublisherInterface
         string $externalId
     ): void {
         $this->jobDispatcher->dispatch(new JobCollection([
-            new Publish(new MappingComponentStruct(
+            new Emission(new MappingComponentStruct(
                 $portalNodeId, $datasetEntityClassName, $externalId
             )),
         ]));
@@ -39,7 +39,7 @@ class Publisher implements PublisherInterface
 
         /** @var MappingInterface $mapping */
         foreach ($mappings as $mapping) {
-            $jobs[] = new Publish(new MappingComponentStruct(
+            $jobs[] = new Emission(new MappingComponentStruct(
                 $mapping->getPortalNodeKey(), $mapping->getDatasetEntityClassName(), $mapping->getExternalId()
             ));
         }
