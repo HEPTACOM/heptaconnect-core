@@ -3,20 +3,22 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
-use Heptacom\HeptaConnect\Core\Component\Messenger\Message\BatchPublishMessage;
-use Heptacom\HeptaConnect\Core\Component\Messenger\Message\PublishMessage;
+use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
+use Heptacom\HeptaConnect\Core\Job\JobCollection;
+use Heptacom\HeptaConnect\Core\Job\Type\Publish;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 class Publisher implements PublisherInterface
 {
-    private MessageBusInterface $messageBus;
+    private JobDispatcherContract $jobDispatcher;
 
-    public function __construct(MessageBusInterface $messageBus)
+    public function __construct(JobDispatcherContract $jobDispatcher)
     {
-        $this->messageBus = $messageBus;
+        $this->jobDispatcher = $jobDispatcher;
     }
 
     public function publish(
@@ -24,11 +26,28 @@ class Publisher implements PublisherInterface
         PortalNodeKeyInterface $portalNodeId,
         string $externalId
     ): void {
-        $this->messageBus->dispatch(new PublishMessage($portalNodeId, $datasetEntityClassName, $externalId));
+        $this->jobDispatcher->dispatch(new JobCollection([
+            new Publish(new MappingComponentStruct(
+                $portalNodeId, $datasetEntityClassName, $externalId
+            )),
+        ]));
     }
 
     public function publishBatch(MappingCollection $mappings): void
     {
-        $this->messageBus->dispatch(new BatchPublishMessage($mappings));
+        $jobs = [];
+
+        /** @var MappingInterface $mapping */
+        foreach ($mappings as $mapping) {
+            $jobs[] = new Publish(new MappingComponentStruct(
+                $mapping->getPortalNodeKey(), $mapping->getDatasetEntityClassName(), $mapping->getExternalId()
+            ));
+        }
+
+        if ($jobs === []) {
+            return;
+        }
+
+        $this->jobDispatcher->dispatch(new JobCollection($jobs));
     }
 }
