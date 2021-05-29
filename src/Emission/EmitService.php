@@ -78,7 +78,7 @@ class EmitService implements EmitServiceInterface
 
             $mappingsIterator = $mappings->filter(fn (MappingInterface $mapping) => $mapping->getPortalNodeKey()->equals($portalNodeKey));
             /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface> $mappingsForPortalNode */
-            $mappingsForPortalNode = iterable_to_array($mappingsIterator);
+            $mappingsForPortalNode = \iterable_to_array($mappingsIterator);
             $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
 
             $this->emissionActor->performEmission($mappingsForPortalNode, $stack, $this->getEmitContext($portalNodeKey));

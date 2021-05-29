@@ -129,8 +129,8 @@ class StatusReportingService implements StatusReportingServiceInterface
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
             $portal = $this->portalRegistry->getPortal($portalNodeKey);
             $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $statusReporters = iterable_to_array($portal->getStatusReporters()->bySupportedTopic($topic));
-            $statusReporterDecorators = iterable_to_array($portalExtensions->getStatusReporters()->bySupportedTopic($topic));
+            $statusReporters = \iterable_to_array($portal->getStatusReporters()->bySupportedTopic($topic));
+            $statusReporterDecorators = \iterable_to_array($portalExtensions->getStatusReporters()->bySupportedTopic($topic));
 
             if ($statusReporters) {
                 foreach ($statusReporters as $statusReporter) {

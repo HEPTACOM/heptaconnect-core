@@ -126,7 +126,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
             $mapping->getDatasetEntityClassName()
         );
 
-        $routeIds = iterable_to_array($routeIds);
+        $routeIds = \iterable_to_array($routeIds);
 
         if (\count($routeIds) === 0) {
             $portalNodeId = $this->storageKeyGenerator->serialize($portalNodeKey);
@@ -161,7 +161,7 @@ class Router implements RouterInterface, MessageSubscriberInterface
         foreach ($routeIds as $routeId) {
             $route = $this->routeRepository->read($routeId);
 
-            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \join('_', [
+            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\join('_', [
                 $this->storageKeyGenerator->serialize($route->getSourceKey()),
                 $this->storageKeyGenerator->serialize($route->getTargetKey()),
                 $this->storageKeyGenerator->serialize($mapping->getMappingNodeKey()),

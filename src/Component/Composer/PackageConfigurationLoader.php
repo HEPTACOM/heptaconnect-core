@@ -59,7 +59,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             $config = new PackageConfiguration();
             $heptaconnectKeywords = \array_filter(
                 $packageInstance->getKeywords() ?? [],
-                fn (string $k): bool => str_starts_with($k, 'heptaconnect-')
+                fn (string $k): bool => \str_starts_with($k, 'heptaconnect-')
             );
 
             if (empty($heptaconnectKeywords)) {
