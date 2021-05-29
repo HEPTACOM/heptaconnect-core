@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Job;
+namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 
-class EmissionJobHandler
+class EmissionHandler
 {
     private MappingServiceInterface $mappingService;
 
@@ -20,7 +20,7 @@ class EmissionJobHandler
         $this->emitService = $emitService;
     }
 
-    public function publish(MappingComponentStructContract $mapping): void
+    public function triggerEmission(MappingComponentStructContract $mapping): void
     {
         $mapping = $this->mappingService->get(
             $mapping->getDatasetEntityClassName(),
