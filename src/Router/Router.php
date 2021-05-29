@@ -84,6 +84,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
         yield EmitMessage::class => ['method' => 'handleEmitMessage'];
     }
 
+    /**
+     * @deprecated 1.0 Replaced with JobMessage
+     */
     public function handlePublishMessage(PublishMessage $message): void
     {
         $mapping = $this->mappingService->get(
@@ -95,6 +98,9 @@ class Router implements RouterInterface, MessageSubscriberInterface
         $this->emitService->emit(new TypedMappingCollection($mapping->getDatasetEntityClassName(), [$mapping]));
     }
 
+    /**
+     * @deprecated 1.0 Replaced with JobMessage
+     */
     public function handleBatchPublishMessage(BatchPublishMessage $message): void
     {
         $typedMappingCollections = [];
