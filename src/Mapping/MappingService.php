@@ -52,30 +52,14 @@ class MappingService implements MappingServiceInterface
     public function addException(MappingInterface $mapping, \Throwable $exception): void
     {
         try {
-            $mappingKeys = $this->mappingRepository->listByNodes(
+            $this->mappingExceptionRepository->create(
+                $mapping->getPortalNodeKey(),
                 $mapping->getMappingNodeKey(),
-                $mapping->getPortalNodeKey()
+                $exception
             );
-            $mappingKey = null;
-
-            foreach ($mappingKeys as $mappingKey) {
-                $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
-                break;
-            }
-
-            if (!$mappingKey instanceof MappingKeyInterface) {
-                $mappingKey = $this->mappingRepository->create(
-                    $mapping->getPortalNodeKey(),
-                    $mapping->getMappingNodeKey(),
-                    $mapping->getExternalId()
-                );
-            }
-
-            $this->mappingExceptionRepository->create($mappingKey, $exception);
         } catch (\Throwable $throwable) {
             $this->logger->error('MAPPING_EXCEPTION', [
                 'exception' => $exception,
-                'mappingKey' => $mappingKey ? $this->storageKeyGenerator->serialize($mappingKey) : null,
                 'mappingNodeKey' => $this->storageKeyGenerator->serialize($mapping->getMappingNodeKey()),
                 'portalNodeKey' => $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()),
                 'externalId' => $mapping->getExternalId(),
