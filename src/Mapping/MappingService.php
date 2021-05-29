@@ -155,6 +155,7 @@ class MappingService implements MappingServiceInterface
         $nodes = new MappingNodeKeyCollection();
 
         foreach ($mappingComponentCollection->getPortalNodeKeys() as $portalNodeKey) {
+            $createMappingNodes = 0;
             $portalNodeMappings = new MappingComponentCollection($mappingComponentCollection->filterByPortalNodeKey($portalNodeKey));
 
             foreach ($portalNodeMappings->getDatasetEntityClassNames() as $datasetEntityClassName) {
@@ -175,9 +176,13 @@ class MappingService implements MappingServiceInterface
                     static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $datasetEntityClassName, $externalId),
                     $missingExternalIds
                 ));
-                // TODO batch
-                $nodes->push([$this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey)]);
+
+                ++$createMappingNodes;
             }
+
+            $nodes->push(
+                $this->mappingNodeRepository->createList($datasetEntityClassName, $portalNodeKey, $createMappingNodes)
+            );
         }
 
         $payload = new MappingCollection();
