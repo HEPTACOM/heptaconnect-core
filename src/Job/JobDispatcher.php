@@ -37,7 +37,7 @@ class JobDispatcher extends JobDispatcherContract
             $jobKeys[] = $this->jobRepository->add($job->getMappingComponent(), $job->getType(), $payloadId);
         }
 
-        if ($jobKeys !== []) {
+        if ($jobKeys === []) {
             return;
         }
 
