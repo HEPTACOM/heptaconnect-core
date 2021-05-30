@@ -7,5 +7,5 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructCon
 
 abstract class DelegatingJobActorContract
 {
-    abstract public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): void;
+    abstract public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): bool;
 }

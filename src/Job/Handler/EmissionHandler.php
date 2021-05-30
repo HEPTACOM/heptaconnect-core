@@ -20,7 +20,7 @@ class EmissionHandler
         $this->emitService = $emitService;
     }
 
-    public function triggerEmission(MappingComponentStructContract $mapping): void
+    public function triggerEmission(MappingComponentStructContract $mapping): bool
     {
         $mapping = $this->mappingService->get(
             $mapping->getDatasetEntityClassName(),
@@ -29,5 +29,7 @@ class EmissionHandler
         );
 
         $this->emitService->emit(new TypedMappingCollection($mapping->getDatasetEntityClassName(), [$mapping]));
+
+        return true;
     }
 }

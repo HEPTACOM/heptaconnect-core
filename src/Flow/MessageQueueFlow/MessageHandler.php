@@ -8,7 +8,10 @@ use Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobPayloadRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
+use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class MessageHandler implements MessageSubscriberInterface
 {
@@ -18,14 +21,18 @@ class MessageHandler implements MessageSubscriberInterface
 
     private DelegatingJobActorContract $jobActor;
 
+    private MessageBusInterface $bus;
+
     public function __construct(
         JobRepositoryContract $jobRepository,
         JobPayloadRepositoryContract $jobPayloadRepository,
-        DelegatingJobActorContract $jobActor
+        DelegatingJobActorContract $jobActor,
+        MessageBusInterface $bus
     ) {
         $this->jobRepository = $jobRepository;
         $this->jobPayloadRepository = $jobPayloadRepository;
         $this->jobActor = $jobActor;
+        $this->bus = $bus;
     }
 
     public static function getHandledMessages(): iterable
@@ -33,7 +40,7 @@ class MessageHandler implements MessageSubscriberInterface
         yield JobMessage::class => ['method' => 'handleJob'];
     }
 
-    public function handleJob(JobMessage $message)
+    public function handleJob(JobMessage $message): void
     {
         /** @var JobKeyInterface $jobKey */
         foreach ($message->getJobKeys() as $jobKey) {
@@ -46,7 +53,9 @@ class MessageHandler implements MessageSubscriberInterface
             }
 
             // TODO mark as tried to execute
-            $this->jobActor->performJob($job->getJobType(), $job->getMapping(), $payload);
+            if (!$this->jobActor->performJob($job->getJobType(), $job->getMapping(), $payload)) {
+                $this->bus->dispatch(Envelope::wrap($message)->with(new DelayStamp(60000)));
+            }
             // TODO mark as executed
         }
     }

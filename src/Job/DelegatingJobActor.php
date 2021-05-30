@@ -17,12 +17,14 @@ class DelegatingJobActor extends DelegatingJobActorContract
         $this->emissionHandler = $emissionHandler;
     }
 
-    public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): void
+    public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): bool
     {
         switch ($type) {
             case Emission::class:
-                $this->emissionHandler->triggerEmission($mapping);
-                break;
+                return $this->emissionHandler->triggerEmission($mapping);
         }
+
+        // TODO error log
+        return true;
     }
 }
