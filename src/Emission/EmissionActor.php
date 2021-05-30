@@ -15,6 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
 class EmissionActor implements EmissionActorInterface
@@ -28,14 +29,18 @@ class EmissionActor implements EmissionActorInterface
 
     private RouteRepositoryContract $routeRepository;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         JobDispatcherContract $jobDispatcher,
         LoggerInterface $logger,
-        RouteRepositoryContract $routeRepository
+        RouteRepositoryContract $routeRepository,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->jobDispatcher = $jobDispatcher;
         $this->logger = $logger;
         $this->routeRepository = $routeRepository;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function performEmission(
@@ -53,7 +58,12 @@ class EmissionActor implements EmissionActorInterface
         ));
 
         if ($routeKeys->count() < 1) {
-            return;
+            // TODO: add custom type for exception
+            throw new \Exception(\sprintf(\implode(\PHP_EOL, [
+                'Message is not routed. Add a route and re-explore this entity.',
+                'source portal: %s',
+                'data type: %s',
+            ]), $this->storageKeyGenerator->serialize($context->getPortalNodeKey()), $mappings->getType()));
         }
 
         try {
