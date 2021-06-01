@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 
 class EmitContextFactory
 {
@@ -26,13 +27,16 @@ class EmitContextFactory
 
     private MappingServiceInterface $mappingService;
 
+    private MappingNodeRepositoryContract $mappingNodeRepository;
+
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalRegistryInterface $portalRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        MappingServiceInterface $mappingService
+        MappingServiceInterface $mappingService,
+        MappingNodeRepositoryContract $mappingNodeRepository
     ) {
         $this->configurationService = $configurationService;
         $this->portalRegistry = $portalRegistry;
@@ -40,6 +44,7 @@ class EmitContextFactory
         $this->resourceLocking = $resourceLocking;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->mappingService = $mappingService;
+        $this->mappingNodeRepository = $mappingNodeRepository;
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey): EmitContextInterface
@@ -52,6 +57,7 @@ class EmitContextFactory
             $this->portalStackServiceContainerFactory,
             $this->mappingService,
             $portalNodeKey,
+            $this->mappingNodeRepository
         );
     }
 }

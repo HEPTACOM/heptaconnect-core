@@ -8,11 +8,10 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -44,43 +43,41 @@ class EmissionActor implements EmissionActorInterface
     }
 
     public function performEmission(
-        TypedMappingCollection $mappings,
+        iterable $externalIds,
         EmitterStackInterface $stack,
         EmitContextInterface $context
     ): void {
-        if ($mappings->count() < 1) {
+        $externalIds = \iterable_to_array($externalIds);
+
+        if (!$externalIds) {
             return;
         }
 
         $routeKeys = new RouteKeyCollection($this->routeRepository->listBySourceAndEntityType(
             $context->getPortalNodeKey(),
-            $mappings->getType()
+            $stack->supports()
         ));
 
         if ($routeKeys->count() < 1) {
             // TODO: add custom type for exception
-            throw new \Exception(\sprintf(\implode(\PHP_EOL, [
-                'Message is not routed. Add a route and re-explore this entity.',
-                'source portal: %s',
-                'data type: %s',
-            ]), $this->storageKeyGenerator->serialize($context->getPortalNodeKey()), $mappings->getType()));
+            throw new \Exception(\sprintf(\implode(\PHP_EOL, ['Message is not routed. Add a route and re-explore this entity.', 'source portal: %s', 'data type: %s']), $this->storageKeyGenerator->serialize($context->getPortalNodeKey()), $stack->supports()));
         }
 
         try {
-            /** @var MappedDatasetEntityStruct $mappedDatasetEntityStruct */
-            foreach ($stack->next($mappings, $context) as $mappedDatasetEntityStruct) {
+            /** @var DatasetEntityContract $entity */
+            foreach ($stack->next($externalIds, $context) as $entity) {
                 $jobs = new JobCollection();
 
                 foreach ($routeKeys as $routeKey) {
                     $jobs->push([
                         new Reception(
                             new MappingComponentStruct(
-                                $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey(),
-                                $mappedDatasetEntityStruct->getMapping()->getDatasetEntityClassName(),
-                                $mappedDatasetEntityStruct->getMapping()->getExternalId()
+                                $context->getPortalNodeKey(),
+                                $stack->supports(),
+                                $entity->getPrimaryKey()
                             ),
                             $routeKey,
-                            $mappedDatasetEntityStruct->getDatasetEntity()
+                            $entity
                         ),
                     ]);
                 }
@@ -89,7 +86,7 @@ class EmissionActor implements EmissionActorInterface
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
-                'type' => $mappings->getType(),
+                'type' => $stack->supports(),
                 'stack' => $stack,
                 'exception' => $exception,
             ]);

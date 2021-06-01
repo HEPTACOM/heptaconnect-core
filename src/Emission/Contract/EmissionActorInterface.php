@@ -5,12 +5,14 @@ namespace Heptacom\HeptaConnect\Core\Emission\Contract;
 
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
 
 interface EmissionActorInterface
 {
+    /**
+     * @param string[] $externalIds
+     */
     public function performEmission(
-        TypedMappingCollection $mappings,
+        iterable $externalIds,
         EmitterStackInterface $stack,
         EmitContextInterface $context
     ): void;

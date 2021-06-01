@@ -4,11 +4,9 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 
 class DirectEmitter extends EmitterContract
 {
@@ -17,7 +15,7 @@ class DirectEmitter extends EmitterContract
      */
     private string $supports;
 
-    private MappedDatasetEntityCollection $mappedEntities;
+    private DatasetEntityCollection $entities;
 
     /**
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $supports
@@ -25,7 +23,7 @@ class DirectEmitter extends EmitterContract
     public function __construct(string $supports)
     {
         $this->supports = $supports;
-        $this->mappedEntities = new MappedDatasetEntityCollection();
+        $this->entities = new DatasetEntityCollection();
     }
 
     public function supports(): string
@@ -33,25 +31,23 @@ class DirectEmitter extends EmitterContract
         return $this->supports;
     }
 
-    public function getMappedEntities(): MappedDatasetEntityCollection
+    public function getEntities(): DatasetEntityCollection
     {
-        return $this->mappedEntities;
+        return $this->entities;
     }
 
-    protected function run(MappingInterface $mapping, EmitContextInterface $context): ?DatasetEntityContract
+    protected function run(string $externalId, EmitContextInterface $context): ?DatasetEntityContract
     {
-        /** @var MappedDatasetEntityStruct $match */
-        foreach ($this->mappedEntities->filter($this->matchesMapping($mapping)) as $match) {
-            return $match->getDatasetEntity();
+        $matches = $this->entities->filter(
+            fn (DatasetEntityContract $entity): bool => $entity->getPrimaryKey() === $externalId &&
+                \is_a($entity, $this->supports())
+        );
+
+        /** @var DatasetEntityContract $match */
+        foreach ($matches as $match) {
+            return $match;
         }
 
         return null;
-    }
-
-    private function matchesMapping(MappingInterface $mapping): callable
-    {
-        return static fn (MappedDatasetEntityStruct $m): bool => $mapping->getDatasetEntityClassName() === $m->getMapping()->getDatasetEntityClassName() &&
-            $mapping->getPortalNodeKey()->equals($m->getMapping()->getPortalNodeKey()) &&
-            $mapping->getExternalId() === $m->getMapping()->getExternalId();
     }
 }
