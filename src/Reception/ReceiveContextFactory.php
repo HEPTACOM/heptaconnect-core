@@ -1,25 +1,32 @@
-<?php
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 
-class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
+class ReceiveContextFactory
 {
-    private EntityStatusContract $entityStatus;
-
     private MappingServiceInterface $mappingService;
+
+    private ConfigurationServiceInterface $configurationService;
+
+    private PortalRegistryInterface $portalRegistry;
+
+    private PortalStorageFactory $portalStorageFactory;
+
+    private ResourceLockingContract $resourceLocking;
+
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
+
+    private EntityStatusContract $entityStatus;
 
     public function __construct(
         MappingServiceInterface $mappingService,
@@ -28,32 +35,28 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        EntityStatusContract $entityStatus,
-        PortalNodeKeyInterface $portalNodeKey
+        EntityStatusContract $entityStatus
     ) {
-        parent::__construct(
-            $configurationService,
-            $portalRegistry,
-            $portalStorageFactory,
-            $resourceLocking,
-            $portalStackServiceContainerFactory,
-            $portalNodeKey
-        );
-        $this->entityStatus = $entityStatus;
         $this->mappingService = $mappingService;
+        $this->configurationService = $configurationService;
+        $this->portalRegistry = $portalRegistry;
+        $this->portalStorageFactory = $portalStorageFactory;
+        $this->resourceLocking = $resourceLocking;
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
+        $this->entityStatus = $entityStatus;
     }
 
-    public function getEntityStatus(): EntityStatusContract
+    public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface
     {
-        return $this->entityStatus;
-    }
-
-    public function markAsFailed(MappingNodeKeyInterface $mappingNodeKey, \Throwable $throwable): void
-    {
-        $this->mappingService->addException(
-            $this->getPortalNodeKey(),
-            $mappingNodeKey,
-            $throwable
+        return new ReceiveContext(
+            $this->mappingService,
+            $this->configurationService,
+            $this->portalRegistry,
+            $this->portalStorageFactory,
+            $this->resourceLocking,
+            $this->portalStackServiceContainerFactory,
+            $this->entityStatus,
+            $portalNodeKey
         );
     }
 }

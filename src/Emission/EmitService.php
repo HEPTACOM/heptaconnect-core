@@ -25,12 +25,12 @@ class EmitService implements EmitServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @var array<array-key, EmitterStackInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface>
      */
     private array $emissionStackCache = [];
 
     /**
-     * @var array<array-key, EmitContextInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface>
      */
     private array $emitContextCache = [];
 
