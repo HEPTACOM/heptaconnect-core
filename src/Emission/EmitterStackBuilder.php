@@ -110,7 +110,7 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
         $emitterStack = new EmitterStack(\array_map(
             static fn (EmitterContract $e) => clone $e,
             \array_reverse($this->emitters, false),
-        ));
+        ), $this->entityClassName);
 
         if ($emitterStack instanceof LoggerAwareInterface) {
             $emitterStack->setLogger($this->logger);

@@ -17,26 +17,34 @@ use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
 {
-    private ReceiveContextInterface $receiveContext;
+    private ReceiveContextFactory $receiveContextFactory;
 
     private LoggerInterface $logger;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    /**
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface>
+     */
     private array $receiverStackCache = [];
+
+    /**
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface>
+     */
+    private array $receiveContextCache = [];
 
     private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
 
     private ReceptionActorInterface $receptionActor;
 
     public function __construct(
-        ReceiveContextInterface $receiveContext,
+        ReceiveContextFactory $receiveContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
         ReceptionActorInterface $receptionActor
     ) {
-        $this->receiveContext = $receiveContext;
+        $this->receiveContextFactory = $receiveContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
@@ -78,7 +86,11 @@ class ReceiveService implements ReceiveServiceInterface
                 continue;
             }
 
-            $this->receptionActor->performReception($mappedDatasetEntitiesForPortalNode, $stack, $this->receiveContext);
+            $this->receptionActor->performReception(
+                $mappedDatasetEntitiesForPortalNode,
+                $stack,
+                $this->getReceiveContext($portalNodeKey)
+            );
         }
     }
 
@@ -103,5 +115,13 @@ class ReceiveService implements ReceiveServiceInterface
         }
 
         return null;
+    }
+
+    private function getReceiveContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface
+    {
+        $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey);
+        $this->receiveContextCache[$cacheKey] ??= $this->receiveContextFactory->createContext($portalNodeKey);
+
+        return clone $this->receiveContextCache[$cacheKey];
     }
 }

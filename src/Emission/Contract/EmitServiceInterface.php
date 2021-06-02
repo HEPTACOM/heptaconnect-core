@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission\Contract;
 
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 
 interface EmitServiceInterface
 {
-    public function emit(TypedMappingCollection $mappings): void;
+    public function emit(TypedMappingComponentCollection $mappingComponents): void;
 }

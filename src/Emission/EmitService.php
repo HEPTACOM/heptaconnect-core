@@ -9,8 +9,9 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
@@ -24,12 +25,12 @@ class EmitService implements EmitServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @var array<array-key, EmitterStackInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface>
      */
     private array $emissionStackCache = [];
 
     /**
-     * @var array<array-key, EmitContextInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface>
      */
     private array $emitContextCache = [];
 
@@ -51,15 +52,16 @@ class EmitService implements EmitServiceInterface
         $this->emissionActor = $emissionActor;
     }
 
-    public function emit(TypedMappingCollection $mappings): void
+    public function emit(TypedMappingComponentCollection $mappingComponents): void
     {
         $emittingPortalNodes = [];
-        $entityClassName = $mappings->getType();
+        $entityClassName = $mappingComponents->getType();
 
-        /** @var MappingInterface $mapping */
-        foreach ($mappings as $mapping) {
+        /** @var MappingComponentStructContract $mapping */
+        foreach ($mappingComponents as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 
+            // TODO: Group mapping components by portal node and iterate over the chunks for less complexity.
             if (\array_reduce($emittingPortalNodes, fn (bool $match, PortalNodeKeyInterface $key) => $match || $key->equals($portalNodeKey), false)) {
                 continue;
             }
@@ -76,12 +78,14 @@ class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            $mappingsIterator = $mappings->filter(fn (MappingInterface $mapping) => $mapping->getPortalNodeKey()->equals($portalNodeKey));
-            /** @psalm-var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface> $mappingsForPortalNode */
-            $mappingsForPortalNode = \iterable_to_array($mappingsIterator);
-            $mappingsForPortalNode = new TypedMappingCollection($entityClassName, $mappingsForPortalNode);
+            /** @var string[] $externalIds */
+            $externalIds = (new MappingComponentCollection($mappingComponents->filter(
+                static fn (MappingComponentStructContract $mapping) => $mapping->getPortalNodeKey()->equals($portalNodeKey)
+            )))->map(
+                static fn (MappingComponentStructContract $mapping) => $mapping->getExternalId()
+            );
 
-            $this->emissionActor->performEmission($mappingsForPortalNode, $stack, $this->getEmitContext($portalNodeKey));
+            $this->emissionActor->performEmission($externalIds, $stack, $this->getEmitContext($portalNodeKey));
         }
     }
 
