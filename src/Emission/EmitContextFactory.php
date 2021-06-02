@@ -47,7 +47,7 @@ class EmitContextFactory
         $this->mappingNodeRepository = $mappingNodeRepository;
     }
 
-    public function createContext(PortalNodeKeyInterface $portalNodeKey): EmitContextInterface
+    public function createContext(PortalNodeKeyInterface $portalNodeKey, bool $directEmission = false): EmitContextInterface
     {
         return new EmitContext(
             $this->configurationService,
@@ -57,7 +57,8 @@ class EmitContextFactory
             $this->portalStackServiceContainerFactory,
             $this->mappingService,
             $portalNodeKey,
-            $this->mappingNodeRepository
+            $this->mappingNodeRepository,
+            $directEmission
         );
     }
 }

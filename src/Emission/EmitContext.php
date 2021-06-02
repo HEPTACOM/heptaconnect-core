@@ -21,6 +21,8 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
 
     private MappingNodeRepositoryContract $mappingNodeRepository;
 
+    private bool $directEmission;
+
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalRegistryInterface $portalRegistry,
@@ -29,7 +31,8 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         MappingServiceInterface $mappingService,
         PortalNodeKeyInterface $portalNodeKey,
-        MappingNodeRepositoryContract $mappingNodeRepository
+        MappingNodeRepositoryContract $mappingNodeRepository,
+        bool $directEmission
     ) {
         parent::__construct(
             $configurationService,
@@ -39,8 +42,15 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
             $portalStackServiceContainerFactory,
             $portalNodeKey
         );
+
         $this->mappingService = $mappingService;
         $this->mappingNodeRepository = $mappingNodeRepository;
+        $this->directEmission = $directEmission;
+    }
+
+    public function isDirectEmission(): bool
+    {
+        return $this->directEmission;
     }
 
     public function markAsFailed(string $externalId, string $datasetEntityClassName, \Throwable $throwable): void

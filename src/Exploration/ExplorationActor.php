@@ -69,7 +69,7 @@ class ExplorationActor implements ExplorationActorInterface
             ->pushDecorators()
             ->build();
 
-        $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey());
+        $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey(), true);
 
         $mappings = [];
         $primaryKeys = [];
