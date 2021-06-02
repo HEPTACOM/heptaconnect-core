@@ -64,10 +64,10 @@ class EmissionActor implements EmissionActorInterface
         }
 
         try {
+            $jobs = new JobCollection();
+
             /** @var DatasetEntityContract $entity */
             foreach ($stack->next($externalIds, $context) as $entity) {
-                $jobs = new JobCollection();
-
                 foreach ($routeKeys as $routeKey) {
                     $jobs->push([
                         new Reception(
@@ -81,9 +81,9 @@ class EmissionActor implements EmissionActorInterface
                         ),
                     ]);
                 }
-
-                $this->jobDispatcher->dispatch($jobs);
             }
+
+            $this->jobDispatcher->dispatch($jobs);
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EMIT_NO_THROW(), [
                 'type' => $stack->supports(),
