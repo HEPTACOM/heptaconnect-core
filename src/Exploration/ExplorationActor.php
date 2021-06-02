@@ -167,7 +167,7 @@ class ExplorationActor implements ExplorationActorInterface
         }
     }
 
-    protected function flushDirectEmissions(
+    private function flushDirectEmissions(
         EmitterStackInterface $emissionStack,
         EmitContextInterface $emitContext,
         PortalNodeKeyInterface $portalNodeKey,
@@ -184,7 +184,7 @@ class ExplorationActor implements ExplorationActorInterface
         $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
     }
 
-    protected function flushPublications(
+    private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName,
         array $mappings
