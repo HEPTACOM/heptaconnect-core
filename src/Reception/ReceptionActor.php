@@ -64,15 +64,13 @@ class ReceptionActor implements ReceptionActorInterface
 
         try {
             /** @var MappingInterface $mapping */
-            $mapping = null;
-
             foreach ($stack->next($mappedDatasetEntities, $context) as $mapping) {
-                $this->saveMappings($mapping->getPortalNodeKey(), $entities);
+                $this->saveMappings($context->getPortalNodeKey(), $entities);
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
                 'type' => $mappedDatasetEntities->getType(),
-                'portalNodeKey' => $mapping instanceof MappingInterface ? $context->getPortalNodeKey($mapping) : null,
+                'portalNodeKey' => $context->getPortalNodeKey(),
                 'stack' => $stack,
                 'exception' => $exception,
             ]);
