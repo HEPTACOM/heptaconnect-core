@@ -112,7 +112,7 @@ class ExplorationActor implements ExplorationActorInterface
                         'ExplorationActor: Entity was explored and publication is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
                         $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
                         $entityClassName,
-                        $primaryKey
+                        (string) $entity
                     ));
 
                     if (\count($mappings) >= self::CHUNK_SIZE) {
