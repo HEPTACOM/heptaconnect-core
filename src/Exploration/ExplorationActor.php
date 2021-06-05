@@ -15,7 +15,8 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -196,6 +197,9 @@ class ExplorationActor implements ExplorationActorInterface
             \implode(',', \array_map(fn (MappingInterface $mapping) => $mapping->getExternalId(), $mappings))
         ));
 
-        $this->publisher->publishBatch(new MappingCollection($mappings));
+        $this->publisher->publishBatch(new MappingComponentCollection(\array_map(
+            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityClassName, $mapping->getExternalId()),
+            $mappings
+        )));
     }
 }
