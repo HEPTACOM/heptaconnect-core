@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
 use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Dataset\Base\Support\TrackedEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
@@ -101,7 +101,7 @@ class ReceptionHandler
             return false;
         }
 
-        $trackedEntities = new TrackedEntityCollection($this->objectIterator->iterate($entity));
+        $trackedEntities = new DatasetEntityCollection($this->objectIterator->iterate($entity));
         $mappingsToEnsure = new MappingComponentCollection();
 
         /** @var DatasetEntityContract $trackedEntity */
