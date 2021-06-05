@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableExcepti
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingKeyInterface;
@@ -21,6 +20,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryCont
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
+use Heptacom\HeptaConnect\Storage\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 
 class MappingService implements MappingServiceInterface
