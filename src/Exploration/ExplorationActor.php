@@ -24,7 +24,9 @@ use Psr\Log\LoggerInterface;
 
 class ExplorationActor implements ExplorationActorInterface
 {
-    public const CHUNK_SIZE = 50;
+    public const CHUNK_SIZE_EMISSION = 10;
+
+    public const CHUNK_SIZE_PUBLICATION = 50;
 
     private LoggerInterface $logger;
 
@@ -93,7 +95,7 @@ class ExplorationActor implements ExplorationActorInterface
                         $primaryKey
                     ));
 
-                    if (\count($primaryKeys) >= self::CHUNK_SIZE) {
+                    if (\count($primaryKeys) >= self::CHUNK_SIZE_EMISSION) {
                         $this->flushDirectEmissions(
                             $emissionStack,
                             $emitContext,
@@ -116,7 +118,7 @@ class ExplorationActor implements ExplorationActorInterface
                         (string) $entity
                     ));
 
-                    if (\count($mappings) >= self::CHUNK_SIZE) {
+                    if (\count($mappings) >= self::CHUNK_SIZE_PUBLICATION) {
                         $this->flushPublications(
                             $context->getPortalNodeKey(),
                             $entityClassName,
