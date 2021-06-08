@@ -11,8 +11,6 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -102,24 +100,10 @@ class ReceptionHandler
             return false;
         }
 
-        $trackedEntities = new DatasetEntityCollection($this->objectIterator->iterate($entity));
-        $mappingsToEnsure = new MappingComponentCollection();
-
-        /** @var DatasetEntityContract $trackedEntity */
-        foreach ($trackedEntities->getIterator() as $trackedEntity) {
-            if (!$trackedEntity instanceof DatasetEntityContract || $trackedEntity->getPrimaryKey() === null) {
-                continue;
-            }
-
-            $mappingsToEnsure->push([new MappingComponentStruct(
-                $mapping->getPortalNodeKey(),
-                \get_class($trackedEntity),
-                $trackedEntity->getPrimaryKey()
-            )]);
-        }
-
-        $trackedEntities = $this->entityMapper->mapEntities($trackedEntities, $mapping->getPortalNodeKey());
-        $typedMappedDatasetEntities = new TypedMappedDatasetEntityCollection($mapping->getDatasetEntityClassName());
+        $trackedEntities = $this->entityMapper->mapEntities(
+            new DatasetEntityCollection($this->objectIterator->iterate($entity)),
+            $mapping->getPortalNodeKey()
+        );
 
         try {
             // TODO: improve performance
@@ -130,9 +114,11 @@ class ReceptionHandler
                 $mapping->getDatasetEntityClassName()
             )))->setExternalId($entity->getPrimaryKey());
 
-            $typedMappedDatasetEntities->push([
-                new MappedDatasetEntityStruct($targetMapping, $entity),
-            ]);
+            $typedMappedDatasetEntities = new TypedMappedDatasetEntityCollection(
+                $mapping->getDatasetEntityClassName(),
+                [new MappedDatasetEntityStruct($targetMapping, $entity)]
+            );
+
             $this->receiveService->receive($typedMappedDatasetEntities);
 
             return true;
