@@ -94,7 +94,8 @@ class ReceptionHandler
         $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\join('_', [
                 $this->storageKeyGenerator->serialize($route->getSourceKey()),
                 $this->storageKeyGenerator->serialize($route->getTargetKey()),
-                $this->storageKeyGenerator->serialize($mappingNodeKey),
+                $mapping->getDatasetEntityClassName(),
+                $mapping->getExternalId(),
             ]));
 
         if (!$lock->acquire()) {
