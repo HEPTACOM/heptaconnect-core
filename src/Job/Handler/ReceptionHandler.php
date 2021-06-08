@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
@@ -82,13 +83,6 @@ class ReceptionHandler
             return true;
         }
 
-        $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-            $mapping->getDatasetEntityClassName(),
-            $mapping->getPortalNodeKey(),
-            [$mapping->getExternalId()],
-        ));
-        $mappingNodeKey = \current($mappingNodeKeys);
-
         $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\join('_', [
                 $this->storageKeyGenerator->serialize($route->getSourceKey()),
                 $this->storageKeyGenerator->serialize($route->getTargetKey()),
@@ -100,12 +94,28 @@ class ReceptionHandler
             return false;
         }
 
-        $trackedEntities = $this->entityMapper->mapEntities(
-            new DatasetEntityCollection($this->objectIterator->iterate($entity)),
-            $mapping->getPortalNodeKey()
-        );
-
         try {
+            $trackedEntities = $this->entityMapper->mapEntities(
+                new DatasetEntityCollection($this->objectIterator->iterate($entity)),
+                $mapping->getPortalNodeKey()
+            );
+
+            $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
+                $mapping->getDatasetEntityClassName(),
+                $mapping->getPortalNodeKey(),
+                [$mapping->getExternalId()],
+            ));
+            $mappingNodeKey = \current($mappingNodeKeys);
+
+            if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
+                throw new \Exception(\sprintf(
+                    'Mapping node is missing for root entity. PortalNode: %s; Type: %s; PrimaryKey: %s',
+                    $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()),
+                    $mapping->getDatasetEntityClassName(),
+                    $mapping->getExternalId()
+                ));
+            }
+
             // TODO: improve performance
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
 
