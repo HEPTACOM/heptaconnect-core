@@ -111,7 +111,10 @@ class MappingService implements MappingServiceInterface
         foreach ($mappingNodeKeys as $mappedExternalId => $mappingNodeKey) {
             if (($match = \array_search($mappedExternalId, $newExternalIds, true)) !== false) {
                 unset($newExternalIds[$match]);
-                yield $mappedExternalId => (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))->setExternalId($mappedExternalId);
+                yield $mappedExternalId => (new MappingStruct(
+                    $portalNodeKey,
+                    new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName))
+                )->setExternalId($mappedExternalId);
             }
         }
 
