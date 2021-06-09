@@ -146,6 +146,7 @@ class ReceptionActor implements ReceptionActorInterface
         }
 
         // FIXME: something in this loop is terribly slow
+        /** @var MappingInterface[] $originalReflectionMappings */
         foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
             $externalIds = \array_map('strval', \array_keys($originalReflectionMappings));
             $receivedMappingsIterable = $this->mappingService->getListByExternalIds(
