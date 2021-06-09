@@ -82,7 +82,7 @@ class MappingService implements MappingServiceInterface
             throw new MappingNodeNotCreatedException();
         }
 
-        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
+        $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
             ->setExternalId($externalId);
 
         if (!$mappingExists) {
@@ -131,7 +131,7 @@ class MappingService implements MappingServiceInterface
             }
 
             $createPayload->push([
-                (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
+                (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
                     ->setExternalId($newExternalId),
             ]);
 
