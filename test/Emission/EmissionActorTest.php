@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowEmitter;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
+use Heptacom\HeptaConnect\Storage\Base\TypedMappingCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

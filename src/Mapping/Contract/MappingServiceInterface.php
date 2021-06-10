@@ -11,7 +11,11 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 interface MappingServiceInterface
 {
-    public function addException(MappingInterface $mapping, \Throwable $exception): void;
+    public function addException(
+        PortalNodeKeyInterface $portalNodeKey,
+        MappingNodeKeyInterface $mappingNodeKey,
+        \Throwable $exception
+    ): void;
 
     public function get(
         string $datasetEntityClassName,

@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableExcepti
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingKeyInterface;
@@ -21,6 +20,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryCont
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
+use Heptacom\HeptaConnect\Storage\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 
 class MappingService implements MappingServiceInterface
@@ -49,37 +49,18 @@ class MappingService implements MappingServiceInterface
         $this->logger = $logger;
     }
 
-    public function addException(MappingInterface $mapping, \Throwable $exception): void
-    {
+    public function addException(
+        PortalNodeKeyInterface $portalNodeKey,
+        MappingNodeKeyInterface $mappingNodeKey,
+        \Throwable $exception
+    ): void {
         try {
-            $mappingKeys = $this->mappingRepository->listByNodes(
-                $mapping->getMappingNodeKey(),
-                $mapping->getPortalNodeKey()
-            );
-            $mappingKey = null;
-
-            foreach ($mappingKeys as $mappingKey) {
-                $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
-                break;
-            }
-
-            if (!$mappingKey instanceof MappingKeyInterface) {
-                $mappingKey = $this->mappingRepository->create(
-                    $mapping->getPortalNodeKey(),
-                    $mapping->getMappingNodeKey(),
-                    $mapping->getExternalId()
-                );
-            }
-
-            $this->mappingExceptionRepository->create($mappingKey, $exception);
+            $this->mappingExceptionRepository->create($portalNodeKey, $mappingNodeKey, $exception);
         } catch (\Throwable $throwable) {
             $this->logger->error('MAPPING_EXCEPTION', [
                 'exception' => $exception,
-                'mappingKey' => $mappingKey ? $this->storageKeyGenerator->serialize($mappingKey) : null,
-                'mappingNodeKey' => $this->storageKeyGenerator->serialize($mapping->getMappingNodeKey()),
-                'portalNodeKey' => $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()),
-                'externalId' => $mapping->getExternalId(),
-                'mapping' => $mapping,
+                'mappingNodeKey' => $this->storageKeyGenerator->serialize($mappingNodeKey),
+                'portalNodeKey' => $this->storageKeyGenerator->serialize($portalNodeKey),
                 'outerException' => $throwable,
             ]);
         }
@@ -101,7 +82,7 @@ class MappingService implements MappingServiceInterface
             throw new MappingNodeNotCreatedException();
         }
 
-        $mapping = (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
+        $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
             ->setExternalId($externalId);
 
         if (!$mappingExists) {
@@ -130,7 +111,10 @@ class MappingService implements MappingServiceInterface
         foreach ($mappingNodeKeys as $mappedExternalId => $mappingNodeKey) {
             if (($match = \array_search($mappedExternalId, $newExternalIds, true)) !== false) {
                 unset($newExternalIds[$match]);
-                yield $mappedExternalId => (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))->setExternalId($mappedExternalId);
+                yield $mappedExternalId => (new MappingStruct(
+                    $portalNodeKey,
+                    new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName))
+                )->setExternalId($mappedExternalId);
             }
         }
 
@@ -150,7 +134,7 @@ class MappingService implements MappingServiceInterface
             }
 
             $createPayload->push([
-                (new MappingStruct($portalNodeKey, $this->mappingNodeRepository->read($mappingNodeKey)))
+                (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
                     ->setExternalId($newExternalId),
             ]);
 
@@ -171,6 +155,7 @@ class MappingService implements MappingServiceInterface
         $nodes = new MappingNodeKeyCollection();
 
         foreach ($mappingComponentCollection->getPortalNodeKeys() as $portalNodeKey) {
+            $createMappingNodes = 0;
             $portalNodeMappings = new MappingComponentCollection($mappingComponentCollection->filterByPortalNodeKey($portalNodeKey));
 
             foreach ($portalNodeMappings->getDatasetEntityClassNames() as $datasetEntityClassName) {
@@ -191,9 +176,13 @@ class MappingService implements MappingServiceInterface
                     static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $datasetEntityClassName, $externalId),
                     $missingExternalIds
                 ));
-                // TODO batch
-                $nodes->push([$this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey)]);
+
+                ++$createMappingNodes;
             }
+
+            $nodes->push(
+                $this->mappingNodeRepository->createList($datasetEntityClassName, $portalNodeKey, $createMappingNodes)
+            );
         }
 
         $payload = new MappingCollection();
@@ -260,13 +249,13 @@ class MappingService implements MappingServiceInterface
                 throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
             }
 
-            $fromPortalExistences = [];
+            $intoPortalExistences = [];
 
             foreach ($this->mappingRepository->listByMappingNode($mergeInto) as $mappingKey) {
                 $mapping = $this->mappingRepository->read($mappingKey);
                 $portalNode = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
-                $fromPortalExistences[$portalNode] = $mapping->getExternalId();
+                $intoPortalExistences[$portalNode] = $mapping->getExternalId();
             }
 
             /** @var MappingInterface[] $mappingsToCreate */
@@ -278,8 +267,8 @@ class MappingService implements MappingServiceInterface
                 $mapping = $this->mappingRepository->read($mappingKey);
                 $portalNode = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
-                if (\array_key_exists($portalNode, $fromPortalExistences) && $fromPortalExistences[$portalNode] !== null) {
-                    if ($fromPortalExistences[$portalNode] !== $mapping->getExternalId()) {
+                if (\array_key_exists($portalNode, $intoPortalExistences) && $intoPortalExistences[$portalNode] !== null) {
+                    if ($intoPortalExistences[$portalNode] !== $mapping->getExternalId()) {
                         throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
                     }
                 } else {

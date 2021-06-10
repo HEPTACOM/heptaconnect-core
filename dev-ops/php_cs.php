@@ -7,7 +7,7 @@ $finder = Finder::create()
     ->in(dirname(__DIR__) . '/src')
     ->in(dirname(__DIR__) . '/test');
 
-return Config::create()
+return (new Config())
     ->setFinder($finder)
     ->setCacheFile(dirname(__DIR__) . '/.build/.php_cs.cache')
     ->setRiskyAllowed(true)
@@ -24,6 +24,7 @@ return Config::create()
         'yoda_style' => ['equal' => false, 'identical' => false, 'less_and_greater' => false],
 
         'native_function_invocation' => [
+            'include' => ['@all'],
             'strict' => true,
         ],
         'native_constant_invocation' => [

@@ -49,7 +49,7 @@ class ReceptionActor implements ReceptionActorInterface
 
         $entities = \array_map(
             static fn (MappedDatasetEntityStruct $m): DatasetEntityContract => $m->getDatasetEntity(),
-            iterable_to_array($mappedDatasetEntities)
+            \iterable_to_array($mappedDatasetEntities)
         );
 
         foreach ($this->deepObjectIterator->iterate($entities) as $object) {
@@ -64,15 +64,13 @@ class ReceptionActor implements ReceptionActorInterface
 
         try {
             /** @var MappingInterface $mapping */
-            $mapping = null;
-
             foreach ($stack->next($mappedDatasetEntities, $context) as $mapping) {
-                $this->saveMappings($mapping->getPortalNodeKey(), $entities);
+                $this->saveMappings($context->getPortalNodeKey(), $entities);
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
                 'type' => $mappedDatasetEntities->getType(),
-                'portalNodeKey' => $mapping instanceof MappingInterface ? $context->getPortalNodeKey($mapping) : null,
+                'portalNodeKey' => $context->getPortalNodeKey(),
                 'stack' => $stack,
                 'exception' => $exception,
             ]);
@@ -148,6 +146,7 @@ class ReceptionActor implements ReceptionActorInterface
         }
 
         // FIXME: something in this loop is terribly slow
+        /** @var MappingInterface[] $originalReflectionMappings */
         foreach ($originalReflectionMappingsByType as $datasetEntityType => $originalReflectionMappings) {
             $externalIds = \array_map('strval', \array_keys($originalReflectionMappings));
             $receivedMappingsIterable = $this->mappingService->getListByExternalIds(

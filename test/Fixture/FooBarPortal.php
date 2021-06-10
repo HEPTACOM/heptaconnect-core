@@ -7,23 +7,9 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class FooBarPortal extends PortalContract
 {
-    private PortalNodeKeyInterface $portalNodeKey;
-
-    private MappingNodeKeyInterface $mappingNodeKey;
-
-    public function __construct(
-        PortalNodeKeyInterface $portalNodeKey,
-        MappingNodeKeyInterface $mappingNodeKey
-    ) {
-        $this->portalNodeKey = $portalNodeKey;
-        $this->mappingNodeKey = $mappingNodeKey;
-    }
-
     public function getExplorers(): ExplorerCollection
     {
         return new ExplorerCollection();
@@ -32,7 +18,7 @@ class FooBarPortal extends PortalContract
     public function getEmitters(): EmitterCollection
     {
         return new EmitterCollection([
-            new FooBarEmitter(10, $this->portalNodeKey, $this->mappingNodeKey),
+            new FooBarEmitter(10),
         ]);
     }
 

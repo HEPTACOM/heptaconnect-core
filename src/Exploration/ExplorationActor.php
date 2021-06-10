@@ -10,17 +10,23 @@ use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
 class ExplorationActor implements ExplorationActorInterface
 {
-    public const CHUNK_SIZE = 50;
+    public const CHUNK_SIZE_EMISSION = 10;
+
+    public const CHUNK_SIZE_PUBLICATION = 50;
 
     private LoggerInterface $logger;
 
@@ -34,13 +40,16 @@ class ExplorationActor implements ExplorationActorInterface
 
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         LoggerInterface $logger,
         MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor,
         EmitContextFactory $emitContextFactory,
         PublisherInterface $publisher,
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory
+        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->logger = $logger;
         $this->mappingService = $mappingService;
@@ -48,6 +57,7 @@ class ExplorationActor implements ExplorationActorInterface
         $this->emitContextFactory = $emitContextFactory;
         $this->publisher = $publisher;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function performExploration(
@@ -55,7 +65,6 @@ class ExplorationActor implements ExplorationActorInterface
         ExplorerStackInterface $stack,
         ExploreContextInterface $context
     ): void {
-        $mappings = [];
         $directEmitter = new DirectEmitter($entityClassName);
         $emissionStack = $this->emitterStackBuilderFactory
             ->createEmitterStackBuilder($context->getPortalNodeKey(), $entityClassName)
@@ -63,31 +72,76 @@ class ExplorationActor implements ExplorationActorInterface
             ->pushDecorators()
             ->build();
 
-        $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey());
+        $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey(), true);
+
+        $mappings = [];
+        $primaryKeys = [];
+        $directEmitter->getEntities()->clear();
 
         try {
             /** @var DatasetEntityContract|string|int|null $entity */
             foreach ($stack->next($context) as $entity) {
                 if ($entity instanceof DatasetEntityContract && ($primaryKey = $entity->getPrimaryKey()) !== null) {
-                    $mapping = $this->mappingService->get($entityClassName, $context->getPortalNodeKey(), $primaryKey);
+                    // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
+                    $this->mappingService->get($entityClassName, $context->getPortalNodeKey(), $primaryKey);
 
-                    $directEmitter->getMappedEntities()->clear();
-                    $directEmitter->getMappedEntities()->push([new MappedDatasetEntityStruct($mapping, $entity)]);
-                    $this->emissionActor->performEmission(
-                        new TypedMappingCollection($entityClassName, [$mapping]),
-                        clone $emissionStack,
-                        $emitContext,
-                    );
+                    $primaryKeys[] = $primaryKey;
+                    $directEmitter->getEntities()->push([$entity]);
+
+                    $this->logger->debug(\sprintf(
+                        'ExplorationActor: Entity was explored and direct emission is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
+                        $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
+                        $entityClassName,
+                        $primaryKey
+                    ));
+
+                    if (\count($primaryKeys) >= self::CHUNK_SIZE_EMISSION) {
+                        $this->flushDirectEmissions(
+                            $emissionStack,
+                            $emitContext,
+                            $context->getPortalNodeKey(),
+                            $entityClassName,
+                            $primaryKeys
+                        );
+
+                        $primaryKeys = [];
+                        $directEmitter->getEntities()->clear();
+                    }
                 } elseif (\is_string($entity) || \is_int($entity)) {
                     // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
                     $mappings[] = $this->mappingService->get($entityClassName, $context->getPortalNodeKey(), (string) $entity);
 
-                    if (\count($mappings) >= self::CHUNK_SIZE) {
-                        $this->publisher->publishBatch(new MappingCollection($mappings));
+                    $this->logger->debug(\sprintf(
+                        'ExplorationActor: Entity was explored and publication is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
+                        $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
+                        $entityClassName,
+                        (string) $entity
+                    ));
+
+                    if (\count($mappings) >= self::CHUNK_SIZE_PUBLICATION) {
+                        $this->flushPublications(
+                            $context->getPortalNodeKey(),
+                            $entityClassName,
+                            $mappings
+                        );
+
                         $mappings = [];
                     }
+                } else {
+                    if ($entity instanceof DatasetEntityContract && $entity->getPrimaryKey() === null) {
+                        $this->logger->warning(\sprintf(
+                            'ExplorationActor: Entity with empty primary key was explored. Type: %s; PortalNode: %s',
+                            $entityClassName,
+                            $this->storageKeyGenerator->serialize($context->getPortalNodeKey())
+                        ));
+                    } else {
+                        $this->logger->warning(\sprintf(
+                            'ExplorationActor: Empty or invalid primary key was explored. Type: %s; PortalNode: %s',
+                            $entityClassName,
+                            $this->storageKeyGenerator->serialize($context->getPortalNodeKey())
+                        ));
+                    }
                 }
-                // TODO: log this
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EXPLORE_NO_THROW(), [
@@ -96,9 +150,58 @@ class ExplorationActor implements ExplorationActorInterface
                 'exception' => $exception,
             ]);
         } finally {
+            if ($primaryKeys !== []) {
+                $this->flushDirectEmissions(
+                    $emissionStack,
+                    $emitContext,
+                    $context->getPortalNodeKey(),
+                    $entityClassName,
+                    $primaryKeys
+                );
+            }
+
             if ($mappings !== []) {
-                $this->publisher->publishBatch(new MappingCollection($mappings));
+                $this->flushPublications(
+                    $context->getPortalNodeKey(),
+                    $entityClassName,
+                    $mappings
+                );
             }
         }
+    }
+
+    private function flushDirectEmissions(
+        EmitterStackInterface $emissionStack,
+        EmitContextInterface $emitContext,
+        PortalNodeKeyInterface $portalNodeKey,
+        string $entityClassName,
+        array $primaryKeys
+    ): void {
+        $this->logger->debug(\sprintf(
+            'ExplorationActor: Flush a batch of direct emissions. PortalNode: %s; Type: %s, PrimaryKeys: %s',
+            $this->storageKeyGenerator->serialize($portalNodeKey),
+            $entityClassName,
+            \implode(',', $primaryKeys)
+        ));
+
+        $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
+    }
+
+    private function flushPublications(
+        PortalNodeKeyInterface $portalNodeKey,
+        string $entityClassName,
+        array $mappings
+    ): void {
+        $this->logger->debug(\sprintf(
+            'ExplorationActor: Flush a batch of publications. PortalNode: %s; Type: %s, PrimaryKeys: %s',
+            $this->storageKeyGenerator->serialize($portalNodeKey),
+            $entityClassName,
+            \implode(',', \array_map(fn (MappingInterface $mapping) => $mapping->getExternalId(), $mappings))
+        ));
+
+        $this->publisher->publishBatch(new MappingComponentCollection(\array_map(
+            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityClassName, $mapping->getExternalId()),
+            $mappings
+        )));
     }
 }

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Component\Messenger\Message;
+namespace Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\Message;
 
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
@@ -17,12 +17,5 @@ class JobMessage
     public function getJobKeys(): JobKeyCollection
     {
         return $this->jobKeys;
-    }
-
-    public function setJobKeys(JobKeyCollection $jobKeys): self
-    {
-        $this->jobKeys = $jobKeys;
-
-        return $this;
     }
 }

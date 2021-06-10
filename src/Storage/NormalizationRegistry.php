@@ -24,8 +24,8 @@ class NormalizationRegistry
      */
     public function __construct(iterable $normalizer, iterable $denormalizer)
     {
-        $this->normalizer = iterable_to_array($normalizer);
-        $this->denormalizer = iterable_to_array($denormalizer);
+        $this->normalizer = \iterable_to_array($normalizer);
+        $this->denormalizer = \iterable_to_array($denormalizer);
     }
 
     public function getNormalizer($value): ?NormalizerInterface

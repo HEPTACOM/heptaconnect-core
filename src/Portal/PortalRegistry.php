@@ -68,7 +68,7 @@ class PortalRegistry implements PortalRegistryInterface
 
             $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
 
-            $this->cache['portalExtensions'][$portalClass] = new PortalExtensionCollection(iterable_to_array($extensions));
+            $this->cache['portalExtensions'][$portalClass] = new PortalExtensionCollection(\iterable_to_array($extensions));
         }
 
         return $this->cache['portalExtensions'][$portalClass];

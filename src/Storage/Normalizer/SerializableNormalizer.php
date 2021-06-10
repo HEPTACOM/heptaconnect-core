@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
+use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class SerializableNormalizer implements NormalizerInterface
@@ -24,6 +25,10 @@ class SerializableNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, $format = null)
     {
+        if ($data instanceof StreamInterface) {
+            return false;
+        }
+
         try {
             \serialize($data);
 
