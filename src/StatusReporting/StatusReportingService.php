@@ -4,38 +4,40 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface;
+use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Container;
+
 
 class StatusReportingService implements StatusReportingServiceInterface
 {
-    private StatusReportingContextFactoryInterface $statusReportingContextFactory;
 
     private LoggerInterface $logger;
-
-    private PortalRegistryInterface $portalRegistry;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     private array $statusReporterStackCache = [];
 
+    private Container $container;
+
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
+
     public function __construct(
-        StatusReportingContextFactoryInterface $statusReportingContextFactory,
         LoggerInterface $logger,
-        PortalRegistryInterface $portalRegistry,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
-        $this->statusReportingContextFactory = $statusReportingContextFactory;
         $this->logger = $logger;
-        $this->portalRegistry = $portalRegistry;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array
@@ -45,19 +47,13 @@ class StatusReportingService implements StatusReportingServiceInterface
         $topics = [];
 
         if (\is_null($topic)) {
-            $portal = $this->portalRegistry->getPortal($portalNodeKey);
+            $this->container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+            $statusReporters = $this->container->get(StatusReporterCollection::class);
 
             /** @var StatusReporterContract $statusReporter */
-            foreach ($portal->getStatusReporters()->getIterator() as $statusReporter) {
+            foreach ($statusReporters as $statusReporter) {
                 $topics[] = $statusReporter->supportsTopic();
             }
-
-            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-
-            foreach ($portalExtensions->getStatusReporters()->getIterator() as $statusReporter) {
-                $topics[] = $statusReporter->supportsTopic();
-            }
-
             $topics = \array_unique($topics);
         } else {
             $topics[] = $topic;
@@ -94,12 +90,11 @@ class StatusReportingService implements StatusReportingServiceInterface
         }
 
         $results = [];
-        $context = $this->statusReportingContextFactory->factory($portalNodeKey);
 
         /** @var StatusReporterStackInterface $stack */
         foreach ($stacks as $stack) {
             try {
-                $results[] = $stack->next($context);
+                $results[] = $stack->next($this->container->get(PortalNodeContextInterface::class));
             } catch (\Throwable $exception) {
                 $this->logger->critical(LogMessage::STATUS_REPORT_NO_THROW(), [
                     'topic' => $topic,
@@ -107,11 +102,10 @@ class StatusReportingService implements StatusReportingServiceInterface
                     'stack' => $stack,
                     'exception' => $exception,
                     'results' => $results,
-                    'context' => $context,
+                    'context' => $this->container->get(PortalNodeContextInterface::class),
                 ]);
             }
         }
-
         if (empty($results)) {
             return [];
         }
@@ -127,18 +121,10 @@ class StatusReportingService implements StatusReportingServiceInterface
         $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            $portal = $this->portalRegistry->getPortal($portalNodeKey);
-            $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-            $statusReporters = iterable_to_array($portal->getStatusReporters()->bySupportedTopic($topic));
-            $statusReporterDecorators = iterable_to_array($portalExtensions->getStatusReporters()->bySupportedTopic($topic));
+            $statusReporters = $this->container->get(StatusReporterCollection::class);
 
-            if ($statusReporters) {
-                foreach ($statusReporters as $statusReporter) {
-                    $stack = new StatusReporterStack([...$statusReporterDecorators, $statusReporter]);
-                    $this->statusReporterStackCache[$cacheKey][] = $stack;
-                }
-            } elseif ($statusReporterDecorators) {
-                $stack = new StatusReporterStack([...$statusReporterDecorators]);
+            foreach ($statusReporters as $statusReporter) {
+                $stack = new StatusReporterStack([$statusReporter]);
                 $this->statusReporterStackCache[$cacheKey][] = $stack;
             }
         }
