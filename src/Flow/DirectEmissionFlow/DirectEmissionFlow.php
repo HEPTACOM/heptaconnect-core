@@ -10,12 +10,15 @@ use Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\Exception\UnidentifiedEnt
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\NullProfiler;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerAwareInterface;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class DirectEmissionFlow implements LoggerAwareInterface
+class DirectEmissionFlow implements LoggerAwareInterface, ProfilerAwareInterface
 {
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
@@ -26,6 +29,8 @@ class DirectEmissionFlow implements LoggerAwareInterface
     private EmissionActorInterface $emissionActor;
 
     private LoggerInterface $logger;
+
+    private ProfilerContract $profiler;
 
     public function __construct(
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
@@ -38,6 +43,7 @@ class DirectEmissionFlow implements LoggerAwareInterface
         $this->mappingService = $mappingService;
         $this->emissionActor = $emissionActor;
         $this->logger = new NullLogger();
+        $this->profiler = new NullProfiler();
     }
 
     public function run(PortalNodeKeyInterface $portalNodeKey, DatasetEntityCollection $entities): DirectEmissionResult
@@ -74,8 +80,11 @@ class DirectEmissionFlow implements LoggerAwareInterface
                     ->build();
 
                 \iterable_to_array($this->mappingService->getListByExternalIds($type, $portalNodeKey, $externalIds));
+                $this->profiler->start('EmissionActor::performEmission', 'DirectEmissionFlow');
                 $this->emissionActor->performEmission($externalIds, $emissionStack, $emitContext);
+                $this->profiler->stop();
             } catch (\Throwable $exception) {
+                $this->profiler->stop($exception);
                 $result->addError($exception);
                 $this->logger->error($exception->getMessage());
             }
@@ -87,5 +96,10 @@ class DirectEmissionFlow implements LoggerAwareInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+    }
+
+    public function setProfiler(ProfilerContract $profiler): void
+    {
+        $this->profiler = $profiler;
     }
 }
