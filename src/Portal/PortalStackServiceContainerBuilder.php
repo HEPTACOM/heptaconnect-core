@@ -67,7 +67,7 @@ class PortalStackServiceContainerBuilder
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        foreach (glob($portal->getPath() . '/resources/config/services.*') as $path) {
+        foreach (glob($portal->getPath() . '/resources/config/services.{yml,yaml,xml,php}') as $path) {
             try {
                 $delegatingLoader->load($path);
             } catch (\Throwable $throwable) {
