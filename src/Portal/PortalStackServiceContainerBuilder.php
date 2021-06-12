@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingCo
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -53,8 +52,7 @@ class PortalStackServiceContainerBuilder
     public function build(
         PortalContract $portal,
         PortalExtensionCollection $portalExtensions,
-        PortalNodeKeyInterface $portalNodeKey,
-        PortalNodeContextInterface $context
+        PortalNodeKeyInterface $portalNodeKey
     ): Container {
         $containerBuilder = new ContainerBuilder();
 
@@ -68,7 +66,6 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->set(NormalizationRegistry::class, $this->normalizationRegistry);
         $containerBuilder->set(DeepCloneContract::class, new DeepCloneContract());
         $containerBuilder->set(DeepObjectIteratorContract::class, new DeepObjectIteratorContract());
-        $containerBuilder->set(PortalNodeContextInterface::class, $context);
         $containerBuilder->set(PortalStorageInterface::class, $this->portalStorageFactory->createPortalStorage($portalNodeKey));
         $containerBuilder->set(ResourceLockFacade::class, new ResourceLockFacade($this->resourceLocking));
         $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);

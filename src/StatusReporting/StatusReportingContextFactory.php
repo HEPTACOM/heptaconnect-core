@@ -13,22 +13,20 @@ class StatusReportingContextFactory implements StatusReportingContextFactoryInte
 {
     private ConfigurationServiceInterface $configurationService;
 
-    private PortalStackServiceContainerFactory $containerFactory;
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
-    public function __construct(ConfigurationServiceInterface $configurationService)
-    {
+    public function __construct(
+        ConfigurationServiceInterface $configurationService,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+    ) {
         $this->configurationService = $configurationService;
-    }
-
-    public function setContainerFactory(PortalStackServiceContainerFactory $containerFactory): void
-    {
-        $this->containerFactory = $containerFactory;
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): StatusReportingContextInterface
     {
         return new StatusReportingContext(
-            $this->containerFactory->create($portalNodeKey),
+            $this->portalStackServiceContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
         );
     }
