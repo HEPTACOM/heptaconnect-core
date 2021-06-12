@@ -47,6 +47,5 @@
         "psr-4": {
             "Heptacom\\HeptaConnect\\Test\\": "test/"
         }
-    },
-    "minimum-stability": "stable"
+    }
 }
