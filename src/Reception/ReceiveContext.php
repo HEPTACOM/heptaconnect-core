@@ -3,17 +3,12 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
-use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
-use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
+use Psr\Container\ContainerInterface;
 
 class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
@@ -22,23 +17,12 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
     private MappingServiceInterface $mappingService;
 
     public function __construct(
+        ContainerInterface $container,
+        ?array $configuration,
         MappingServiceInterface $mappingService,
-        ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        EntityStatusContract $entityStatus,
-        PortalNodeKeyInterface $portalNodeKey
+        EntityStatusContract $entityStatus
     ) {
-        parent::__construct(
-            $configurationService,
-            $portalRegistry,
-            $portalStorageFactory,
-            $resourceLocking,
-            $portalStackServiceContainerFactory,
-            $portalNodeKey
-        );
+        parent::__construct($container, $configuration);
         $this->entityStatus = $entityStatus;
         $this->mappingService = $mappingService;
     }

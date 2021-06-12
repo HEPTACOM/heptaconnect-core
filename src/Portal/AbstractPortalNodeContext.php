@@ -3,9 +3,6 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
@@ -15,61 +12,43 @@ use Psr\Container\ContainerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
-    private ConfigurationServiceInterface $configurationService;
+    private ContainerInterface $container;
 
-    private PortalRegistryInterface $portalRegistry;
+    private ?array $configuration;
 
-    private PortalStorageFactory $portalStorageFactory;
-
-    private ResourceLockFacade $resourceLockFacade;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private PortalNodeKeyInterface $portalNodeKey;
-
-    public function __construct(
-        ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        PortalNodeKeyInterface $portalNodeKey
-    ) {
-        $this->configurationService = $configurationService;
-        $this->portalRegistry = $portalRegistry;
-        $this->portalStorageFactory = $portalStorageFactory;
-        $this->resourceLockFacade = new ResourceLockFacade($resourceLocking);
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->portalNodeKey = $portalNodeKey;
+    public function __construct(ContainerInterface $container, ?array $configuration)
+    {
+        $this->container = $container;
+        $this->configuration = $configuration;
     }
 
     public function getConfig(): ?array
     {
-        return $this->configurationService->getPortalNodeConfiguration($this->portalNodeKey);
+        return $this->configuration;
     }
 
     public function getPortal(): PortalContract
     {
-        return $this->portalRegistry->getPortal($this->portalNodeKey);
+        return $this->getContainer()->get(PortalContract::class);
     }
 
     public function getPortalNodeKey(): PortalNodeKeyInterface
     {
-        return $this->portalNodeKey;
+        return $this->getContainer()->get(PortalNodeKeyInterface::class);
     }
 
     public function getResourceLocker(): ResourceLockFacade
     {
-        return $this->resourceLockFacade;
+        return $this->getContainer()->get(ResourceLockFacade::class);
     }
 
     public function getStorage(): PortalStorageInterface
     {
-        return $this->portalStorageFactory->createPortalStorage($this->portalNodeKey);
+        return $this->getContainer()->get(PortalStorageInterface::class);
     }
 
     public function getContainer(): ContainerInterface
     {
-        return $this->portalStackServiceContainerFactory->create($this->portalNodeKey);
+        return $this->container;
     }
 }

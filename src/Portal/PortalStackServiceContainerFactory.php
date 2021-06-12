@@ -47,6 +47,7 @@ class PortalStackServiceContainerFactory
         $result = $this->portalStackServiceContainerBuilder->build(
             $this->portalRegistry->getPortal($portalNodeKey),
             $this->portalRegistry->getPortalExtensions($portalNodeKey),
+            $portalNodeKey,
             $context
         );
         $this->portalContainers[$key] = $result;

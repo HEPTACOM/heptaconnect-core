@@ -3,17 +3,12 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission;
 
-use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
-use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
+use Psr\Container\ContainerInterface;
 
 class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
 {
@@ -24,24 +19,13 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
     private bool $directEmission;
 
     public function __construct(
-        ConfigurationServiceInterface $configurationService,
-        PortalRegistryInterface $portalRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        ContainerInterface $container,
+        ?array $configuration,
         MappingServiceInterface $mappingService,
-        PortalNodeKeyInterface $portalNodeKey,
         MappingNodeRepositoryContract $mappingNodeRepository,
         bool $directEmission
     ) {
-        parent::__construct(
-            $configurationService,
-            $portalRegistry,
-            $portalStorageFactory,
-            $resourceLocking,
-            $portalStackServiceContainerFactory,
-            $portalNodeKey
-        );
+        parent::__construct($container, $configuration);
 
         $this->mappingService = $mappingService;
         $this->mappingNodeRepository = $mappingNodeRepository;
