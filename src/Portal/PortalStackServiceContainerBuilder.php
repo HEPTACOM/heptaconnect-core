@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
-use Heptacom\HeptaConnect\Core\Portal\Exception\PortalClassReflectionException;
 use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -48,7 +47,6 @@ class PortalStackServiceContainerBuilder
     }
 
     /**
-     * @throws PortalClassReflectionException
      * @throws DelegatingLoaderLoadException
      */
     public function build(
