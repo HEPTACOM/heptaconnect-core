@@ -58,14 +58,7 @@ class PortalStackServiceContainerBuilder
         PortalNodeContextInterface $context
     ): Container {
         $containerBuilder = new ContainerBuilder();
-        $className = get_class($portal);
-        try {
-            $reflector = new \ReflectionClass($className);
-        } catch (\Throwable $throwable) {
-            throw new PortalClassReflectionException($className);
-        }
-        $serviceConfigPath = dirname($reflector->getFileName()) . '\\..';
-        $fileLocator = new FileLocator($serviceConfigPath);
+        $fileLocator = new FileLocator($portal->getPath());
 
         $loaderResolver = new LoaderResolver([
             new XmlFileLoader($containerBuilder, $fileLocator),
@@ -74,7 +67,7 @@ class PortalStackServiceContainerBuilder
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        foreach (glob($serviceConfigPath . '/resources/config/services.*') as $path) {
+        foreach (glob($portal->getPath() . '/resources/config/services.*') as $path) {
             try {
                 $delegatingLoader->load($path);
             } catch (\Throwable $throwable) {
