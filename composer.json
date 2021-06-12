@@ -47,5 +47,11 @@
         "psr-4": {
             "Heptacom\\HeptaConnect\\Test\\": "test/"
         }
+    },
+    "repositories": {
+        "heptaconnect-sources": {
+            "type": "path",
+            "url": "../**"
+        }
     }
 }
