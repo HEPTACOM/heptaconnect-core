@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -88,6 +89,9 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
+
+        $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
+
         $containerBuilder->compile();
 
         return $containerBuilder;
