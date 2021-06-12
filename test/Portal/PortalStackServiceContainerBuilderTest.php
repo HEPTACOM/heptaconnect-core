@@ -15,7 +15,6 @@ use Psr\Log\LoggerInterface;
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotFoundException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotInstantiable
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotInstantiableEndlessLoopDetected
- * @covers \Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainer
  * @covers \Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder
  */
 class PortalStackServiceContainerBuilderTest extends TestCase

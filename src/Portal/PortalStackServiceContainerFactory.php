@@ -7,7 +7,7 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Symfony\Component\DependencyInjection\Container;
+use Psr\Container\ContainerInterface;
 
 class PortalStackServiceContainerFactory
 {
@@ -33,12 +33,12 @@ class PortalStackServiceContainerFactory
         $this->statusReportingContextFactory = $statusReportingContextFactory;
     }
 
-    public function create(PortalNodeKeyInterface $portalNodeKey): Container
+    public function create(PortalNodeKeyInterface $portalNodeKey): ContainerInterface
     {
         $key = $this->storageKeyGenerator->serialize($portalNodeKey);
         $result = $this->portalContainers[$key] ?? null;
 
-        if ($result instanceof PortalStackServiceContainer) {
+        if ($result instanceof ContainerInterface) {
             return $result;
         }
 
