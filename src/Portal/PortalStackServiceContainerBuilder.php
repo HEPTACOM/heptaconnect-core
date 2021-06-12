@@ -87,7 +87,6 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);
 
         $containerBuilder->compile();
-        $portal->setContainer($containerBuilder);
 
         return $containerBuilder;
     }
