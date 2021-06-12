@@ -21,9 +21,11 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
@@ -106,13 +108,17 @@ class PortalStackServiceContainerBuilder
     private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder): void
     {
         $fileLocator = new FileLocator($path);
-
+        $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
         $loaderResolver = new LoaderResolver([
             new XmlFileLoader($containerBuilder, $fileLocator),
             new YamlFileLoader($containerBuilder, $fileLocator),
             new PhpFileLoader($containerBuilder, $fileLocator),
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
+
+        foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
+            $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
+        }
 
         foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}') as $serviceDefPath) {
             try {
@@ -139,5 +145,19 @@ class PortalStackServiceContainerBuilder
             $definition->clearTag($tag);
             $definition->addTag($tag, ['priority' => $priority]);
         }
+    }
+
+    private function getPsr4NamespacesFromPackage(string $path): array
+    {
+        $composerJsonFile = $path.DIRECTORY_SEPARATOR.'composer.json';
+
+        if (\is_file($composerJsonFile)) {
+            $composerContent = \file_get_contents($composerJsonFile);
+            $composerJson = (array) \json_decode($composerContent, true, 512, \JSON_THROW_ON_ERROR);
+
+            return (array) ($composerJson['autoload']['psr-4'] ?? []);
+        }
+
+        return [];
     }
 }
