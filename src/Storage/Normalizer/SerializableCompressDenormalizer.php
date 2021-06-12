@@ -16,7 +16,7 @@ class SerializableCompressDenormalizer implements DenormalizerInterface
 
     public function getType(): string
     {
-        return $this->serializableDenormalizer->getType() . '+gzpress';
+        return $this->serializableDenormalizer->getType().'+gzpress';
     }
 
     public function denormalize($data, $type, $format = null, array $context = [])

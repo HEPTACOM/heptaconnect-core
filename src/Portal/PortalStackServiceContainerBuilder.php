@@ -16,6 +16,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Container;
@@ -23,7 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\Config\FileLocator;
 
 class PortalStackServiceContainerBuilder
 {
@@ -101,7 +101,7 @@ class PortalStackServiceContainerBuilder
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        foreach (\glob($path . '/resources/config/services.{yml,yaml,xml,php}') as $serviceDefPath) {
+        foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}') as $serviceDefPath) {
             try {
                 $delegatingLoader->load($serviceDefPath);
             } catch (\Throwable $throwable) {
