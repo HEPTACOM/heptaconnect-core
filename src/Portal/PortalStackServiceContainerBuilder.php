@@ -11,6 +11,8 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
+use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -18,14 +20,18 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class PortalStackServiceContainerBuilder
 {
+    public const STATUS_REPORTER_TAG = 'heptaconnect.flow_component.status_reporter';
+
     private LoggerInterface $logger;
 
     private NormalizationRegistry $normalizationRegistry;
@@ -56,8 +62,17 @@ class PortalStackServiceContainerBuilder
     ): Container {
         $containerBuilder = new ContainerBuilder();
 
+        $seenDefinitions = [];
+        $packageStep = 0;
+
         foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path) {
             $this->loadContainerPackage($path, $containerBuilder);
+
+            /** @var Definition[] $newDefinitions */
+            $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
+            $seenDefinitions = $containerBuilder->getDefinitions();
+            $this->tagDefinitionsByPriority($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_TAG, -100 * $packageStep);
+            ++$packageStep;
         }
 
         $containerBuilder->set(PortalContract::class, $portal);
@@ -70,6 +85,7 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->set(ResourceLockFacade::class, new ResourceLockFacade($this->resourceLocking));
         $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);
 
+        $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->compile();
 
         return $containerBuilder;
@@ -104,6 +120,24 @@ class PortalStackServiceContainerBuilder
             } catch (\Throwable $throwable) {
                 throw new DelegatingLoaderLoadException($serviceDefPath, $throwable);
             }
+        }
+    }
+
+    /**
+     * @param Definition[] $definitions
+     * @psalm-param class-string $interface
+     */
+    private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
+    {
+        foreach ($definitions as $id => $definition) {
+            $class = $definition->getClass() ?? (string)$id;
+
+            if (!\class_exists($class) || !\is_a($class, $interface, true)) {
+                continue;
+            }
+
+            $definition->clearTag($tag);
+            $definition->addTag($tag, ['priority' => $priority]);
         }
     }
 }
