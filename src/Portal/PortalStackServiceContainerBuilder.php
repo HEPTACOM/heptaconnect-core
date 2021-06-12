@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
@@ -56,21 +57,9 @@ class PortalStackServiceContainerBuilder
         PortalNodeContextInterface $context
     ): Container {
         $containerBuilder = new ContainerBuilder();
-        $fileLocator = new FileLocator($portal->getPath());
 
-        $loaderResolver = new LoaderResolver([
-            new XmlFileLoader($containerBuilder, $fileLocator),
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            new PhpFileLoader($containerBuilder, $fileLocator),
-        ]);
-        $delegatingLoader = new DelegatingLoader($loaderResolver);
-
-        foreach (glob($portal->getPath() . '/resources/config/services.{yml,yaml,xml,php}') as $path) {
-            try {
-                $delegatingLoader->load($path);
-            } catch (\Throwable $throwable) {
-                throw new DelegatingLoaderLoadException($path);
-            }
+        foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path) {
+            $this->loadContainerPackage($path, $containerBuilder);
         }
 
         $containerBuilder->set(PortalContract::class, $portal);
@@ -87,5 +76,37 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->compile();
 
         return $containerBuilder;
+    }
+
+    /**
+     * @return iterable<string>
+     */
+    private function getPathsToLoad(PortalContract $portal, PortalExtensionCollection $portalExtensions): iterable
+    {
+        yield $portal->getPath();
+        yield from $portalExtensions->map(static fn (PortalExtensionContract $ext): string => $ext->getPath());
+    }
+
+    /**
+     * @throws DelegatingLoaderLoadException
+     */
+    private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder): void
+    {
+        $fileLocator = new FileLocator($path);
+
+        $loaderResolver = new LoaderResolver([
+            new XmlFileLoader($containerBuilder, $fileLocator),
+            new YamlFileLoader($containerBuilder, $fileLocator),
+            new PhpFileLoader($containerBuilder, $fileLocator),
+        ]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver);
+
+        foreach (\glob($path . '/resources/config/services.{yml,yaml,xml,php}') as $serviceDefPath) {
+            try {
+                $delegatingLoader->load($serviceDefPath);
+            } catch (\Throwable $throwable) {
+                throw new DelegatingLoaderLoadException($serviceDefPath, $throwable);
+            }
+        }
     }
 }
