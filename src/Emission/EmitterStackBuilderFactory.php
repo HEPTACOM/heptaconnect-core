@@ -5,19 +5,20 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
+use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
 class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private PortalStackServiceContainerFactory $portalContainerFactory;
 
     private LoggerInterface $logger;
 
-    public function __construct(PortalRegistryInterface $portalRegistry, LoggerInterface $logger)
+    public function __construct(PortalStackServiceContainerFactory $portalContainerFactory, LoggerInterface $logger)
     {
-        $this->portalRegistry = $portalRegistry;
+        $this->portalContainerFactory = $portalContainerFactory;
         $this->logger = $logger;
     }
 
@@ -25,6 +26,12 @@ class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ): EmitterStackBuilderInterface {
-        return new EmitterStackBuilder($this->portalRegistry, $this->logger, $portalNodeKey, $entityClassName);
+        $container = $this->portalContainerFactory->create($portalNodeKey);
+        /** @var EmitterCollection $sources */
+        $sources = $container->get(EmitterCollection::class);
+        /** @var EmitterCollection $decorators */
+        $decorators = $container->get(EmitterCollection::class.'.decorator');
+
+        return new EmitterStackBuilder($sources, $decorators, $entityClassName, $this->logger);
     }
 }

@@ -4,51 +4,44 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
+use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class EmitterStackBuilder implements EmitterStackBuilderInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private EmitterCollection $sourceEmitters;
 
-    private LoggerInterface $logger;
-
-    private PortalNodeKeyInterface $portalNodeKey;
+    private EmitterCollection $emitterDecorators;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
     private string $entityClassName;
 
+    private LoggerInterface $logger;
+
     /**
      * @var EmitterContract[]
      */
     private array $emitters = [];
 
-    private ?PortalContract $cachedPortal = null;
-
-    private ?PortalExtensionCollection $cachedPortalExtensions = null;
-
     /**
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityClassName
      */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        LoggerInterface $logger,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        EmitterCollection $sourceEmitters,
+        EmitterCollection $emitterDecorators,
+        string $entityClassName,
+        LoggerInterface $logger
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->logger = $logger;
-        $this->portalNodeKey = $portalNodeKey;
+        $this->sourceEmitters = $sourceEmitters;
+        $this->emitterDecorators = $emitterDecorators;
         $this->entityClassName = $entityClassName;
+        $this->logger = $logger;
     }
 
     public function push(EmitterContract $emitter): self
@@ -75,7 +68,7 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     {
         $lastEmitter = null;
 
-        foreach ($this->getPortal()->getEmitters()->bySupport($this->entityClassName) as $emitter) {
+        foreach ($this->sourceEmitters->bySupport($this->entityClassName) as $emitter) {
             $lastEmitter = $emitter;
         }
 
@@ -93,7 +86,7 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->getPortalExtensions()->getEmitterDecorators()->bySupport($this->entityClassName) as $emitter) {
+        foreach ($this->emitterDecorators->bySupport($this->entityClassName) as $emitter) {
             $this->logger->debug(\sprintf(
                 'EmitterStackBuilder: Pushed %s as decorator emitter.',
                 \get_class($emitter)
@@ -124,15 +117,5 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function isEmpty(): bool
     {
         return empty($this->emitters);
-    }
-
-    private function getPortal(): PortalContract
-    {
-        return $this->cachedPortal ??= $this->portalRegistry->getPortal($this->portalNodeKey);
-    }
-
-    private function getPortalExtensions(): PortalExtensionCollection
-    {
-        return $this->cachedPortalExtensions ??= $this->portalRegistry->getPortalExtensions($this->portalNodeKey);
     }
 }

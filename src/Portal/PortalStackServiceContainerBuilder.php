@@ -6,6 +6,8 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
+use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
@@ -37,6 +39,10 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 class PortalStackServiceContainerBuilder
 {
     public const STATUS_REPORTER_TAG = 'heptaconnect.flow_component.status_reporter';
+
+    public const EMITTER_TAG = 'heptaconnect.flow_component.emitter';
+
+    public const EMITTER_DECORATOR_TAG = 'heptaconnect.flow_component.emitter_decorator';
 
     private LoggerInterface $logger;
 
@@ -78,6 +84,7 @@ class PortalStackServiceContainerBuilder
 
         $seenDefinitions = [];
         $packageStep = 0;
+        $emitterTag = self::EMITTER_TAG;
 
         foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path) {
             $this->loadContainerPackage($path, $containerBuilder);
@@ -86,6 +93,9 @@ class PortalStackServiceContainerBuilder
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
             $seenDefinitions = $containerBuilder->getDefinitions();
             $this->tagDefinitionsByPriority($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_TAG, -100 * $packageStep);
+            $this->tagDefinitionsByPriority($newDefinitions, EmitterContract::class, $emitterTag, -100 * $packageStep);
+
+            $emitterTag = self::EMITTER_DECORATOR_TAG;
             ++$packageStep;
         }
 
@@ -105,6 +115,8 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
+        $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
+        $containerBuilder->setDefinition(EmitterCollection::class.'.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
 
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
