@@ -90,17 +90,19 @@ class PortalStackServiceContainerBuilder
         }
 
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
-
-        $containerBuilder->set(PortalContract::class, $portal);
-        $containerBuilder->set('portal_extensions', $portalExtensions);
-        $containerBuilder->set(LoggerInterface::class, $this->logger);
-        $containerBuilder->set(NormalizationRegistry::class, $this->normalizationRegistry);
-        $containerBuilder->set(DeepCloneContract::class, new DeepCloneContract());
-        $containerBuilder->set(DeepObjectIteratorContract::class, new DeepObjectIteratorContract());
-        $containerBuilder->set(PortalStorageInterface::class, $this->portalStorageFactory->createPortalStorage($portalNodeKey));
-        $containerBuilder->set(ResourceLockFacade::class, new ResourceLockFacade($this->resourceLocking));
-        $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);
-        $containerBuilder->set(ProfilerContract::class, $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)));
+        $this->setSyntheticServices($containerBuilder, [
+            PortalContract::class => $portal,
+            PortalExtensionCollection::class => $portalExtensions,
+            LoggerInterface::class => $this->logger,
+            NormalizationRegistry::class => $this->normalizationRegistry,
+            DeepCloneContract::class => new DeepCloneContract(),
+            DeepObjectIteratorContract::class => new DeepObjectIteratorContract(),
+            PortalStorageInterface::class => $this->portalStorageFactory->createPortalStorage($portalNodeKey),
+            ResourceLockFacade::class => new ResourceLockFacade($this->resourceLocking),
+            PortalNodeKeyInterface::class => $portalNodeKey,
+            ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
+        ]);
+        $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
 
@@ -200,5 +202,20 @@ class PortalStackServiceContainerBuilder
         }
 
         \array_walk($automaticLoadedDefinitionsToRemove, [$containerBuilder, 'removeDefinition']);
+    }
+
+    /**
+     * @param object[] $services
+     */
+    private function setSyntheticServices(ContainerBuilder $containerBuilder, array $services): void
+    {
+        foreach ($services as $id => $service) {
+            $definitionId = (string)$id;
+            $containerBuilder->set($definitionId, $service);
+            $definition = (new Definition())
+                ->setSynthetic(true)
+                ->setClass(\get_class($service));
+            $containerBuilder->setDefinition($definitionId, $definition);
+        }
     }
 }
