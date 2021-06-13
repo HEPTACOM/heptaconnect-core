@@ -26,13 +26,17 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Http\Discovery\Psr17FactoryDiscovery;
+use Http\Discovery\Psr18ClientDiscovery;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
-use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
@@ -121,6 +125,9 @@ class PortalStackServiceContainerBuilder
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
             PortalExtensionCollection::class => $portalExtensions,
+            ClientInterface::class => Psr18ClientDiscovery::find(),
+            RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
+            UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
             LoggerInterface::class => $this->logger,
             NormalizationRegistry::class => $this->normalizationRegistry,
             DeepCloneContract::class => new DeepCloneContract(),
