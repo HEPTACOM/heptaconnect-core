@@ -89,6 +89,8 @@ class PortalStackServiceContainerBuilder
             ++$packageStep;
         }
 
+        $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
+
         $containerBuilder->set(PortalContract::class, $portal);
         $containerBuilder->set('portal_extensions', $portalExtensions);
         $containerBuilder->set(LoggerInterface::class, $this->logger);
@@ -175,5 +177,28 @@ class PortalStackServiceContainerBuilder
         }
 
         return [];
+    }
+
+    private function removeAboutToBeSyntheticlyInjectedServices(ContainerBuilder $containerBuilder): void
+    {
+        $automaticLoadedDefinitionsToRemove = [];
+
+        foreach ($containerBuilder->getDefinitions() as $id => $definition) {
+            $class = $definition->getClass() ?? (string)$id;
+
+            if (!\class_exists($class)) {
+                continue;
+            }
+
+            if (\is_a($class, PortalContract::class, true)) {
+                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+            }
+
+            if (\is_a($class, PortalExtensionContract::class, true)) {
+                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+            }
+        }
+
+        \array_walk($automaticLoadedDefinitionsToRemove, [$containerBuilder, 'removeDefinition']);
     }
 }
