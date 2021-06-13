@@ -18,6 +18,8 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
+use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -49,6 +51,10 @@ class PortalStackServiceContainerBuilder
     public const EXPLORER_TAG = 'heptaconnect.flow_component.explorer';
 
     public const EXPLORER_DECORATOR_TAG = 'heptaconnect.flow_component.explorer_decorator';
+
+    public const RECEIVER_TAG = 'heptaconnect.flow_component.receiver';
+
+    public const RECEIVER_DECORATOR_TAG = 'heptaconnect.flow_component.receiver_decorator';
 
     private LoggerInterface $logger;
 
@@ -92,6 +98,7 @@ class PortalStackServiceContainerBuilder
         $packageStep = 0;
         $emitterTag = self::EMITTER_TAG;
         $explorerTag = self::EXPLORER_TAG;
+        $receiverTag = self::RECEIVER_TAG;
 
         foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path) {
             $this->loadContainerPackage($path, $containerBuilder);
@@ -102,9 +109,11 @@ class PortalStackServiceContainerBuilder
             $this->tagDefinitionsByPriority($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_TAG, -100 * $packageStep);
             $this->tagDefinitionsByPriority($newDefinitions, EmitterContract::class, $emitterTag, -100 * $packageStep);
             $this->tagDefinitionsByPriority($newDefinitions, ExplorerContract::class, $explorerTag, -100 * $packageStep);
+            $this->tagDefinitionsByPriority($newDefinitions, ReceiverContract::class, $receiverTag, -100 * $packageStep);
 
             $emitterTag = self::EMITTER_DECORATOR_TAG;
             $explorerTag = self::EXPLORER_DECORATOR_TAG;
+            $receiverTag = self::RECEIVER_DECORATOR_TAG;
             ++$packageStep;
         }
 
@@ -128,6 +137,8 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->setDefinition(EmitterCollection::class.'.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
         $containerBuilder->setDefinition(ExplorerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EXPLORER_TAG)]));
         $containerBuilder->setDefinition(ExplorerCollection::class.'.decorator', new Definition(ExplorerCollection::class, [new TaggedIteratorArgument(self::EXPLORER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(ReceiverCollection::class, new Definition(null, [new TaggedIteratorArgument(self::RECEIVER_TAG)]));
+        $containerBuilder->setDefinition(ReceiverCollection::class.'.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
 
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 

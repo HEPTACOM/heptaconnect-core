@@ -3,21 +3,22 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
 class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private PortalStackServiceContainerFactory $portalContainerFactory;
 
     private LoggerInterface $logger;
 
-    public function __construct(PortalRegistryInterface $portalRegistry, LoggerInterface $logger)
+    public function __construct(PortalStackServiceContainerFactory $portalContainerFactory, LoggerInterface $logger)
     {
-        $this->portalRegistry = $portalRegistry;
+        $this->portalContainerFactory = $portalContainerFactory;
         $this->logger = $logger;
     }
 
@@ -25,6 +26,13 @@ class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterfac
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ): ReceiverStackBuilderInterface {
-        return new ReceiverStackBuilder($this->portalRegistry, $this->logger, $portalNodeKey, $entityClassName);
+        $container = $this->portalContainerFactory->create($portalNodeKey);
+        /** @var ReceiverCollection $receivers */
+        $receivers = $container->get(ReceiverCollection::class);
+        /** @var ReceiverCollection $receiverDecorators */
+        $receiverDecorators = $container->get(ReceiverCollection::class.'.decorator');
+        $receivers->push($receiverDecorators);
+
+        return new ReceiverStackBuilder($receivers, $receiverDecorators, $entityClassName, $this->logger);
     }
 }

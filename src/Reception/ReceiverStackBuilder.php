@@ -3,24 +3,21 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private ReceiverCollection $sourceReceivers;
+
+    private ReceiverCollection $receiverDecorators;
 
     private LoggerInterface $logger;
-
-    private PortalNodeKeyInterface $portalNodeKey;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
@@ -32,23 +29,19 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
      */
     private array $receivers = [];
 
-    private ?PortalContract $cachedPortal = null;
-
-    private ?PortalExtensionCollection $cachedPortalExtensions = null;
-
     /**
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityClassName
      */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        LoggerInterface $logger,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        ReceiverCollection $sourceReceivers,
+        ReceiverCollection $receiverDecorators,
+        string $entityClassName,
+        LoggerInterface $logger
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->portalNodeKey = $portalNodeKey;
-        $this->entityClassName = $entityClassName;
+        $this->sourceReceivers = $sourceReceivers;
+        $this->receiverDecorators = $receiverDecorators;
         $this->logger = $logger;
+        $this->entityClassName = $entityClassName;
     }
 
     public function push(ReceiverContract $receiver): self
@@ -75,7 +68,7 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     {
         $lastReceiver = null;
 
-        foreach ($this->getPortal()->getReceivers()->bySupport($this->entityClassName) as $receiver) {
+        foreach ($this->sourceReceivers->bySupport($this->entityClassName) as $receiver) {
             $lastReceiver = $receiver;
         }
 
@@ -93,7 +86,7 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->getPortalExtensions()->getReceiverDecorators()->bySupport($this->entityClassName) as $receiver) {
+        foreach ($this->receiverDecorators->bySupport($this->entityClassName) as $receiver) {
             $this->logger->debug(\sprintf(
                 'ReceiverStackBuilder: Pushed %s as decorator receiver.',
                 \get_class($receiver)
@@ -124,15 +117,5 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function isEmpty(): bool
     {
         return empty($this->receivers);
-    }
-
-    private function getPortal(): PortalContract
-    {
-        return $this->cachedPortal ??= $this->portalRegistry->getPortal($this->portalNodeKey);
-    }
-
-    private function getPortalExtensions(): PortalExtensionCollection
-    {
-        return $this->cachedPortalExtensions ??= $this->portalRegistry->getPortalExtensions($this->portalNodeKey);
     }
 }
