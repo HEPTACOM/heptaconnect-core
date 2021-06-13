@@ -73,7 +73,7 @@ class PortalStackServiceContainerBuilder
         PortalContract $portal,
         PortalExtensionCollection $portalExtensions,
         PortalNodeKeyInterface $portalNodeKey
-    ): Container {
+    ): ContainerBuilder {
         $containerBuilder = new ContainerBuilder();
 
         $seenDefinitions = [];
@@ -107,8 +107,6 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
 
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
-
-        $containerBuilder->compile();
 
         return $containerBuilder;
     }
