@@ -12,11 +12,14 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -43,16 +46,24 @@ class PortalStackServiceContainerBuilder
 
     private ResourceLockingContract $resourceLocking;
 
+    private ProfilerFactoryContract $profilerFactory;
+
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistry $normalizationRegistry,
         PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking
+        ResourceLockingContract $resourceLocking,
+        ProfilerFactoryContract $profilerFactory,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
         $this->portalStorageFactory = $portalStorageFactory;
         $this->resourceLocking = $resourceLocking;
+        $this->profilerFactory = $profilerFactory;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     /**
@@ -87,6 +98,7 @@ class PortalStackServiceContainerBuilder
         $containerBuilder->set(PortalStorageInterface::class, $this->portalStorageFactory->createPortalStorage($portalNodeKey));
         $containerBuilder->set(ResourceLockFacade::class, new ResourceLockFacade($this->resourceLocking));
         $containerBuilder->set(PortalNodeKeyInterface::class, $portalNodeKey);
+        $containerBuilder->set(ProfilerContract::class, $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)));
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
 
