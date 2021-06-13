@@ -4,51 +4,44 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private ExplorerCollection $sourceExplorers;
 
-    private PortalNodeKeyInterface $portalNodeKey;
-
-    private LoggerInterface $logger;
+    private ExplorerCollection $explorerDecorators;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
     private string $entityClassName;
 
+    private LoggerInterface $logger;
+
     /**
      * @var ExplorerContract[]
      */
     private array $explorers = [];
 
-    private ?PortalContract $cachedPortal = null;
-
-    private ?PortalExtensionCollection $cachedPortalExtensions = null;
-
     /**
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityClassName
      */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        LoggerInterface $logger,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        ExplorerCollection $sourceExplorers,
+        ExplorerCollection $explorerDecorators,
+        string $entityClassName,
+        LoggerInterface $logger
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->logger = $logger;
-        $this->portalNodeKey = $portalNodeKey;
+        $this->sourceExplorers = $sourceExplorers;
+        $this->explorerDecorators = $explorerDecorators;
         $this->entityClassName = $entityClassName;
+        $this->logger = $logger;
     }
 
     public function push(ExplorerContract $explorer): self
@@ -75,7 +68,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     {
         $lastExplorer = null;
 
-        foreach ($this->getPortal()->getExplorers()->bySupport($this->entityClassName) as $explorer) {
+        foreach ($this->sourceExplorers->bySupport($this->entityClassName) as $explorer) {
             $lastExplorer = $explorer;
         }
 
@@ -93,7 +86,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->getPortalExtensions()->getExplorerDecorators()->bySupport($this->entityClassName) as $explorer) {
+        foreach ($this->explorerDecorators->bySupport($this->entityClassName) as $explorer) {
             $this->logger->debug(\sprintf(
                 'ExplorerStackBuilder: Pushed %s as decorator explorer.',
                 \get_class($explorer)
@@ -124,15 +117,5 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     public function isEmpty(): bool
     {
         return empty($this->explorers);
-    }
-
-    private function getPortal(): PortalContract
-    {
-        return $this->cachedPortal ??= $this->portalRegistry->getPortal($this->portalNodeKey);
-    }
-
-    private function getPortalExtensions(): PortalExtensionCollection
-    {
-        return $this->cachedPortalExtensions ??= $this->portalRegistry->getPortalExtensions($this->portalNodeKey);
     }
 }

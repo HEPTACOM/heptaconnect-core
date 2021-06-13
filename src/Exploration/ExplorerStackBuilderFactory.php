@@ -5,19 +5,20 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterface
 {
-    private PortalRegistryInterface $portalRegistry;
+    private PortalStackServiceContainerFactory $portalContainerFactory;
 
     private LoggerInterface $logger;
 
-    public function __construct(PortalRegistryInterface $portalRegistry, LoggerInterface $logger)
+    public function __construct(PortalStackServiceContainerFactory $portalContainerFactory, LoggerInterface $logger)
     {
-        $this->portalRegistry = $portalRegistry;
+        $this->portalContainerFactory = $portalContainerFactory;
         $this->logger = $logger;
     }
 
@@ -25,6 +26,12 @@ class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterfac
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName
     ): ExplorerStackBuilderInterface {
-        return new ExplorerStackBuilder($this->portalRegistry, $this->logger, $portalNodeKey, $entityClassName);
+        $container = $this->portalContainerFactory->create($portalNodeKey);
+        /** @var ExplorerCollection $sources */
+        $sources = $container->get(ExplorerCollection::class);
+        /** @var ExplorerCollection $decorators */
+        $decorators = $container->get(ExplorerCollection::class.'.decorator');
+
+        return new ExplorerStackBuilder($sources, $decorators, $entityClassName, $this->logger);
     }
 }

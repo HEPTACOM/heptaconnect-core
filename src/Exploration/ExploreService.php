@@ -8,10 +8,9 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
-use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
@@ -19,41 +18,39 @@ class ExploreService implements ExploreServiceInterface
 {
     private ExploreContextFactoryInterface $exploreContextFactory;
 
-    private PortalRegistryInterface $portalRegistry;
-
     private ExplorationActorInterface $explorationActor;
 
     private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory;
+
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
     private LoggerInterface $logger;
 
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
-        PortalRegistryInterface $portalRegistry,
         ExplorationActorInterface $explorationActor,
         ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         LoggerInterface $logger
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
-        $this->portalRegistry = $portalRegistry;
         $this->explorationActor = $explorationActor;
         $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->logger = $logger;
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
     {
+        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+
+        /** @var ExplorerCollection $explorers */
+        $explorers = $container->get(ExplorerCollection::class);
+        /** @var ExplorerCollection $explorerDecorators */
+        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
+        $explorers->push($explorerDecorators);
+
         $context = $this->exploreContextFactory->factory($portalNodeKey);
-        $portal = $this->portalRegistry->getPortal($portalNodeKey);
-        $portalExtensions = $this->portalRegistry->getPortalExtensions($portalNodeKey);
-        $explorers = new ExplorerCollection();
-
-        /** @var PortalExtensionContract $portalExtension */
-        foreach ($portalExtensions as $portalExtension) {
-            $explorers->push($portalExtension->getExplorerDecorators());
-        }
-
-        $explorers->push($portal->getExplorers());
 
         foreach (self::getSupportedTypes($explorers) as $supportedType) {
             if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
