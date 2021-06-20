@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 
 class ScalarNormalizer implements NormalizerInterface
 {

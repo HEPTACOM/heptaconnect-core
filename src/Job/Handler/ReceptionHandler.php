@@ -108,12 +108,7 @@ class ReceptionHandler
             $mappingNodeKey = \current($mappingNodeKeys);
 
             if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
-                throw new \Exception(\sprintf(
-                    'Mapping node is missing for root entity. PortalNode: %s; Type: %s; PrimaryKey: %s',
-                    $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()),
-                    $mapping->getDatasetEntityClassName(),
-                    $mapping->getExternalId()
-                ));
+                throw new \Exception(\sprintf('Mapping node is missing for root entity. PortalNode: %s; Type: %s; PrimaryKey: %s', $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()), $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
             }
 
             // TODO: improve performance

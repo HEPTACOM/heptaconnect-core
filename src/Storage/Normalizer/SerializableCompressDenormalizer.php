@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 
 class SerializableCompressDenormalizer implements DenormalizerInterface
 {
@@ -16,7 +16,7 @@ class SerializableCompressDenormalizer implements DenormalizerInterface
 
     public function getType(): string
     {
-        return $this->serializableDenormalizer->getType() . '+gzpress';
+        return $this->serializableDenormalizer->getType().'+gzpress';
     }
 
     public function denormalize($data, $type, $format = null, array $context = [])
