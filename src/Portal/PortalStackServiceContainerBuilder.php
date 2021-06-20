@@ -105,8 +105,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $explorerTag = self::EXPLORER_TAG;
         $receiverTag = self::RECEIVER_TAG;
 
-        foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path) {
-            $this->loadContainerPackage($path, $containerBuilder);
+        foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path => $autoloadPsr4) {
+            $this->loadContainerPackage($path, $containerBuilder, $autoloadPsr4);
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -154,18 +154,22 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     }
 
     /**
-     * @return iterable<string>
+     * @psalm-return iterable<string, bool>
      */
     private function getPathsToLoad(PortalContract $portal, PortalExtensionCollection $portalExtensions): iterable
     {
-        yield $portal->getPath();
-        yield from $portalExtensions->map(static fn (PortalExtensionContract $ext): string => $ext->getPath());
+        yield $portal->getPath() => $portal->hasAutomaticPsr4Prototyping();
+
+        /** @var PortalExtensionContract $portalExtension */
+        foreach ($portalExtensions as $portalExtension) {
+            yield $portalExtension->getPath() => $portalExtension->hasAutomaticPsr4Prototyping();
+        }
     }
 
     /**
      * @throws DelegatingLoaderLoadException
      */
-    private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder): void
+    private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder, bool $autoloadPsr4): void
     {
         $fileLocator = new FileLocator($path);
         $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
@@ -176,8 +180,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
-            $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
+        if ($autoloadPsr4) {
+            foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
+                $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
+            }
         }
 
         foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}', \GLOB_BRACE) as $serviceDefPath) {
