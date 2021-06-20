@@ -3,24 +3,24 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface;
-use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
-use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 
 class PortalStorage implements PortalStorageInterface
 {
-    private NormalizationRegistry $normalizationRegistry;
+    private NormalizationRegistryContract $normalizationRegistry;
 
     private PortalStorageContract $portalStorage;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
     public function __construct(
-        NormalizationRegistry $normalizationRegistry,
+        NormalizationRegistryContract $normalizationRegistry,
         PortalStorageContract $portalStorage,
         PortalNodeKeyInterface $portalNodeKey
     ) {

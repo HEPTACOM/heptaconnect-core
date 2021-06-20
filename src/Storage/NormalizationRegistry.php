@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface;
-use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 
-class NormalizationRegistry
+class NormalizationRegistry extends NormalizationRegistryContract
 {
     /**
      * @var array|NormalizerInterface[]
@@ -19,8 +20,8 @@ class NormalizationRegistry
     private array $denormalizer;
 
     /**
-     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface> $normalizer
-     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface> $denormalizer
+     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface> $normalizer
+     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface> $denormalizer
      */
     public function __construct(iterable $normalizer, iterable $denormalizer)
     {
@@ -36,7 +37,7 @@ class NormalizationRegistry
             }
         }
 
-        return null;
+        return parent::getNormalizer($value);
     }
 
     public function getNormalizerByType(string $type): ?NormalizerInterface
@@ -47,7 +48,7 @@ class NormalizationRegistry
             }
         }
 
-        return null;
+        return parent::getNormalizerByType($type);
     }
 
     public function getDenormalizer(string $type): ?DenormalizerInterface
@@ -58,6 +59,6 @@ class NormalizationRegistry
             }
         }
 
-        return null;
+        return parent::getDenormalizer($type);
     }
 }

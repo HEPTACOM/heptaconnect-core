@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\NormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Psr\Http\Message\StreamInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 

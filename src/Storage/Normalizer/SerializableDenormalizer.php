@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
-use Heptacom\HeptaConnect\Core\Storage\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class SerializableDenormalizer implements DenormalizerInterface

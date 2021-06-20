@@ -5,7 +5,6 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
-use Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
@@ -20,6 +19,7 @@ use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -62,7 +62,7 @@ class PortalStackServiceContainerBuilder
 
     private LoggerInterface $logger;
 
-    private NormalizationRegistry $normalizationRegistry;
+    private NormalizationRegistryContract $normalizationRegistry;
 
     private PortalStorageFactory $portalStorageFactory;
 
@@ -74,7 +74,7 @@ class PortalStackServiceContainerBuilder
 
     public function __construct(
         LoggerInterface $logger,
-        NormalizationRegistry $normalizationRegistry,
+        NormalizationRegistryContract $normalizationRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
         ProfilerFactoryContract $profilerFactory,
@@ -129,7 +129,7 @@ class PortalStackServiceContainerBuilder
             RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
             UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
             LoggerInterface::class => $this->logger,
-            NormalizationRegistry::class => $this->normalizationRegistry,
+            NormalizationRegistryContract::class => $this->normalizationRegistry,
             DeepCloneContract::class => new DeepCloneContract(),
             DeepObjectIteratorContract::class => new DeepObjectIteratorContract(),
             PortalStorageInterface::class => $this->portalStorageFactory->createPortalStorage($portalNodeKey),
