@@ -5,9 +5,9 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Core\Storage\Struct\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use League\Flysystem\FilesystemInterface;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class StreamNormalizer implements NormalizerInterface
 {
