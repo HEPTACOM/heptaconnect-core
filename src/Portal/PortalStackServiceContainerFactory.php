@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Container\ContainerInterface;
@@ -12,7 +13,7 @@ class PortalStackServiceContainerFactory
 {
     private PortalRegistryInterface $portalRegistry;
 
-    private PortalStackServiceContainerBuilder $portalStackServiceContainerBuilder;
+    private PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
@@ -20,7 +21,7 @@ class PortalStackServiceContainerFactory
 
     public function __construct(
         PortalRegistryInterface $portalRegistry,
-        PortalStackServiceContainerBuilder $portalStackServiceContainerBuilder,
+        PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->portalRegistry = $portalRegistry;
