@@ -180,7 +180,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
         }
 
-        foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}') as $serviceDefPath) {
+        foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}', \GLOB_BRACE) as $serviceDefPath) {
             try {
                 $delegatingLoader->load($serviceDefPath);
             } catch (\Throwable $throwable) {
