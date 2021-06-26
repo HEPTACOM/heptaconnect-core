@@ -187,7 +187,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         if ($autoloadPsr4) {
             foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
-                $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
+                $fileLoader->registerClasses(new Definition(), $namespace, $directory.\DIRECTORY_SEPARATOR.'*');
             }
         }
 
@@ -204,7 +204,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private function loadFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
     {
-        foreach (\glob($path . '/flow-components/*.php', \GLOB_BRACE) as $flowComponentScript) {
+        foreach (\glob($path.'/flow-components/*.php', \GLOB_BRACE) as $flowComponentScript) {
             // prevent access to object context
             (static function (string $file) {
                 include $file;
@@ -213,19 +213,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         foreach ($this->flowComponentBuilder->buildExplorers() as $explorer) {
             $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(random_bytes(16)) => $explorer,
+                \bin2hex(\random_bytes(16)) => $explorer,
             ]);
         }
 
         foreach ($this->flowComponentBuilder->buildEmitters() as $emitter) {
             $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(random_bytes(16)) => $emitter,
+                \bin2hex(\random_bytes(16)) => $emitter,
             ]);
         }
 
         foreach ($this->flowComponentBuilder->buildReceivers() as $receiver) {
             $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(random_bytes(16)) => $receiver,
+                \bin2hex(\random_bytes(16)) => $receiver,
             ]);
         }
     }
@@ -237,7 +237,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
     {
         foreach ($definitions as $id => $definition) {
-            $class = $definition->getClass() ?? (string)$id;
+            $class = $definition->getClass() ?? (string) $id;
 
             if (!\class_exists($class) || !\is_a($class, $interface, true)) {
                 continue;
@@ -250,7 +250,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private function getPsr4NamespacesFromPackage(string $path): array
     {
-        $composerJsonFile = $path.DIRECTORY_SEPARATOR.'composer.json';
+        $composerJsonFile = $path.\DIRECTORY_SEPARATOR.'composer.json';
 
         if (\is_file($composerJsonFile)) {
             $composerContent = \file_get_contents($composerJsonFile);
@@ -267,18 +267,18 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $automaticLoadedDefinitionsToRemove = [];
 
         foreach ($containerBuilder->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? (string)$id;
+            $class = $definition->getClass() ?? (string) $id;
 
             if (!\class_exists($class)) {
                 continue;
             }
 
             if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+                $automaticLoadedDefinitionsToRemove[] = (string) $id;
             }
 
             if (\is_a($class, PortalExtensionContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+                $automaticLoadedDefinitionsToRemove[] = (string) $id;
             }
         }
 
@@ -291,7 +291,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     private function setSyntheticServices(ContainerBuilder $containerBuilder, array $services): void
     {
         foreach ($services as $id => $service) {
-            $definitionId = (string)$id;
+            $definitionId = (string) $id;
             $containerBuilder->set($definitionId, $service);
             $definition = (new Definition())
                 ->setSynthetic(true)
