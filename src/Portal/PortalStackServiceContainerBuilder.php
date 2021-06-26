@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
+use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
@@ -73,13 +74,16 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    private FlowComponent $flowComponentBuilder;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
         ProfilerFactoryContract $profilerFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        FlowComponent $flowComponentBuilder
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -87,6 +91,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->resourceLocking = $resourceLocking;
         $this->profilerFactory = $profilerFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->flowComponentBuilder = $flowComponentBuilder;
     }
 
     /**
@@ -192,6 +197,28 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             } catch (\Throwable $throwable) {
                 throw new DelegatingLoaderLoadException($serviceDefPath, $throwable);
             }
+        }
+
+        foreach (\glob($path.'/flow-components/*.php', \GLOB_BRACE) as $flowComponentScript) {
+            include $flowComponentScript;
+        }
+
+        foreach ($this->flowComponentBuilder->buildExplorers() as $explorer) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(random_bytes(16)) => $explorer,
+            ]);
+        }
+
+        foreach ($this->flowComponentBuilder->buildEmitters() as $emitter) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(random_bytes(16)) => $emitter,
+            ]);
+        }
+
+        foreach ($this->flowComponentBuilder->buildReceivers() as $receiver) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(random_bytes(16)) => $receiver,
+            ]);
         }
     }
 
