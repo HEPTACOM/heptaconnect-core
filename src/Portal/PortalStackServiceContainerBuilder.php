@@ -204,7 +204,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private function loadFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
     {
-        foreach (\glob($path.'/flow-components/*.php', \GLOB_BRACE) as $flowComponentScript) {
+        foreach (\glob($path.'/flow-components/*.php') as $flowComponentScript) {
             // prevent access to object context
             (static function (string $file) {
                 include $file;
