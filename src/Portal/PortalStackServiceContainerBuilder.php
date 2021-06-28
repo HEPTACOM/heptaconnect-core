@@ -197,7 +197,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $fileLoader->registerClasses(
                 new Definition(),
                 $namespace,
-                \rtrim($path, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . '*',
+                \rtrim($path, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.'*',
                 $exclude
             );
         }
@@ -218,7 +218,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        $globPattern = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.{yml,yaml,xml,php}';
+        $globPattern = $containerConfigurationPath.\DIRECTORY_SEPARATOR.'services.{yml,yaml,xml,php}';
 
         foreach (\glob($globPattern, \GLOB_BRACE) as $serviceDefinitionPath) {
             try {
