@@ -110,8 +110,17 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $explorerTag = self::EXPLORER_TAG;
         $receiverTag = self::RECEIVER_TAG;
 
-        foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path => $autoloadPsr4) {
-            $this->loadContainerPackage($path, $containerBuilder, $autoloadPsr4);
+        /** @var PortalContract|PortalExtensionContract $package */
+        foreach ([$portal, ...$portalExtensions] as $package) {
+            $containerConfigurationPath = $package->getContainerConfigurationPath();
+            $flowComponentsPath = $package->getFlowComponentsPath();
+
+            $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
+                $containerConfigurationPath,
+                $flowComponentsPath,
+            ]);
+            $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
+            $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -159,25 +168,49 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     }
 
     /**
-     * @psalm-return iterable<string, bool>
+     * @param Definition[] $definitions
+     * @psalm-param class-string $interface
      */
-    private function getPathsToLoad(PortalContract $portal, PortalExtensionCollection $portalExtensions): iterable
+    private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
     {
-        yield $portal->getPath() => $portal->hasAutomaticPsr4Prototyping();
+        foreach ($definitions as $id => $definition) {
+            $class = $definition->getClass() ?? (string) $id;
 
-        /** @var PortalExtensionContract $portalExtension */
-        foreach ($portalExtensions as $portalExtension) {
-            yield $portalExtension->getPath() => $portalExtension->hasAutomaticPsr4Prototyping();
+            if (!\class_exists($class) || !\is_a($class, $interface, true)) {
+                continue;
+            }
+
+            $definition->clearTag($tag);
+            $definition->addTag($tag, ['priority' => $priority]);
+        }
+    }
+
+    private function registerPsr4Prototype(
+        ContainerBuilder $containerBuilder,
+        array $psr4,
+        array $exclude = []
+    ): void {
+        foreach ($psr4 as $namespace => $path) {
+            $fileLocator = new FileLocator($path);
+            $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
+
+            $fileLoader->registerClasses(
+                new Definition(),
+                $namespace,
+                \rtrim($path, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . '*',
+                $exclude
+            );
         }
     }
 
     /**
      * @throws DelegatingLoaderLoadException
      */
-    private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder, bool $autoloadPsr4): void
-    {
-        $fileLocator = new FileLocator($path);
-        $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
+    private function registerContainerConfiguration(
+        ContainerBuilder $containerBuilder,
+        string $containerConfigurationPath
+    ): void {
+        $fileLocator = new FileLocator($containerConfigurationPath);
         $loaderResolver = new LoaderResolver([
             new XmlFileLoader($containerBuilder, $fileLocator),
             new YamlFileLoader($containerBuilder, $fileLocator),
@@ -185,28 +218,22 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
 
-        if ($autoloadPsr4) {
-            foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
-                $fileLoader->registerClasses(new Definition(), $namespace, $directory.\DIRECTORY_SEPARATOR.'*');
-            }
-        }
+        $globPattern = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.{yml,yaml,xml,php}';
 
-        foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}', \GLOB_BRACE) as $serviceDefPath) {
+        foreach (\glob($globPattern, \GLOB_BRACE) as $serviceDefinitionPath) {
             try {
-                $delegatingLoader->load($serviceDefPath);
+                $delegatingLoader->load($serviceDefinitionPath);
             } catch (\Throwable $throwable) {
-                throw new DelegatingLoaderLoadException($serviceDefPath, $throwable);
+                throw new DelegatingLoaderLoadException($serviceDefinitionPath, $throwable);
             }
         }
-
-        $this->loadFlowComponentsFromBuilder($containerBuilder, $path);
     }
 
-    private function loadFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
+    private function registerFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
     {
         $this->flowComponentBuilder->reset();
 
-        foreach (\glob($path.'/flow-components/*.php') as $flowComponentScript) {
+        foreach (\glob($path.\DIRECTORY_SEPARATOR.'*.php') as $flowComponentScript) {
             // prevent access to object context
             (static function (string $file) {
                 include $file;
@@ -230,38 +257,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
                 \bin2hex(\random_bytes(16)) => $receiver,
             ]);
         }
-    }
-
-    /**
-     * @param Definition[] $definitions
-     * @psalm-param class-string $interface
-     */
-    private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
-    {
-        foreach ($definitions as $id => $definition) {
-            $class = $definition->getClass() ?? (string) $id;
-
-            if (!\class_exists($class) || !\is_a($class, $interface, true)) {
-                continue;
-            }
-
-            $definition->clearTag($tag);
-            $definition->addTag($tag, ['priority' => $priority]);
-        }
-    }
-
-    private function getPsr4NamespacesFromPackage(string $path): array
-    {
-        $composerJsonFile = $path.\DIRECTORY_SEPARATOR.'composer.json';
-
-        if (\is_file($composerJsonFile)) {
-            $composerContent = \file_get_contents($composerJsonFile);
-            $composerJson = (array) \json_decode($composerContent, true, 512, \JSON_THROW_ON_ERROR);
-
-            return (array) ($composerJson['autoload']['psr-4'] ?? []);
-        }
-
-        return [];
     }
 
     private function removeAboutToBeSyntheticlyInjectedServices(ContainerBuilder $containerBuilder): void
