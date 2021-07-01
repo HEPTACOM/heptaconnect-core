@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
+use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
@@ -73,13 +74,16 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    private FlowComponent $flowComponentBuilder;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
         PortalStorageFactory $portalStorageFactory,
         ResourceLockingContract $resourceLocking,
         ProfilerFactoryContract $profilerFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        FlowComponent $flowComponentBuilder
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -87,6 +91,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->resourceLocking = $resourceLocking;
         $this->profilerFactory = $profilerFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->flowComponentBuilder = $flowComponentBuilder;
     }
 
     /**
@@ -105,8 +110,17 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $explorerTag = self::EXPLORER_TAG;
         $receiverTag = self::RECEIVER_TAG;
 
-        foreach ($this->getPathsToLoad($portal, $portalExtensions) as $path => $autoloadPsr4) {
-            $this->loadContainerPackage($path, $containerBuilder, $autoloadPsr4);
+        /** @var PortalContract|PortalExtensionContract $package */
+        foreach ([$portal, ...$portalExtensions] as $package) {
+            $containerConfigurationPath = $package->getContainerConfigurationPath();
+            $flowComponentsPath = $package->getFlowComponentsPath();
+
+            $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
+                $containerConfigurationPath,
+                $flowComponentsPath,
+            ]);
+            $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
+            $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -154,55 +168,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     }
 
     /**
-     * @psalm-return iterable<string, bool>
-     */
-    private function getPathsToLoad(PortalContract $portal, PortalExtensionCollection $portalExtensions): iterable
-    {
-        yield $portal->getPath() => $portal->hasAutomaticPsr4Prototyping();
-
-        /** @var PortalExtensionContract $portalExtension */
-        foreach ($portalExtensions as $portalExtension) {
-            yield $portalExtension->getPath() => $portalExtension->hasAutomaticPsr4Prototyping();
-        }
-    }
-
-    /**
-     * @throws DelegatingLoaderLoadException
-     */
-    private function loadContainerPackage(string $path, ContainerBuilder $containerBuilder, bool $autoloadPsr4): void
-    {
-        $fileLocator = new FileLocator($path);
-        $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
-        $loaderResolver = new LoaderResolver([
-            new XmlFileLoader($containerBuilder, $fileLocator),
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            new PhpFileLoader($containerBuilder, $fileLocator),
-        ]);
-        $delegatingLoader = new DelegatingLoader($loaderResolver);
-
-        if ($autoloadPsr4) {
-            foreach ($this->getPsr4NamespacesFromPackage($path) as $namespace => $directory) {
-                $fileLoader->registerClasses(new Definition(), $namespace, $directory.DIRECTORY_SEPARATOR.'*');
-            }
-        }
-
-        foreach (\glob($path.'/resources/config/services.{yml,yaml,xml,php}', \GLOB_BRACE) as $serviceDefPath) {
-            try {
-                $delegatingLoader->load($serviceDefPath);
-            } catch (\Throwable $throwable) {
-                throw new DelegatingLoaderLoadException($serviceDefPath, $throwable);
-            }
-        }
-    }
-
-    /**
      * @param Definition[] $definitions
      * @psalm-param class-string $interface
      */
     private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
     {
         foreach ($definitions as $id => $definition) {
-            $class = $definition->getClass() ?? (string)$id;
+            $class = $definition->getClass() ?? (string) $id;
 
             if (!\class_exists($class) || !\is_a($class, $interface, true)) {
                 continue;
@@ -213,18 +185,78 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         }
     }
 
-    private function getPsr4NamespacesFromPackage(string $path): array
+    private function registerPsr4Prototype(
+        ContainerBuilder $containerBuilder,
+        array $psr4,
+        array $exclude = []
+    ): void {
+        foreach ($psr4 as $namespace => $path) {
+            $fileLocator = new FileLocator($path);
+            $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
+
+            $fileLoader->registerClasses(
+                new Definition(),
+                $namespace,
+                \rtrim($path, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.'*',
+                $exclude
+            );
+        }
+    }
+
+    /**
+     * @throws DelegatingLoaderLoadException
+     */
+    private function registerContainerConfiguration(
+        ContainerBuilder $containerBuilder,
+        string $containerConfigurationPath
+    ): void {
+        $fileLocator = new FileLocator($containerConfigurationPath);
+        $loaderResolver = new LoaderResolver([
+            new XmlFileLoader($containerBuilder, $fileLocator),
+            new YamlFileLoader($containerBuilder, $fileLocator),
+            new PhpFileLoader($containerBuilder, $fileLocator),
+        ]);
+        $delegatingLoader = new DelegatingLoader($loaderResolver);
+
+        $globPattern = $containerConfigurationPath.\DIRECTORY_SEPARATOR.'services.{yml,yaml,xml,php}';
+
+        foreach (\glob($globPattern, \GLOB_BRACE) as $serviceDefinitionPath) {
+            try {
+                $delegatingLoader->load($serviceDefinitionPath);
+            } catch (\Throwable $throwable) {
+                throw new DelegatingLoaderLoadException($serviceDefinitionPath, $throwable);
+            }
+        }
+    }
+
+    private function registerFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
     {
-        $composerJsonFile = $path.DIRECTORY_SEPARATOR.'composer.json';
+        $this->flowComponentBuilder->reset();
 
-        if (\is_file($composerJsonFile)) {
-            $composerContent = \file_get_contents($composerJsonFile);
-            $composerJson = (array) \json_decode($composerContent, true, 512, \JSON_THROW_ON_ERROR);
-
-            return (array) ($composerJson['autoload']['psr-4'] ?? []);
+        foreach (\glob($path.\DIRECTORY_SEPARATOR.'*.php') as $flowComponentScript) {
+            // prevent access to object context
+            (static function (string $file) {
+                include $file;
+            })($flowComponentScript);
         }
 
-        return [];
+        foreach ($this->flowComponentBuilder->buildExplorers() as $explorer) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(\random_bytes(16)) => $explorer,
+            ]);
+        }
+
+        foreach ($this->flowComponentBuilder->buildEmitters() as $emitter) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(\random_bytes(16)) => $emitter,
+            ]);
+        }
+
+        foreach ($this->flowComponentBuilder->buildReceivers() as $receiver) {
+            $this->setSyntheticServices($containerBuilder, [
+                \bin2hex(\random_bytes(16)) => $receiver,
+            ]);
+        }
     }
 
     private function removeAboutToBeSyntheticlyInjectedServices(ContainerBuilder $containerBuilder): void
@@ -232,18 +264,18 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $automaticLoadedDefinitionsToRemove = [];
 
         foreach ($containerBuilder->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? (string)$id;
+            $class = $definition->getClass() ?? (string) $id;
 
             if (!\class_exists($class)) {
                 continue;
             }
 
             if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+                $automaticLoadedDefinitionsToRemove[] = (string) $id;
             }
 
             if (\is_a($class, PortalExtensionContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string)$id;
+                $automaticLoadedDefinitionsToRemove[] = (string) $id;
             }
         }
 
@@ -256,7 +288,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     private function setSyntheticServices(ContainerBuilder $containerBuilder, array $services): void
     {
         foreach ($services as $id => $service) {
-            $definitionId = (string)$id;
+            $definitionId = (string) $id;
             $containerBuilder->set($definitionId, $service);
             $definition = (new Definition())
                 ->setSynthetic(true)

@@ -70,5 +70,11 @@
             "type": "path",
             "url": "../**"
         }
+    },
+    "support": {
+        "issues": "https://github.com/HEPTACOM/heptaconnect-core/issues",
+        "source": "https://github.com/HEPTACOM/heptaconnect-core",
+        "docs": "https://connect.heptacom.de/",
+        "rss": "https://connect.heptacom.de/feed/rss2.xml"
     }
 }
