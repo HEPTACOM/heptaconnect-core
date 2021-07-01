@@ -247,21 +247,16 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             })($flowComponentScript);
         }
 
-        foreach ($this->flowComponentBuilder->buildExplorers() as $explorer) {
-            $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(\random_bytes(16)) => $explorer,
-            ]);
-        }
+        $flowComponents = [
+            ...$this->flowComponentBuilder->buildExplorers(),
+            ...$this->flowComponentBuilder->buildEmitters(),
+            ...$this->flowComponentBuilder->buildReceivers(),
+            ...$this->flowComponentBuilder->buildStatusReporters(),
+        ];
 
-        foreach ($this->flowComponentBuilder->buildEmitters() as $emitter) {
+        foreach ($flowComponents as $flowComponent) {
             $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(\random_bytes(16)) => $emitter,
-            ]);
-        }
-
-        foreach ($this->flowComponentBuilder->buildReceivers() as $receiver) {
-            $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(\random_bytes(16)) => $receiver,
+                \bin2hex(\random_bytes(16)) => $flowComponent,
             ]);
         }
     }
