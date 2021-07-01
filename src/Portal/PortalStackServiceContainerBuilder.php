@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
+use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -30,6 +31,7 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContrac
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
+use League\Flysystem\FilesystemInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
@@ -76,6 +78,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private FlowComponent $flowComponentBuilder;
 
+    private FilesystemFactory $filesystemFactory;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -83,7 +87,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ResourceLockingContract $resourceLocking,
         ProfilerFactoryContract $profilerFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        FlowComponent $flowComponentBuilder
+        FlowComponent $flowComponentBuilder,
+        FilesystemFactory $filesystemFactory
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -92,6 +97,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->profilerFactory = $profilerFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->flowComponentBuilder = $flowComponentBuilder;
+        $this->filesystemFactory = $filesystemFactory;
     }
 
     /**
@@ -151,6 +157,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ResourceLockFacade::class => new ResourceLockFacade($this->resourceLocking),
             PortalNodeKeyInterface::class => $portalNodeKey,
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
+            FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
