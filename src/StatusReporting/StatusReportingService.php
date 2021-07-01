@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
-use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterStack;
@@ -73,71 +72,51 @@ class StatusReportingService implements StatusReportingServiceInterface
         StatusReporterCollection $statusReporters,
         string $topic
     ): array {
+        $topicStatusReporters = new StatusReporterCollection($statusReporters->bySupportedTopic($topic));
+
+        if ($topicStatusReporters->count() < 1) {
+            $this->logger->critical(LogMessage::STATUS_REPORT_NO_STATUS_REPORTER_FOR_TYPE(), [
+                'topic' => $topic,
+                'portalNodeKey' => $portalNodeKey,
+            ]);
+
+            return [];
+        }
+
+        $stack = $this->getStatusReporterStack($portalNodeKey, $topicStatusReporters, $topic);
+
         try {
-            $stacks = $this->getStatusReporterStacks($portalNodeKey, $statusReporters, $topic);
+            return $stack->next($context);
         } catch (\Throwable $exception) {
-            $this->logger->critical(LogMessage::STATUS_REPORT_NO_STACKS(), [
+            $this->logger->critical(LogMessage::STATUS_REPORT_NO_THROW(), [
                 'topic' => $topic,
                 'portalNodeKey' => $portalNodeKey,
+                'stack' => $stack,
                 'exception' => $exception,
+                'context' => $context,
             ]);
 
-            return [];
+            return [
+                $topic => false,
+                'exception' => $exception->getMessage(),
+            ];
         }
-
-        if (empty($stacks)) {
-            $this->logger->critical(LogMessage::STATUS_REPORT_NO_RECEIVER_FOR_TYPE(), [
-                'topic' => $topic,
-                'portalNodeKey' => $portalNodeKey,
-            ]);
-
-            return [];
-        }
-
-        $results = [];
-
-        /** @var StatusReporterStackInterface $stack */
-        foreach ($stacks as $stack) {
-            try {
-                $results[] = $stack->next($context);
-            } catch (\Throwable $exception) {
-                $this->logger->critical(LogMessage::STATUS_REPORT_NO_THROW(), [
-                    'topic' => $topic,
-                    'portalNodeKey' => $portalNodeKey,
-                    'stack' => $stack,
-                    'exception' => $exception,
-                    'results' => $results,
-                    'context' => $context,
-                ]);
-            }
-        }
-        if (empty($results)) {
-            return [];
-        }
-
-        return \array_merge_recursive(...$results);
     }
 
     /**
      * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
      */
-    private function getStatusReporterStacks(
+    private function getStatusReporterStack(
         PortalNodeKeyInterface $portalNodeKey,
         StatusReporterCollection $statusReporters,
         string $topic
-    ): array {
+    ): StatusReporterStack {
         $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            foreach ($statusReporters as $statusReporter) {
-                $stack = new StatusReporterStack([$statusReporter]);
-                $this->statusReporterStackCache[$cacheKey][] = $stack;
-            }
+            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters);
         }
 
-        return \array_map(
-            fn (StatusReporterStackInterface $receiverStack) => clone $receiverStack,
-            $this->statusReporterStackCache[$cacheKey] ??= []
-        );
+        return clone $this->statusReporterStackCache[$cacheKey];
     }
 }
