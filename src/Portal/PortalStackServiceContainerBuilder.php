@@ -42,6 +42,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -161,6 +162,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         }
 
         $portalConfiguration = new PortalConfiguration($configuration);
+
+        foreach ($portalConfiguration->keys() as $key) {
+            $containerBuilder->setParameter('portal.'.$key, $portalConfiguration->get($key));
+        }
+
+        $bindings = \array_combine(
+            \array_map(static fn(string $key): string => '$portal'.\str_replace('.', '', \ucwords($key, '_.-')), $portalConfiguration->keys()),
+            \array_map(static fn(string $key): BoundArgument => new BoundArgument('%portal.'.$key.'%'), $portalConfiguration->keys())
+        );
+
+        foreach ($containerBuilder->getDefinitions() as $definition) {
+            $definition->setBindings($bindings);
+        }
 
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
