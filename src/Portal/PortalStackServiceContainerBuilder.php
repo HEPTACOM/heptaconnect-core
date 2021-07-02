@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
@@ -14,6 +16,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
@@ -80,6 +83,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private FilesystemFactory $filesystemFactory;
 
+    private ConfigurationServiceInterface $configurationService;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -88,7 +93,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ProfilerFactoryContract $profilerFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         FlowComponent $flowComponentBuilder,
-        FilesystemFactory $filesystemFactory
+        FilesystemFactory $filesystemFactory,
+        ConfigurationServiceInterface $configurationService
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -98,6 +104,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->flowComponentBuilder = $flowComponentBuilder;
         $this->filesystemFactory = $filesystemFactory;
+        $this->configurationService = $configurationService;
     }
 
     /**
@@ -142,6 +149,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ++$packageStep;
         }
 
+        $configuration = [];
+
+        try {
+            $configuration = $this->configurationService->getPortalNodeConfiguration($portalNodeKey);
+        } catch (\Throwable $throwable) {
+            $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
+                'portal_node_key' => $portalNodeKey,
+                'exception' => $throwable,
+            ]);
+        }
+
+        $portalConfiguration = new PortalConfiguration($configuration);
+
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
@@ -158,6 +178,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             PortalNodeKeyInterface::class => $portalNodeKey,
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
+            ConfigurationContract::class => $portalConfiguration,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
