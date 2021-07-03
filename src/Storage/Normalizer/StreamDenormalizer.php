@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
-use Heptacom\HeptaConnect\Core\Storage\Struct\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\StreamFactoryInterface;
