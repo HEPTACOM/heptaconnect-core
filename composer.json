@@ -27,7 +27,7 @@
         "heptacom/heptaconnect-dataset-base": "self.version",
         "heptacom/heptaconnect-portal-base": "self.version",
         "heptacom/heptaconnect-storage-base": "self.version",
-        "league/flysystem": "^1.1.4",
+        "league/flysystem": "^1",
         "php-http/discovery": "^1.0",
         "psr/cache": "^1.0",
         "psr/container": "^1.0",
