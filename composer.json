@@ -20,7 +20,7 @@
         "php": ">=7.4",
         "ext-json": "*",
         "bentools/iterable-functions": "^1.4",
-        "composer/composer": ">=1",
+        "composer/composer": "^2",
         "dragonmantank/cron-expression": ">=3",
         "heptacom/heptaconnect-dataset-base": "self.version",
         "heptacom/heptaconnect-portal-base": "self.version",
