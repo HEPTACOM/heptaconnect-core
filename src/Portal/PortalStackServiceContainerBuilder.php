@@ -7,6 +7,7 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
@@ -42,7 +43,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -67,6 +67,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     public const RECEIVER_TAG = 'heptaconnect.flow_component.receiver';
 
     public const RECEIVER_DECORATOR_TAG = 'heptaconnect.flow_component.receiver_decorator';
+
+    public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
     private LoggerInterface $logger;
 
@@ -150,6 +152,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ++$packageStep;
         }
 
+        foreach ($containerBuilder->getDefinitions() as $definition) {
+            $definition->addTag(self::SERVICE_FROM_A_PORTAL_TAG);
+        }
+
         $configuration = [];
 
         try {
@@ -162,19 +168,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         }
 
         $portalConfiguration = new PortalConfiguration($configuration);
-
-        foreach ($portalConfiguration->keys() as $key) {
-            $containerBuilder->setParameter('portal.'.$key, $portalConfiguration->get($key));
-        }
-
-        $bindings = \array_combine(
-            \array_map(static fn(string $key): string => '$portal'.\str_replace('.', '', \ucwords($key, '_.-')), $portalConfiguration->keys()),
-            \array_map(static fn(string $key): BoundArgument => new BoundArgument('%portal.'.$key.'%'), $portalConfiguration->keys())
-        );
-
-        foreach ($containerBuilder->getDefinitions() as $definition) {
-            $definition->setBindings($bindings);
-        }
 
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
@@ -205,6 +198,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(ReceiverCollection::class.'.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
 
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
+        $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
         return $containerBuilder;
     }
