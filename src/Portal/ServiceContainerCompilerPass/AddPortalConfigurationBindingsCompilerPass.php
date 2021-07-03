@@ -45,7 +45,7 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
                 $this->getConstructorArgumentNames($definition),
                 $this->getConstructorCallNames($definition),
             );
-            $related = \array_filter($argumentNames, static fn (string $k): bool => \strncmp($k, '$portal', 7) === 0);
+            $related = \array_filter($argumentNames, static fn (string $k): bool => \strncmp($k, '$config', 7) === 0);
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
 
             $definition->setBindings($requiredBindings);
@@ -54,12 +54,12 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
 
     private function getParameterKey(string $configurationName): string
     {
-        return 'portal.'.$configurationName;
+        return 'portal_config.'.$configurationName;
     }
 
     private function getBindingKey(string $configurationName): string
     {
-        return '$portal'.\str_replace('.', '', \ucwords($configurationName, '_.-'));
+        return '$config'.\str_replace('.', '', \ucwords($configurationName, '_.-'));
     }
 
     private function createBinding(string $configurationName): BoundArgument
