@@ -12,6 +12,8 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterface
 {
+    public const CONFIG_KEY_SEPARATORS = '_.-';
+
     private ConfigurationContract $configuration;
 
     public function __construct(ConfigurationContract $configuration)
@@ -59,7 +61,7 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
 
     private function getBindingKey(string $configurationName): string
     {
-        return '$config'.\str_replace('.', '', \ucwords($configurationName, '_.-'));
+        return '$config'.\str_replace(\str_split(self::CONFIG_KEY_SEPARATORS), '', \ucwords($configurationName, self::CONFIG_KEY_SEPARATORS));
     }
 
     private function createBinding(string $configurationName): BoundArgument
