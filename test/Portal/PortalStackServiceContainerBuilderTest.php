@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
@@ -17,6 +18,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
@@ -79,7 +81,9 @@ class PortalStackServiceContainerBuilderTest extends TestCase
             $this->createMock(FlowComponent::class),
             $this->createMock(FilesystemFactory::class),
             $configurationService,
+            $this->createMock(PublisherInterface::class),
         );
+        $builder->setDirectEmissionFlow($this->createMock(DirectEmissionFlowContract::class));
         $container = $builder->build(
             new Portal(),
             new PortalExtensionCollection([
@@ -93,6 +97,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
         static::assertTrue($container->has(ConfigurationContract::class));
         static::assertTrue($container->has(DeepCloneContract::class));
         static::assertTrue($container->has(DeepObjectIteratorContract::class));
+        static::assertTrue($container->has(DirectEmissionFlowContract::class));
         static::assertTrue($container->has(FilesystemInterface::class));
         static::assertTrue($container->has(LoggerInterface::class));
         static::assertTrue($container->has(NormalizationRegistryContract::class));
@@ -101,6 +106,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
         static::assertTrue($container->has(PortalNodeKeyInterface::class));
         static::assertTrue($container->has(PortalStorageInterface::class));
         static::assertTrue($container->has(ProfilerContract::class));
+        static::assertTrue($container->has(PublisherInterface::class));
         static::assertTrue($container->has(RequestFactoryInterface::class));
         static::assertTrue($container->has(ResourceLockFacade::class));
         static::assertTrue($container->has(UriFactoryInterface::class));
