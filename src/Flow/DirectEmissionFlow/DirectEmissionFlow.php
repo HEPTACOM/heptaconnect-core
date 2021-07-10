@@ -7,10 +7,12 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\DirectEmitter;
-use Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\Exception\UnidentifiedEntityException;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionResult;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\Exception\UnidentifiedEntityException;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\NullProfiler;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerAwareInterface;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
@@ -19,7 +21,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class DirectEmissionFlow implements LoggerAwareInterface, ProfilerAwareInterface
+class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwareInterface, ProfilerAwareInterface
 {
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 

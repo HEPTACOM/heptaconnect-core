@@ -9,6 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookServiceInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\WebhookRepositoryContract;
 
+/**
+ * @internal
+ */
 class WebhookService implements WebhookServiceInterface
 {
     private WebhookRepositoryContract $webhookRepository;

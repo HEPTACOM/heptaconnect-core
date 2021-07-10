@@ -40,7 +40,8 @@
         "symfony/dependency-injection": "^4.4|^5.0",
         "symfony/lock": "^4.0 || ^5.0",
         "symfony/messenger": "^4.0 || ^5.0",
-        "symfony/polyfill-php80": ">=1.15"
+        "symfony/polyfill-php80": ">=1.15",
+        "symfony/yaml": "^4.4|^5.0"
     },
     "require-dev": {
         "dq5studios/psalm-junit": ">=2",
@@ -56,6 +57,8 @@
         "phpstan/phpstan-phpunit": ">=0.12",
         "phpstan/phpstan-strict-rules": ">=0.12",
         "phpunit/phpunit": ">=9.3 <10",
+        "php-http/curl-client": ">=1",
+        "nyholm/psr7": ">=1",
         "psalm/plugin-phpunit": ">=0.10",
         "vimeo/psalm": ">=4"
     },

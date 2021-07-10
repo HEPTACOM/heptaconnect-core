@@ -9,12 +9,14 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilde
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
@@ -24,6 +26,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -88,6 +91,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private ConfigurationServiceInterface $configurationService;
 
+    private PublisherInterface $publisher;
+
+    private ?DirectEmissionFlowContract $directEmissionFlow = null;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -97,7 +104,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         StorageKeyGeneratorContract $storageKeyGenerator,
         FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService
+        ConfigurationServiceInterface $configurationService,
+        PublisherInterface $publisher
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -108,6 +116,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->flowComponentBuilder = $flowComponentBuilder;
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
+        $this->publisher = $publisher;
     }
 
     /**
@@ -125,18 +134,27 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $emitterTag = self::EMITTER_TAG;
         $explorerTag = self::EXPLORER_TAG;
         $receiverTag = self::RECEIVER_TAG;
+        $prototypedIds = [];
+        $definedIds = [];
+        $flowBuildedIds = [];
 
         /** @var PortalContract|PortalExtensionContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
             $containerConfigurationPath = $package->getContainerConfigurationPath();
             $flowComponentsPath = $package->getFlowComponentsPath();
 
-            $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
-                $containerConfigurationPath,
-                $flowComponentsPath,
-            ]);
-            $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
-            $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
+            $prototypedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
+                $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
+                    $containerConfigurationPath,
+                    $flowComponentsPath,
+                ]);
+            });
+            $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder) {
+                $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
+            });
+            $flowBuildedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder) {
+                $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
+            });
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -176,7 +194,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ClientInterface::class => Psr18ClientDiscovery::find(),
             RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
             UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
-            LoggerInterface::class => $this->logger,
+            LoggerInterface::class => new PortalLogger(
+                $this->logger,
+                \sprintf('[%s] ', $this->storageKeyGenerator->serialize($portalNodeKey)),
+                [
+                    'portalNodeKey' => $portalNodeKey,
+                ]
+            ),
             NormalizationRegistryContract::class => $this->normalizationRegistry,
             DeepCloneContract::class => new DeepCloneContract(),
             DeepObjectIteratorContract::class => new DeepObjectIteratorContract(),
@@ -186,8 +210,15 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
+            PublisherInterface::class => $this->publisher,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+
+        if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
+            $this->setSyntheticServices($containerBuilder, [
+                DirectEmissionFlowContract::class => $this->directEmissionFlow,
+            ]);
+        }
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
@@ -197,10 +228,41 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(ReceiverCollection::class, new Definition(null, [new TaggedIteratorArgument(self::RECEIVER_TAG)]));
         $containerBuilder->setDefinition(ReceiverCollection::class.'.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
 
+        $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
+            \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
+        ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
         return $containerBuilder;
+    }
+
+    public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
+    {
+        $this->directEmissionFlow = $directEmissionFlow;
+    }
+
+    private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array
+    {
+        $currentIds = $containerBuilder->getServiceIds();
+        $tag = '51f3a91f-900e-4828-a94b-5b3fb0ee7510';
+
+        foreach ($containerBuilder->getDefinitions() as $definition) {
+            $definition->addTag($tag);
+        }
+
+        $registration();
+
+        $allPreviousServices = \array_keys($containerBuilder->findTaggedServiceIds($tag));
+
+        foreach ($containerBuilder->getDefinitions() as $definition) {
+            $definition->clearTag($tag);
+        }
+
+        return \array_merge(
+            \array_diff($containerBuilder->getServiceIds(), $currentIds),
+            \array_diff($containerBuilder->getServiceIds(), $allPreviousServices),
+        );
     }
 
     /**

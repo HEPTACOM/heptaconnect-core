@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 
+/**
+ * @internal
+ */
 class WebhookContextFactory
 {
     private ConfigurationServiceInterface $configurationService;

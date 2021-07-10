@@ -12,6 +12,9 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\CronjobRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 
+/**
+ * @internal
+ */
 class CronjobService implements CronjobServiceInterface
 {
     private CronjobRepositoryContract $cronjobRepository;

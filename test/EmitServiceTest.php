@@ -12,9 +12,9 @@ use Heptacom\HeptaConnect\Core\Emission\EmitService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Heptacom\HeptaConnect\Storage\Base\TypedMappingCollection;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -29,12 +29,12 @@ class EmitServiceTest extends TestCase
      */
     public function testEmitCount(int $count): void
     {
-        $mapping = $this->createMock(MappingInterface::class);
+        $mapping = $this->createMock(MappingComponentStructContract::class);
         $mapping->expects(static::exactly($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $stack = new EmitterStack([]);
+        $stack = new EmitterStack([], FooBarEntity::class);
         $stackBuilder = $this->createMock(EmitterStackBuilderInterface::class);
         $stackBuilder->method('build')->willReturn($stack);
         $stackBuilder->method('pushSource')->willReturnSelf();
@@ -50,7 +50,7 @@ class EmitServiceTest extends TestCase
             $stackBuilderFactory,
             $this->createMock(EmissionActorInterface::class),
         );
-        $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
+        $emitService->emit(new TypedMappingComponentCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 
     /**
@@ -68,12 +68,12 @@ class EmitServiceTest extends TestCase
             ->method('critical')
             ->with(LogMessage::EMIT_NO_EMITTER_FOR_TYPE());
 
-        $mapping = $this->createMock(MappingInterface::class);
+        $mapping = $this->createMock(MappingComponentStructContract::class);
         $mapping->expects(static::atLeast($count))
             ->method('getDatasetEntityClassName')
             ->willReturn(FooBarEntity::class);
 
-        $stack = new EmitterStack([]);
+        $stack = new EmitterStack([], FooBarEntity::class);
         $stackBuilder = $this->createMock(EmitterStackBuilderInterface::class);
         $stackBuilder->method('build')->willReturn($stack);
         $stackBuilder->method('pushSource')->willReturnSelf();
@@ -89,7 +89,7 @@ class EmitServiceTest extends TestCase
             $stackBuilderFactory,
             $this->createMock(EmissionActorInterface::class),
     );
-        $emitService->emit(new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
+        $emitService->emit(new TypedMappingComponentCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)));
     }
 
     /**
