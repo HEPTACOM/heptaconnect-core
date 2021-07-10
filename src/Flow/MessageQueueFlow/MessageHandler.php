@@ -55,7 +55,9 @@ class MessageHandler implements MessageSubscriberInterface
         }
 
         foreach ($jobs as $type => $jobData) {
+            // TODO mark as tried to execute
             $this->jobActor->performJobs($type, $jobData);
+            // TODO mark as executed
         }
     }
 }
