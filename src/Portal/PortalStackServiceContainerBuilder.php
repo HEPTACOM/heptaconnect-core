@@ -24,6 +24,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -88,6 +89,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private ConfigurationServiceInterface $configurationService;
 
+    private PublisherInterface $publisher;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -97,7 +100,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         StorageKeyGeneratorContract $storageKeyGenerator,
         FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService
+        ConfigurationServiceInterface $configurationService,
+        PublisherInterface $publisher
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -108,6 +112,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->flowComponentBuilder = $flowComponentBuilder;
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
+        $this->publisher = $publisher;
     }
 
     /**
@@ -186,6 +191,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
+            PublisherInterface::class => $this->publisher,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
