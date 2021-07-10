@@ -22,6 +22,8 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use HeptacomFixture\Portal\A\AutomaticService\ExceptionNotInContainer;
+use HeptacomFixture\Portal\A\ManualService\ExceptionInContainer;
 use HeptacomFixture\Portal\A\Portal;
 use HeptacomFixture\Portal\Extension\PortalExtension;
 use League\Flysystem\FilesystemInterface;
@@ -85,6 +87,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
             ]),
             $this->createMock(PortalNodeKeyInterface::class),
         );
+        $container->compile();
 
         static::assertTrue($container->has(ClientInterface::class));
         static::assertTrue($container->has(ConfigurationContract::class));
@@ -101,5 +104,8 @@ class PortalStackServiceContainerBuilderTest extends TestCase
         static::assertTrue($container->has(RequestFactoryInterface::class));
         static::assertTrue($container->has(ResourceLockFacade::class));
         static::assertTrue($container->has(UriFactoryInterface::class));
+
+        static::assertTrue($container->has(ExceptionInContainer::class));
+        static::assertFalse($container->has(ExceptionNotInContainer::class));
     }
 }
