@@ -176,7 +176,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ClientInterface::class => Psr18ClientDiscovery::find(),
             RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
             UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
-            LoggerInterface::class => $this->logger,
+            LoggerInterface::class => new PortalLogger(
+                $this->logger,
+                \sprintf('[%s] ', $this->storageKeyGenerator->serialize($portalNodeKey)),
+                [
+                    'portalNodeKey' => $portalNodeKey,
+                ]
+            ),
             NormalizationRegistryContract::class => $this->normalizationRegistry,
             DeepCloneContract::class => new DeepCloneContract(),
             DeepObjectIteratorContract::class => new DeepObjectIteratorContract(),
