@@ -10,9 +10,8 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -39,18 +38,13 @@ class ReceptionActor implements ReceptionActorInterface
     }
 
     public function performReception(
-        TypedMappedDatasetEntityCollection $mappedDatasetEntities,
+        TypedDatasetEntityCollection $entities,
         ReceiverStackInterface $stack,
         ReceiveContextInterface $context
     ): void {
-        if ($mappedDatasetEntities->count() < 1) {
+        if ($entities->count() < 1) {
             return;
         }
-
-        $entities = \array_map(
-            static fn (MappedDatasetEntityStruct $m): DatasetEntityContract => $m->getDatasetEntity(),
-            \iterable_to_array($mappedDatasetEntities)
-        );
 
         foreach ($this->deepObjectIterator->iterate($entities) as $object) {
             if (!$object instanceof DatasetEntityContract) {
@@ -63,13 +57,12 @@ class ReceptionActor implements ReceptionActorInterface
         }
 
         try {
-            /** @var MappingInterface $mapping */
-            foreach ($stack->next($mappedDatasetEntities, $context) as $mapping) {
-                $this->saveMappings($context->getPortalNodeKey(), $entities);
+            foreach ($stack->next($entities, $context) as $receivedEntity) {
+                $this->saveMappings($context->getPortalNodeKey(), [$receivedEntity]);
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                'type' => $mappedDatasetEntities->getType(),
+                'type' => $entities->getType(),
                 'portalNodeKey' => $context->getPortalNodeKey(),
                 'stack' => $stack,
                 'exception' => $exception,

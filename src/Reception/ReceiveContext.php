@@ -5,10 +5,13 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
+use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
@@ -32,12 +35,22 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
         return $this->entityStatus;
     }
 
-    public function markAsFailed(MappingNodeKeyInterface $mappingNodeKey, \Throwable $throwable): void
+    public function markAsFailed(DatasetEntityContract $entity, \Throwable $throwable): void
     {
-        $this->mappingService->addException(
-            $this->getPortalNodeKey(),
-            $mappingNodeKey,
-            $throwable
-        );
+        $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
+
+        if ($mapping instanceof MappingInterface) {
+            $this->mappingService->addException(
+                $this->getPortalNodeKey(),
+                $mapping->getMappingNodeKey(),
+                $throwable
+            );
+        } else {
+            /** @var LoggerInterface $logger */
+            $logger = $this->getContainer()->get(LoggerInterface::class);
+            $logger->error(
+                'ReceiveContext: The reception of an unmappable entity failed. Exception: ' . $throwable->getMessage()
+            );
+        }
     }
 }

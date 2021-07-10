@@ -114,6 +114,7 @@ class ReceptionHandler
             // TODO: improve performance
             $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
 
+            // TODO: evaluate whether this is still required
             $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
                 $mappingNodeKey,
                 $mapping->getDatasetEntityClassName()
