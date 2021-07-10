@@ -16,6 +16,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
@@ -25,6 +26,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -89,6 +91,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private ConfigurationServiceInterface $configurationService;
 
+    private PublisherInterface $publisher;
+
+    private ?DirectEmissionFlowContract $directEmissionFlow = null;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -98,7 +104,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         StorageKeyGeneratorContract $storageKeyGenerator,
         FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService
+        ConfigurationServiceInterface $configurationService,
+        PublisherInterface $publisher
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -109,6 +116,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->flowComponentBuilder = $flowComponentBuilder;
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
+        $this->publisher = $publisher;
     }
 
     /**
@@ -202,8 +210,15 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
+            PublisherInterface::class => $this->publisher,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+
+        if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
+            $this->setSyntheticServices($containerBuilder, [
+                DirectEmissionFlowContract::class => $this->directEmissionFlow,
+            ]);
+        }
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
@@ -220,6 +235,11 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
         return $containerBuilder;
+    }
+
+    public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
+    {
+        $this->directEmissionFlow = $directEmissionFlow;
     }
 
     private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array

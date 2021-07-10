@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @internal
+ */
 class CronjobContext extends AbstractPortalNodeContext implements CronjobContextInterface
 {
     private CronjobInterface $cronjob;

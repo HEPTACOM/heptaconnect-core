@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
 use Psr\Container\ContainerInterface;
 
+/**
+ * @internal
+ */
 class WebhookContext extends AbstractPortalNodeContext implements WebhookContextInterface
 {
     private WebhookInterface $webhook;
