@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
+use Heptacom\HeptaConnect\Core\Job\JobData;
+use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
 use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
@@ -12,7 +14,7 @@ use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
@@ -60,76 +62,130 @@ class ReceptionHandler
         $this->objectIterator = $objectIterator;
     }
 
-    public function triggerReception(MappingComponentStructContract $mapping, array $payload): bool
+    public function triggerReception(JobDataCollection $jobs): void
     {
-        $routeKey = $payload[Reception::ROUTE_KEY] ?? null;
+        $receptions = [];
 
-        if (!$routeKey instanceof RouteKeyInterface) {
-            // TODO error
-            return false;
-        }
+        /** @var JobData $job */
+        foreach ($jobs as $job) {
+            $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;
 
-        $entity = $payload[Reception::ENTITY] ?? null;
-
-        if (!$entity instanceof DatasetEntityContract) {
-            // TODO error
-            return false;
-        }
-
-        $route = $this->routeRepository->read($routeKey);
-
-        if ($route->getEntityClassName() !== \get_class($entity)) {
-            // TODO error
-            return true;
-        }
-
-        $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\join('_', [
-                $this->storageKeyGenerator->serialize($route->getSourceKey()),
-                $this->storageKeyGenerator->serialize($route->getTargetKey()),
-                $mapping->getDatasetEntityClassName(),
-                $mapping->getExternalId(),
-            ]));
-
-        if (!$lock->acquire()) {
-            return false;
-        }
-
-        try {
-            $trackedEntities = $this->entityMapper->mapEntities(
-                new DatasetEntityCollection($this->objectIterator->iterate($entity)),
-                $mapping->getPortalNodeKey()
-            );
-
-            $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-                $mapping->getDatasetEntityClassName(),
-                $mapping->getPortalNodeKey(),
-                [$mapping->getExternalId()],
-            ));
-            $mappingNodeKey = \current($mappingNodeKeys);
-
-            if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
-                throw new \Exception(\sprintf('Mapping node is missing for root entity. PortalNode: %s; Type: %s; PrimaryKey: %s', $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey()), $mapping->getDatasetEntityClassName(), $mapping->getExternalId()));
+            if (!$routeKey instanceof RouteKeyInterface) {
+                // TODO error
+                continue;
             }
 
-            // TODO: improve performance
-            $this->entityReflector->reflectEntities($trackedEntities, $route->getTargetKey());
+            $entity = $job->getPayload()[Reception::ENTITY] ?? null;
 
-            // TODO: evaluate whether this is still required
-            $targetMapping = (new MappingStruct($route->getTargetKey(), new MappingNodeStruct(
-                $mappingNodeKey,
-                $mapping->getDatasetEntityClassName()
-            )))->setExternalId($entity->getPrimaryKey());
+            if (!$entity instanceof DatasetEntityContract) {
+                // TODO error
+                continue;
+            }
 
-            $typedMappedDatasetEntities = new TypedMappedDatasetEntityCollection(
-                $mapping->getDatasetEntityClassName(),
-                [new MappedDatasetEntityStruct($targetMapping, $entity)]
-            );
+            $route = $this->routeRepository->read($routeKey);
 
-            $this->receiveService->receive($typedMappedDatasetEntities);
+            if ($route->getEntityClassName() !== \get_class($entity)) {
+                // TODO error
+                continue;
+            }
 
-            return true;
+            $externalId = $job->getMappingComponent()->getExternalId();
+
+            if (!\is_string($externalId)) {
+                // TODO error
+                continue;
+            }
+
+            $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
+            $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
+
+            $receptions[$route->getEntityClassName()][$targetPortal][$sourcePortal][$externalId] = [
+                'mapping' => $job->getMappingComponent(),
+                'entity' => $entity,
+            ];
+        }
+
+        $lockedReceptions = [];
+        $locks = [];
+
+        try {
+            foreach ($receptions as $dataType => $portaledEntities) {
+                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
+                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
+                        foreach ($entities as $externalId => $entity) {
+                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\join('_', [
+                                    $sourcePortalKey,
+                                    $targetPortalKey,
+                                    $dataType,
+                                    $externalId,
+                                ]));
+
+                            if (!$lock->acquire()) {
+                                continue;
+                            }
+
+                            $locks[] = $lock;
+                            $lockedReceptions[$dataType][$targetPortalKey][$sourcePortalKey][$externalId] = $entity;
+                        }
+                    }
+                }
+            }
+
+            foreach ($lockedReceptions as $dataType => $portaledEntities) {
+                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
+                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
+                        $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
+
+                        if (!$sourcePortalNodeKey instanceof PortalNodeKeyInterface) {
+                            continue;
+                        }
+
+                        $targetPortalNodeKey = $this->storageKeyGenerator->deserialize($targetPortalKey);
+
+                        if (!$targetPortalNodeKey instanceof PortalNodeKeyInterface) {
+                            continue;
+                        }
+
+                        // TODO inspect memory raise
+                        $mappedEntities = $this->entityMapper->mapEntities(
+                            new DatasetEntityCollection($this->objectIterator->iterate(\array_column($entities, 'entity'))),
+                            $sourcePortalNodeKey
+                        );
+                        // TODO: improve performance
+                        $this->entityReflector->reflectEntities($mappedEntities, $targetPortalNodeKey);
+
+                        $externalIds = \array_map(
+                            static fn (MappingComponentStructContract $m): ?string => $m->getExternalId(),
+                            \array_column($entities, 'mapping')
+                        );
+                        $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
+                            $dataType,
+                            $sourcePortalNodeKey,
+                            $externalIds,
+                        );
+
+                        $mappedDatasetEntities = new TypedMappedDatasetEntityCollection($dataType);
+
+                        foreach ($mappingNodeKeys as $externalId => $mappingNodeKey) {
+                            // TODO: evaluate whether this is still required
+                            $targetMapping = (new MappingStruct($targetPortalNodeKey, new MappingNodeStruct(
+                                $mappingNodeKey,
+                                $dataType
+                            )))->setExternalId($externalId);
+
+                            $mappedDatasetEntities->push([new MappedDatasetEntityStruct($targetMapping, $entities[$externalId]['entity'])]);
+                        }
+
+                        $this->receiveService->receive($mappedDatasetEntities);
+                    }
+                }
+            }
         } finally {
-            $lock->release();
+            foreach ($locks as $lock) {
+                if ($lock->isAcquired()) {
+                    $lock->release();
+                }
+            }
         }
     }
 }

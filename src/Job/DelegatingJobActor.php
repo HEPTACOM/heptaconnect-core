@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler;
 use Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler;
 use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 
 class DelegatingJobActor extends DelegatingJobActorContract
 {
@@ -22,16 +21,15 @@ class DelegatingJobActor extends DelegatingJobActorContract
         $this->receptionHandler = $receptionHandler;
     }
 
-    public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): bool
+    public function performJobs(string $type, JobDataCollection $jobs): void
     {
         switch ($type) {
             case Emission::class:
-                return $this->emissionHandler->triggerEmission($mapping);
+                $this->emissionHandler->triggerEmission($jobs);
+                break;
             case Reception::class:
-                return $this->receptionHandler->triggerReception($mapping, $payload);
+                $this->receptionHandler->triggerReception($jobs);
+                break;
         }
-
-        // TODO error log
-        return true;
     }
 }
