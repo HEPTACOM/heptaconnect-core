@@ -32,7 +32,7 @@ class PortalConfiguration extends ConfigurationContract
         return \array_keys(\array_filter($this->flattened(), static fn ($value): bool => !\is_array($value)));
     }
 
-    private function & flattened(): array
+    private function &flattened(): array
     {
         if (\is_null($this->flat)) {
             $this->flat = [];

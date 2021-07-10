@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
@@ -30,9 +31,9 @@ class PrefixFilesystem extends AbstractFilesystem
      */
     public function stripPath(string $path): string
     {
-        $prefix = rtrim($this->prefix, '/');
-        $path = preg_replace('#^' . preg_quote($prefix, '#') . '#', '', $path);
-        $path = ltrim($path, '/');
+        $prefix = \rtrim($this->prefix, '/');
+        $path = \preg_replace('#^'.\preg_quote($prefix, '#').'#', '', $path);
+        $path = \ltrim($path, '/');
 
         return $path;
     }
@@ -42,11 +43,11 @@ class PrefixFilesystem extends AbstractFilesystem
      */
     public function preparePath(string $path): string
     {
-        return $this->prefix . $path;
+        return $this->prefix.$path;
     }
 
     private function normalizePrefix(string $prefix): string
     {
-        return trim($prefix, '/') . '/';
+        return \trim($prefix, '/').'/';
     }
 }

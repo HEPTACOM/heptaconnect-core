@@ -116,7 +116,7 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
         $parameters = $method->getParameters();
         $parameters = \array_filter($parameters, [$this, 'isParameterScalarish']);
 
-        return \array_map(static fn(\ReflectionParameter $p): string => '$'.$p->getName(), $parameters);
+        return \array_map(static fn (\ReflectionParameter $p): string => '$'.$p->getName(), $parameters);
     }
 
     private function isParameterScalarish(\ReflectionParameter $parameter): bool
