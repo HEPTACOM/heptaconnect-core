@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
  */
 class ReceiverStackBuilderTest extends TestCase
 {
-    public function testStackBuilderOrder(): void
+    public function testStackBuilderManualOrder(): void
     {
         $stackBuilder = new ReceiverStackBuilder(
             new ReceiverCollection(),
@@ -51,6 +51,46 @@ class ReceiverStackBuilderTest extends TestCase
         $receiver2->method('supports')->willReturn(FooBarEntity::class);
         $stackBuilder->push($receiver1); // resembles source
         $stackBuilder->push($receiver2); // resembles decorators
+        $stack = $stackBuilder->build();
+        $stack->next(new MappedDatasetEntityCollection(), $this->createMock(ReceiveContextInterface::class));
+
+        self::assertEquals([2, 1], $calc);
+    }
+
+    public function testStackBuilderOrderFromCtor(): void
+    {
+        $calc = [];
+
+        $receiver1 = $this->createMock(ReceiverContract::class);
+        $receiver1->method('receive')
+            ->willReturnCallback(
+                static function (MappedDatasetEntityCollection $m, ReceiveContextInterface $c, ReceiverStackInterface $s) use (&$calc): iterable {
+                    $calc[] = 1;
+
+                    return $s->next($m, $c);
+                }
+            );
+        $receiver1->method('supports')->willReturn(FooBarEntity::class);
+        $receiver2 = $this->createMock(ReceiverContract::class);
+        $receiver2->method('receive')
+            ->willReturnCallback(
+                static function (MappedDatasetEntityCollection $m, ReceiveContextInterface $c, ReceiverStackInterface $s) use (&$calc): iterable {
+                    $calc[] = 2;
+
+                    return $s->next($m, $c);
+                }
+            );
+        $receiver2->method('supports')->willReturn(FooBarEntity::class);
+
+        $stackBuilder = new ReceiverStackBuilder(
+            new ReceiverCollection([$receiver1]),
+            new ReceiverCollection([$receiver2]),
+            FooBarEntity::class,
+            $this->createMock(LoggerInterface::class),
+        );
+
+        $stackBuilder->pushSource();
+        $stackBuilder->pushDecorators();
         $stack = $stackBuilder->build();
         $stack->next(new MappedDatasetEntityCollection(), $this->createMock(ReceiveContextInterface::class));
 

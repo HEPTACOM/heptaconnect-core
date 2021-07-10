@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
  */
 class ExplorerStackBuilderTest extends TestCase
 {
-    public function testStackBuilderOrder(): void
+    public function testStackBuilderManualOrder(): void
     {
         $stackBuilder = new ExplorerStackBuilder(
             new ExplorerCollection(),
@@ -50,6 +50,46 @@ class ExplorerStackBuilderTest extends TestCase
         $explorer2->method('supports')->willReturn(FooBarEntity::class);
         $stackBuilder->push($explorer1); // resembles source
         $stackBuilder->push($explorer2); // resembles decorators
+        $stack = $stackBuilder->build();
+        $stack->next($this->createMock(ExploreContextInterface::class));
+
+        self::assertEquals([2, 1], $calc);
+    }
+
+    public function testStackBuilderOrderFromCtor(): void
+    {
+        $calc = [];
+
+        $explorer1 = $this->createMock(ExplorerContract::class);
+        $explorer1->method('explore')
+            ->willReturnCallback(
+                static function (ExploreContextInterface $c, ExplorerStackInterface $s) use (&$calc): iterable {
+                    $calc[] = 1;
+
+                    return $s->next($c);
+                }
+            );
+        $explorer1->method('supports')->willReturn(FooBarEntity::class);
+        $explorer2 = $this->createMock(ExplorerContract::class);
+        $explorer2->method('explore')
+            ->willReturnCallback(
+                static function (ExploreContextInterface $c, ExplorerStackInterface $s) use (&$calc): iterable {
+                    $calc[] = 2;
+
+                    return $s->next($c);
+                }
+            );
+        $explorer2->method('supports')->willReturn(FooBarEntity::class);
+
+        $stackBuilder = new ExplorerStackBuilder(
+            new ExplorerCollection([$explorer1]),
+            new ExplorerCollection([$explorer2]),
+            FooBarEntity::class,
+            $this->createMock(LoggerInterface::class),
+        );
+
+        $stackBuilder->pushSource();
+        $stackBuilder->pushDecorators();
         $stack = $stackBuilder->build();
         $stack->next($this->createMock(ExploreContextInterface::class));
 
