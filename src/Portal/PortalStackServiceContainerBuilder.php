@@ -15,6 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
@@ -90,6 +91,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     private ConfigurationServiceInterface $configurationService;
 
     private PublisherInterface $publisher;
+
+    private ?DirectEmissionFlowContract $directEmissionFlow = null;
 
     public function __construct(
         LoggerInterface $logger,
@@ -195,6 +198,12 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
+        if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
+            $this->setSyntheticServices($containerBuilder, [
+                DirectEmissionFlowContract::class => $this->directEmissionFlow,
+            ]);
+        }
+
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class.'.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
@@ -207,6 +216,11 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
         return $containerBuilder;
+    }
+
+    public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
+    {
+        $this->directEmissionFlow = $directEmissionFlow;
     }
 
     /**
