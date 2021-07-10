@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
@@ -55,7 +56,7 @@ abstract class AbstractFilesystem implements FilesystemInterface
     {
         $directory = $this->preparePath($directory);
 
-        return array_map(
+        return \array_map(
             function ($info) {
                 $info['dirname'] = $this->stripPath($info['dirname']);
                 $info['path'] = $this->stripPath($info['path']);

@@ -69,7 +69,7 @@ class ReceiveService implements ReceiveServiceInterface
             $receivingPortalNodes[] = $portalNodeKey;
 
             /** @var iterable<array-key, \Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $portalNodeEntities */
-            $portalNodeEntities = iterable_map(
+            $portalNodeEntities = \iterable_map(
                 $mappedDatasetEntities->filter(
                     static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
                         return $mappedDatasetEntityStruct->getMapping()->getPortalNodeKey()->equals($portalNodeKey);
@@ -92,7 +92,7 @@ class ReceiveService implements ReceiveServiceInterface
             }
 
             $this->receptionActor->performReception(
-                new TypedDatasetEntityCollection($type, iterable_to_array($portalNodeEntities)),
+                new TypedDatasetEntityCollection($type, \iterable_to_array($portalNodeEntities)),
                 $stack,
                 $this->getReceiveContext($portalNodeKey)
             );
