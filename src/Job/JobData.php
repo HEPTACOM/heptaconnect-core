@@ -9,9 +9,9 @@ class JobData
 {
     protected MappingComponentStructContract $mappingComponent;
 
-    protected array $payload;
+    protected ?array $payload;
 
-    public function __construct(MappingComponentStructContract $mappingComponent, array $payload)
+    public function __construct(MappingComponentStructContract $mappingComponent, ?array $payload)
     {
         $this->mappingComponent = $mappingComponent;
         $this->payload = $payload;
@@ -22,7 +22,7 @@ class JobData
         return $this->mappingComponent;
     }
 
-    public function getPayload(): array
+    public function getPayload(): ?array
     {
         return $this->payload;
     }
