@@ -46,11 +46,13 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
                 $throwable
             );
         } else {
-            /** @var LoggerInterface $logger */
             $logger = $this->getContainer()->get(LoggerInterface::class);
-            $logger->error(
-                'ReceiveContext: The reception of an unmappable entity failed. Exception: '.$throwable->getMessage()
-            );
+
+            if ($logger instanceof LoggerInterface) {
+                $logger->error(
+                    'ReceiveContext: The reception of an unmappable entity failed. Exception: '.$throwable->getMessage()
+                );
+            }
         }
     }
 }
