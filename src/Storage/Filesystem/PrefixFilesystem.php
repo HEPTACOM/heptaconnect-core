@@ -10,10 +10,7 @@ class PrefixFilesystem extends AbstractFilesystem
 {
     use PluggableTrait;
 
-    /**
-     * @var string
-     */
-    private $prefix;
+    private string $prefix;
 
     public function __construct(FilesystemInterface $filesystem, string $prefix)
     {
@@ -26,9 +23,6 @@ class PrefixFilesystem extends AbstractFilesystem
         $this->prefix = $this->normalizePrefix($prefix);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function stripPath(string $path): string
     {
         $prefix = \rtrim($this->prefix, '/');
@@ -38,9 +32,6 @@ class PrefixFilesystem extends AbstractFilesystem
         return $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function preparePath(string $path): string
     {
         return $this->prefix.$path;

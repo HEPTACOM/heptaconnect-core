@@ -4,7 +4,8 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
+use Heptacom\HeptaConnect\Core\Job\JobData;
+use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 
 class EmissionHandler
@@ -16,13 +17,19 @@ class EmissionHandler
         $this->emitService = $emitService;
     }
 
-    public function triggerEmission(MappingComponentStructContract $mapping): bool
+    public function triggerEmission(JobDataCollection $jobs): void
     {
-        $this->emitService->emit(new TypedMappingComponentCollection(
-            $mapping->getDatasetEntityClassName(),
-            [$mapping]
-        ));
+        $emissions = [];
 
-        return true;
+        /** @var JobData $job */
+        foreach ($jobs as $job) {
+            $emissions[$job->getMappingComponent()->getDatasetEntityClassName()][] = $job->getMappingComponent();
+        }
+
+        foreach ($emissions as $dataType => $emission) {
+            foreach (\array_chunk($emission, 10) as $emissionChunk) {
+                $this->emitService->emit(new TypedMappingComponentCollection($dataType, $emissionChunk));
+            }
+        }
     }
 }
