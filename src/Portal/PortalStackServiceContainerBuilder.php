@@ -136,7 +136,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $receiverTag = self::RECEIVER_TAG;
         $prototypedIds = [];
         $definedIds = [];
-        $flowBuildedIds = [];
+        $flowBuilderIds = [];
 
         /** @var PortalContract|PortalExtensionContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
@@ -152,7 +152,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder) {
                 $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
             });
-            $flowBuildedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder) {
+            $flowBuilderIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder) {
                 $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
             });
 
