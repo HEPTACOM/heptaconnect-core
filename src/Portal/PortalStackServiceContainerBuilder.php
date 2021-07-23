@@ -41,6 +41,8 @@ use Http\Discovery\Psr18ClientDiscovery;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -194,6 +196,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ClientInterface::class => Psr18ClientDiscovery::find(),
             RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
             UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
+            ResponseFactoryInterface::class => Psr17FactoryDiscovery::findResponseFactory(),
+            StreamFactoryInterface::class => Psr17FactoryDiscovery::findStreamFactory(),
             LoggerInterface::class => new PortalLogger(
                 $this->logger,
                 \sprintf('[%s] ', $this->storageKeyGenerator->serialize($portalNodeKey)),
