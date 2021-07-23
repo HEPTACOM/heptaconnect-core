@@ -74,18 +74,15 @@ class ExplorationActor implements ExplorationActorInterface
 
         $emitContext = $this->emitContextFactory->createContext($context->getPortalNodeKey(), true);
 
-        $mappings = [];
-        $primaryKeys = [];
+        $publicationPks = [];
+        $emissionPks = [];
         $directEmitter->getEntities()->clear();
 
         try {
             /** @var DatasetEntityContract|string|int|null $entity */
             foreach ($stack->next($context) as $entity) {
                 if ($entity instanceof DatasetEntityContract && ($primaryKey = $entity->getPrimaryKey()) !== null) {
-                    // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
-                    $this->mappingService->get($entityClassName, $context->getPortalNodeKey(), $primaryKey);
-
-                    $primaryKeys[] = $primaryKey;
+                    $emissionPks[] = $primaryKey;
                     $directEmitter->getEntities()->push([$entity]);
 
                     $this->logger->debug(\sprintf(
@@ -95,21 +92,20 @@ class ExplorationActor implements ExplorationActorInterface
                         $primaryKey
                     ));
 
-                    if (\count($primaryKeys) >= self::CHUNK_SIZE_EMISSION) {
+                    if (\count($emissionPks) >= self::CHUNK_SIZE_EMISSION) {
                         $this->flushDirectEmissions(
                             $emissionStack,
                             $emitContext,
                             $context->getPortalNodeKey(),
                             $entityClassName,
-                            $primaryKeys
+                            $emissionPks
                         );
 
-                        $primaryKeys = [];
+                        $emissionPks = [];
                         $directEmitter->getEntities()->clear();
                     }
                 } elseif (\is_string($entity) || \is_int($entity)) {
-                    // TODO: use batch operations by using $this->mappingService->getListByExternalIds()
-                    $mappings[] = $this->mappingService->get($entityClassName, $context->getPortalNodeKey(), (string) $entity);
+                    $publicationPks[] = (string) $entity;
 
                     $this->logger->debug(\sprintf(
                         'ExplorationActor: Entity was explored and publication is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
@@ -118,14 +114,14 @@ class ExplorationActor implements ExplorationActorInterface
                         (string) $entity
                     ));
 
-                    if (\count($mappings) >= self::CHUNK_SIZE_PUBLICATION) {
+                    if (\count($publicationPks) >= self::CHUNK_SIZE_PUBLICATION) {
                         $this->flushPublications(
                             $context->getPortalNodeKey(),
                             $entityClassName,
-                            $mappings
+                            $publicationPks
                         );
 
-                        $mappings = [];
+                        $publicationPks = [];
                     }
                 } else {
                     if ($entity instanceof DatasetEntityContract && $entity->getPrimaryKey() === null) {
@@ -150,21 +146,21 @@ class ExplorationActor implements ExplorationActorInterface
                 'exception' => $exception,
             ]);
         } finally {
-            if ($primaryKeys !== []) {
+            if ($emissionPks !== []) {
                 $this->flushDirectEmissions(
                     $emissionStack,
                     $emitContext,
                     $context->getPortalNodeKey(),
                     $entityClassName,
-                    $primaryKeys
+                    $emissionPks
                 );
             }
 
-            if ($mappings !== []) {
+            if ($publicationPks !== []) {
                 $this->flushPublications(
                     $context->getPortalNodeKey(),
                     $entityClassName,
-                    $mappings
+                    $publicationPks
                 );
             }
         }
@@ -184,24 +180,35 @@ class ExplorationActor implements ExplorationActorInterface
             \implode(',', $primaryKeys)
         ));
 
+        \iterable_filter($this->mappingService->getListByExternalIds($entityClassName, $portalNodeKey, $primaryKeys));
         $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
     }
 
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
         string $entityClassName,
-        array $mappings
+        array $externalIds
     ): void {
         $this->logger->debug(\sprintf(
             'ExplorationActor: Flush a batch of publications. PortalNode: %s; Type: %s, PrimaryKeys: %s',
             $this->storageKeyGenerator->serialize($portalNodeKey),
             $entityClassName,
-            \implode(',', \array_map(fn (MappingInterface $mapping) => $mapping->getExternalId(), $mappings))
+            \implode(',', $externalIds)
         ));
 
-        $this->publisher->publishBatch(new MappingComponentCollection(\array_map(
-            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityClassName, $mapping->getExternalId()),
-            $mappings
-        )));
+        $this->publisher->publishBatch(new MappingComponentCollection($this->iterableValues(\iterable_map(
+            $this->mappingService->getListByExternalIds($entityClassName, $portalNodeKey, $externalIds),
+            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityClassName, $mapping->getExternalId())
+        ))));
+    }
+
+    /**
+     * @TODO replace with iterable_values from bentools v2
+     */
+    private function iterableValues(iterable $i): iterable
+    {
+        foreach ($i as $item) {
+            yield $item;
+        }
     }
 }
