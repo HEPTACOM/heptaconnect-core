@@ -32,23 +32,18 @@ class DelegatingJobActor extends DelegatingJobActorContract
         $this->logger = $logger;
     }
 
-    public function performJob(string $type, MappingComponentStructContract $mapping, ?array $payload): bool
+    public function performJobs(string $type, JobDataCollection $jobs): void
     {
         switch ($type) {
             case Emission::class:
-                return $this->emissionHandler->triggerEmission($mapping);
+                $this->emissionHandler->triggerEmission($jobs);
+                break;
             case Reception::class:
-                return $this->receptionHandler->triggerReception($mapping, $payload);
+                $this->receptionHandler->triggerReception($jobs);
+                break;
             case Exploration::class:
-                return $this->explorationHandler->triggerExploration($mapping);
+                $this->explorationHandler->triggerExplorations($jobs);
+                break;
         }
-        /*
-         * Logger nicht correct injected, wirft error in der queue wenn erreicht
-         */
-        $this->logger.debug(\sprintf(
-            'DelegatingJobActor: Unable to find correct Handler for type %s.',
-            $type
-        ));
-        return true;
     }
 }

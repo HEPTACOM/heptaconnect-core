@@ -7,12 +7,12 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
+use Heptacom\HeptaConnect\Core\Reception\ReceiveContextFactory;
 use Heptacom\HeptaConnect\Core\Reception\ReceiveService;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -30,7 +30,7 @@ class ReceiveServiceTest extends TestCase
      */
     public function testReceiveCount(int $count): void
     {
-        $receiveContext = $this->createMock(ReceiveContextInterface::class);
+        $receiveContextFactory = $this->createMock(ReceiveContextFactory::class);
         $logger = $this->createMock(LoggerInterface::class);
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($count > 0 ? static::atLeastOnce() : static::never())
@@ -54,7 +54,7 @@ class ReceiveServiceTest extends TestCase
         $stackBuilderFactory->method('createReceiverStackBuilder')->willReturn($stackBuilder);
 
         $receiveService = new ReceiveService(
-            $receiveContext,
+            $receiveContextFactory,
             $logger,
             $storageKeyGenerator,
             $stackBuilderFactory,
@@ -70,7 +70,7 @@ class ReceiveServiceTest extends TestCase
      */
     public function testMissingReceiver(int $count): void
     {
-        $receiveContext = $this->createMock(ReceiveContextInterface::class);
+        $receiveContextFactory = $this->createMock(ReceiveContextFactory::class);
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($count > 0 ? static::atLeastOnce() : static::never())
@@ -102,7 +102,7 @@ class ReceiveServiceTest extends TestCase
         $storageKeyGenerator = $this->createMock(StorageKeyGeneratorContract::class);
 
         $receiveService = new ReceiveService(
-            $receiveContext,
+            $receiveContextFactory,
             $logger,
             $storageKeyGenerator,
             $stackBuilderFactory,

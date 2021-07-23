@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Cronjob\Contract\CronjobInterface;
 
+/**
+ * @internal
+ */
 class CronjobContextFactory
 {
     private ConfigurationServiceInterface $configurationService;

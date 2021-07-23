@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Test\Fixture;
 
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
@@ -12,16 +12,15 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 class FooBarReceiver extends ReceiverContract
 {
     public function receive(
-        MappedDatasetEntityCollection $mappedDatasetEntities,
+        TypedDatasetEntityCollection $entities,
         ReceiveContextInterface $context,
         ReceiverStackInterface $stack
     ): iterable {
-        /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
-        foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
-            $mapping = $mappedDatasetEntity->getMapping();
-            $mapping->setExternalId('');
+        /** @var DatasetEntityContract $entity */
+        foreach ($entities as $entity) {
+            $entity->setPrimaryKey('');
 
-            yield $mapping;
+            yield $entity;
         }
 
         yield from $stack->next($mappedDatasetEntities, $context);

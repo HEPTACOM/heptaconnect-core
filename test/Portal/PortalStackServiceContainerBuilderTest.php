@@ -3,117 +3,115 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Test\Portal;
 
+use Composer\Autoload\ClassLoader;
+use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
+use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
+use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
+use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
+use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
+use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
+use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
+use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use HeptacomFixture\Portal\A\AutomaticService\ExceptionNotInContainer;
+use HeptacomFixture\Portal\A\ManualService\ExceptionInContainer;
+use HeptacomFixture\Portal\A\Portal;
+use HeptacomFixture\Portal\Extension\PortalExtension;
+use League\Flysystem\FilesystemInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotFoundException
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotInstantiable
  * @covers \Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotInstantiableEndlessLoopDetected
+ * @covers \Heptacom\HeptaConnect\Core\Portal\PortalConfiguration
+ * @covers \Heptacom\HeptaConnect\Core\Portal\PortalLogger
  * @covers \Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder
+ * @covers \Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass
  */
 class PortalStackServiceContainerBuilderTest extends TestCase
 {
+    private ClassLoader $classLoader;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->classLoader = new ClassLoader();
+        $this->classLoader->addPsr4('HeptacomFixture\\Portal\\A\\', __DIR__.'/../../test-composer-integration/portal-package/src/');
+        $this->classLoader->addPsr4('HeptacomFixture\\Portal\\Extension\\', __DIR__.'/../../test-composer-integration/portal-package-extension/src/');
+        $this->classLoader->register();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->classLoader->unregister();
+    }
+
     public function testServiceRetrieval(): void
     {
-        $builder = new PortalStackServiceContainerBuilder(
-            $this->createMock(LoggerInterface::class)
-        );
-        $container = $builder->build($this->getPortalContract(
-            static fn (array $s): array => \array_merge($s, [
-                'test_service' => new \stdClass(),
-            ])),
-            new PortalExtensionCollection([
-                $this->getPortalExtensionContract(static fn (array $s): array => $s),
-            ]),
-            $this->createMock(PortalNodeContextInterface::class)
-        );
+        $configurationService = $this->createMock(ConfigurationServiceInterface::class);
+        $configurationService->expects(self::atLeastOnce())
+            ->method('getPortalNodeConfiguration')
+            ->willReturn([]);
 
-        static::assertTrue($container->has('test_service'));
-        static::assertInstanceOf(\stdClass::class, $container->get('test_service'));
-    }
-
-    public function testServiceDecoratedRetrieval(): void
-    {
         $builder = new PortalStackServiceContainerBuilder(
-            $this->createMock(LoggerInterface::class)
+            $this->createMock(LoggerInterface::class),
+            $this->createMock(NormalizationRegistryContract::class),
+            $this->createMock(PortalStorageFactory::class),
+            $this->createMock(ResourceLockingContract::class),
+            $this->createMock(ProfilerFactoryContract::class),
+            $this->createMock(StorageKeyGeneratorContract::class),
+            $this->createMock(FlowComponent::class),
+            $this->createMock(FilesystemFactory::class),
+            $configurationService,
+            $this->createMock(PublisherInterface::class),
         );
+        $builder->setDirectEmissionFlow($this->createMock(DirectEmissionFlowContract::class));
         $container = $builder->build(
-            $this->getPortalContract(static fn (array $s): array => \array_merge($s, [
-                'test_service' => (object) [
-                    'value' => 17,
-                ],
-            ])),
+            new Portal(),
             new PortalExtensionCollection([
-                $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
-                    'test_service' => (object) [
-                        'value' => $s['test_service']->value + 8,
-                    ],
-                ])),
-                $this->getPortalExtensionContract(static fn (array $s): array => \array_merge($s, [
-                    'test_service' => (object) [
-                        'value' => $s['test_service']->value * 5,
-                    ],
-                ])),
+                new PortalExtension(),
             ]),
-            $this->createMock(PortalNodeContextInterface::class)
+            $this->createMock(PortalNodeKeyInterface::class),
         );
+        $container->compile();
 
-        static::assertTrue($container->has('test_service'));
+        static::assertTrue($container->has(ClientInterface::class));
+        static::assertTrue($container->has(ConfigurationContract::class));
+        static::assertTrue($container->has(DeepCloneContract::class));
+        static::assertTrue($container->has(DeepObjectIteratorContract::class));
+        static::assertTrue($container->has(DirectEmissionFlowContract::class));
+        static::assertTrue($container->has(FilesystemInterface::class));
+        static::assertTrue($container->has(LoggerInterface::class));
+        static::assertTrue($container->has(NormalizationRegistryContract::class));
+        static::assertTrue($container->has(PortalContract::class));
+        static::assertTrue($container->has(PortalExtensionCollection::class));
+        static::assertTrue($container->has(PortalNodeKeyInterface::class));
+        static::assertTrue($container->has(PortalStorageInterface::class));
+        static::assertTrue($container->has(ProfilerContract::class));
+        static::assertTrue($container->has(PublisherInterface::class));
+        static::assertTrue($container->has(RequestFactoryInterface::class));
+        static::assertTrue($container->has(ResourceLockFacade::class));
+        static::assertTrue($container->has(UriFactoryInterface::class));
 
-        $service = $container->get('test_service');
-
-        static::assertInstanceOf(\stdClass::class, $service);
-        static::assertEquals($service->value, 125);
-    }
-
-    protected function getPortalContract(callable $serviceToService): PortalContract
-    {
-        return new class($serviceToService) extends PortalContract {
-            /**
-             * @var callable
-             */
-            private $serviceToService;
-
-            public function __construct(callable $serviceToService)
-            {
-                $this->serviceToService = $serviceToService;
-            }
-
-            public function getServices(): array
-            {
-                return \call_user_func($this->serviceToService, parent::getServices());
-            }
-        };
-    }
-
-    protected function getPortalExtensionContract(callable $serviceToService): PortalExtensionContract
-    {
-        return new class($serviceToService) extends PortalExtensionContract {
-            /**
-             * @var callable
-             */
-            private $serviceToService;
-
-            public function __construct(callable $serviceToService)
-            {
-                $this->serviceToService = $serviceToService;
-            }
-
-            public function extendServices(array $services): array
-            {
-                return \call_user_func($this->serviceToService, $services);
-            }
-
-            public function supports(): string
-            {
-                return PortalContract::class;
-            }
-        };
+        static::assertTrue($container->has(ExceptionInContainer::class));
+        static::assertFalse($container->has(ExceptionNotInContainer::class));
     }
 }

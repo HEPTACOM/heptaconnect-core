@@ -14,6 +14,7 @@ namespace Heptacom\HeptaConnect\Core\Component;
  * @method static string STATUS_REPORT_NO_STATUS_REPORTER_FOR_TYPE()
  * @method static string PORTAL_LOAD_ERROR()
  * @method static string PORTAL_EXTENSION_LOAD_ERROR()
+ * @method static string PORTAL_NODE_CONFIGURATION_INVALID()
  */
 abstract class LogMessage
 {

@@ -10,9 +10,7 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Reception\ReceptionActor;
 use Heptacom\HeptaConnect\Core\Test\Fixture\FooBarEntity;
 use Heptacom\HeptaConnect\Core\Test\Fixture\ThrowReceiver;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -20,7 +18,9 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
+ * @covers \Heptacom\HeptaConnect\Core\Component\LogMessage
  * @covers \Heptacom\HeptaConnect\Core\Reception\ReceptionActor
+ * @covers \Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable
  */
 class ReceptionActorTest extends TestCase
 {
@@ -43,15 +43,7 @@ class ReceptionActorTest extends TestCase
         $stackBuilderFactory = $this->createMock(ReceiverStackBuilderFactoryInterface::class);
         $stackBuilderFactory->method('createReceiverStackBuilder')->willReturn($stackBuilder);
 
-        $mapping = $this->createMock(MappingInterface::class);
-        $mapping->expects(static::atLeast($count))
-            ->method('getDatasetEntityClassName')
-            ->willReturn(FooBarEntity::class);
-
-        $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
-        $mappedDatasetEntity->expects(static::atLeast($count))
-            ->method('getMapping')
-            ->willReturn($mapping);
+        $entity = $this->createMock(FooBarEntity::class);
 
         $receptionActor = new ReceptionActor(
             $logger,
@@ -59,7 +51,7 @@ class ReceptionActorTest extends TestCase
             new DeepObjectIteratorContract(),
         );
         $receptionActor->performReception(
-            new TypedMappedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $mappedDatasetEntity)),
+            new TypedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $entity)),
             $stack,
             $this->createMock(ReceiveContextInterface::class),
         );
