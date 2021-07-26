@@ -10,10 +10,8 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterfa
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
-use Heptacom\HeptaConnect\Core\Job\Type\AbstractJobType;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Dataset\Base\Support\AbstractCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
@@ -50,21 +48,19 @@ class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher = $jobDispatcher;
     }
 
-    public function exploreLater(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null) {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
+    {
+        $jobs = new JobCollection();
 
-        /** @var ExplorerCollection $explorers */
-        $explorers = $container->get(ExplorerCollection::class);
-        /** @var ExplorerCollection $explorerDecorators */
-        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
-        $explorers->push($explorerDecorators);
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+                continue;
+            }
 
-        foreach (self::getSupportedTypes($explorers) as $supportedType) {
-            $jobs = new JobCollection();
             $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType.'_NO_ID'))]);
-            $this->jobDispatcher->dispatch($jobs);
         }
 
+        $this->jobDispatcher->dispatch($jobs);
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
