@@ -69,17 +69,9 @@ class ExploreService implements ExploreServiceInterface
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-
-        /** @var ExplorerCollection $explorers */
-        $explorers = $container->get(ExplorerCollection::class);
-        /** @var ExplorerCollection $explorerDecorators */
-        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
-        $explorers->push($explorerDecorators);
-
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
-        foreach (self::getSupportedTypes($explorers) as $supportedType) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
             if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
                 continue;
             }
@@ -116,5 +108,18 @@ class ExploreService implements ExploreServiceInterface
         }
 
         return \array_keys($types);
+    }
+
+    protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
+    {
+        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+
+        /** @var ExplorerCollection $explorers */
+        $explorers = $container->get(ExplorerCollection::class);
+        /** @var ExplorerCollection $explorerDecorators */
+        $explorerDecorators = $container->get(ExplorerCollection::class . '.decorator');
+        $explorers->push($explorerDecorators);
+
+        return $explorers;
     }
 }
