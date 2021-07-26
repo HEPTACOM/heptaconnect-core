@@ -10,8 +10,6 @@ use Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler;
 use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
-use Psr\Log\LoggerInterface;
 
 class DelegatingJobActor extends DelegatingJobActorContract
 {
@@ -21,15 +19,14 @@ class DelegatingJobActor extends DelegatingJobActorContract
 
     private ExplorationHandler $explorationHandler;
 
-    private LoggerInterface $logger;
-
-
-    public function __construct(EmissionHandler $emissionHandler, ReceptionHandler $receptionHandler, ExplorationHandler $explorationHandler, LoggerInterface $logger)
-    {
+    public function __construct(
+        EmissionHandler $emissionHandler,
+        ReceptionHandler $receptionHandler,
+        ExplorationHandler $explorationHandler
+    ) {
         $this->emissionHandler = $emissionHandler;
         $this->receptionHandler = $receptionHandler;
         $this->explorationHandler = $explorationHandler;
-        $this->logger = $logger;
     }
 
     public function performJobs(string $type, JobDataCollection $jobs): void
