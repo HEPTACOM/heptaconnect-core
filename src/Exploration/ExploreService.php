@@ -3,14 +3,18 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
+use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
+use Heptacom\HeptaConnect\Core\Job\JobCollection;
+use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
@@ -26,33 +30,44 @@ class ExploreService implements ExploreServiceInterface
 
     private LoggerInterface $logger;
 
+    private JobDispatcherContract $jobDispatcher;
+
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
         ExplorationActorInterface $explorationActor,
         ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        JobDispatcherContract $jobDispatcher
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
         $this->explorationActor = $explorationActor;
         $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->logger = $logger;
+        $this->jobDispatcher = $jobDispatcher;
+    }
+
+    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
+    {
+        $jobs = new JobCollection();
+
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+                continue;
+            }
+
+            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType.'_NO_ID'))]);
+        }
+
+        $this->jobDispatcher->dispatch($jobs);
     }
 
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-
-        /** @var ExplorerCollection $explorers */
-        $explorers = $container->get(ExplorerCollection::class);
-        /** @var ExplorerCollection $explorerDecorators */
-        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
-        $explorers->push($explorerDecorators);
-
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
-        foreach (self::getSupportedTypes($explorers) as $supportedType) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
             if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
                 continue;
             }
@@ -89,5 +104,18 @@ class ExploreService implements ExploreServiceInterface
         }
 
         return \array_keys($types);
+    }
+
+    protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
+    {
+        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+
+        /** @var ExplorerCollection $explorers */
+        $explorers = $container->get(ExplorerCollection::class);
+        /** @var ExplorerCollection $explorerDecorators */
+        $explorerDecorators = $container->get(ExplorerCollection::class . '.decorator');
+        $explorers->push($explorerDecorators);
+
+        return $explorers;
     }
 }

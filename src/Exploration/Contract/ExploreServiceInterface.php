@@ -14,4 +14,11 @@ interface ExploreServiceInterface
      * @throws PortalNodeNotFoundException
      */
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void;
+
+    /**
+     * @psalm-param array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>>|null $dataTypes
+     *
+     * @throws PortalNodeNotFoundException
+     */
+    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void;
 }
