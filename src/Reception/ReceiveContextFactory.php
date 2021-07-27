@@ -12,24 +12,26 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 
 class ReceiveContextFactory
 {
-    private MappingServiceInterface $mappingService;
-
     private ConfigurationServiceInterface $configurationService;
 
     private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
     private EntityStatusContract $entityStatus;
 
+    private array $postProcessors;
+
+
     public function __construct(
-        MappingServiceInterface $mappingService,
         ConfigurationServiceInterface $configurationService,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        EntityStatusContract $entityStatus
+        EntityStatusContract $entityStatus,
+        iterable $postProcessors
     ) {
-        $this->mappingService = $mappingService;
         $this->configurationService = $configurationService;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->entityStatus = $entityStatus;
+        $this->postProcessors = $postProcessors instanceof \Traversable ? iterator_to_array($postProcessors) : $postProcessors;
+
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface
@@ -37,8 +39,8 @@ class ReceiveContextFactory
         return new ReceiveContext(
             $this->portalStackServiceContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey),
-            $this->mappingService,
-            $this->entityStatus
+            $this->entityStatus,
+            $this->postProcessors
         );
     }
 }

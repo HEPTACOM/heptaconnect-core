@@ -3,31 +3,40 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Core\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
-use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
     private EntityStatusContract $entityStatus;
 
-    private MappingServiceInterface $mappingService;
+    private EventDispatcherInterface $eventDispatcher;
+
+    private PostProcessorDataBag $postProcessingBag;
 
     public function __construct(
         ContainerInterface $container,
         ?array $configuration,
-        MappingServiceInterface $mappingService,
-        EntityStatusContract $entityStatus
+        EntityStatusContract $entityStatus,
+        array $postProcessors
     ) {
         parent::__construct($container, $configuration);
         $this->entityStatus = $entityStatus;
-        $this->mappingService = $mappingService;
+        $this->postProcessingBag = new PostProcessorDataBag();
+        $this->eventDispatcher = new EventDispatcher();
+        foreach ($postProcessors as $postProcessor) {
+            $this->eventDispatcher->addSubscriber($postProcessor);
+        }
+    }
+
+    public function getPostProcessingBag(): PostProcessorDataBag
+    {
+        return $this->postProcessingBag;
     }
 
     public function getEntityStatus(): EntityStatusContract
@@ -35,24 +44,8 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
         return $this->entityStatus;
     }
 
-    public function markAsFailed(DatasetEntityContract $entity, \Throwable $throwable): void
+    public function getEventDispatcher(): EventDispatcherInterface
     {
-        $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-        if ($mapping instanceof MappingInterface) {
-            $this->mappingService->addException(
-                $this->getPortalNodeKey(),
-                $mapping->getMappingNodeKey(),
-                $throwable
-            );
-        } else {
-            $logger = $this->getContainer()->get(LoggerInterface::class);
-
-            if ($logger instanceof LoggerInterface) {
-                $logger->error(
-                    'ReceiveContext: The reception of an unmappable entity failed. Exception: '.$throwable->getMessage()
-                );
-            }
-        }
+        return $this->eventDispatcher;
     }
 }
