@@ -58,7 +58,7 @@ class ReceptionActor implements ReceptionActorInterface
         }
 
         try {
-            iterable_to_array($stack->next($entities, $context));
+            \iterable_to_array($stack->next($entities, $context));
             $this->saveMappings($context->getPortalNodeKey(), $entities);
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
