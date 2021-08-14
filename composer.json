@@ -57,7 +57,7 @@
     "support": {
         "issues": "https://github.com/HEPTACOM/heptaconnect-repository-base/issues",
         "source": "https://github.com/HEPTACOM/heptaconnect-repository-base",
-        "docs": "https://connect.heptacom.de/",
-        "rss": "https://connect.heptacom.de/feed/rss2.xml"
+        "docs": "https://heptaconnect.io/",
+        "rss": "https://heptaconnect.io/news/rss2.xml"
     }
 }
