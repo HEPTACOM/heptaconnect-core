@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
+use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 
-class EmissionHandler
+class EmissionHandler implements EmissionHandlerInterface
 {
     private EmitServiceInterface $emitService;
 

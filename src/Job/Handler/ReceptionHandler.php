@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
+use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
@@ -24,7 +25,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContra
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Symfony\Component\Lock\LockFactory;
 
-class ReceptionHandler
+class ReceptionHandler implements ReceptionHandlerInterface
 {
     private RouteRepositoryContract $routeRepository;
 

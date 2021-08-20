@@ -5,8 +5,8 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
-use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
@@ -34,7 +34,7 @@ class ExplorationActor implements ExplorationActorInterface
 
     private EmissionActorInterface $emissionActor;
 
-    private EmitContextFactory $emitContextFactory;
+    private EmitContextFactoryInterface $emitContextFactory;
 
     private PublisherInterface $publisher;
 
@@ -46,7 +46,7 @@ class ExplorationActor implements ExplorationActorInterface
         LoggerInterface $logger,
         MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor,
-        EmitContextFactory $emitContextFactory,
+        EmitContextFactoryInterface $emitContextFactory,
         PublisherInterface $publisher,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator
