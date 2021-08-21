@@ -6,7 +6,9 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Test\Fixture\Portal;
 use Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,19 +20,23 @@ class ConfigurationService implements ConfigurationServiceInterface
 
     private CacheItemPoolInterface $cache;
 
+    private StorageKeyGeneratorContract $keyGenerator;
+
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         ConfigurationStorageContract $storage,
-        CacheItemPoolInterface $cache)
+        CacheItemPoolInterface $cache,
+        StorageKeyGeneratorContract $keyGenerator)
     {
         $this->portalRegistry = $portalRegistry;
         $this->storage = $storage;
         $this->cache = $cache;
+        $this->keyGenerator = $keyGenerator;
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
-        $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey->getUuid()));
+        $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
         if (!$cachedConfig->isHit()) {
             $config = null;
             $template = $this->getMergedConfigurationTemplate($portalNodeKey);
@@ -47,7 +53,7 @@ class ConfigurationService implements ConfigurationServiceInterface
     public function setPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
         #Invalidate cached configuration
-        $cachedConfigKey = $this->getConfigCacheKey($portalNodeKey->getUuid());
+        $cachedConfigKey = $this->getConfigCacheKey($portalNodeKey);
         $cachedConfig = $this->cache->getItem($cachedConfigKey);
         if ($cachedConfig->isHit()) {
             $this->cache->deleteItem($cachedConfigKey);
@@ -107,8 +113,13 @@ class ConfigurationService implements ConfigurationServiceInterface
         return $template;
     }
 
-    private function getConfigCacheKey(string $uuid): string
+    private function getConfigCacheKey(PortalNodeKeyInterface $portalNodeKey): string
     {
-        return "heptacom.heptaconnect.core.configuration.cachekey.".$uuid;
+        $key = $this->keyGenerator->serialize($portalNodeKey);
+        $psr6Reserved = array('{', '}', '(', ')', '/', '\\', '@', ':');
+        foreach ($psr6Reserved as $char) {
+            $key = str_replace($char, '', $key);
+        }
+        return "config.cache.".$key;
     }
 }
