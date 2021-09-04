@@ -27,8 +27,6 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
 
     private EmitContextFactory $emitContextFactory;
 
-    private MappingServiceInterface $mappingService;
-
     private EmissionActorInterface $emissionActor;
 
     private LoggerInterface $logger;
@@ -38,12 +36,10 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
     public function __construct(
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         EmitContextFactory $emitContextFactory,
-        MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor
     ) {
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
         $this->emitContextFactory = $emitContextFactory;
-        $this->mappingService = $mappingService;
         $this->emissionActor = $emissionActor;
         $this->logger = new NullLogger();
         $this->profiler = new NullProfiler();
@@ -82,7 +78,6 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
                     ->pushDecorators()
                     ->build();
 
-                \iterable_to_array($this->mappingService->getListByExternalIds($type, $portalNodeKey, $externalIds));
                 $this->profiler->start('EmissionActor::performEmission', 'DirectEmissionFlow');
                 $this->emissionActor->performEmission($externalIds, $emissionStack, $emitContext);
                 $this->profiler->stop();
