@@ -123,10 +123,12 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    public function delete($key): void
+    public function delete($key): bool
     {
         try {
             $this->portalStorage->unset($this->portalNodeKey, $key);
+
+            return true;
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
@@ -148,9 +150,15 @@ class PortalStorage implements PortalStorageInterface
         return $this->normalizationRegistry->getNormalizerByType($type) instanceof NormalizerInterface;
     }
 
-    public function clear()
+    public function clear(): bool
     {
-        $this->portalStorage->clear($this->portalNodeKey);
+        try  {
+            $this->portalStorage->clear($this->portalNodeKey);
+        } catch (\Throwable $throwable) {
+            return false;
+        }
+
+        return true;
     }
 
     public function getMultiple($keys, $default = null): iterable
@@ -209,10 +217,12 @@ class PortalStorage implements PortalStorageInterface
         return true;
     }
 
-    public function deleteMultiple($keys)
+    public function deleteMultiple($keys): bool
     {
         try {
             $this->portalStorage->deleteMultiple($this->portalNodeKey, \iterable_to_array($keys));
+
+            return true;
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
