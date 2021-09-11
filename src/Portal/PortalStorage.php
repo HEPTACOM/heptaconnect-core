@@ -160,8 +160,26 @@ class PortalStorage implements PortalStorageInterface
 
     public function setMultiple($values, $ttl = null)
     {
-        foreach($values as $key => $value) {
-            $this->set($key, $value);
+        try {
+            $payload = [];
+
+            foreach ($values as $key => $value) {
+                $normalizer = $this->normalizationRegistry->getNormalizer($value);
+
+                if (!$normalizer instanceof NormalizerInterface) {
+                    throw new PortalStorageNormalizationException($key, $value);
+                }
+
+                $payload[$normalizer->getType()][$key] = (string) $normalizer->normalize($value);
+            }
+
+            foreach ($payload as $type => $payloadItems) {
+                foreach ($payloadItems as $key => $value) {
+                    $this->portalStorage->set($this->portalNodeKey, $key, $value, $type, $ttl);
+                }
+            }
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
     }
 
