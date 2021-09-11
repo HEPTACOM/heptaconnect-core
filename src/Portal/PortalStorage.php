@@ -69,7 +69,7 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    public function set($key, $value, $ttl = null): void
+    public function set($key, $value, $ttl = null): bool
     {
         $ttl = $this->convertTtl($ttl);
 
@@ -87,6 +87,8 @@ class PortalStorage implements PortalStorageInterface
                 $normalizer->getType(),
                 $ttl
             );
+
+            return true;
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
@@ -170,7 +172,7 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    public function setMultiple($values, $ttl = null)
+    public function setMultiple($values, $ttl = null): bool
     {
         $ttl = $this->convertTtl($ttl);
 
@@ -195,6 +197,8 @@ class PortalStorage implements PortalStorageInterface
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
+
+        return true;
     }
 
     public function deleteMultiple($keys)
