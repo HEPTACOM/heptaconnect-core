@@ -59,5 +59,6 @@
         "source": "https://github.com/HEPTACOM/heptaconnect-repository-base",
         "docs": "https://heptaconnect.io/",
         "rss": "https://heptaconnect.io/news/rss2.xml"
-    }
+    },
+    "website": "https://heptaconnect.io"
 }
