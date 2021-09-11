@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\MappingPersisterContract;
+use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
 use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
