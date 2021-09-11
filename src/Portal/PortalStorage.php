@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Exception\PortalStorageExceptionWrapper;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -39,36 +40,40 @@ class PortalStorage implements PortalStorageInterface
      */
     public function get($key, $default = null)
     {
-        if (!$this->portalStorage->has($this->portalNodeKey, $key)) {
-            return $default;
-        }
-
         try {
-            $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
-        } catch (NotFoundException $exception) {
-            $this->portalStorage->unset($this->portalNodeKey, $key);
+            if (!$this->portalStorage->has($this->portalNodeKey, $key)) {
+                return $default;
+            }
 
-            return $default;
+            try {
+                $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
+            } catch (NotFoundException $exception) {
+                $this->portalStorage->unset($this->portalNodeKey, $key);
+
+                return $default;
+            }
+
+            $type = $this->portalStorage->getType($this->portalNodeKey, $key);
+            $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
+
+            if (!$denormalizer instanceof DenormalizerInterface) {
+                return $default;
+            }
+
+            if (!$denormalizer->supportsDenormalization($value, $type)) {
+                return $default;
+            }
+
+            $result = $denormalizer->denormalize($value, $type);
+
+            if ($result === null) {
+                $this->portalStorage->unset($this->portalNodeKey, $key);
+            }
+
+            return $result;
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
-
-        $type = $this->portalStorage->getType($this->portalNodeKey, $key);
-        $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
-
-        if (!$denormalizer instanceof DenormalizerInterface) {
-            return $default;
-        }
-
-        if (!$denormalizer->supportsDenormalization($value, $type)) {
-            return $default;
-        }
-
-        $result = $denormalizer->denormalize($value, $type);
-
-        if ($result === null) {
-            $this->portalStorage->unset($this->portalNodeKey, $key);
-        }
-
-        return $result;
     }
 
     /**
@@ -80,19 +85,23 @@ class PortalStorage implements PortalStorageInterface
      */
     public function set($key, $value, $ttl = null): void
     {
-        $normalizer = $this->normalizationRegistry->getNormalizer($value);
+        try {
+            $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
-        if (!$normalizer instanceof NormalizerInterface) {
-            return;
+            if (!$normalizer instanceof NormalizerInterface) {
+                return;
+            }
+
+            $this->portalStorage->set(
+                $this->portalNodeKey,
+                $key,
+                (string) $normalizer->normalize($value),
+                $normalizer->getType(),
+                $ttl
+            );
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
-
-        $this->portalStorage->set(
-            $this->portalNodeKey,
-            $key,
-            (string) $normalizer->normalize($value),
-            $normalizer->getType(),
-            $ttl
-        );
     }
 
     public function list(): iterable
@@ -122,7 +131,11 @@ class PortalStorage implements PortalStorageInterface
      */
     public function has($key): bool
     {
-        return $this->portalStorage->has($this->portalNodeKey, $key);
+        try {
+            return $this->portalStorage->has($this->portalNodeKey, $key);
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
+        }
     }
 
     /**
@@ -132,7 +145,11 @@ class PortalStorage implements PortalStorageInterface
      */
     public function delete($key): void
     {
-        $this->portalStorage->unset($this->portalNodeKey, $key);
+        try {
+            $this->portalStorage->unset($this->portalNodeKey, $key);
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
+        }
     }
 
     /**
@@ -169,7 +186,11 @@ class PortalStorage implements PortalStorageInterface
      */
     public function getMultiple($keys, $default = null): iterable
     {
-        return $this->portalStorage->getMultiple($this->portalNodeKey, $keys);
+        try {
+            return $this->portalStorage->getMultiple($this->portalNodeKey, $keys);
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
+        }
     }
 
     /**
@@ -194,6 +215,10 @@ class PortalStorage implements PortalStorageInterface
      */
     public function deleteMultiple($keys)
     {
-        $this->portalStorage->deleteMultiple($this->portalNodeKey, $keys);
+        try {
+            $this->portalStorage->deleteMultiple($this->portalNodeKey, $keys);
+        } catch (\Throwable $throwable) {
+            throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
+        }
     }
 }
