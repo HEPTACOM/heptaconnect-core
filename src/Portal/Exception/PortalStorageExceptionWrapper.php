@@ -9,6 +9,6 @@ class PortalStorageExceptionWrapper extends \Exception implements CacheException
 {
     public function __construct(string $method, ?\Throwable $previous = null)
     {
-        parent::__construct('The cache failed in ' . $method, 1631375161, $previous);
+        parent::__construct('The cache failed in '.$method, 1631375161, $previous);
     }
 }
