@@ -152,7 +152,17 @@ class PortalStorage implements PortalStorageInterface
     public function getMultiple($keys, $default = null): iterable
     {
         try {
-            return $this->portalStorage->getMultiple($this->portalNodeKey, $keys);
+            $keys = \iterable_to_array($keys);
+
+            $result = $this->portalStorage->getMultiple($this->portalNodeKey, $keys);
+
+            foreach ($keys as $key) {
+                if (!\array_key_exists($key, $result)) {
+                    $result[$key] = $default;
+                }
+            }
+
+            return $result;
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
