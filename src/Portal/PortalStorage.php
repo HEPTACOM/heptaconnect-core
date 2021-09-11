@@ -80,13 +80,13 @@ class PortalStorage implements PortalStorageInterface
                 throw new PortalStorageNormalizationException($key, $value);
             }
 
-            $this->portalStorage->set(
-                $this->portalNodeKey,
-                $key,
-                (string) $normalizer->normalize($value),
-                $normalizer->getType(),
-                $ttl
-            );
+            $normalizedValue = $normalizer->normalize($value);
+
+            if (!\is_scalar($normalizedValue)) {
+                throw new PortalStorageNormalizationException($key, $value);
+            }
+
+            $this->portalStorage->set($this->portalNodeKey, $key, (string) $normalizedValue, $normalizer->getType(), $ttl);
 
             return true;
         } catch (\Throwable $throwable) {
@@ -186,12 +186,20 @@ class PortalStorage implements PortalStorageInterface
                     throw new PortalStorageNormalizationException($key, $value);
                 }
 
-                $payload[$normalizer->getType()][$key] = (string) $normalizer->normalize($value);
+                $normalizedValue = $normalizer->normalize($value);
+
+                if (!\is_scalar($normalizedValue)) {
+                    throw new PortalStorageNormalizationException($key, $value);
+                }
+
+                $payload[$normalizer->getType()][$key] = (string) $normalizedValue;
             }
+
+            unset($key, $value);
 
             foreach ($payload as $type => $payloadItems) {
                 foreach ($payloadItems as $key => $value) {
-                    $this->portalStorage->set($this->portalNodeKey, $key, $value, $type, $ttl);
+                    $this->portalStorage->set($this->portalNodeKey, (string) $key, $value, $type, $ttl);
                 }
             }
         } catch (\Throwable $throwable) {
