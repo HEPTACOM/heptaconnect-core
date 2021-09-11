@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\PortalStorageExceptionWrapper;
+use Heptacom\HeptaConnect\Core\Portal\Exception\PortalStorageNormalizationException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -49,7 +50,7 @@ class PortalStorage implements PortalStorageInterface
             $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
 
             if (!$denormalizer instanceof DenormalizerInterface) {
-                return $default;
+                throw new PortalStorageNormalizationException($key, $value);
             }
 
             if (!$denormalizer->supportsDenormalization($value, $type)) {
@@ -74,7 +75,7 @@ class PortalStorage implements PortalStorageInterface
             $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
             if (!$normalizer instanceof NormalizerInterface) {
-                return;
+                throw new PortalStorageNormalizationException($key, $value);
             }
 
             $this->portalStorage->set(
