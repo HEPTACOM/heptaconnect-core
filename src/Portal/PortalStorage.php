@@ -71,6 +71,8 @@ class PortalStorage implements PortalStorageInterface
 
     public function set($key, $value, $ttl = null): void
     {
+        $ttl = $this->convertTtl($ttl);
+
         try {
             $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
@@ -170,6 +172,8 @@ class PortalStorage implements PortalStorageInterface
 
     public function setMultiple($values, $ttl = null)
     {
+        $ttl = $this->convertTtl($ttl);
+
         try {
             $payload = [];
 
@@ -199,6 +203,22 @@ class PortalStorage implements PortalStorageInterface
             $this->portalStorage->deleteMultiple($this->portalNodeKey, \iterable_to_array($keys));
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
+        }
+    }
+
+    /**
+     * @param \DateInterval|int|null $ttl
+     */
+    private function convertTtl($ttl): ?\DateInterval
+    {
+        if (!\is_integer($ttl)) {
+            return $ttl;
+        }
+
+        try {
+            return new \DateInterval(\sprintf('PT%dS', $ttl));
+        } catch (\Throwable $throwable) {
+            return null;
         }
     }
 }
