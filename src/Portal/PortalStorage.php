@@ -30,14 +30,6 @@ class PortalStorage implements PortalStorageInterface
         $this->portalNodeKey = $portalNodeKey;
     }
 
-    /**
-     * @param string $key
-     * @param null $default
-     * @return mixed|null
-     * @throws NotFoundException
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
     public function get($key, $default = null)
     {
         try {
@@ -76,13 +68,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param string $key
-     * @param mixed $value
-     * @param \DateInterval|null $ttl
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
     public function set($key, $value, $ttl = null): void
     {
         try {
@@ -124,11 +109,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param string $key
-     * @return bool
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     */
     public function has($key): bool
     {
         try {
@@ -138,11 +118,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param string $key
-     * @throws NotFoundException
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     */
     public function delete($key): void
     {
         try {
@@ -168,22 +143,11 @@ class PortalStorage implements PortalStorageInterface
         return $this->normalizationRegistry->getNormalizerByType($type) instanceof NormalizerInterface;
     }
 
-    /**
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     */
     public function clear()
     {
         $this->portalStorage->clear($this->portalNodeKey);
     }
 
-    /**
-     * @param array $keys
-     * @param null $default
-     * @return iterable
-     * @throws NotFoundException
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
     public function getMultiple($keys, $default = null): iterable
     {
         try {
@@ -193,13 +157,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param iterable $values
-     * @param null $ttl
-     * @return bool|void
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     * @throws \Symfony\Component\Serializer\Exception\ExceptionInterface
-     */
     public function setMultiple($values, $ttl = null)
     {
         foreach($values as $key => $value) {
@@ -207,12 +164,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param iterable $keys
-     * @return bool|void
-     * @throws NotFoundException
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
-     */
     public function deleteMultiple($keys)
     {
         try {
