@@ -1,12 +1,12 @@
 {
     "name": "heptacom/heptaconnect-core",
-    "version": "0.6.0",
     "type": "library",
     "description": "HEPTAconnect core processes",
     "keywords": [
         "heptaconnect",
         "messaging"
     ],
+    "version": "0.6.0",
     "license": [
         "AGPL-3.0-or-later",
         "proprietary"
@@ -35,13 +35,13 @@
         "psr/http-factory": "^1.0",
         "psr/http-message": "^1.0",
         "psr/log": "^1.1",
-        "ramsey/uuid": "^3.5|^4",
-        "symfony/config": "^4.4|^5.0",
-        "symfony/dependency-injection": "^4.4|^5.0",
+        "ramsey/uuid": "^3.5 || ^4",
+        "symfony/config": "^4.4 || ^5.0",
+        "symfony/dependency-injection": "^4.4 || ^5.0",
         "symfony/lock": "^4.0 || ^5.0",
         "symfony/messenger": "^4.0 || ^5.0",
         "symfony/polyfill-php80": ">=1.15",
-        "symfony/yaml": "^4.4|^5.0"
+        "symfony/yaml": "^4.4 || ^5.0"
     },
     "require-dev": {
         "dq5studios/psalm-junit": ">=2",
@@ -51,14 +51,14 @@
         "infection/infection": ">=0.21",
         "maglnet/composer-require-checker": ">=2",
         "mavimo/phpstan-junit": ">=0.3",
+        "nyholm/psr7": ">=1",
+        "php-http/curl-client": ">=1",
         "phpstan/extension-installer": ">=1",
         "phpstan/phpstan": ">=0.12",
         "phpstan/phpstan-deprecation-rules": ">=0.12",
         "phpstan/phpstan-phpunit": ">=0.12",
         "phpstan/phpstan-strict-rules": ">=0.12",
         "phpunit/phpunit": ">=9.3 <10",
-        "php-http/curl-client": ">=1",
-        "nyholm/psr7": ">=1",
         "psalm/plugin-phpunit": ">=0.10",
         "vimeo/psalm": ">=4"
     },

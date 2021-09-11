@@ -3,12 +3,12 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
-use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
+use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
@@ -113,7 +113,7 @@ class ExploreService implements ExploreServiceInterface
         /** @var ExplorerCollection $explorers */
         $explorers = $container->get(ExplorerCollection::class);
         /** @var ExplorerCollection $explorerDecorators */
-        $explorerDecorators = $container->get(ExplorerCollection::class . '.decorator');
+        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
         $explorers->push($explorerDecorators);
 
         return $explorers;

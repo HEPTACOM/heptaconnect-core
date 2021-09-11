@@ -196,7 +196,7 @@ class PortalStorage implements PortalStorageInterface
     public function deleteMultiple($keys)
     {
         try {
-            $this->portalStorage->deleteMultiple($this->portalNodeKey, $keys);
+            $this->portalStorage->deleteMultiple($this->portalNodeKey, \iterable_to_array($keys));
         } catch (\Throwable $throwable) {
             throw new PortalStorageExceptionWrapper(__METHOD__, $throwable);
         }
