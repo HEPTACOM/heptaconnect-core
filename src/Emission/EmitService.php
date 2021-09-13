@@ -5,6 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
@@ -18,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class EmitService implements EmitServiceInterface
 {
-    private EmitContextFactory $emitContextFactory;
+    private EmitContextFactoryInterface $emitContextFactory;
 
     private LoggerInterface $logger;
 
@@ -39,7 +40,7 @@ class EmitService implements EmitServiceInterface
     private EmissionActorInterface $emissionActor;
 
     public function __construct(
-        EmitContextFactory $emitContextFactory,
+        EmitContextFactoryInterface $emitContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,

@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
+use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 
-class ExplorationHandler
+class ExplorationHandler implements ExplorationHandlerInterface
 {
     private ExploreServiceInterface $exploreService;
 
