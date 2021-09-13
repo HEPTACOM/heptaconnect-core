@@ -7,12 +7,9 @@ definitions:
             variables:
                 MYSQL_DATABASE: 'pipelines'
                 MYSQL_ROOT_PASSWORD: 'let_me_in'
-    caches:
-        heptaconnect-ci: .build
     steps:
         -   step: &default-step
                 caches:
-                    - heptaconnect-ci
                     - composer
                 artifacts:
                     - .build/**
@@ -47,31 +44,31 @@ definitions:
                 <<: *default-step
                 name: Install
                 script:
-                    - GLOBAL_REPOSITORIES_DIR=.build/private-composer composer-repository
+                    - GLOBAL_REPOSITORIES_DIR=`pwd`/.build/private-composer composer-repository
                     - make vendor
         -   step: &test-unit
                 <<: *default-step
                 name: Unit tests
                 script:
-                    - GLOBAL_REPOSITORIES_DIR=.build/private-composer composer-repository
+                    - GLOBAL_REPOSITORIES_DIR=`pwd`/.build/private-composer composer-repository
                     - make test
         -   step: &test-coverage
                 <<: *default-step
                 name: Unit test coverage
                 script:
-                    - GLOBAL_REPOSITORIES_DIR=.build/private-composer composer-repository
+                    - GLOBAL_REPOSITORIES_DIR=`pwd`/.build/private-composer composer-repository
                     - make coverage
         -   step: &test-code-style
                 <<: *default-step
                 name: Code style and static code analysis
                 script:
-                    - GLOBAL_REPOSITORIES_DIR=.build/private-composer composer-repository
+                    - GLOBAL_REPOSITORIES_DIR=`pwd`/.build/private-composer composer-repository
                     - make cs
         -   step: &test-infection
                 <<: *default-step
                 name: Unit test infection detection
                 script:
-                    - GLOBAL_REPOSITORIES_DIR=.build/private-composer composer-repository
+                    - GLOBAL_REPOSITORIES_DIR=`pwd`/.build/private-composer composer-repository
                     - make infection
 
 pipelines:
