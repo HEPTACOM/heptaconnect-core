@@ -52,6 +52,7 @@
         "maglnet/composer-require-checker": ">=2",
         "mavimo/phpstan-junit": ">=0.3",
         "nyholm/psr7": ">=1",
+        "phpmd/phpmd" : "@stable",
         "php-http/curl-client": ">=1",
         "phpstan/extension-installer": ">=1",
         "phpstan/phpstan": ">=0.12",
@@ -88,5 +89,6 @@
         "source": "https://github.com/HEPTACOM/heptaconnect-core",
         "docs": "https://connect.heptacom.de/",
         "rss": "https://connect.heptacom.de/feed/rss2.xml"
-    }
+    },
+    "website": "https://heptaconnect.io"
 }
