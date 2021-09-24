@@ -34,7 +34,7 @@ class ReceiveServiceTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects($count > 0 ? static::atLeastOnce() : static::never())
-            ->method('getDatasetEntityClassName')
+            ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
 
         $mappedDatasetEntity = $this->createMock(MappedDatasetEntityStruct::class);
@@ -88,7 +88,7 @@ class ReceiveServiceTest extends TestCase
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
-            ->method('getDatasetEntityClassName')
+            ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
         $mapping->expects(static::atLeast($count))
             ->method('getPortalNodeKey')

@@ -36,7 +36,7 @@ class EmissionActorTest extends TestCase
 
         $mapping = $this->createMock(MappingInterface::class);
         $mapping->expects(static::atLeast($count))
-            ->method('getDatasetEntityClassName')
+            ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
 
         $routeRepository = $this->createMock(RouteRepositoryContract::class);

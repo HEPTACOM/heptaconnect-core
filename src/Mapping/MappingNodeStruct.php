@@ -13,15 +13,15 @@ class MappingNodeStruct implements MappingNodeStructInterface
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
-    private string $datasetEntityClassName;
+    private string $entityType;
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
-    public function __construct(MappingNodeKeyInterface $id, string $datasetEntityClassName)
+    public function __construct(MappingNodeKeyInterface $id, string $entityType)
     {
         $this->id = $id;
-        $this->datasetEntityClassName = $datasetEntityClassName;
+        $this->entityType = $entityType;
     }
 
     public function getKey(): MappingNodeKeyInterface
@@ -39,17 +39,17 @@ class MappingNodeStruct implements MappingNodeStructInterface
     /**
      * @return class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
      */
-    public function getDatasetEntityClassName(): string
+    public function getEntityType(): string
     {
-        return $this->datasetEntityClassName;
+        return $this->entityType;
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
-    public function setDatasetEntityClassName(string $datasetEntityClassName): self
+    public function setEntityType(string $entityType): self
     {
-        $this->datasetEntityClassName = $datasetEntityClassName;
+        $this->entityType = $entityType;
 
         return $this;
     }
