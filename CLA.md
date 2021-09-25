@@ -12,7 +12,7 @@ This Agreement is between Heptacom GmbH, Am Tabakquartier 62, 28197 Bremen [Germ
 
 1.3 "**Submitting**" means any form of physical, electronic or written correspondence transmitted to the project using "GitHub".
 
-1.4 "**Project**" means any open source project on "GitHub".
+1.4 "**Project**" means any open source project from "HEPTACOM" on "GitHub".
 
 1.5 "**GitHub**" is a free web-based service, which is used by HEPTACOM as a social coding platform for software development projects.
 
@@ -49,7 +49,7 @@ This Agreement is between Heptacom GmbH, Am Tabakquartier 62, 28197 Bremen [Germ
 ## __5. General Provisions__
 5.1 **Liability.** The liability of the Contributor is limited to intent and fraudulent intent. The compensation for negligently caused consequential damages by the Contributor is excluded. The Contributor shall be liable for his representatives and vicarious agents according to § 278 of the German Civil Code (BGB).
 
-5.2 **Term and Termination.** This Agreement shall enter into force upon signature and shall be entered into for an indefinite period of time. Both parties may terminate this Agreement by giving six (6) weeks notice at the end of a calendar quarter. Upon termination of this Agreement, HEPTACOM shall delete or deactivate the Contributor from GitHub and shall no longer receive any Contribution from the Contributor.
+5.2 **Term and Termination.** This Agreement shall enter into force upon signature and shall be entered into for an indefinite period of time. Both parties may terminate this Agreement by giving six (6) weeks notice at the end of a calendar quarter. Upon termination of this Agreement, HEPTACOM shall no longer receive any Contribution from the Contributor.
 
 5.3 **Survival.** Upon termination or expiration of this Agreement, all terms of the Agreement, including the license grants, shall remain in full force and effect, with the exception that the Contributor will no longer make submissions to HEPTACOM.
 
