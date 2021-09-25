@@ -55,7 +55,7 @@ class PortalStorage implements PortalStorageInterface
             if (!$denormalizer instanceof DenormalizerInterface) {
                 $this->logger->error('Failed retrieving a normalizer for a value from the portal storage', [
                     'code' => 1631565257,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -77,7 +77,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed retrieving a value from the portal storage', [
                 'code' => 1631561839,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'key' => $key,
             ]);
 
@@ -95,7 +95,7 @@ class PortalStorage implements PortalStorageInterface
             if (!$normalizer instanceof NormalizerInterface) {
                 $this->logger->error('Failed getting a normalizer for a value for storing a value in the portal storage', [
                     'code' => 1631565446,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -107,7 +107,7 @@ class PortalStorage implements PortalStorageInterface
             if (!\is_scalar($normalizedValue)) {
                 $this->logger->error('Failed normalizing a value for storing a value in the portal storage', [
                     'code' => 1631565376,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -121,7 +121,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed storing a value in the portal storage', [
                 'code' => 1631387510,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'key' => $key,
             ]);
 
@@ -157,7 +157,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed retrieving existence of a key in the portal storage', [
                 'code' => 1631387470,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'key' => $key,
             ]);
 
@@ -175,7 +175,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed deleting a key in the portal storage', [
                 'code' => 1631387448,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'key' => $key,
             ]);
 
@@ -209,7 +209,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed clearing the portal storage', [
                 'code' => 1631387430,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
             ]);
 
             return false;
@@ -232,7 +232,7 @@ class PortalStorage implements PortalStorageInterface
                 if (!$denormalizer instanceof DenormalizerInterface) {
                     $this->logger->error('Failed retrieving a value from the portal storage', [
                         'code' => 1631563639,
-                        'portalNodKey' => $this->portalNodeKey,
+                        'portalNodeKey' => $this->portalNodeKey,
                         'key' => $key,
                     ]);
                 }
@@ -240,7 +240,7 @@ class PortalStorage implements PortalStorageInterface
                 if (!$denormalizer->supportsDenormalization($value, $type)) {
                     $this->logger->error('Failed normalizing a value from the portal storage', [
                         'code' => 1631563699,
-                        'portalNodKey' => $this->portalNodeKey,
+                        'portalNodeKey' => $this->portalNodeKey,
                         'key' => $key,
                     ]);
 
@@ -255,7 +255,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed getting multiple values from the portal storage', [
                 'code' => 1631563058,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'keys' => $keys,
             ]);
         }
@@ -281,7 +281,7 @@ class PortalStorage implements PortalStorageInterface
             if (!$normalizer instanceof NormalizerInterface) {
                 $this->logger->error('Failed storing a value out of many in the portal storage', [
                     'code' => 1631562097,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -294,7 +294,7 @@ class PortalStorage implements PortalStorageInterface
                 $this->logger->error('Failed normalizing a value out of many for storing it in the portal storage', [
                     'code' => 1631562928,
                     'exception' => $throwable,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -304,7 +304,7 @@ class PortalStorage implements PortalStorageInterface
             if (!\is_scalar($normalizedValue)) {
                 $this->logger->error('Failed to normalize a value for storing it in the portal storage', [
                     'code' => 1631562285,
-                    'portalNodKey' => $this->portalNodeKey,
+                    'portalNodeKey' => $this->portalNodeKey,
                     'key' => $key,
                 ]);
 
@@ -328,7 +328,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed storing multiple values in the portal storage', [
                 'code' => 1631387363,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'key' => $key,
             ]);
 
@@ -346,7 +346,7 @@ class PortalStorage implements PortalStorageInterface
             $this->logger->error('Failed deleting multiple keys in the portal storage', [
                 'code' => 1631387202,
                 'exception' => $throwable,
-                'portalNodKey' => $this->portalNodeKey,
+                'portalNodeKey' => $this->portalNodeKey,
                 'keys' => $keys,
             ]);
 
