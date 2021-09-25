@@ -50,7 +50,7 @@
         },
         {
             "name": "heptacom-fixture/heptaconnect-portal-a",
-            "version": "dev-feature/CONNECT-26",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "portal-package",
@@ -84,7 +84,7 @@
         },
         {
             "name": "heptacom-fixture/heptaconnect-portal-extension-a",
-            "version": "dev-feature/CONNECT-26",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "portal-package-extension",
@@ -122,7 +122,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-dataset-base",
-                "reference": "c6c861e4f5cbc583c47159948bd7de6a142dd6f4"
+                "reference": "9f270ccf03098dd3ec5084f88686e193ee1166cd"
             },
             "require": {
                 "bentools/iterable-functions": ">=1",
@@ -138,6 +138,7 @@
                 "infection/infection": ">=0.21",
                 "maglnet/composer-require-checker": ">=2",
                 "mavimo/phpstan-junit": ">=0.3",
+                "phpmd/phpmd": "@stable",
                 "phpstan/extension-installer": ">=1",
                 "phpstan/phpstan": ">=0.12",
                 "phpstan/phpstan-deprecation-rules": ">=0.12",
@@ -192,7 +193,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-portal-base",
-                "reference": "aa542ed0ce3ee5c78bc573b964e150221a6c5677"
+                "reference": "6b827cc5108b4fc0d61507f51276a6aceb210737"
             },
             "require": {
                 "bentools/iterable-functions": ">=1.4 <2",
@@ -222,6 +223,7 @@
                 "maglnet/composer-require-checker": ">=2",
                 "mavimo/phpstan-junit": ">=0.3",
                 "nyholm/psr7": ">=1",
+                "phpmd/phpmd": "@stable",
                 "phpstan/extension-installer": ">=1",
                 "phpstan/phpstan": ">=0.12",
                 "phpstan/phpstan-deprecation-rules": ">=0.12",
@@ -398,16 +400,16 @@
         },
         {
             "name": "php-http/discovery",
-            "version": "1.14.0",
+            "version": "1.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-http/discovery.git",
-                "reference": "778f722e29250c1fac0bbdef2c122fa5d038c9eb"
+                "reference": "de90ab2b41d7d61609f504e031339776bc8c7223"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-http/discovery/zipball/778f722e29250c1fac0bbdef2c122fa5d038c9eb",
-                "reference": "778f722e29250c1fac0bbdef2c122fa5d038c9eb",
+                "url": "https://api.github.com/repos/php-http/discovery/zipball/de90ab2b41d7d61609f504e031339776bc8c7223",
+                "reference": "de90ab2b41d7d61609f504e031339776bc8c7223",
                 "shasum": ""
             },
             "require": {
@@ -460,9 +462,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-http/discovery/issues",
-                "source": "https://github.com/php-http/discovery/tree/1.14.0"
+                "source": "https://github.com/php-http/discovery/tree/1.14.1"
             },
-            "time": "2021-06-01T14:30:21+00:00"
+            "time": "2021-09-18T07:57:46+00:00"
         },
         {
             "name": "psr/container",
@@ -867,12 +869,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce"
+                "reference": "f24ae462b1d60c333df104f0b81ec7d0e12f6e9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/46cd95797e9df938fdd2b03693b5fca5e64b01ce",
-                "reference": "46cd95797e9df938fdd2b03693b5fca5e64b01ce",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/f24ae462b1d60c333df104f0b81ec7d0e12f6e9f",
+                "reference": "f24ae462b1d60c333df104f0b81ec7d0e12f6e9f",
                 "shasum": ""
             },
             "require": {
@@ -923,7 +925,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.23.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/main"
             },
             "funding": [
                 {
@@ -939,7 +941,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-19T12:13:01+00:00"
+            "time": "2021-09-14T14:02:44+00:00"
         },
         {
             "name": "symfony/polyfill-php73",
@@ -1111,12 +1113,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "8a0585c57a56d5bb6c7362319a19fb5b9c587105"
+                "reference": "0dac3fd03aa68d0d46f44f6f98efe7505cc8278a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/8a0585c57a56d5bb6c7362319a19fb5b9c587105",
-                "reference": "8a0585c57a56d5bb6c7362319a19fb5b9c587105",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/0dac3fd03aa68d0d46f44f6f98efe7505cc8278a",
+                "reference": "0dac3fd03aa68d0d46f44f6f98efe7505cc8278a",
                 "shasum": ""
             },
             "require": {
@@ -1205,7 +1207,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-10T07:19:42+00:00"
+            "time": "2021-09-21T13:32:14+00:00"
         }
     ],
     "packages-dev": [],
