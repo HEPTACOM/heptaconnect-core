@@ -78,7 +78,9 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
                 \get_class($lastReceiver)
             ));
 
-            $this->receivers[] = $lastReceiver;
+            if (!\in_array($lastReceiver, $this->receivers, true)) {
+                $this->receivers[] = $lastReceiver;
+            }
         }
 
         return $this;
@@ -92,7 +94,9 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
                 \get_class($receiver)
             ));
 
-            $this->receivers[] = $receiver;
+            if (!\in_array($receiver, $this->receivers, true)) {
+                $this->receivers[] = $receiver;
+            }
         }
 
         return $this;
