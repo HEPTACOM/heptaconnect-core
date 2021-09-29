@@ -9,10 +9,10 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterfac
 interface ExplorationActorInterface
 {
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
     public function performExploration(
-        string $entityClassName,
+        string $entityType,
         ExplorerStackInterface $stack,
         ExploreContextInterface $context
     ): void;

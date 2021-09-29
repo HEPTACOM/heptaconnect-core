@@ -56,7 +56,7 @@ class EmitService implements EmitServiceInterface
     public function emit(TypedMappingComponentCollection $mappingComponents): void
     {
         $emittingPortalNodes = [];
-        $entityClassName = $mappingComponents->getType();
+        $entityType = $mappingComponents->getType();
 
         /** @var MappingComponentStructContract $mapping */
         foreach ($mappingComponents as $mapping) {
@@ -68,11 +68,11 @@ class EmitService implements EmitServiceInterface
             }
 
             $emittingPortalNodes[] = $portalNodeKey;
-            $stack = $this->getEmitterStack($portalNodeKey, $entityClassName);
+            $stack = $this->getEmitterStack($portalNodeKey, $entityType);
 
             if (!$stack instanceof EmitterStackInterface) {
                 $this->logger->critical(LogMessage::EMIT_NO_EMITTER_FOR_TYPE(), [
-                    'type' => $entityClassName,
+                    'type' => $entityType,
                     'portalNodeKey' => $portalNodeKey,
                 ]);
 
@@ -90,13 +90,13 @@ class EmitService implements EmitServiceInterface
         }
     }
 
-    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): ?EmitterStackInterface
+    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?EmitterStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]);
+        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->emissionStackCache)) {
             $builder = $this->emitterStackBuilderFactory
-                ->createEmitterStackBuilder($portalNodeKey, $entityClassName)
+                ->createEmitterStackBuilder($portalNodeKey, $entityType)
                 ->pushSource()
                 // TODO break when source is already empty
                 ->pushDecorators();
