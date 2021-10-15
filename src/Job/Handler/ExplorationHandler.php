@@ -33,7 +33,7 @@ class ExplorationHandler implements ExplorationHandlerInterface
             $key = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
 
             $keys[$key] = $mapping->getPortalNodeKey();
-            $types[$key][] = $mapping->getDatasetEntityClassName();
+            $types[$key][] = $mapping->getEntityType();
         }
 
         foreach ($keys as $key => $portalNodeKey) {

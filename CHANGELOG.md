@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+                                 
+### Changed
+
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\EmitContext::markAsFailed` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface::createEmitterStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilderFactory::createEmitterStackBuilder`
+- Change a parameter name of  `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\EmitService::getEmitterStack` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface::createExplorerStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilderFactory::createExplorerStackBuilder`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface::performExploration` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor::performExploration`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface::createReceiverStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilderFactory::createReceiverStackBuilder`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\ReceiveService::getReceiverStack` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::get` and `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in global refactoring effort, respective change in its implementing class for `\Heptacom\HeptaConnect\Core\Mapping\MappingService::get` and `\Heptacom\HeptaConnect\Core\Mapping\MappingService::getListByExternalIds` and additionally `\Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::__construct` in global refactoring effort and change its getter and setter methods to match the change (`\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::getEntityType`, `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::setEntityType`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\Publisher::publish` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::__construct` in global refactoring effort and change its getter method to match the change (`\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::getForeignEntityType`)
+- Change method call in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` to use renamed method of `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
+- Change method call in  `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler::triggerEmission`, `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler::triggerExplorations`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::reflect`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::merge` to use renamed method of `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
+- Change method name of `\Heptacom\HeptaConnect\Core\Mapping\MappingStruct` in global refactoring effort
 
 ## [0.7.0] - 2021-09-25
 

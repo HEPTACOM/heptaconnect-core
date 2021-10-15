@@ -67,22 +67,22 @@ class MappingService implements MappingServiceInterface
     }
 
     public function get(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): MappingInterface {
-        $mappingNodeKey = $this->getMappingNodeKey($datasetEntityClassName, $portalNodeKey, $externalId);
+        $mappingNodeKey = $this->getMappingNodeKey($entityType, $portalNodeKey, $externalId);
         $mappingExists = $mappingNodeKey instanceof MappingNodeKeyInterface;
 
         if (!$mappingExists) {
-            $mappingNodeKey = $this->mappingNodeRepository->create($datasetEntityClassName, $portalNodeKey);
+            $mappingNodeKey = $this->mappingNodeRepository->create($entityType, $portalNodeKey);
         }
 
         if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
             throw new MappingNodeNotCreatedException();
         }
 
-        $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
+        $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $entityType)))
             ->setExternalId($externalId);
 
         if (!$mappingExists) {
@@ -97,12 +97,12 @@ class MappingService implements MappingServiceInterface
     }
 
     public function getListByExternalIds(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
         array $externalIds
     ): iterable {
         $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-            $datasetEntityClassName,
+            $entityType,
             $portalNodeKey,
             $externalIds
         );
@@ -113,12 +113,12 @@ class MappingService implements MappingServiceInterface
                 unset($newExternalIds[$match]);
                 yield $mappedExternalId => (new MappingStruct(
                     $portalNodeKey,
-                    new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName))
+                    new MappingNodeStruct($mappingNodeKey, $entityType))
                 )->setExternalId($mappedExternalId);
             }
         }
 
-        $newMappingNodeKeys = $this->mappingNodeRepository->createList($datasetEntityClassName, $portalNodeKey, \count($newExternalIds));
+        $newMappingNodeKeys = $this->mappingNodeRepository->createList($entityType, $portalNodeKey, \count($newExternalIds));
         $newMappingNodeKeysIterator = $newMappingNodeKeys->getIterator();
         $createPayload = new MappingCollection();
 
@@ -134,7 +134,7 @@ class MappingService implements MappingServiceInterface
             }
 
             $createPayload->push([
-                (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $datasetEntityClassName)))
+                (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $entityType)))
                     ->setExternalId($newExternalId),
             ]);
 
@@ -158,12 +158,12 @@ class MappingService implements MappingServiceInterface
             $createMappingNodes = 0;
             $portalNodeMappings = new MappingComponentCollection($mappingComponentCollection->filterByPortalNodeKey($portalNodeKey));
 
-            foreach ($portalNodeMappings->getDatasetEntityClassNames() as $datasetEntityClassName) {
-                $datasetEntityMappings = new MappingComponentCollection($portalNodeMappings->filterByDatasetEntityClassName($datasetEntityClassName));
+            foreach ($portalNodeMappings->getEntityTypes() as $entityType) {
+                $datasetEntityMappings = new MappingComponentCollection($portalNodeMappings->filterByEntityType($entityType));
                 $externalIds = $datasetEntityMappings->getExternalIds();
                 $missingExternalIds = $this->mappingRepository->listUnsavedExternalIds(
                     $portalNodeKey,
-                    $datasetEntityClassName,
+                    $entityType,
                     $externalIds
                 );
 
@@ -173,7 +173,7 @@ class MappingService implements MappingServiceInterface
 
                 // TODO check if filtering is faster than new
                 $prePayload->push(\array_map(
-                    static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $datasetEntityClassName, $externalId),
+                    static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $entityType, $externalId),
                     $missingExternalIds
                 ));
 
@@ -181,7 +181,7 @@ class MappingService implements MappingServiceInterface
             }
 
             $nodes->push(
-                $this->mappingNodeRepository->createList($datasetEntityClassName, $portalNodeKey, $createMappingNodes)
+                $this->mappingNodeRepository->createList($entityType, $portalNodeKey, $createMappingNodes)
             );
         }
 
@@ -196,7 +196,7 @@ class MappingService implements MappingServiceInterface
             $nodesItemKey = $nodesIterator->current();
             $mapping = new MappingStruct(
                 $prePayloadItem->getPortalNodeKey(),
-                new MappingNodeStruct($nodesItemKey, $prePayloadItem->getDatasetEntityClassName())
+                new MappingNodeStruct($nodesItemKey, $prePayloadItem->getEntityType())
             );
 
             $mapping->setExternalId($prePayloadItem->getExternalId());
@@ -235,7 +235,7 @@ class MappingService implements MappingServiceInterface
             return $this->mappingRepository->read($mappingKey);
         }
 
-        $mappingNode = new MappingNodeStruct($mapping->getMappingNodeKey(), $mapping->getDatasetEntityClassName());
+        $mappingNode = new MappingNodeStruct($mapping->getMappingNodeKey(), $mapping->getEntityType());
 
         return new MappingStruct($portalNodeKey, $mappingNode);
     }
@@ -245,7 +245,7 @@ class MappingService implements MappingServiceInterface
         try {
             $nodeFrom = $this->mappingNodeRepository->read($mergeFrom);
             $nodeInto = $this->mappingNodeRepository->read($mergeInto);
-            if ($nodeFrom->getDatasetEntityClassName() !== $nodeInto->getDatasetEntityClassName()) {
+            if ($nodeFrom->getEntityType() !== $nodeInto->getEntityType()) {
                 throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto);
             }
 
@@ -311,12 +311,12 @@ class MappingService implements MappingServiceInterface
     }
 
     private function getMappingNodeKey(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): ?MappingNodeKeyInterface {
         $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
-            $datasetEntityClassName,
+            $entityType,
             $portalNodeKey,
             $externalId
         );

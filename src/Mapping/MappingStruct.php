@@ -46,8 +46,8 @@ class MappingStruct implements MappingInterface
         return $this->mappingNodeStruct->getKey();
     }
 
-    public function getDatasetEntityClassName(): string
+    public function getEntityType(): string
     {
-        return $this->mappingNodeStruct->getDatasetEntityClassName();
+        return $this->mappingNodeStruct->getEntityType();
     }
 }

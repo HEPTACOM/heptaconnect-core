@@ -8,10 +8,10 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 interface ExplorerStackBuilderFactoryInterface
 {
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityClassName
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
     public function createExplorerStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        string $entityType
     ): ExplorerStackBuilderInterface;
 }
