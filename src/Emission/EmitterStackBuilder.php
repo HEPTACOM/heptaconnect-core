@@ -78,7 +78,9 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
                 \get_class($lastEmitter)
             ));
 
-            $this->emitters[] = $lastEmitter;
+            if (!\in_array($lastEmitter, $this->emitters, true)) {
+                $this->emitters[] = $lastEmitter;
+            }
         }
 
         return $this;
@@ -92,7 +94,9 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
                 \get_class($emitter)
             ));
 
-            $this->emitters[] = $emitter;
+            if (!\in_array($emitter, $this->emitters, true)) {
+                $this->emitters[] = $emitter;
+            }
         }
 
         return $this;

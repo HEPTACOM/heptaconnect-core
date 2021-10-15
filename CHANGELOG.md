@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+                                 
+### Changed
+
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\EmitContext::markAsFailed` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface::createEmitterStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilderFactory::createEmitterStackBuilder`
+- Change a parameter name of  `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Emission\EmitService::getEmitterStack` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface::createExplorerStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilderFactory::createExplorerStackBuilder`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface::performExploration` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor::performExploration`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface::createReceiverStackBuilder` in global refactoring effort, respective change in its implementing class `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilderFactory::createReceiverStackBuilder`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::push`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushSource`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushDecorators`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\ReceiveService::getReceiverStack` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::get` and `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in global refactoring effort, respective change in its implementing class for `\Heptacom\HeptaConnect\Core\Mapping\MappingService::get` and `\Heptacom\HeptaConnect\Core\Mapping\MappingService::getListByExternalIds` and additionally `\Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::__construct` in global refactoring effort and change its getter and setter methods to match the change (`\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::getEntityType`, `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::setEntityType`)
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Mapping\Publisher::publish` in global refactoring effort
+- Change a parameter name of `\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::__construct` in global refactoring effort and change its getter method to match the change (`\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::getForeignEntityType`)
+- Change method call in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` to use renamed method of `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
+- Change method call in  `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler::triggerEmission`, `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler::triggerExplorations`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::reflect`, `\Heptacom\HeptaConnect\Core\Mapping\MappingService::merge` to use renamed method of `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
+- Change method name of `\Heptacom\HeptaConnect\Core\Mapping\MappingStruct` in global refactoring effort
+
+## [0.7.0] - 2021-09-25
 
 ### Added
 
@@ -16,33 +38,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add interface `\Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface` to `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`
 - Add interface `\Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface` to `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`
 - Add interface `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface` to `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory`
+- Add method `\Heptacom\HeptaConnect\Core\Exploration\DirectEmitter::batch` for better performance in direct emissions
 
 ### Changed
 
-- `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::get` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::set` will now throw exceptions when normalization couldn't happen
+- `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::get` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::set` will now throw exceptions when normalization could not happen
 - Add parameter for `\Psr\Log\LoggerInterface` dependency in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::__construct` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory::__construct`
 - Change type of parameter `\Heptacom\HeptaConnect\Core\Reception\ReceiveContextFactory` to its new interface `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface` in `\Heptacom\HeptaConnect\Core\Reception\ReceiveService::__construct`
 - Change type of parameter `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` to its new interface `\Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface` in `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor::__construct`
 - Change type of parameter `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to its new interface `\Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface` in `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor::__construct`
 - Change type of parameter `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler` to its new interface `\Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface` in `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor::__construct`
 - Change type of parameter `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory` to its new interface `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface` in `\Heptacom\HeptaConnect\Core\Emission\EmitService::__construct`
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Emission\EmitContext::markAsFailed` in global refactoring effort
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface::createEmitterStackBuilder` in global refactoring effort, respective change in its implementing class `Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilderFactory::createEmitterStackBuilder`
-- Change a parameter name of  `Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::push`, `Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushSource`, `Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushDecorators`)
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Emission\EmitService::getEmitterStack` in global refactoring effort
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface::createExplorerStackBuilder` in global refactoring effort, respective change in its implementing class `Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilderFactory::createExplorerStackBuilder`
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface::performExploration` in global refactoring effort, respective change in its implementing class `Heptacom\HeptaConnect\Core\Exploration\ExplorationActor::performExploration`
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::push`, `Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushSource`, `Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushDecorators`)
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface::createReceiverStackBuilder` in global refactoring effort, respective change in its implementing class `Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilderFactory::createReceiverStackBuilder`
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::__construct` in global refactoring effort and rename the field it is saved to. Change the fieldname in corresponding functions that use the field (`Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::push`, `Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushSource`, `Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushDecorators`)
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Reception\ReceiveService::getReceiverStack` in global refactoring effort
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::get` and `Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in global refactoring effort, respective change in its implementing class for `Heptacom\HeptaConnect\Core\Mapping\MappingService::get` and `Heptacom\HeptaConnect\Core\Mapping\MappingService::getListByExternalIds` and additionally `Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::__construct` in global refactoring effort and change its getter and setter methods to match the change (`Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::getEntityType`, `Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::setEntityType`)
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Mapping\Publisher::publish` in global refactoring effort
-- Change a parameter name of `Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::__construct` in global refactoring effort and change its getter method to match the change (`Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::getForeignEntityType`)
-- Change method call in `Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` to use renamed method of `Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
-- Change method call in  `Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler::triggerEmission`, `Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler::triggerExplorations`, `Heptacom\HeptaConnect\Core\Mapping\MappingService::ensurePersistence`, `Heptacom\HeptaConnect\Core\Mapping\MappingService::reflect`, `Heptacom\HeptaConnect\Core\Mapping\MappingService::merge` to use renamed method of `Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract`
-- Change method name of `Heptacom\HeptaConnect\Core\Mapping\MappingStruct` in global refactoring effort
+- Change behavior of service `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionFlow` to not create mappings anymore
+- Remove parameter `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface` from `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionFlow::__construct`
+- Change method `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor::saveMappings` to use new service `\Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract`
+- `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushSource` and `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder::pushDecorators` don't push explorers onto the stack when they are already in the stack
+- `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushSource` and `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder::pushDecorators` don't push emitters onto the stack when they already in the stack
+- `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushSource` and `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder::pushDecorators` don't push receivers onto the stack when they already in the stack
+
+### Removed
+
+- Remove method `\Heptacom\HeptaConnect\Core\Exploration\DirectEmitter::run` as it became obsolete
 
 ## [0.6.0] - 2021-07-26
 
@@ -62,7 +78,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Removed impact of entity primary keys on lock keys in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception`
+- Remove impact of entity primary keys on lock keys in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception`
 
 ## [0.5.0] - 2021-07-11
 
@@ -80,19 +96,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The acting to jobs in `\Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract::performJob` will now happen in batches in `\Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract::performJobs` and expects different parameters
 - The trigger on emission jobs in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler::triggerEmission` will now happen in batches and expects different parameters
 - The trigger on reception jobs in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` will now happen in batches and expects different parameters
-- Changed signature of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface::performReception` to not rely on previously entities bound to `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface` objects
-- Changed signature of `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext::markAsFailed` to not rely on previously entities bound to `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface` objects
+- Change signature of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface::performReception` to not rely on previously entities bound to `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface` objects
+- Change signature of `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext::markAsFailed` to not rely on previously entities bound to `\Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface` objects
 - Do most of the business logic for reception in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to have job related logic less bound to reception processes in general
 
 ### Deprecated
 
-- Deprecated cronjobs and therefore marked `\Heptacom\HeptaConnect\Core\Cronjob\CronjobContext`, `\Heptacom\HeptaConnect\Core\Cronjob\CronjobContextFactory`, `\Heptacom\HeptaConnect\Core\Cronjob\CronjobService` as internal
-- Deprecated webhooks and therefore marked `\Heptacom\HeptaConnect\Core\Webhook\WebhookContext`, `\Heptacom\HeptaConnect\Core\Webhook\WebhookContextFactory`, `\Heptacom\HeptaConnect\Core\Webhook\WebhookService`, `\Heptacom\HeptaConnect\Core\Webhook\Contact\UrlProviderInterface` as internal
+- Deprecate cronjobs and therefore mark `\Heptacom\HeptaConnect\Core\Cronjob\CronjobContext`, `\Heptacom\HeptaConnect\Core\Cronjob\CronjobContextFactory`, `\Heptacom\HeptaConnect\Core\Cronjob\CronjobService` as internal
+- Deprecate webhooks and therefore mark `\Heptacom\HeptaConnect\Core\Webhook\WebhookContext`, `\Heptacom\HeptaConnect\Core\Webhook\WebhookContextFactory`, `\Heptacom\HeptaConnect\Core\Webhook\WebhookService`, `\Heptacom\HeptaConnect\Core\Webhook\Contact\UrlProviderInterface` as internal
 
 ### Removed
 
-- Moved `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionResult` into the portal base package as `\Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionResult`
-- Moved `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\Exception\UnidentifiedEntityException` into the portal base package as `\Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\Exception\UnidentifiedEntityException`
+- Move `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionResult` into the portal base package as `\Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionResult`
+- Move `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\Exception\UnidentifiedEntityException` into the portal base package as `\Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\Exception\UnidentifiedEntityException`
 - The handling of jobs in `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler::handleJob` does not republish failed jobs anymore. That feature will be added back again in a different form
 - The trigger on emission jobs in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler::triggerEmission` will no longer report back success
 - The trigger on reception jobs in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` will no longer report back success

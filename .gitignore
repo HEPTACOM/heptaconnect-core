@@ -2,3 +2,4 @@
 /composer.lock
 
 /.build
+/test-composer-integration/vendor/*

@@ -4,18 +4,19 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
+use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
@@ -23,18 +24,18 @@ class ReceptionActor implements ReceptionActorInterface
 {
     private LoggerInterface $logger;
 
-    private MappingServiceInterface $mappingService;
-
     private DeepObjectIteratorContract $deepObjectIterator;
+
+    private MappingPersisterContract $mappingPersister;
 
     public function __construct(
         LoggerInterface $logger,
-        MappingServiceInterface $mappingService,
-        DeepObjectIteratorContract $deepObjectIterator
+        DeepObjectIteratorContract $deepObjectIterator,
+        MappingPersisterContract $mappingPersister
     ) {
         $this->logger = $logger;
-        $this->mappingService = $mappingService;
         $this->deepObjectIterator = $deepObjectIterator;
+        $this->mappingPersister = $mappingPersister;
     }
 
     public function performReception(
@@ -57,9 +58,8 @@ class ReceptionActor implements ReceptionActorInterface
         }
 
         try {
-            foreach ($stack->next($entities, $context) as $receivedEntity) {
-                $this->saveMappings($context->getPortalNodeKey(), [$receivedEntity]);
-            }
+            \iterable_to_array($stack->next($entities, $context));
+            $this->saveMappings($context->getPortalNodeKey(), $entities);
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
                 'type' => $entities->getType(),
@@ -87,87 +87,45 @@ class ReceptionActor implements ReceptionActorInterface
         }
     }
 
-    /**
-     * @param DatasetEntityContract[] $receivedEntityData
-     */
-    private function saveMappings(PortalNodeKeyInterface $targetPortalNodeKey, array $receivedEntityData): void
+    private function saveMappings(PortalNodeKeyInterface $targetPortalNodeKey, DatasetEntityCollection $entities): void
     {
-        $exceptions = [];
-        $originalReflectionMappingsByType = [];
-        $keyChangesByType = [];
+        $payload = new MappingPersistPayload($targetPortalNodeKey);
 
-        foreach ($this->deepObjectIterator->iterate($receivedEntityData) as $receivedEntity) {
-            if (!$receivedEntity instanceof DatasetEntityContract) {
+        foreach ($this->deepObjectIterator->iterate($entities) as $entity) {
+            if (!$entity instanceof DatasetEntityContract) {
+                // no entity
                 continue;
             }
 
-            if ($receivedEntity->getPrimaryKey() === null) {
+            $primaryKeyChanges = $entity->getAttachment(PrimaryKeyChangesAttachable::class);
+
+            if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable
+                || $primaryKeyChanges->getFirstForeignKey() === $primaryKeyChanges->getForeignKey()) {
+                // no change
                 continue;
             }
 
-            $receivedEntityType = \get_class($receivedEntity);
-            $primaryKeyChanges = $receivedEntity->getAttachment(PrimaryKeyChangesAttachable::class);
+            $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
 
-            if ($primaryKeyChanges instanceof PrimaryKeyChangesAttachable
-                && !\is_null($primaryKeyChanges->getFirstForeignKey())
-                && !\is_null($primaryKeyChanges->getForeignKey())
-                && $primaryKeyChanges->getFirstForeignKey() !== $primaryKeyChanges->getForeignKey()) {
-                $keyChangesByType[$receivedEntityType][$primaryKeyChanges->getFirstForeignKey()] = $primaryKeyChanges->getForeignKey();
-            }
-
-            $original = $receivedEntity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-            if (!$original instanceof PrimaryKeySharingMappingStruct || $original->getExternalId() === null) {
+            if (!$mapping instanceof PrimaryKeySharingMappingStruct) {
+                // no mapping
                 continue;
             }
 
-            $originalReflectionMappingsByType[$receivedEntityType][$receivedEntity->getPrimaryKey()] = $original;
-        }
+            if ($mapping->getExternalId() === null) {
+                // unmappable
+                continue;
+            }
 
-        // TODO log these uncommon cases
-        foreach ($keyChangesByType as $entityType => $keyChanges) {
-            $oldMatchesIterable = $this->mappingService->getListByExternalIds(
-                $entityType,
-                $targetPortalNodeKey,
-                \array_keys($keyChanges)
-            );
-
-            foreach ($oldMatchesIterable as $oldKey => $mapping) {
-                $mapping->setExternalId($keyChanges[$oldKey]);
-                $this->mappingService->save($mapping);
+            if ($primaryKeyChanges->getFirstForeignKey() === null) {
+                $payload->create($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
+            } elseif ($primaryKeyChanges->getForeignKey() === null) {
+                $payload->delete($mapping->getMappingNodeKey());
+            } else {
+                $payload->update($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
             }
         }
 
-        // FIXME: something in this loop is terribly slow
-        /** @var MappingInterface[] $originalReflectionMappings */
-        foreach ($originalReflectionMappingsByType as $entityType => $originalReflectionMappings) {
-            $externalIds = \array_map('strval', \array_keys($originalReflectionMappings));
-            $receivedMappingsIterable = $this->mappingService->getListByExternalIds(
-                $entityType,
-                $targetPortalNodeKey,
-                $externalIds
-            );
-
-            foreach ($receivedMappingsIterable as $externalId => $receivedMapping) {
-                $original = $originalReflectionMappings[$externalId];
-
-                if ($receivedMapping->getMappingNodeKey()->equals($original->getMappingNodeKey())) {
-                    continue;
-                }
-
-                try {
-                    $this->mappingService->merge(
-                        $receivedMapping->getMappingNodeKey(),
-                        $original->getMappingNodeKey()
-                    );
-                } catch (\Throwable $exception) {
-                    $exceptions[] = $exception;
-                }
-            }
-        }
-
-        if ($exceptions) {
-            throw new CumulativeMappingException('Errors occured while merging mapping nodes.', ...$exceptions);
-        }
+        $this->mappingPersister->persist($payload);
     }
 }

@@ -50,7 +50,7 @@
         },
         {
             "name": "heptacom-fixture/heptaconnect-portal-a",
-            "version": "dev-feature/CONNECT-124",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "portal-package",
@@ -84,7 +84,7 @@
         },
         {
             "name": "heptacom-fixture/heptaconnect-portal-extension-a",
-            "version": "dev-feature/CONNECT-124",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "portal-package-extension",

@@ -78,7 +78,9 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
                 \get_class($lastExplorer)
             ));
 
-            $this->explorers[] = $lastExplorer;
+            if (!\in_array($lastExplorer, $this->explorers, true)) {
+                $this->explorers[] = $lastExplorer;
+            }
         }
 
         return $this;
@@ -92,7 +94,9 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
                 \get_class($explorer)
             ));
 
-            $this->explorers[] = $explorer;
+            if (!\in_array($explorer, $this->explorers, true)) {
+                $this->explorers[] = $explorer;
+            }
         }
 
         return $this;
