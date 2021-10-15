@@ -6,7 +6,6 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\Test\Fixture\Portal;
 use Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Cache\CacheItemPoolInterface;
@@ -26,8 +25,8 @@ class ConfigurationService implements ConfigurationServiceInterface
         PortalRegistryInterface $portalRegistry,
         ConfigurationStorageContract $storage,
         CacheItemPoolInterface $cache,
-        StorageKeyGeneratorContract $keyGenerator)
-    {
+        StorageKeyGeneratorContract $keyGenerator
+    ) {
         $this->portalRegistry = $portalRegistry;
         $this->storage = $storage;
         $this->cache = $cache;
@@ -37,24 +36,28 @@ class ConfigurationService implements ConfigurationServiceInterface
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
+
         if (!$cachedConfig->isHit()) {
             $config = null;
             $template = $this->getMergedConfigurationTemplate($portalNodeKey);
+
             if (!\is_null($template)) {
                 $config = $template->resolve($this->storage->getConfiguration($portalNodeKey));
             }
+
             $this->cache->save($cachedConfig->set($config));
         } else {
             $config = $cachedConfig->get();
         }
+
         return $config;
     }
 
     public function setPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
-        #Invalidate cached configuration
         $cachedConfigKey = $this->getConfigCacheKey($portalNodeKey);
         $cachedConfig = $this->cache->getItem($cachedConfigKey);
+
         if ($cachedConfig->isHit()) {
             $this->cache->deleteItem($cachedConfigKey);
         }
@@ -116,10 +119,8 @@ class ConfigurationService implements ConfigurationServiceInterface
     private function getConfigCacheKey(PortalNodeKeyInterface $portalNodeKey): string
     {
         $key = $this->keyGenerator->serialize($portalNodeKey);
-        $psr6Reserved = array('{', '}', '(', ')', '/', '\\', '@', ':');
-        foreach ($psr6Reserved as $char) {
-            $key = str_replace($char, '', $key);
-        }
-        return "config.cache.".$key;
+        $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
+
+        return 'config.cache.'.$key;
     }
 }
