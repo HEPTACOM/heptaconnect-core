@@ -100,13 +100,13 @@ class ReceiveService implements ReceiveServiceInterface
         }
     }
 
-    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): ?ReceiverStackInterface
+    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]);
+        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
-                ->createReceiverStackBuilder($portalNodeKey, $entityClassName)
+                ->createReceiverStackBuilder($portalNodeKey, $entityType)
                 ->pushSource()
                 // TODO break when source is already empty
                 ->pushDecorators();

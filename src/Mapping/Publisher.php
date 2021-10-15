@@ -21,13 +21,13 @@ class Publisher implements PublisherInterface
     }
 
     public function publish(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeId,
         string $externalId
     ): void {
         $this->jobDispatcher->dispatch(new JobCollection([
             new Emission(new MappingComponentStruct(
-                $portalNodeId, $datasetEntityClassName, $externalId
+                $portalNodeId, $entityType, $externalId
             )),
         ]));
     }

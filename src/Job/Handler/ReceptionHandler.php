@@ -85,7 +85,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
             $route = $this->routeRepository->read($routeKey);
 
-            if ($route->getEntityClassName() !== \get_class($entity)) {
+            if ($route->getEntityType() !== \get_class($entity)) {
                 // TODO error
                 continue;
             }
@@ -100,7 +100,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
             $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
 
-            $receptions[$route->getEntityClassName()][$targetPortal][$sourcePortal][$externalId] = [
+            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
                 'mapping' => $job->getMappingComponent(),
                 'entity' => $entity,
             ];

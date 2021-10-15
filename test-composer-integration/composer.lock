@@ -122,10 +122,10 @@
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-dataset-base",
-                "reference": "9f270ccf03098dd3ec5084f88686e193ee1166cd"
+                "reference": "4c28cde08f1fdbc6283db2600c190af5be14d481"
             },
             "require": {
-                "bentools/iterable-functions": ">=1",
+                "bentools/iterable-functions": ">=1 <2",
                 "ext-json": "*",
                 "opis/closure": "^3.6",
                 "php": ">=7.4"
@@ -193,7 +193,7 @@
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-portal-base",
-                "reference": "6b827cc5108b4fc0d61507f51276a6aceb210737"
+                "reference": "74135dbf169fce24ea993d110d45f673274464df"
             },
             "require": {
                 "bentools/iterable-functions": ">=1.4 <2",
@@ -680,12 +680,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/simple-cache.git",
-                "reference": "5a7b96b1dda5d957e01bc1bfe77dcca09c5a7474"
+                "reference": "66e27efc65ddef47d3008c243a235ab9359b5754"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/5a7b96b1dda5d957e01bc1bfe77dcca09c5a7474",
-                "reference": "5a7b96b1dda5d957e01bc1bfe77dcca09c5a7474",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/66e27efc65ddef47d3008c243a235ab9359b5754",
+                "reference": "66e27efc65ddef47d3008c243a235ab9359b5754",
                 "shasum": ""
             },
             "require": {
@@ -710,7 +710,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interfaces for simple caching",
@@ -724,11 +724,11 @@
             "support": {
                 "source": "https://github.com/php-fig/simple-cache/tree/master"
             },
-            "time": "2020-04-21T06:43:17+00:00"
+            "time": "2021-10-06T11:02:22+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
-            "version": "dev-main",
+            "version": "2.5.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/deprecation-contracts.git",
@@ -743,7 +743,6 @@
             "require": {
                 "php": ">=7.1"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -1113,12 +1112,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "0dac3fd03aa68d0d46f44f6f98efe7505cc8278a"
+                "reference": "8052a3999221b21d7a9de5a8cb221543a7bc0c7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/0dac3fd03aa68d0d46f44f6f98efe7505cc8278a",
-                "reference": "0dac3fd03aa68d0d46f44f6f98efe7505cc8278a",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/8052a3999221b21d7a9de5a8cb221543a7bc0c7d",
+                "reference": "8052a3999221b21d7a9de5a8cb221543a7bc0c7d",
                 "shasum": ""
             },
             "require": {
@@ -1207,7 +1206,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-21T13:32:14+00:00"
+            "time": "2021-10-06T07:48:19+00:00"
         }
     ],
     "packages-dev": [],

@@ -9,25 +9,25 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface;
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
     /**
-     * @psalm-var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
+     * @psalm-var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
-    private string $datasetEntityClassName;
+    private string $entityType;
 
     private array $foreignKeys = [];
 
     private ?string $foreignKey = null;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
-    public function __construct(string $datasetEntityClassName)
+    public function __construct(string $entityType)
     {
-        $this->datasetEntityClassName = $datasetEntityClassName;
+        $this->entityType = $entityType;
     }
 
-    public function getForeignDatasetEntityClassName(): string
+    public function getForeignEntityType(): string
     {
-        return $this->datasetEntityClassName;
+        return $this->entityType;
     }
 
     public function getForeignKeys(): array

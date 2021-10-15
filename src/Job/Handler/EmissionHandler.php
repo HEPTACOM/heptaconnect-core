@@ -24,7 +24,7 @@ class EmissionHandler implements EmissionHandlerInterface
 
         /** @var JobData $job */
         foreach ($jobs as $job) {
-            $emissions[$job->getMappingComponent()->getDatasetEntityClassName()][] = $job->getMappingComponent();
+            $emissions[$job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
         }
 
         foreach ($emissions as $dataType => $emission) {

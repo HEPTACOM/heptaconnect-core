@@ -18,20 +18,20 @@ interface MappingServiceInterface
     ): void;
 
     public function get(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): MappingInterface;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $datasetEntityClassName
+     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      *
      * @return MappingInterface[]
      *
      * @psalm-return iterable<string, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface>
      */
     public function getListByExternalIds(
-        string $datasetEntityClassName,
+        string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
         array $externalIds
     ): iterable;
