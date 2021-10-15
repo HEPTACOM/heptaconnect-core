@@ -24,7 +24,7 @@ class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
 
     public function createEmitterStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        string $entityType
     ): EmitterStackBuilderInterface {
         $container = $this->portalContainerFactory->create($portalNodeKey);
         /** @var EmitterCollection $sources */
@@ -32,6 +32,6 @@ class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
         /** @var EmitterCollection $decorators */
         $decorators = $container->get(EmitterCollection::class.'.decorator');
 
-        return new EmitterStackBuilder($sources, $decorators, $entityClassName, $this->logger);
+        return new EmitterStackBuilder($sources, $decorators, $entityType, $this->logger);
     }
 }

@@ -49,18 +49,15 @@ class DirectEmitter extends EmitterContract
         return $this->entities;
     }
 
-    protected function run(string $externalId, EmitContextInterface $context): ?DatasetEntityContract
+    protected function batch(iterable $externalIds, EmitContextInterface $context): iterable
     {
-        $matches = $this->entities->filter(
-            fn (DatasetEntityContract $entity): bool => $entity->getPrimaryKey() === $externalId &&
-                \is_a($entity, $this->supports())
+        $externalIds = \iterable_to_array($externalIds);
+        $type = $this->supports();
+
+        yield from $this->entities->filter(
+            static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey()) &&
+                \in_array($entity->getPrimaryKey(), $externalIds, true) &&
+                \is_a($entity, $type)
         );
-
-        /** @var DatasetEntityContract $match */
-        foreach ($matches as $match) {
-            return $match;
-        }
-
-        return null;
     }
 }

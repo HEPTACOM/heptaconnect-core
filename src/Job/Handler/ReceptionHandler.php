@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
+use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
@@ -19,12 +20,13 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Symfony\Component\Lock\LockFactory;
 
-class ReceptionHandler
+class ReceptionHandler implements ReceptionHandlerInterface
 {
     private RouteRepositoryContract $routeRepository;
 
@@ -42,6 +44,8 @@ class ReceptionHandler
 
     private DeepObjectIteratorContract $objectIterator;
 
+    private JobRepositoryContract $jobRepository;
+
     public function __construct(
         RouteRepositoryContract $routeRepository,
         LockFactory $lockFactory,
@@ -50,7 +54,8 @@ class ReceptionHandler
         EntityMapperContract $entityMapper,
         MappingNodeRepositoryContract $mappingNodeRepository,
         ReceiveServiceInterface $receiveService,
-        DeepObjectIteratorContract $objectIterator
+        DeepObjectIteratorContract $objectIterator,
+        JobRepositoryContract $jobRepository
     ) {
         $this->routeRepository = $routeRepository;
         $this->lockFactory = $lockFactory;
@@ -60,6 +65,7 @@ class ReceptionHandler
         $this->mappingNodeRepository = $mappingNodeRepository;
         $this->receiveService = $receiveService;
         $this->objectIterator = $objectIterator;
+        $this->jobRepository = $jobRepository;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
@@ -84,7 +90,7 @@ class ReceptionHandler
 
             $route = $this->routeRepository->read($routeKey);
 
-            if ($route->getEntityClassName() !== \get_class($entity)) {
+            if ($route->getEntityType() !== \get_class($entity)) {
                 // TODO error
                 continue;
             }
@@ -99,9 +105,10 @@ class ReceptionHandler
             $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
             $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
 
-            $receptions[$route->getEntityClassName()][$targetPortal][$sourcePortal][$externalId] = [
+            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
                 'mapping' => $job->getMappingComponent(),
                 'entity' => $entity,
+                'jobKey' => $job->getJobKey(),
             ];
         }
 
@@ -158,11 +165,11 @@ class ReceptionHandler
                             static fn (MappingComponentStructContract $m): ?string => $m->getExternalId(),
                             \array_column($entities, 'mapping')
                         );
-                        $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
+                        $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
                             $dataType,
                             $sourcePortalNodeKey,
                             $externalIds,
-                        );
+                        ));
 
                         $mappedDatasetEntities = new TypedMappedDatasetEntityCollection($dataType);
 
@@ -176,7 +183,19 @@ class ReceptionHandler
                             $mappedDatasetEntities->push([new MappedDatasetEntityStruct($targetMapping, $entities[$externalId]['entity'])]);
                         }
 
+                        $now = new \DateTimeImmutable();
+
+                        foreach (\array_keys($mappingNodeKeys) as $externalId) {
+                            $this->jobRepository->start($entities[$externalId]['jobKey'], $now);
+                        }
+
                         $this->receiveService->receive($mappedDatasetEntities);
+
+                        $now = new \DateTimeImmutable();
+
+                        foreach (\array_keys($mappingNodeKeys) as $externalId) {
+                            $this->jobRepository->finish($entities[$externalId]['jobKey'], $now);
+                        }
                     }
                 }
             }

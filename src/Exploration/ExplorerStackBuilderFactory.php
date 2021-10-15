@@ -24,7 +24,7 @@ class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterfac
 
     public function createExplorerStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        string $entityType
     ): ExplorerStackBuilderInterface {
         $container = $this->portalContainerFactory->create($portalNodeKey);
         /** @var ExplorerCollection $sources */
@@ -32,6 +32,6 @@ class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterfac
         /** @var ExplorerCollection $decorators */
         $decorators = $container->get(ExplorerCollection::class.'.decorator');
 
-        return new ExplorerStackBuilder($sources, $decorators, $entityClassName, $this->logger);
+        return new ExplorerStackBuilder($sources, $decorators, $entityType, $this->logger);
     }
 }

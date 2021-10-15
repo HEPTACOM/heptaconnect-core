@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
@@ -19,7 +20,7 @@ use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
 {
-    private ReceiveContextFactory $receiveContextFactory;
+    private ReceiveContextFactoryInterface $receiveContextFactory;
 
     private LoggerInterface $logger;
 
@@ -40,7 +41,7 @@ class ReceiveService implements ReceiveServiceInterface
     private ReceptionActorInterface $receptionActor;
 
     public function __construct(
-        ReceiveContextFactory $receiveContextFactory,
+        ReceiveContextFactoryInterface $receiveContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
@@ -99,13 +100,13 @@ class ReceiveService implements ReceiveServiceInterface
         }
     }
 
-    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): ?ReceiverStackInterface
+    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]);
+        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
-                ->createReceiverStackBuilder($portalNodeKey, $entityClassName)
+                ->createReceiverStackBuilder($portalNodeKey, $entityType)
                 ->pushSource()
                 // TODO break when source is already empty
                 ->pushDecorators();

@@ -37,10 +37,10 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
         return $this->directEmission;
     }
 
-    public function markAsFailed(string $externalId, string $datasetEntityClassName, \Throwable $throwable): void
+    public function markAsFailed(string $externalId, string $entityType, \Throwable $throwable): void
     {
         $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-            $datasetEntityClassName,
+            $entityType,
             $this->getPortalNodeKey(),
             [$externalId]
         );

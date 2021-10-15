@@ -6,11 +6,12 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 
-class ReceiveContextFactory
+class ReceiveContextFactory implements ReceiveContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 
