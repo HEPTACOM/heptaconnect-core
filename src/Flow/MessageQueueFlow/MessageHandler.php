@@ -55,15 +55,7 @@ class MessageHandler implements MessageSubscriberInterface
         }
 
         foreach ($jobs as $type => $jobData) {
-            foreach ($jobData as $job) {
-                $this->jobRepository->start($job->getJobKey(), null);
-            }
-
             $this->jobActor->performJobs($type, $jobData);
-
-            foreach ($jobData as $job) {
-                $this->jobRepository->finish($job->getJobKey(), null);
-            }
         }
     }
 }
