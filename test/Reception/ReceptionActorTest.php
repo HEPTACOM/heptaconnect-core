@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Test\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Reception\ReceptionActor;
@@ -14,6 +13,7 @@ use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -47,8 +47,8 @@ class ReceptionActorTest extends TestCase
 
         $receptionActor = new ReceptionActor(
             $logger,
-            $this->createMock(MappingServiceInterface::class),
             new DeepObjectIteratorContract(),
+            $this->createMock(MappingPersisterContract::class),
         );
         $receptionActor->performReception(
             new TypedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $entity)),

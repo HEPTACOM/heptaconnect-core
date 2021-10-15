@@ -4,7 +4,7 @@
 ## Description
 
 This is the HEPTAconnect core package. Here are all processes and entrypoints combined.
-Read more under [Overview](../heptaconnect-docs).
+Read more in the [documentation](https://heptaconnect.io/).
 
 
 ## System requirements

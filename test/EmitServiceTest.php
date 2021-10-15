@@ -31,7 +31,7 @@ class EmitServiceTest extends TestCase
     {
         $mapping = $this->createMock(MappingComponentStructContract::class);
         $mapping->expects(static::exactly($count))
-            ->method('getDatasetEntityClassName')
+            ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
 
         $stack = new EmitterStack([], FooBarEntity::class);
@@ -70,7 +70,7 @@ class EmitServiceTest extends TestCase
 
         $mapping = $this->createMock(MappingComponentStructContract::class);
         $mapping->expects(static::atLeast($count))
-            ->method('getDatasetEntityClassName')
+            ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
 
         $stack = new EmitterStack([], FooBarEntity::class);

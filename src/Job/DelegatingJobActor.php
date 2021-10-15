@@ -4,25 +4,25 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract;
-use Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler;
-use Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler;
-use Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler;
+use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 
 class DelegatingJobActor extends DelegatingJobActorContract
 {
-    private EmissionHandler $emissionHandler;
+    private EmissionHandlerInterface $emissionHandler;
 
-    private ReceptionHandler $receptionHandler;
+    private ReceptionHandlerInterface $receptionHandler;
 
-    private ExplorationHandler $explorationHandler;
+    private ExplorationHandlerInterface $explorationHandler;
 
     public function __construct(
-        EmissionHandler $emissionHandler,
-        ReceptionHandler $receptionHandler,
-        ExplorationHandler $explorationHandler
+        EmissionHandlerInterface $emissionHandler,
+        ReceptionHandlerInterface $receptionHandler,
+        ExplorationHandlerInterface $explorationHandler
     ) {
         $this->emissionHandler = $emissionHandler;
         $this->receptionHandler = $receptionHandler;

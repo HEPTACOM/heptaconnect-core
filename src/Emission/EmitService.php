@@ -5,6 +5,7 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
@@ -18,7 +19,7 @@ use Psr\Log\LoggerInterface;
 
 class EmitService implements EmitServiceInterface
 {
-    private EmitContextFactory $emitContextFactory;
+    private EmitContextFactoryInterface $emitContextFactory;
 
     private LoggerInterface $logger;
 
@@ -39,7 +40,7 @@ class EmitService implements EmitServiceInterface
     private EmissionActorInterface $emissionActor;
 
     public function __construct(
-        EmitContextFactory $emitContextFactory,
+        EmitContextFactoryInterface $emitContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
@@ -55,7 +56,7 @@ class EmitService implements EmitServiceInterface
     public function emit(TypedMappingComponentCollection $mappingComponents): void
     {
         $emittingPortalNodes = [];
-        $entityClassName = $mappingComponents->getType();
+        $entityType = $mappingComponents->getType();
 
         /** @var MappingComponentStructContract $mapping */
         foreach ($mappingComponents as $mapping) {
@@ -67,11 +68,11 @@ class EmitService implements EmitServiceInterface
             }
 
             $emittingPortalNodes[] = $portalNodeKey;
-            $stack = $this->getEmitterStack($portalNodeKey, $entityClassName);
+            $stack = $this->getEmitterStack($portalNodeKey, $entityType);
 
             if (!$stack instanceof EmitterStackInterface) {
                 $this->logger->critical(LogMessage::EMIT_NO_EMITTER_FOR_TYPE(), [
-                    'type' => $entityClassName,
+                    'type' => $entityType,
                     'portalNodeKey' => $portalNodeKey,
                 ]);
 
@@ -89,13 +90,13 @@ class EmitService implements EmitServiceInterface
         }
     }
 
-    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityClassName): ?EmitterStackInterface
+    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?EmitterStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityClassName]);
+        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->emissionStackCache)) {
             $builder = $this->emitterStackBuilderFactory
-                ->createEmitterStackBuilder($portalNodeKey, $entityClassName)
+                ->createEmitterStackBuilder($portalNodeKey, $entityType)
                 ->pushSource()
                 // TODO break when source is already empty
                 ->pushDecorators();

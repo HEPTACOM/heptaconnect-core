@@ -5,8 +5,8 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
-use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
@@ -34,7 +34,7 @@ class ExplorationActor implements ExplorationActorInterface
 
     private EmissionActorInterface $emissionActor;
 
-    private EmitContextFactory $emitContextFactory;
+    private EmitContextFactoryInterface $emitContextFactory;
 
     private PublisherInterface $publisher;
 
@@ -46,7 +46,7 @@ class ExplorationActor implements ExplorationActorInterface
         LoggerInterface $logger,
         MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor,
-        EmitContextFactory $emitContextFactory,
+        EmitContextFactoryInterface $emitContextFactory,
         PublisherInterface $publisher,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator
@@ -61,13 +61,13 @@ class ExplorationActor implements ExplorationActorInterface
     }
 
     public function performExploration(
-        string $entityClassName,
+        string $entityType,
         ExplorerStackInterface $stack,
         ExploreContextInterface $context
     ): void {
-        $directEmitter = new DirectEmitter($entityClassName);
+        $directEmitter = new DirectEmitter($entityType);
         $emissionStack = $this->emitterStackBuilderFactory
-            ->createEmitterStackBuilder($context->getPortalNodeKey(), $entityClassName)
+            ->createEmitterStackBuilder($context->getPortalNodeKey(), $entityType)
             ->push($directEmitter)
             ->pushDecorators()
             ->build();
@@ -88,7 +88,7 @@ class ExplorationActor implements ExplorationActorInterface
                     $this->logger->debug(\sprintf(
                         'ExplorationActor: Entity was explored and direct emission is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
                         $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
-                        $entityClassName,
+                        $entityType,
                         $primaryKey
                     ));
 
@@ -97,7 +97,7 @@ class ExplorationActor implements ExplorationActorInterface
                             $emissionStack,
                             $emitContext,
                             $context->getPortalNodeKey(),
-                            $entityClassName,
+                            $entityType,
                             $emissionPks
                         );
 
@@ -110,14 +110,14 @@ class ExplorationActor implements ExplorationActorInterface
                     $this->logger->debug(\sprintf(
                         'ExplorationActor: Entity was explored and publication is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
                         $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
-                        $entityClassName,
+                        $entityType,
                         (string) $entity
                     ));
 
                     if (\count($publicationPks) >= self::CHUNK_SIZE_PUBLICATION) {
                         $this->flushPublications(
                             $context->getPortalNodeKey(),
-                            $entityClassName,
+                            $entityType,
                             $publicationPks
                         );
 
@@ -127,13 +127,13 @@ class ExplorationActor implements ExplorationActorInterface
                     if ($entity instanceof DatasetEntityContract && $entity->getPrimaryKey() === null) {
                         $this->logger->warning(\sprintf(
                             'ExplorationActor: Entity with empty primary key was explored. Type: %s; PortalNode: %s',
-                            $entityClassName,
+                            $entityType,
                             $this->storageKeyGenerator->serialize($context->getPortalNodeKey())
                         ));
                     } else {
                         $this->logger->warning(\sprintf(
                             'ExplorationActor: Empty or invalid primary key was explored. Type: %s; PortalNode: %s',
-                            $entityClassName,
+                            $entityType,
                             $this->storageKeyGenerator->serialize($context->getPortalNodeKey())
                         ));
                     }
@@ -141,7 +141,7 @@ class ExplorationActor implements ExplorationActorInterface
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EXPLORE_NO_THROW(), [
-                'type' => $entityClassName,
+                'type' => $entityType,
                 'stack' => $stack,
                 'exception' => $exception,
             ]);
@@ -151,7 +151,7 @@ class ExplorationActor implements ExplorationActorInterface
                     $emissionStack,
                     $emitContext,
                     $context->getPortalNodeKey(),
-                    $entityClassName,
+                    $entityType,
                     $emissionPks
                 );
             }
@@ -159,7 +159,7 @@ class ExplorationActor implements ExplorationActorInterface
             if ($publicationPks !== []) {
                 $this->flushPublications(
                     $context->getPortalNodeKey(),
-                    $entityClassName,
+                    $entityType,
                     $publicationPks
                 );
             }
@@ -170,35 +170,35 @@ class ExplorationActor implements ExplorationActorInterface
         EmitterStackInterface $emissionStack,
         EmitContextInterface $emitContext,
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName,
+        string $entityType,
         array $primaryKeys
     ): void {
         $this->logger->debug(\sprintf(
             'ExplorationActor: Flush a batch of direct emissions. PortalNode: %s; Type: %s, PrimaryKeys: %s',
             $this->storageKeyGenerator->serialize($portalNodeKey),
-            $entityClassName,
+            $entityType,
             \implode(',', $primaryKeys)
         ));
 
-        \iterable_filter($this->mappingService->getListByExternalIds($entityClassName, $portalNodeKey, $primaryKeys));
+        \iterable_filter($this->mappingService->getListByExternalIds($entityType, $portalNodeKey, $primaryKeys));
         $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
     }
 
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName,
+        string $entityType,
         array $externalIds
     ): void {
         $this->logger->debug(\sprintf(
             'ExplorationActor: Flush a batch of publications. PortalNode: %s; Type: %s, PrimaryKeys: %s',
             $this->storageKeyGenerator->serialize($portalNodeKey),
-            $entityClassName,
+            $entityType,
             \implode(',', $externalIds)
         ));
 
         $this->publisher->publishBatch(new MappingComponentCollection($this->iterableValues(\iterable_map(
-            $this->mappingService->getListByExternalIds($entityClassName, $portalNodeKey, $externalIds),
-            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityClassName, $mapping->getExternalId())
+            $this->mappingService->getListByExternalIds($entityType, $portalNodeKey, $externalIds),
+            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityType, $mapping->getExternalId())
         ))));
     }
 

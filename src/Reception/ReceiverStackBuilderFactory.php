@@ -24,7 +24,7 @@ class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterfac
 
     public function createReceiverStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityClassName
+        string $entityType
     ): ReceiverStackBuilderInterface {
         $container = $this->portalContainerFactory->create($portalNodeKey);
         /** @var ReceiverCollection $receivers */
@@ -33,6 +33,6 @@ class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterfac
         $receiverDecorators = $container->get(ReceiverCollection::class.'.decorator');
         $receivers->push($receiverDecorators);
 
-        return new ReceiverStackBuilder($receivers, $receiverDecorators, $entityClassName, $this->logger);
+        return new ReceiverStackBuilder($receivers, $receiverDecorators, $entityType, $this->logger);
     }
 }
