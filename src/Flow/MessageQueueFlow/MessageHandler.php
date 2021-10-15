@@ -51,13 +51,11 @@ class MessageHandler implements MessageSubscriberInterface
             }
 
             $jobs[$job->getJobType()] ??= new JobDataCollection();
-            $jobs[$job->getJobType()]->push([new JobData($job->getMapping(), $payload)]);
+            $jobs[$job->getJobType()]->push([new JobData($job->getMapping(), $payload, $jobKey)]);
         }
 
         foreach ($jobs as $type => $jobData) {
-            // TODO mark as tried to execute
             $this->jobActor->performJobs($type, $jobData);
-            // TODO mark as executed
         }
     }
 }
