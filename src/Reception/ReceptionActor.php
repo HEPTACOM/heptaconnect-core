@@ -5,23 +5,17 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
-use Heptacom\HeptaConnect\Core\Reception\PostProcessing\NullPostProcessorData;
 use Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsData;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
-use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
-use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
 class ReceptionActor implements ReceptionActorInterface
@@ -92,47 +86,5 @@ class ReceptionActor implements ReceptionActorInterface
         } finally {
             $context->getEventDispatcher()->dispatch(new PostReceptionEvent($context));
         }
-    }
-    /** @deprecated */
-    private function saveMappings(PortalNodeKeyInterface $targetPortalNodeKey, DatasetEntityCollection $entities): void
-    {
-        $payload = new MappingPersistPayload($targetPortalNodeKey);
-
-        foreach ($this->deepObjectIterator->iterate($entities) as $entity) {
-            if (!$entity instanceof DatasetEntityContract) {
-                // no entity
-                continue;
-            }
-
-            $primaryKeyChanges = $entity->getAttachment(PrimaryKeyChangesAttachable::class);
-
-            if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable
-                || $primaryKeyChanges->getFirstForeignKey() === $primaryKeyChanges->getForeignKey()) {
-                // no change
-                continue;
-            }
-
-            $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-            if (!$mapping instanceof PrimaryKeySharingMappingStruct) {
-                // no mapping
-                continue;
-            }
-
-            if ($mapping->getExternalId() === null) {
-                // unmappable
-                continue;
-            }
-
-            if ($primaryKeyChanges->getFirstForeignKey() === null) {
-                $payload->create($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
-            } elseif ($primaryKeyChanges->getForeignKey() === null) {
-                $payload->delete($mapping->getMappingNodeKey());
-            } else {
-                $payload->update($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
-            }
-        }
-
-        $this->mappingPersister->persist($payload);
     }
 }
