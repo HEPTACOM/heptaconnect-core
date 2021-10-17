@@ -8,8 +8,8 @@ use Heptacom\HeptaConnect\Core\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
@@ -29,6 +29,7 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
         $this->entityStatus = $entityStatus;
         $this->postProcessingBag = new PostProcessorDataBag();
         $this->eventDispatcher = new EventDispatcher();
+
         foreach ($postProcessors as $postProcessor) {
             $this->eventDispatcher->addSubscriber($postProcessor);
         }
