@@ -85,6 +85,13 @@ class ReceptionActor implements ReceptionActorInterface
             }
         } finally {
             $context->getEventDispatcher()->dispatch(new PostReceptionEvent($context));
+
+            /** @var SaveMappingsData $saveMapping */
+            foreach ($context->getPostProcessingBag()->of(SaveMappingsData::class) as $saveMapping) {
+                $this->logger->emergency(LogMessage::RECEIVE_NO_SAVE_MAPPINGS_NOT_PROCESSED(), [
+                    'entity' => $saveMapping->getEntity(),
+                ]);
+            }
         }
     }
 }

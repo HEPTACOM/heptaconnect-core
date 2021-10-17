@@ -10,6 +10,7 @@ namespace Heptacom\HeptaConnect\Core\Component;
  * @method static string EXPLORE_NO_EXPLORER_FOR_TYPE()
  * @method static string RECEIVE_NO_THROW()
  * @method static string RECEIVE_NO_RECEIVER_FOR_TYPE()
+ * @method static string RECEIVE_NO_SAVE_MAPPINGS_NOT_PROCESSED()
  * @method static string STATUS_REPORT_NO_THROW()
  * @method static string STATUS_REPORT_NO_STATUS_REPORTER_FOR_TYPE()
  * @method static string PORTAL_LOAD_ERROR()

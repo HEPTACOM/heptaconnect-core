@@ -28,12 +28,14 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 
     public function handle(PostReceptionEvent $event): void
     {
-        $entities = \iterable_map(
-            $event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class),
-            static fn (SaveMappingsData $data) => $data->getEntity()
-        );
+        $saveMappingsData = \iterable_to_array($event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class));
+        $entities = \array_map(static fn (SaveMappingsData $data): DatasetEntityContract => $data->getEntity(), $saveMappingsData);
 
         $this->saveMappings($event->getContext()->getPortalNodeKey(), \iterable_to_array($entities));
+
+        foreach ($saveMappingsData as $saveMappingData) {
+            $event->getContext()->getPostProcessingBag()->remove($saveMappingData);
+        }
     }
 
     /**
