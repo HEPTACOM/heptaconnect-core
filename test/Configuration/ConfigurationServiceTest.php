@@ -10,7 +10,9 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -32,7 +34,7 @@ class ConfigurationServiceTest extends TestCase
         $registry->method('getPortalExtensions')->willReturn(new PortalExtensionCollection());
         $storage = $this->createMock(ConfigurationStorageContract::class);
         $storage->method('getConfiguration')->willReturn([]);
-        $configService = new ConfigurationService($registry, $storage);
+        $configService = new ConfigurationService($registry, $storage, new NullAdapter(), $this->createMock(StorageKeyGeneratorContract::class));
 
         $config = $configService->getPortalNodeConfiguration($this->createMock(PortalNodeKeyInterface::class));
         static::assertArrayHasKey('limit', $config);
@@ -68,7 +70,7 @@ class ConfigurationServiceTest extends TestCase
         ]));
         $storage = $this->createMock(ConfigurationStorageContract::class);
         $storage->method('getConfiguration')->willReturn([]);
-        $configService = new ConfigurationService($registry, $storage);
+        $configService = new ConfigurationService($registry, $storage, new NullAdapter(), $this->createMock(StorageKeyGeneratorContract::class));
 
         $config = $configService->getPortalNodeConfiguration($this->createMock(PortalNodeKeyInterface::class));
         static::assertArrayHasKey('limit', $config);

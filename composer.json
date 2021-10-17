@@ -38,6 +38,7 @@
         "ramsey/uuid": "^3.5 || ^4",
         "symfony/config": "^4.4 || ^5.0",
         "symfony/dependency-injection": "^4.4 || ^5.0",
+        "symfony/event-dispatcher": "^4.0 || ^5.0",
         "symfony/lock": "^4.0 || ^5.0",
         "symfony/messenger": "^4.0 || ^5.0",
         "symfony/polyfill-php80": ">=1.15",
@@ -61,6 +62,7 @@
         "phpstan/phpstan-strict-rules": ">=0.12",
         "phpunit/phpunit": ">=9.3 <10",
         "psalm/plugin-phpunit": ">=0.10",
+        "symfony/cache": ">=2",
         "vimeo/psalm": ">=4"
     },
     "extra": {

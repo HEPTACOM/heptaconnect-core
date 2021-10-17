@@ -48,7 +48,6 @@ class ReceptionActorTest extends TestCase
         $receptionActor = new ReceptionActor(
             $logger,
             new DeepObjectIteratorContract(),
-            $this->createMock(MappingPersisterContract::class),
         );
         $receptionActor->performReception(
             new TypedDatasetEntityCollection(FooBarEntity::class, \array_fill(0, $count, $entity)),
