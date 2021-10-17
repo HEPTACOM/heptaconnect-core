@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 
+use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
@@ -13,9 +14,12 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
 {
     private MappingServiceInterface $mappingService;
 
-    public function __construct(MappingServiceInterface $mappingService)
+    private LoggerInterface $logger;
+
+    public function __construct(MappingServiceInterface $mappingService, LoggerInterface $logger)
     {
         $this->mappingService = $mappingService;
+        $this->logger = $logger;
     }
 
     public function handle(PostReceptionEvent $event): void
@@ -36,13 +40,12 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
                     $data->getThrowable()
                 );
             } else {
-                $logger = $event->getContext()->getContainer()->get(LoggerInterface::class);
+                $logger = $event->getContext()->getContainer()->get(LoggerInterface::class) ?? $this->logger;
 
-                if ($logger instanceof LoggerInterface) {
-                    $logger->error(
-                        'ReceiveContext: The reception of an unmappable entity failed. Exception: '.$data->getThrowable()->getMessage()
-                    );
-                }
+                $logger->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
+                    'throwable' => $data->getThrowable(),
+                    'data' => $data,
+                ]);
             }
         }
     }
