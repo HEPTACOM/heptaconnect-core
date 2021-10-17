@@ -15,7 +15,6 @@ use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
 use Psr\Log\LoggerInterface;
 
 class ReceptionActor implements ReceptionActorInterface
@@ -24,16 +23,10 @@ class ReceptionActor implements ReceptionActorInterface
 
     private DeepObjectIteratorContract $deepObjectIterator;
 
-    private MappingPersisterContract $mappingPersister;
-
-    public function __construct(
-        LoggerInterface $logger,
-        DeepObjectIteratorContract $deepObjectIterator,
-        MappingPersisterContract $mappingPersister
-    ) {
+    public function __construct(LoggerInterface $logger, DeepObjectIteratorContract $deepObjectIterator)
+    {
         $this->logger = $logger;
         $this->deepObjectIterator = $deepObjectIterator;
-        $this->mappingPersister = $mappingPersister;
     }
 
     public function performReception(
