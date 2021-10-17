@@ -9,6 +9,11 @@ class PostProcessorDataBag
 
     public function add(object $postProcessorData, int $priority = 0): void
     {
+        if (!\array_key_exists($priority, $this->items)) {
+            $this->items[$priority] = [];
+            \krsort($this->items);
+        }
+
         $this->items[$priority][] = $postProcessorData;
     }
 
