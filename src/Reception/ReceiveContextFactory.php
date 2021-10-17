@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -21,7 +20,6 @@ class ReceiveContextFactory implements ReceiveContextFactoryInterface
 
     private array $postProcessors;
 
-
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
@@ -31,8 +29,7 @@ class ReceiveContextFactory implements ReceiveContextFactoryInterface
         $this->configurationService = $configurationService;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->entityStatus = $entityStatus;
-        $this->postProcessors = $postProcessors instanceof \Traversable ? iterator_to_array($postProcessors) : $postProcessors;
-
+        $this->postProcessors = $postProcessors instanceof \Traversable ? \iterator_to_array($postProcessors) : $postProcessors;
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface

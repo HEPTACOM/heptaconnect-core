@@ -7,7 +7,6 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 
 class SaveMappingsData
 {
-
     private DatasetEntityContract $entity;
 
     public function __construct(DatasetEntityContract $entity)
@@ -19,6 +18,4 @@ class SaveMappingsData
     {
         return $this->entity;
     }
-
-
 }

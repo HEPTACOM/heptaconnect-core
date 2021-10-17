@@ -3,12 +3,10 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 
-
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 
 class MarkAsFailedData
 {
-
     private DatasetEntityContract $entity;
     private \Throwable $throwable;
 
@@ -27,6 +25,4 @@ class MarkAsFailedData
     {
         return $this->throwable;
     }
-
-
 }

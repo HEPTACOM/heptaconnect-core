@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 
 class MarkAsFailedPostProcessor extends PostProcessorContract
 {
-
     private MappingServiceInterface $mappingService;
 
     public function __construct(MappingServiceInterface $mappingService)
@@ -21,7 +20,7 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
 
     public function handle(PostReceptionEvent $event): void
     {
-        $markAsFailedData = iterable_map(
+        $markAsFailedData = \iterable_map(
             $event->getContext()->getPostProcessingBag()->of(MarkAsFailedData::class),
             static fn (MarkAsFailedData $data) => $data
         );
@@ -46,6 +45,5 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
                 }
             }
         }
-
     }
 }

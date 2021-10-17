@@ -6,8 +6,8 @@ namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
 use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
@@ -28,7 +28,7 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 
     public function handle(PostReceptionEvent $event): void
     {
-        $entities = iterable_map(
+        $entities = \iterable_map(
             $event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class),
             static fn (SaveMappingsData $data) => $data->getEntity()
         );

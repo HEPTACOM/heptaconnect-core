@@ -8,7 +8,6 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PostReceptionEvent extends Event
 {
-
     private ReceiveContextInterface $context;
 
     public function __construct(ReceiveContextInterface $context)
@@ -20,5 +19,4 @@ class PostReceptionEvent extends Event
     {
         return $this->context;
     }
-
 }

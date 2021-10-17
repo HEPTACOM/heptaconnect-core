@@ -8,7 +8,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 abstract class PostProcessorContract implements EventSubscriberInterface
 {
-    public abstract function handle(PostReceptionEvent $event) : void;
+    abstract public function handle(PostReceptionEvent $event): void;
 
     public static function getSubscribedEvents(): array
     {

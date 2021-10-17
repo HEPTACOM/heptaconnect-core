@@ -7,10 +7,9 @@ use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 
 class NullPostProcessor extends PostProcessorContract
 {
-
     public function handle(PostReceptionEvent $event): void
     {
-        $entities = iterable_map(
+        $entities = \iterable_map(
             $event->getContext()->getPostProcessingBag()->of(NullPostProcessorData::class),
             static fn (NullPostProcessorData $data) => $data->getEntity()
         );
