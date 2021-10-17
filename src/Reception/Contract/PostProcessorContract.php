@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
+namespace Heptacom\HeptaConnect\Core\Reception\Contract;
 
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

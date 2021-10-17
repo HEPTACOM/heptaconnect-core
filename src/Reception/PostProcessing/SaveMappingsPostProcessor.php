@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
+use Heptacom\HeptaConnect\Core\Reception\Contract\PostProcessorContract;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;

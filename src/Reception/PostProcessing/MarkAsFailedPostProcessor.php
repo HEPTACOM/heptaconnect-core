@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\PostProcessorContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
