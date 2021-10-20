@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
+use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
@@ -15,9 +16,12 @@ class StreamDenormalizer implements DenormalizerInterface
 
     private StreamFactoryInterface $streamFactory;
 
-    public function __construct(FilesystemInterface $filesystem)
+    private StreamPathContract $streamPath;
+
+    public function __construct(FilesystemInterface $filesystem, StreamPathContract $streamPath)
     {
         $this->filesystem = $filesystem;
+        $this->streamPath = $streamPath;
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
     }
 
@@ -29,7 +33,7 @@ class StreamDenormalizer implements DenormalizerInterface
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         return new SerializableStream($this->streamFactory->createStreamFromResource(
-            $this->filesystem->readStream(StreamNormalizer::STORAGE_LOCATION.'/'.$data)
+            $this->filesystem->readStream($this->streamPath->buildPath($data))
         ));
     }
 

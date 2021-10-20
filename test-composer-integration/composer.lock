@@ -118,11 +118,11 @@
         },
         {
             "name": "heptacom/heptaconnect-dataset-base",
-            "version": "0.6.0",
+            "version": "0.7.0",
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-dataset-base",
-                "reference": "4c28cde08f1fdbc6283db2600c190af5be14d481"
+                "reference": "2c899b6ba48cbf6e04d76a01bbb6b58c82c3f152"
             },
             "require": {
                 "bentools/iterable-functions": ">=1 <2",
@@ -189,11 +189,11 @@
         },
         {
             "name": "heptacom/heptaconnect-portal-base",
-            "version": "0.6.0",
+            "version": "0.7.0",
             "dist": {
                 "type": "path",
                 "url": "../vendor/heptacom/heptaconnect-portal-base",
-                "reference": "74135dbf169fce24ea993d110d45f673274464df"
+                "reference": "845d7d7059f193730be91ef887874d267210bc10"
             },
             "require": {
                 "bentools/iterable-functions": ">=1.4 <2",
@@ -204,6 +204,7 @@
                 "php": ">=7.4",
                 "php-http/discovery": "^1.0",
                 "psr/container": "^1.0",
+                "psr/event-dispatcher": "^1.0",
                 "psr/http-factory": "^1.0",
                 "psr/http-message": "^1.0",
                 "psr/log": "^1.0",
@@ -513,6 +514,59 @@
                 "source": "https://github.com/php-fig/container/tree/1.1.x"
             },
             "time": "2021-03-05T17:36:06+00:00"
+        },
+        {
+            "name": "psr/event-dispatcher",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/event-dispatcher.git",
+                "reference": "aa4f89e91c423b516ff226c50dc83f824011c253"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/event-dispatcher/zipball/aa4f89e91c423b516ff226c50dc83f824011c253",
+                "reference": "aa4f89e91c423b516ff226c50dc83f824011c253",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2.0"
+            },
+            "suggest": {
+                "fig/event-dispatcher-util": "Provides some useful PSR-14 utilities"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\EventDispatcher\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Standard interfaces for event handling.",
+            "keywords": [
+                "events",
+                "psr",
+                "psr-14"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/event-dispatcher/tree/master"
+            },
+            "time": "2021-02-08T21:15:39+00:00"
         },
         {
             "name": "psr/http-factory",
@@ -1112,12 +1166,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/serializer.git",
-                "reference": "8052a3999221b21d7a9de5a8cb221543a7bc0c7d"
+                "reference": "7f41111a068a1983875f3ce6bd5b23c61e2d624b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/serializer/zipball/8052a3999221b21d7a9de5a8cb221543a7bc0c7d",
-                "reference": "8052a3999221b21d7a9de5a8cb221543a7bc0c7d",
+                "url": "https://api.github.com/repos/symfony/serializer/zipball/7f41111a068a1983875f3ce6bd5b23c61e2d624b",
+                "reference": "7f41111a068a1983875f3ce6bd5b23c61e2d624b",
                 "shasum": ""
             },
             "require": {
@@ -1206,7 +1260,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-10-06T07:48:19+00:00"
+            "time": "2021-10-16T15:18:05+00:00"
         }
     ],
     "packages-dev": [],

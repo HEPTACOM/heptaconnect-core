@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
+use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
@@ -11,15 +12,21 @@ use Ramsey\Uuid\Uuid;
 
 class StreamNormalizer implements NormalizerInterface
 {
-    public const STORAGE_LOCATION = '42c5acf20a7011eba428f754dbb80254';
+    /**
+     * @deprecated use \Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract::STORAGE_LOCATION
+     */
+    public const STORAGE_LOCATION = StreamPathContract::STORAGE_LOCATION;
 
     public const NS_FILENAME = '048a23d3ac504a67a477da1d098090b0';
 
     private FilesystemInterface $filesystem;
 
-    public function __construct(FilesystemInterface $filesystem)
+    private StreamPathContract $streamPath;
+
+    public function __construct(FilesystemInterface $filesystem, StreamPathContract $streamPath)
     {
         $this->filesystem = $filesystem;
+        $this->streamPath = $streamPath;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -47,8 +54,7 @@ class StreamNormalizer implements NormalizerInterface
         }
 
         $stream = $object->copy()->detach();
-
-        $this->filesystem->putStream(self::STORAGE_LOCATION.'/'.$filename, $stream);
+        $this->filesystem->putStream($this->streamPath->buildPath($filename), $stream);
 
         if (\is_resource($stream)) {
             \fclose($stream);
