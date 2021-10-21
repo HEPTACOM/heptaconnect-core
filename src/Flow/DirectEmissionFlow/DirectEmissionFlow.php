@@ -65,7 +65,7 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
             /** @var string[] $externalIds */
             $externalIds = \array_filter(\iterable_to_array($entitiesByType->map(
                 static fn (DatasetEntityContract $entity): ?string => $entity->getPrimaryKey()
-            )));
+            )), static fn (?string $primaryKey): bool => !\is_null($primaryKey));
 
             try {
                 $directEmitter = new DirectEmitter($type);
