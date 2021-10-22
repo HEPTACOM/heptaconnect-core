@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 class StreamDenormalizer implements DenormalizerInterface
 {
@@ -32,6 +33,14 @@ class StreamDenormalizer implements DenormalizerInterface
 
     public function denormalize($data, $type, $format = null, array $context = [])
     {
+        if (!\is_string($data)) {
+            throw new UnexpectedValueException('data is null', 1634868818);
+        }
+
+        if ($data === "") {
+            throw new UnexpectedValueException('data is empty', 1634868819);
+        }
+
         return new SerializableStream($this->streamFactory->createStreamFromResource(
             $this->filesystem->readStream($this->streamPath->buildPath($data))
         ));
@@ -39,6 +48,6 @@ class StreamDenormalizer implements DenormalizerInterface
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === $this->getType();
+        return \is_string($data) && $data !== "" && ($type === $this->getType());
     }
 }
