@@ -17,6 +17,7 @@ namespace Heptacom\HeptaConnect\Core\Component;
  * @method static string PORTAL_EXTENSION_LOAD_ERROR()
  * @method static string PORTAL_NODE_CONFIGURATION_INVALID()
  * @method static string MARK_AS_FAILED_ENTITY_IS_UNMAPPED()
+ * @method static string STORAGE_STREAM_NORMALIZER_CONVERTS_HINT_TO_FILENAME()
  */
 abstract class LogMessage
 {

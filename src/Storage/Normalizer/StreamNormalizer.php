@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
+use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use League\Flysystem\FilesystemInterface;
+use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
 class StreamNormalizer implements NormalizerInterface
@@ -23,10 +25,16 @@ class StreamNormalizer implements NormalizerInterface
 
     private StreamPathContract $streamPath;
 
-    public function __construct(FilesystemInterface $filesystem, StreamPathContract $streamPath)
-    {
+    private LoggerInterface $logger;
+
+    public function __construct(
+        FilesystemInterface $filesystem,
+        StreamPathContract $streamPath,
+        LoggerInterface $logger
+    ) {
         $this->filesystem = $filesystem;
         $this->streamPath = $streamPath;
+        $this->logger = $logger;
     }
 
     public function supportsNormalization($data, $format = null)
@@ -54,7 +62,16 @@ class StreamNormalizer implements NormalizerInterface
         }
 
         $stream = $object->copy()->detach();
-        $this->filesystem->putStream($this->streamPath->buildPath($filename), $stream);
+        $path = $this->streamPath->buildPath($filename);
+
+        $this->logger->debug(LogMessage::STORAGE_STREAM_NORMALIZER_CONVERTS_HINT_TO_FILENAME(), [
+            'filename' => $filename,
+            'path' => $path,
+            'mediaId' => $mediaId,
+            'code' => 1635462690,
+        ]);
+
+        $this->filesystem->putStream($path, $stream);
 
         if (\is_resource($stream)) {
             \fclose($stream);
