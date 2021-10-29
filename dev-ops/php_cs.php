@@ -3,9 +3,7 @@
 use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
-$finder = Finder::create()
-    ->in(dirname(__DIR__) . '/src')
-    ->in(dirname(__DIR__) . '/test');
+$finder = Finder::create()->in(dirname(__DIR__) . '/src');
 
 return (new Config())
     ->setFinder($finder)
