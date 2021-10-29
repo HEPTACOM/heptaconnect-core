@@ -56,9 +56,9 @@ class StreamNormalizer implements NormalizerInterface
         $mediaId = $context['mediaId'] ?? null;
 
         if ($mediaId === null) {
-            $filename = Uuid::uuid4()->getHex();
+            $filename = (string) Uuid::uuid4()->getHex();
         } else {
-            $filename = Uuid::uuid5(self::NS_FILENAME, $mediaId)->getHex();
+            $filename = (string) Uuid::uuid5(self::NS_FILENAME, $mediaId)->getHex();
         }
 
         $stream = $object->copy()->detach();
