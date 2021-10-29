@@ -21,6 +21,7 @@ definitions:
                 after-script:
                     - cp -a .build test-results
                     - find test-results -type f -name '*.xml' -exec sed -i .bak -e "s|`pwd`/||" {} +
+                    - 'test ${BITBUCKET_EXIT_CODE} -eq 0 || composer config --list'
         -   step: &github-keyword-gate-step
                 <<: *default-step
                 name: Github Keyword Gate
