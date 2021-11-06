@@ -17,19 +17,20 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Symfony\Component\Lock\LockFactory;
 
 class ReceptionHandler implements ReceptionHandlerInterface
 {
-    private RouteRepositoryContract $routeRepository;
-
     private LockFactory $lockFactory;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
@@ -46,8 +47,9 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private JobRepositoryContract $jobRepository;
 
+    private RouteGetActionInterface $routeGetAction;
+
     public function __construct(
-        RouteRepositoryContract $routeRepository,
         LockFactory $lockFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EntityReflectorContract $entityReflector,
@@ -55,9 +57,9 @@ class ReceptionHandler implements ReceptionHandlerInterface
         MappingNodeRepositoryContract $mappingNodeRepository,
         ReceiveServiceInterface $receiveService,
         DeepObjectIteratorContract $objectIterator,
-        JobRepositoryContract $jobRepository
+        JobRepositoryContract $jobRepository,
+        RouteGetActionInterface $routeGetAction
     ) {
-        $this->routeRepository = $routeRepository;
         $this->lockFactory = $lockFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->entityReflector = $entityReflector;
@@ -66,11 +68,23 @@ class ReceptionHandler implements ReceptionHandlerInterface
         $this->receiveService = $receiveService;
         $this->objectIterator = $objectIterator;
         $this->jobRepository = $jobRepository;
+        $this->routeGetAction = $routeGetAction;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];
+        $routeKeys = new RouteKeyCollection(\iterable_map(
+            $jobs->column('payload'),
+            static fn (?array $p): ?RouteKeyInterface => $p[Reception::ROUTE_KEY] ?? null
+        ));
+        $routeData = $this->routeGetAction->get(new RouteGetCriteria($routeKeys));
+        /** @var RouteGetResult[] $routes */
+        $routes = [];
+
+        foreach ($routeData as $routeDatum) {
+            $routes[$this->storageKeyGenerator->serialize($routeDatum->getKey())] = $routeDatum;
+        }
 
         /** @var JobData $job */
         foreach ($jobs as $job) {
@@ -88,7 +102,12 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 continue;
             }
 
-            $route = $this->routeRepository->read($routeKey);
+            $route = $routes[$this->storageKeyGenerator->serialize($routeKey)] ?? null;
+
+            if (!$route instanceof RouteGetResult) {
+                // TODO error
+                continue;
+            }
 
             if ($route->getEntityType() !== \get_class($entity)) {
                 // TODO error
