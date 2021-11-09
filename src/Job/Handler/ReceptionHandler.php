@@ -78,12 +78,12 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $jobs->column('payload'),
             static fn (?array $p): ?RouteKeyInterface => $p[Reception::ROUTE_KEY] ?? null
         ));
-        $routeData = $this->routeGetAction->get(new RouteGetCriteria($routeKeys));
+        $routeDatas = $this->routeGetAction->get(new RouteGetCriteria($routeKeys));
         /** @var RouteGetResult[] $routes */
         $routes = [];
 
-        foreach ($routeData as $routeDatum) {
-            $routes[$this->storageKeyGenerator->serialize($routeDatum->getKey())] = $routeDatum;
+        foreach ($routeDatas as $routeData) {
+            $routes[$this->storageKeyGenerator->serialize($routeData->getKey())] = $routeData;
         }
 
         /** @var JobData $job */
