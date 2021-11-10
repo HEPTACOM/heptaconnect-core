@@ -53,7 +53,7 @@
         "maglnet/composer-require-checker": ">=2",
         "mavimo/phpstan-junit": ">=0.3",
         "nyholm/psr7": ">=1",
-        "phpmd/phpmd" : "@stable",
+        "phpmd/phpmd": "@stable",
         "php-http/curl-client": ">=1",
         "phpstan/extension-installer": ">=1",
         "phpstan/phpstan": ">=0.12",

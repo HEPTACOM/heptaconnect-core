@@ -48,9 +48,10 @@ cs-psalm: vendor .build ## Run psalm for static code analysis
 
 .PHONY: cs-phpmd
 cs-phpmd: vendor .build ## Run php mess detector for static code analysis
-	$(PHP) vendor/bin/phpmd --ignore-violations-on-exit src ansi rulesets/codesize.xml,rulesets/naming.xml,rulesets/unusedcode.xml
+	# TODO Re-add rulesets/unused.xml when phpmd fixes false-positive UnusedPrivateField
+	$(PHP) vendor/bin/phpmd --ignore-violations-on-exit src ansi rulesets/codesize.xml,rulesets/naming.xml
 	[[ -f .build/phpmd-junit.xslt ]] || $(CURL) https://phpmd.org/junit.xslt -o .build/phpmd-junit.xslt
-	$(PHP) vendor/bin/phpmd src xml rulesets/codesize.xml,rulesets/naming.xml,rulesets/unusedcode.xml | xsltproc .build/phpmd-junit.xslt - > .build/php-md.junit.xml
+	$(PHP) vendor/bin/phpmd src xml rulesets/codesize.xml,rulesets/naming.xml | xsltproc .build/phpmd-junit.xslt - > .build/php-md.junit.xml
 
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor ## Run composer-unused to detect once-required packages that are not used anymore
