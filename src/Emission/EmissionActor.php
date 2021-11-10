@@ -12,8 +12,9 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Listing\ReceptionRouteListActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Listing\ReceptionRouteListCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Listing\ReceptionRouteListResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
@@ -26,20 +27,20 @@ class EmissionActor implements EmissionActorInterface
 
     private LoggerInterface $logger;
 
-    private RouteRepositoryContract $routeRepository;
-
     private StorageKeyGeneratorContract $storageKeyGenerator;
+
+    private ReceptionRouteListActionInterface $receptionRouteListAction;
 
     public function __construct(
         JobDispatcherContract $jobDispatcher,
         LoggerInterface $logger,
-        RouteRepositoryContract $routeRepository,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        ReceptionRouteListActionInterface $receptionRouteListAction
     ) {
         $this->jobDispatcher = $jobDispatcher;
         $this->logger = $logger;
-        $this->routeRepository = $routeRepository;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->receptionRouteListAction = $receptionRouteListAction;
     }
 
     public function performEmission(
@@ -53,12 +54,10 @@ class EmissionActor implements EmissionActorInterface
             return;
         }
 
-        $routeKeys = new RouteKeyCollection($this->routeRepository->listBySourceAndEntityType(
-            $context->getPortalNodeKey(),
-            $stack->supports()
-        ));
+        /** @var ReceptionRouteListResult[] $receptionRoutes */
+        $receptionRoutes = \iterable_to_array($this->receptionRouteListAction->list(new ReceptionRouteListCriteria($context->getPortalNodeKey(), $stack->supports())));
 
-        if ($routeKeys->count() < 1) {
+        if ($receptionRoutes === []) {
             // TODO: add custom type for exception
             throw new \Exception(\sprintf(\implode(\PHP_EOL, ['Message is not routed. Add a route and re-explore this entity.', 'source portal: %s', 'data type: %s']), $this->storageKeyGenerator->serialize($context->getPortalNodeKey()), $stack->supports()));
         }
@@ -68,7 +67,7 @@ class EmissionActor implements EmissionActorInterface
 
             /** @var DatasetEntityContract $entity */
             foreach ($stack->next($externalIds, $context) as $entity) {
-                foreach ($routeKeys as $routeKey) {
+                foreach ($receptionRoutes as $receptionRoute) {
                     $jobs->push([
                         new Reception(
                             new MappingComponentStruct(
@@ -76,7 +75,7 @@ class EmissionActor implements EmissionActorInterface
                                 $stack->supports(),
                                 $entity->getPrimaryKey()
                             ),
-                            $routeKey,
+                            $receptionRoute->getRoute(),
                             $entity
                         ),
                     ]);
