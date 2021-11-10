@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
@@ -27,6 +28,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\RouteGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Enum\RouteCapability;
 use Symfony\Component\Lock\LockFactory;
 
 class ReceptionHandler implements ReceptionHandlerInterface
@@ -91,34 +93,33 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;
 
             if (!$routeKey instanceof RouteKeyInterface) {
-                // TODO error
-                continue;
+                throw new ReceptionJobHandlingException($job, 1636503503);
             }
 
             $entity = $job->getPayload()[Reception::ENTITY] ?? null;
 
             if (!$entity instanceof DatasetEntityContract) {
-                // TODO error
-                continue;
+                throw new ReceptionJobHandlingException($job, 1636503504);
             }
 
             $route = $routes[$this->storageKeyGenerator->serialize($routeKey)] ?? null;
 
             if (!$route instanceof RouteGetResult) {
-                // TODO error
-                continue;
+                throw new ReceptionJobHandlingException($job, 1636503505);
+            }
+
+            if (!\in_array(RouteCapability::RECEPTION, $route->getCapabilities())) {
+                throw new ReceptionJobHandlingException($job, 1636503506);
             }
 
             if ($route->getEntityType() !== \get_class($entity)) {
-                // TODO error
-                continue;
+                throw new ReceptionJobHandlingException($job, 1636503507);
             }
 
             $externalId = $job->getMappingComponent()->getExternalId();
 
             if (!\is_string($externalId)) {
-                // TODO error
-                continue;
+                throw new ReceptionJobHandlingException($job, 1636503508);
             }
 
             $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
