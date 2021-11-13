@@ -75,6 +75,14 @@ class HttpHandleService implements HttpHandleServiceInterface
         $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
 
         if (!$enabled) {
+            $this->logger->warning(LogMessage::WEB_HTTP_HANDLE_DISABLED(), [
+                'code' => 1636845085,
+                'path' => $path,
+                'portalNodeKey' => $portalNodeKey,
+                'request' => $request,
+                'web_http_correlation_id' => $correlationId,
+            ]);
+
             return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId)->withStatus(423);
         }
 
@@ -82,6 +90,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
         if (!$stack instanceof HttpHandlerStackInterface) {
             $this->logger->critical(LogMessage::WEB_HTTP_HANDLE_NO_HANDLER_FOR_PATH(), [
+                'code' => 1636845086,
                 'path' => $path,
                 'portalNodeKey' => $portalNodeKey,
                 'request' => $request,

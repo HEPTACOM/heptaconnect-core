@@ -30,6 +30,7 @@ class HttpHandlingActor implements HttpHandlingActorInterface
             return $stack->next($request, $response, $context);
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::WEB_HTTP_HANDLE_NO_THROW(), [
+                'code' => 1636845126,
                 'request' => $request,
                 'stack' => $stack,
                 'exception' => $exception,
