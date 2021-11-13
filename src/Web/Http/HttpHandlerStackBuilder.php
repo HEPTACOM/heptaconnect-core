@@ -40,7 +40,7 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function push(HttpHandlerContract $httpHandler): self
     {
-        if (\is_a($this->path, $httpHandler->supports(), true)) {
+        if (\is_a($this->path, $httpHandler->getPath(), true)) {
             $this->logger->debug(\sprintf(
                 'HttpHandlerStackBuilder: Pushed %s as arbitrary http handler.',
                 \get_class($httpHandler)
