@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
@@ -24,6 +25,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use HeptacomFixture\Portal\A\AutomaticService\ExceptionNotInContainer;
 use HeptacomFixture\Portal\A\ManualService\ExceptionInContainer;
@@ -43,6 +45,8 @@ use Psr\Log\LoggerInterface;
  * @covers \Heptacom\HeptaConnect\Core\Portal\PortalLogger
  * @covers \Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder
  * @covers \Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass
+ * @covers \Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass
+ * @covers \Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass
  */
 class PortalStackServiceContainerBuilderTest extends TestCase
 {
@@ -72,6 +76,10 @@ class PortalStackServiceContainerBuilderTest extends TestCase
             ->method('getPortalNodeConfiguration')
             ->willReturn([]);
 
+        $httpHandlerUrlProvider = $this->createMock(HttpHandlerUrlProviderInterface::class);
+        $httpHandlerUrlProviderFactory = $this->createMock(HttpHandlerUrlProviderFactoryInterface::class);
+        $httpHandlerUrlProviderFactory->method('factory')->willReturn($httpHandlerUrlProvider);
+
         $builder = new PortalStackServiceContainerBuilder(
             $this->createMock(LoggerInterface::class),
             $this->createMock(NormalizationRegistryContract::class),
@@ -83,6 +91,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
             $this->createMock(FilesystemFactory::class),
             $configurationService,
             $this->createMock(PublisherInterface::class),
+            $httpHandlerUrlProviderFactory,
         );
         $builder->setDirectEmissionFlow($this->createMock(DirectEmissionFlowContract::class));
         $container = $builder->build(
@@ -113,6 +122,7 @@ class PortalStackServiceContainerBuilderTest extends TestCase
         static::assertTrue($container->has(UriFactoryInterface::class));
 
         static::assertTrue($container->has(HttpHandlerCollection::class));
+        static::assertTrue($container->has(HttpHandlerUrlProviderInterface::class));
 
         static::assertTrue($container->has(ExceptionInContainer::class));
         static::assertFalse($container->has(ExceptionNotInContainer::class));
