@@ -11,6 +11,8 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,13 +44,16 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     private ResponseFactoryInterface $responseFactory;
 
+    private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
+
     public function __construct(
         HttpHandlingActorInterface $actor,
         HttpHandleContextFactoryInterface $contextFactory,
         LoggerInterface $logger,
         HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        ResponseFactoryInterface $responseFactory
+        ResponseFactoryInterface $responseFactory,
+        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction
     ) {
         $this->actor = $actor;
         $this->contextFactory = $contextFactory;
@@ -56,6 +61,7 @@ class HttpHandleService implements HttpHandleServiceInterface
         $this->stackBuilderFactory = $stackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->responseFactory = $responseFactory;
+        $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
@@ -64,6 +70,14 @@ class HttpHandleService implements HttpHandleServiceInterface
         $response = $this->responseFactory->createResponse(501);
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
+
+        $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
+        $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
+
+        if (!$enabled) {
+            return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId)->withStatus(423);
+        }
+
         $stack = $this->getStack($portalNodeKey, $path);
 
         if (!$stack instanceof HttpHandlerStackInterface) {
