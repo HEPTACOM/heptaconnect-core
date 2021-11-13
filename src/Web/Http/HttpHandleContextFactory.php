@@ -17,7 +17,7 @@ class HttpHandleContextFactory implements HttpHandleContextFactoryInterface
 
     public function __construct(
         ConfigurationServiceInterface $configurationService,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->configurationService = $configurationService;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
