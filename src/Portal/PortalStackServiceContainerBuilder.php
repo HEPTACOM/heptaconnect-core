@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConf
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -37,6 +38,7 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
@@ -103,6 +105,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
 
+    private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -113,7 +117,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
         ConfigurationServiceInterface $configurationService,
-        PublisherInterface $publisher
+        PublisherInterface $publisher,
+        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -125,6 +130,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
+        $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
     }
 
     /**
@@ -224,6 +230,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
+            HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
