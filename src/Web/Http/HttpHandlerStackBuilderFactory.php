@@ -32,6 +32,6 @@ class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryIn
         /** @var HttpHandlerCollection $decorators */
         $decorators = $container->get(HttpHandlerCollection::class.'.decorator');
 
-        return new HttpHandlerStackBuilder($sources, $decorators, $entityType, $this->logger);
+        return new HttpHandlerStackBuilder($sources, $decorators, $path, $this->logger);
     }
 }
