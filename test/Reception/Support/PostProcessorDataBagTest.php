@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Test\Reception\Support;
 
-use Heptacom\HeptaConnect\Core\Reception\Support\PostProcessorDataBag;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Heptacom\HeptaConnect\Core\Reception\Support\PostProcessorDataBag
+ * @covers \Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag
  */
 class PostProcessorDataBagTest extends TestCase
 {
