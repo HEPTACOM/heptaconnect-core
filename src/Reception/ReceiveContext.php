@@ -5,9 +5,9 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedData;
-use Heptacom\HeptaConnect\Core\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
