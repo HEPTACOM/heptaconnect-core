@@ -12,7 +12,8 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\RouteRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Listing\ReceptionRouteListActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Listing\ReceptionRouteListResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\TypedMappingCollection;
 use PHPUnit\Framework\TestCase;
@@ -39,16 +40,16 @@ class EmissionActorTest extends TestCase
             ->method('getEntityType')
             ->willReturn(FooBarEntity::class);
 
-        $routeRepository = $this->createMock(RouteRepositoryContract::class);
-        $routeRepository->expects($count > 0 ? static::once() : static::never())
-            ->method('listBySourceAndEntityType')
-            ->willReturn([$this->createMock(RouteKeyInterface::class)]);
+        $receptionRouteListAction = $this->createMock(ReceptionRouteListActionInterface::class);
+        $receptionRouteListAction->expects($count > 0 ? static::once() : static::never())
+            ->method('list')
+            ->willReturn([new ReceptionRouteListResult($this->createMock(RouteKeyInterface::class))]);
 
         $emissionActor = new EmissionActor(
             $this->createMock(JobDispatcherContract::class),
             $logger,
-            $routeRepository,
             $this->createMock(StorageKeyGeneratorContract::class),
+            $receptionRouteListAction
         );
         $emissionActor->performEmission(
             new TypedMappingCollection(FooBarEntity::class, \array_fill(0, $count, $mapping)),
