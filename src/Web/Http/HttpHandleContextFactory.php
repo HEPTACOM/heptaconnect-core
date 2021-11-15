@@ -1,17 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Webhook;
+namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\Webhook\Contract\WebhookInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 
-/**
- * @internal
- */
-class WebhookContextFactory
+class HttpHandleContextFactory implements HttpHandleContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 
@@ -25,12 +23,11 @@ class WebhookContextFactory
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
-    public function createContext(WebhookInterface $webhook): WebhookContextInterface
+    public function createContext(PortalNodeKeyInterface $portalNodeKey): HttpHandleContextInterface
     {
-        return new WebhookContext(
-            $this->portalStackServiceContainerFactory->create($webhook->getPortalNodeKey()),
-            $this->configurationService->getPortalNodeConfiguration($webhook->getPortalNodeKey()),
-            $webhook
+        return new HttpHandleContext(
+            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
         );
     }
 }

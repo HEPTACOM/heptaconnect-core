@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConf
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -35,6 +36,9 @@ use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
@@ -73,6 +77,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     public const RECEIVER_DECORATOR_TAG = 'heptaconnect.flow_component.receiver_decorator';
 
+    public const WEB_HTTP_HANDLER_TAG = 'heptaconnect.flow_component.web_http_handler';
+
+    public const WEB_HTTP_HANDLER_DECORATOR_TAG = 'heptaconnect.flow_component.web_http_handler';
+
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
     private LoggerInterface $logger;
@@ -97,6 +105,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
 
+    private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -107,7 +117,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
         ConfigurationServiceInterface $configurationService,
-        PublisherInterface $publisher
+        PublisherInterface $publisher,
+        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -119,6 +130,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
+        $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
     }
 
     /**
@@ -136,6 +148,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $emitterTag = self::EMITTER_TAG;
         $explorerTag = self::EXPLORER_TAG;
         $receiverTag = self::RECEIVER_TAG;
+        $webHttpHandlerTag = self::WEB_HTTP_HANDLER_TAG;
         $prototypedIds = [];
         $definedIds = [];
         $flowBuilderIds = [];
@@ -165,10 +178,12 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $this->tagDefinitionsByPriority($newDefinitions, EmitterContract::class, $emitterTag, -100 * $packageStep);
             $this->tagDefinitionsByPriority($newDefinitions, ExplorerContract::class, $explorerTag, -100 * $packageStep);
             $this->tagDefinitionsByPriority($newDefinitions, ReceiverContract::class, $receiverTag, -100 * $packageStep);
+            $this->tagDefinitionsByPriority($newDefinitions, HttpHandlerContract::class, $webHttpHandlerTag, -100 * $packageStep);
 
             $emitterTag = self::EMITTER_DECORATOR_TAG;
             $explorerTag = self::EXPLORER_DECORATOR_TAG;
             $receiverTag = self::RECEIVER_DECORATOR_TAG;
+            $webHttpHandlerTag = self::WEB_HTTP_HANDLER_DECORATOR_TAG;
             ++$packageStep;
         }
 
@@ -215,6 +230,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
+            HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
@@ -231,6 +247,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(ExplorerCollection::class.'.decorator', new Definition(ExplorerCollection::class, [new TaggedIteratorArgument(self::EXPLORER_DECORATOR_TAG)]));
         $containerBuilder->setDefinition(ReceiverCollection::class, new Definition(null, [new TaggedIteratorArgument(self::RECEIVER_TAG)]));
         $containerBuilder->setDefinition(ReceiverCollection::class.'.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(HttpHandlerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_TAG)]));
+        $containerBuilder->setDefinition(HttpHandlerCollection::class.'.decorator', new Definition(HttpHandlerCollection::class, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_DECORATOR_TAG)]));
 
         $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
             \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
@@ -347,6 +365,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ...$this->flowComponentBuilder->buildEmitters(),
             ...$this->flowComponentBuilder->buildReceivers(),
             ...$this->flowComponentBuilder->buildStatusReporters(),
+            ...$this->flowComponentBuilder->buildHttpHandlers(),
         ];
 
         foreach ($flowComponents as $flowComponent) {
