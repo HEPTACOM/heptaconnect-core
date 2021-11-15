@@ -37,6 +37,6 @@ class HttpHandlingActor implements HttpHandlingActorInterface
             ]);
         }
 
-        return $response->withStatus(503);
+        return $response->withStatus(500);
     }
 }
