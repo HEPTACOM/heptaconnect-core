@@ -235,6 +235,8 @@ class PortalStorage implements PortalStorageInterface
                         'portalNodeKey' => $this->portalNodeKey,
                         'key' => $key,
                     ]);
+
+                    continue;
                 }
 
                 if (!$denormalizer->supportsDenormalization($value, $type)) {

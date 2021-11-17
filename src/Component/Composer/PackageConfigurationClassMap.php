@@ -45,7 +45,13 @@ class PackageConfigurationClassMap
      */
     public function getClassForFile(string $filePath): ?string
     {
-        return \array_search($filePath, $this->map, true) ?: null;
+        $index = \array_search($filePath, $this->map, true);
+
+        if ($index === false) {
+            return null;
+        }
+
+        return $index;
     }
 
     public function getClasses(): StringCollection

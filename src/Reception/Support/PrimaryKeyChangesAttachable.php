@@ -37,7 +37,9 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
 
     public function getFirstForeignKey(): ?string
     {
-        return \reset($this->foreignKeys) ?: null;
+        $result = \current($this->foreignKeys);
+
+        return \is_string($result) ? $result : null;
     }
 
     public function getForeignKey(): ?string

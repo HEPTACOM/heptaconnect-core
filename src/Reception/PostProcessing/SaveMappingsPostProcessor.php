@@ -58,8 +58,14 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 
             $primaryKeyChanges = $entity->getAttachment(PrimaryKeyChangesAttachable::class);
 
-            if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable
-                || $primaryKeyChanges->getFirstForeignKey() === $primaryKeyChanges->getForeignKey()) {
+            if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable) {
+                // no change
+                continue;
+            }
+
+            $externalId = $primaryKeyChanges->getForeignKey();
+
+            if ($primaryKeyChanges->getFirstForeignKey() === $externalId) {
                 // no change
                 continue;
             }
@@ -77,11 +83,11 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             }
 
             if ($primaryKeyChanges->getFirstForeignKey() === null) {
-                $payload->create($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
-            } elseif ($primaryKeyChanges->getForeignKey() === null) {
+                $payload->create($mapping->getMappingNodeKey(), $externalId);
+            } elseif ($externalId === null) {
                 $payload->delete($mapping->getMappingNodeKey());
             } else {
-                $payload->update($mapping->getMappingNodeKey(), $primaryKeyChanges->getForeignKey());
+                $payload->update($mapping->getMappingNodeKey(), $externalId);
             }
         }
 

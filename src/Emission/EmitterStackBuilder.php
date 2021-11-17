@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class EmitterStackBuilder implements EmitterStackBuilderInterface
@@ -108,10 +107,7 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
             static fn (EmitterContract $e) => clone $e,
             \array_reverse($this->emitters, false),
         ), $this->entityType);
-
-        if ($emitterStack instanceof LoggerAwareInterface) {
-            $emitterStack->setLogger($this->logger);
-        }
+        $emitterStack->setLogger($this->logger);
 
         $this->logger->debug('EmitterStackBuilder: Built emitter stack.');
 

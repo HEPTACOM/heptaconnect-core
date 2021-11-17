@@ -173,11 +173,14 @@ class ReceptionHandler implements ReceptionHandlerInterface
                             continue;
                         }
 
+                        /** @var DatasetEntityContract[] $rawEntities */
+                        $rawEntities = \array_column($entities, 'entity');
+                        /** @var array<DatasetEntityContract|object> $rawEntities */
+                        $rawEntities = $this->objectIterator->iterate($rawEntities);
+                        /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
+                        $filteredEntityObjects = new DatasetEntityCollection($rawEntities);
                         // TODO inspect memory raise
-                        $mappedEntities = $this->entityMapper->mapEntities(
-                            new DatasetEntityCollection($this->objectIterator->iterate(\array_column($entities, 'entity'))),
-                            $sourcePortalNodeKey
-                        );
+                        $mappedEntities = $this->entityMapper->mapEntities($filteredEntityObjects, $sourcePortalNodeKey);
                         // TODO: improve performance
                         $this->entityReflector->reflectEntities($mappedEntities, $targetPortalNodeKey);
 

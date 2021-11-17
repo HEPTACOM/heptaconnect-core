@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class ReceiverStackBuilder implements ReceiverStackBuilderInterface
@@ -108,10 +107,7 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
             static fn (ReceiverContract $e) => clone $e,
             \array_reverse($this->receivers, false),
         ));
-
-        if ($receiverStack instanceof LoggerAwareInterface) {
-            $receiverStack->setLogger($this->logger);
-        }
+        $receiverStack->setLogger($this->logger);
 
         $this->logger->debug('ReceiverStackBuilder: Built receiver stack.');
 

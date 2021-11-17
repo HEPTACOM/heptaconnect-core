@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilder implements ExplorerStackBuilderInterface
@@ -108,10 +107,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
             static fn (ExplorerContract $e) => clone $e,
             \array_reverse($this->explorers, false),
         ));
-
-        if ($explorerStack instanceof LoggerAwareInterface) {
-            $explorerStack->setLogger($this->logger);
-        }
+        $explorerStack->setLogger($this->logger);
 
         $this->logger->debug('ExplorerStackBuilder: Built explorer stack.');
 

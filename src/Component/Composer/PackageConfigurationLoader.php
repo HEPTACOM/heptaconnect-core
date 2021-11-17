@@ -8,6 +8,7 @@ use Composer\Composer;
 use Composer\Factory;
 use Composer\IO\NullIO;
 use Composer\Package\CompletePackageInterface;
+use Composer\Package\Locker;
 use Composer\Package\RootPackageInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Psr\Cache\CacheItemInterface;
@@ -52,7 +53,14 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
 
         $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
         $result = new PackageConfigurationCollection();
-        $workingDir ??= \getcwd();
+
+        if ($workingDir === null) {
+            $cwd = \getcwd();
+
+            if (\is_string($cwd)) {
+                $workingDir = $cwd;
+            }
+        }
 
         /** @var CompletePackageInterface $packageInstance */
         foreach ($this->iteratePackages($composer) as $packageInstance) {
@@ -94,13 +102,24 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
 
     private function getCacheKey(): ?string
     {
-        if (\is_file($this->composerJson)) {
-            return \hash_file('md5', $this->composerJson);
-        } elseif (\is_string($this->composerJson)) {
-            return \hash('md5', $this->composerJson);
+        $filename = $this->composerJson;
+
+        if (!\is_string($filename)) {
+            return null;
         }
 
-        return null;
+        if (\is_file($filename)) {
+            $result = \hash_file('md5', $filename);
+
+            if (\is_string($result)) {
+                return $result;
+            }
+        }
+
+        /** @var string|bool $result */
+        $result = \hash('md5', $filename);
+
+        return \is_string($result) ? $result : null;
     }
 
     /**
@@ -108,13 +127,15 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
      */
     private function iteratePackages(Composer $composer): iterable
     {
-        if ($composer->getLocker()->isLocked()) {
-            $packageLockData = (array) ($composer->getLocker()->getLockData()['packages'] ?? []);
+        $locker = $composer->getLocker();
+
+        if ($locker instanceof Locker && $locker->isLocked()) {
+            $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
             /** @var array $package */
             foreach ($packageLockData as $package) {
-                $packageInstance = $composer->getLocker()->getLockedRepository()->findPackage($package['name'], $package['version']);
+                $packageInstance = $locker->getLockedRepository()->findPackage($package['name'], $package['version']);
 
                 if (!$packageInstance instanceof CompletePackageInterface) {
                     continue;

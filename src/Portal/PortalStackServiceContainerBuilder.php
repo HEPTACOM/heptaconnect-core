@@ -202,7 +202,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ]);
         }
 
-        $portalConfiguration = new PortalConfiguration($configuration);
+        $portalConfiguration = new PortalConfiguration($configuration ?? []);
 
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
@@ -340,10 +340,14 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             new PhpFileLoader($containerBuilder, $fileLocator),
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
-
         $globPattern = $containerConfigurationPath.\DIRECTORY_SEPARATOR.'services.{yml,yaml,xml,php}';
+        $globbedFiles = \glob($globPattern, \GLOB_BRACE);
 
-        foreach (\glob($globPattern, \GLOB_BRACE) as $serviceDefinitionPath) {
+        if (!\is_array($globbedFiles)) {
+            return;
+        }
+
+        foreach ($globbedFiles as $serviceDefinitionPath) {
             try {
                 $delegatingLoader->load($serviceDefinitionPath);
             } catch (\Throwable $throwable) {
@@ -356,9 +360,15 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     {
         $this->flowComponentBuilder->reset();
 
-        foreach (\glob($path.\DIRECTORY_SEPARATOR.'*.php') as $flowComponentScript) {
+        $globbedFiles = \glob($path.\DIRECTORY_SEPARATOR.'*.php');
+
+        if (!\is_array($globbedFiles)) {
+            return;
+        }
+
+        foreach ($globbedFiles as $flowComponentScript) {
             // prevent access to object context
-            (static function (string $file) {
+            (static function (string $file): void {
                 include $file;
             })($flowComponentScript);
         }

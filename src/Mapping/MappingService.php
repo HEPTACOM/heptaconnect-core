@@ -5,7 +5,6 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
-use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
@@ -76,10 +75,6 @@ class MappingService implements MappingServiceInterface
 
         if (!$mappingExists) {
             $mappingNodeKey = $this->mappingNodeRepository->create($entityType, $portalNodeKey);
-        }
-
-        if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
-            throw new MappingNodeNotCreatedException();
         }
 
         $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $entityType)))

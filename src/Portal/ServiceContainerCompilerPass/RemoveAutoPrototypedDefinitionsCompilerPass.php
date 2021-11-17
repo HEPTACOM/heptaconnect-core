@@ -38,6 +38,14 @@ class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterfa
 
     protected function isPrototypable(string $class): bool
     {
+        if (\interface_exists($class)) {
+            return false;
+        }
+
+        if (!\class_exists($class)) {
+            return false;
+        }
+
         if (\is_a($class, \Throwable::class, true)) {
             return false;
         }
