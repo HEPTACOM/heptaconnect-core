@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStack;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 
 class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
@@ -102,10 +101,7 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
             static fn (HttpHandlerContract $e) => clone $e,
             \array_reverse($this->selection, false),
         ));
-
-        if ($stack instanceof LoggerAwareInterface) {
-            $stack->setLogger($this->logger);
-        }
+        $stack->setLogger($this->logger);
 
         $this->logger->debug('HttpHandlerStackBuilder: Built emitter stack.');
 

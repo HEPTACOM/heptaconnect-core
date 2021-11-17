@@ -27,7 +27,7 @@ class ReceiveService implements ReceiveServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface|null>
      */
     private array $receiverStackCache = [];
 
@@ -100,6 +100,11 @@ class ReceiveService implements ReceiveServiceInterface
         }
     }
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     *
+     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     */
     private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
     {
         $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);

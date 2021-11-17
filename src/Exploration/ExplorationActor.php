@@ -111,7 +111,7 @@ class ExplorationActor implements ExplorationActorInterface
                         'ExplorationActor: Entity was explored and publication is prepared. PortalNode: %s; Type: %s; PrimaryKey: %s',
                         $this->storageKeyGenerator->serialize($context->getPortalNodeKey()),
                         $entityType,
-                        (string) $entity
+                        $entity
                     ));
 
                     if (\count($publicationPks) >= self::CHUNK_SIZE_PUBLICATION) {
@@ -166,6 +166,11 @@ class ExplorationActor implements ExplorationActorInterface
         }
     }
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     *
+     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     */
     private function flushDirectEmissions(
         EmitterStackInterface $emissionStack,
         EmitContextInterface $emitContext,
@@ -184,6 +189,11 @@ class ExplorationActor implements ExplorationActorInterface
         $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
     }
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     *
+     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     */
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
         string $entityType,

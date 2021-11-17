@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AllDefinitionDefaultsCompilerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
             $class = $definition->getClass() ?? (string) $id;

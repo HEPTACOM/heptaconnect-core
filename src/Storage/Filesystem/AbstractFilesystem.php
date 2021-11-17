@@ -9,10 +9,7 @@ use League\Flysystem\PluginInterface;
 
 abstract class AbstractFilesystem implements FilesystemInterface
 {
-    /**
-     * @var FilesystemInterface
-     */
-    protected $filesystem;
+    protected FilesystemInterface $filesystem;
 
     public function __construct(FilesystemInterface $filesystem)
     {

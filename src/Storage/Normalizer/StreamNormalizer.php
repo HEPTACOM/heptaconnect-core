@@ -37,7 +37,7 @@ class StreamNormalizer implements NormalizerInterface
         $this->logger = $logger;
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, ?string $format = null)
     {
         return $data instanceof SerializableStream;
     }
@@ -47,7 +47,10 @@ class StreamNormalizer implements NormalizerInterface
         return 'stream';
     }
 
-    public function normalize($object, $format = null, array $context = [])
+    /**
+     * @return string
+     */
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         if (!$object instanceof SerializableStream) {
             throw new InvalidArgumentException();

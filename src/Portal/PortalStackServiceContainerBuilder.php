@@ -164,10 +164,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
                     $flowComponentsPath,
                 ]);
             });
-            $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder) {
+            $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
                 $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
             });
-            $flowBuilderIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder) {
+            $flowBuilderIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder): void {
                 $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
             });
 
@@ -264,6 +264,9 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->directEmissionFlow = $directEmissionFlow;
     }
 
+    /**
+     * @param callable():void $registration
+     */
     private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array
     {
         $currentIds = $containerBuilder->getServiceIds();

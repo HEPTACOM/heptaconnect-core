@@ -66,7 +66,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 continue;
             }
 
-            $config->setName((string) $packageInstance->getName());
+            $config->setName($packageInstance->getName());
             $config->setTags(new StringCollection($heptaconnectKeywords));
 
             $extra = $packageInstance->getExtra() ?? [];
@@ -133,7 +133,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     private function iterateClassMaps(
         Composer $composer,
         CompletePackageInterface $package,
-        string $workingDir
+        ?string $workingDir
     ): iterable {
         $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload() ?? []);
         $installPath = $composer->getInstallationManager()->getInstallPath($package);

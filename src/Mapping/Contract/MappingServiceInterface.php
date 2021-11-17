@@ -17,6 +17,9 @@ interface MappingServiceInterface
         \Throwable $exception
     ): void;
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     */
     public function get(
         string $entityType,
         PortalNodeKeyInterface $portalNodeKey,

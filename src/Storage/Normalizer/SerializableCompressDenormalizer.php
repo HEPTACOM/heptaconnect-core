@@ -19,7 +19,7 @@ class SerializableCompressDenormalizer implements DenormalizerInterface
         return $this->serializableDenormalizer->getType().'+gzpress';
     }
 
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, $type, ?string $format = null, array $context = [])
     {
         return $this->serializableDenormalizer->denormalize(
             \gzuncompress($data),
@@ -29,7 +29,7 @@ class SerializableCompressDenormalizer implements DenormalizerInterface
         );
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, ?string $format = null)
     {
         return $type === $this->getType() &&
             $this->serializableDenormalizer->supportsDenormalization(

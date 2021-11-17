@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
+use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterStack;
@@ -21,6 +22,9 @@ class StatusReportingService implements StatusReportingServiceInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    /**
+     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
+     */
     private array $statusReporterStackCache = [];
 
     private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
@@ -103,14 +107,11 @@ class StatusReportingService implements StatusReportingServiceInterface
         }
     }
 
-    /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
-     */
     private function getStatusReporterStack(
         PortalNodeKeyInterface $portalNodeKey,
         StatusReporterCollection $statusReporters,
         string $topic
-    ): StatusReporterStack {
+    ): StatusReporterStackInterface {
         $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {

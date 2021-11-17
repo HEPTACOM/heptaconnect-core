@@ -31,7 +31,7 @@ class StreamDenormalizer implements DenormalizerInterface
         return 'stream';
     }
 
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, $type, ?string $format = null, array $context = [])
     {
         if (!\is_string($data)) {
             throw new UnexpectedValueException('data is null', 1634868818);
@@ -46,7 +46,7 @@ class StreamDenormalizer implements DenormalizerInterface
         ));
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, ?string $format = null)
     {
         return \is_string($data) && $data !== "" && ($type === $this->getType());
     }

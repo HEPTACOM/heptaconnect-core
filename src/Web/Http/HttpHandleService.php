@@ -23,7 +23,7 @@ use Ramsey\Uuid\Uuid;
 class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface|null>
      */
     private array $stackCache = [];
 

@@ -18,7 +18,7 @@ class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterfa
         $this->prototypedIds = $prototypedIds;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         foreach ($this->prototypedIds as $serviceId) {
             if (!$container->hasDefinition($serviceId)) {

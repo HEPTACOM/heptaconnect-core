@@ -38,12 +38,8 @@ class ConfigurationService implements ConfigurationServiceInterface
         $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
 
         if (!$cachedConfig->isHit()) {
-            $config = null;
             $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-
-            if (!\is_null($template)) {
-                $config = $template->resolve($this->storage->getConfiguration($portalNodeKey));
-            }
+            $config = $template->resolve($this->storage->getConfiguration($portalNodeKey));
 
             $this->cache->save($cachedConfig->set($config));
         } else {
@@ -63,10 +59,6 @@ class ConfigurationService implements ConfigurationServiceInterface
         }
 
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-
-        if (\is_null($template)) {
-            return;
-        }
 
         if (\is_null($configuration)) {
             $data = null;
@@ -102,7 +94,7 @@ class ConfigurationService implements ConfigurationServiceInterface
         return $editable;
     }
 
-    private function getMergedConfigurationTemplate(PortalNodeKeyInterface $portalNodeKey): ?OptionsResolver
+    private function getMergedConfigurationTemplate(PortalNodeKeyInterface $portalNodeKey): OptionsResolver
     {
         $portal = $this->portalRegistry->getPortal($portalNodeKey);
 

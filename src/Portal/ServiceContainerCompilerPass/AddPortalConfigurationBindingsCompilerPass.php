@@ -21,7 +21,7 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
         $this->configuration = $configuration;
     }
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         $keys = $this->configuration->keys();
 

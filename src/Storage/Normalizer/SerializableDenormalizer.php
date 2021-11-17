@@ -13,7 +13,7 @@ class SerializableDenormalizer implements DenormalizerInterface
         return 'serializable';
     }
 
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize($data, $type, ?string $format = null, array $context = [])
     {
         if (!$this->supportsDenormalization($data, $type)) {
             throw new InvalidArgumentException();
@@ -33,7 +33,7 @@ class SerializableDenormalizer implements DenormalizerInterface
         return $result;
     }
 
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization($data, $type, ?string $format = null)
     {
         return $type === $this->getType()
             && \is_string($data)

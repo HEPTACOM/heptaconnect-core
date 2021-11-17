@@ -26,7 +26,7 @@ class EmitService implements EmitServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface>
+     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface|null>
      */
     private array $emissionStackCache = [];
 
@@ -90,6 +90,11 @@ class EmitService implements EmitServiceInterface
         }
     }
 
+    /**
+     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     *
+     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     */
     private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?EmitterStackInterface
     {
         $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);

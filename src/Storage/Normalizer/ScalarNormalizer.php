@@ -13,7 +13,10 @@ class ScalarNormalizer implements NormalizerInterface
         return 'scalar';
     }
 
-    public function normalize($object, $format = null, array $context = [])
+    /**
+     * @return string
+     */
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         if (!$this->supportsNormalization($object)) {
             throw new InvalidArgumentException();
@@ -22,7 +25,7 @@ class ScalarNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization($data, ?string $format = null)
     {
         return \is_bool($data) || \is_string($data) || \is_null($data) || \is_float($data) || \is_int($data);
     }

@@ -26,6 +26,7 @@ class PrefixFilesystem extends AbstractFilesystem
     public function stripPath(string $path): string
     {
         $prefix = \rtrim($this->prefix, '/');
+        /** @var string $path */
         $path = \preg_replace('#^'.\preg_quote($prefix, '#').'#', '', $path);
         $path = \ltrim($path, '/');
 

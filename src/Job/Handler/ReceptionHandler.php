@@ -182,7 +182,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
                         $this->entityReflector->reflectEntities($mappedEntities, $targetPortalNodeKey);
 
                         $externalIds = \array_map(
-                            static fn (MappingComponentStructContract $m): ?string => $m->getExternalId(),
+                            static fn (MappingComponentStructContract $m): string => $m->getExternalId(),
                             \array_column($entities, 'mapping')
                         );
                         $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
