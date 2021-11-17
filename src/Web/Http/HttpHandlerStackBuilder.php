@@ -114,6 +114,6 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function isEmpty(): bool
     {
-        return empty($this->selection);
+        return $this->selection === [];
     }
 }

@@ -50,7 +50,7 @@ class EmissionActor implements EmissionActorInterface
     ): void {
         $externalIds = \iterable_to_array($externalIds);
 
-        if (!$externalIds) {
+        if ($externalIds === []) {
             return;
         }
 

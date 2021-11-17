@@ -62,7 +62,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 fn (string $k): bool => \str_starts_with($k, 'heptaconnect-')
             );
 
-            if (empty($heptaconnectKeywords)) {
+            if ($heptaconnectKeywords === []) {
                 continue;
             }
 
@@ -72,7 +72,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             $extra = $packageInstance->getExtra() ?? [];
             $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
-            if (\count($heptaconnect) > 0) {
+            if ($heptaconnect !== []) {
                 /* @var array<array-key, string> $keywords */
                 $config->setConfiguration($heptaconnect);
             }

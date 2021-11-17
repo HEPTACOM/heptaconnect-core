@@ -167,7 +167,7 @@ class MappingService implements MappingServiceInterface
                     $externalIds
                 );
 
-                if (empty($missingExternalIds)) {
+                if ($missingExternalIds === []) {
                     continue;
                 }
 

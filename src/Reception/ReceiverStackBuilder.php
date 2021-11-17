@@ -120,6 +120,6 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function isEmpty(): bool
     {
-        return empty($this->receivers);
+        return $this->receivers === [];
     }
 }

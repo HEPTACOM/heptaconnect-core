@@ -37,7 +37,7 @@ class StreamDenormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('data is null', 1634868818);
         }
 
-        if ($data === "") {
+        if ($data === '') {
             throw new UnexpectedValueException('data is empty', 1634868819);
         }
 

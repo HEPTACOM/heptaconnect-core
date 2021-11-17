@@ -120,6 +120,6 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function isEmpty(): bool
     {
-        return empty($this->emitters);
+        return $this->emitters === [];
     }
 }

@@ -120,6 +120,6 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function isEmpty(): bool
     {
-        return empty($this->explorers);
+        return $this->explorers === [];
     }
 }

@@ -16,7 +16,7 @@ class PrefixFilesystem extends AbstractFilesystem
     {
         parent::__construct($filesystem);
 
-        if (empty($prefix)) {
+        if ($prefix === '') {
             throw new \InvalidArgumentException('The prefix must not be empty.');
         }
 
