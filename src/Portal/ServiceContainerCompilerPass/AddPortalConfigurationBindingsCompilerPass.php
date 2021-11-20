@@ -38,6 +38,10 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
             \array_map([$this, 'createBinding'], $keys)
         );
 
+        if (!\is_array($bindings)) {
+            throw new \LogicException('array_combine should not have return false', 1637433403);
+        }
+
         foreach ($container->getDefinitions() as $definition) {
             if (!$definition->hasTag(PortalStackServiceContainerBuilder::SERVICE_FROM_A_PORTAL_TAG)) {
                 continue;
