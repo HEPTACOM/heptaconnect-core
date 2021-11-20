@@ -64,8 +64,9 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             }
 
             $externalId = $primaryKeyChanges->getForeignKey();
+            $firstForeignKey = $primaryKeyChanges->getFirstForeignKey();
 
-            if ($primaryKeyChanges->getFirstForeignKey() === $externalId) {
+            if ($firstForeignKey === $externalId) {
                 // no change
                 continue;
             }
@@ -82,7 +83,7 @@ class SaveMappingsPostProcessor extends PostProcessorContract
                 continue;
             }
 
-            if ($primaryKeyChanges->getFirstForeignKey() === null) {
+            if ($firstForeignKey === null && $externalId !== null) {
                 $payload->create($mapping->getMappingNodeKey(), $externalId);
             } elseif ($externalId === null) {
                 $payload->delete($mapping->getMappingNodeKey());

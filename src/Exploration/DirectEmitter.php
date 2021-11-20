@@ -16,6 +16,9 @@ class DirectEmitter extends EmitterContract
      */
     private string $supports;
 
+    /**
+     * @psalm-var \Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
+     */
     private DatasetEntityCollection $entities;
 
     /**
