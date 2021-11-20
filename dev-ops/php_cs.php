@@ -14,6 +14,9 @@ return (new Config())
         '@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
         'blank_line_after_opening_tag' => false,
+        'concat_space' => [
+            'spacing' => 'one',
+        ],
 
         'no_useless_else' => true,
         'no_useless_return' => true,
