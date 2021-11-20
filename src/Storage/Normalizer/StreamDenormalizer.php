@@ -41,13 +41,33 @@ class StreamDenormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('data is empty', 1634868819);
         }
 
-        return new SerializableStream($this->streamFactory->createStreamFromResource(
-            $this->filesystem->readStream($this->streamPath->buildPath($data))
-        ));
+        $resource = $this->filesystem->readStream($this->streamPath->buildPath($data));
+
+        if ($resource == false) {
+            throw new UnexpectedValueException('File can not be read from', 1637101289);
+        }
+
+        return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
     }
 
     public function supportsDenormalization($data, $type, ?string $format = null)
     {
-        return \is_string($data) && $data !== "" && ($type === $this->getType());
+        if (!\is_string($data)) {
+            return false;
+        }
+
+        if ($data !== '') {
+            return false;
+        }
+
+        if ($type !== $this->getType()) {
+            return false;
+        }
+
+        if (!$this->filesystem->has($this->streamPath->buildPath($data))) {
+            return false;
+        }
+
+        return true;
     }
 }
