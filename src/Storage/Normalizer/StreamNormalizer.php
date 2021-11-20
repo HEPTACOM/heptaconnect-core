@@ -53,7 +53,7 @@ class StreamNormalizer implements NormalizerInterface
     public function normalize($object, ?string $format = null, array $context = [])
     {
         if (!$object instanceof SerializableStream) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('$object is no SerializableStream', 1637432853);
         }
 
         $mediaId = $context['mediaId'] ?? null;
@@ -65,6 +65,11 @@ class StreamNormalizer implements NormalizerInterface
         }
 
         $stream = $object->copy()->detach();
+
+        if ($stream === null) {
+            throw new InvalidArgumentException('stream is invalid', 1637432854);
+        }
+
         $path = $this->streamPath->buildPath($filename);
 
         $this->logger->debug(LogMessage::STORAGE_STREAM_NORMALIZER_CONVERTS_HINT_TO_FILENAME(), [
@@ -76,9 +81,7 @@ class StreamNormalizer implements NormalizerInterface
 
         $this->filesystem->putStream($path, $stream);
 
-        if (\is_resource($stream)) {
-            \fclose($stream);
-        }
+        \fclose($stream);
 
         return $filename;
     }
