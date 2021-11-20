@@ -23,17 +23,17 @@ clean: ## Cleans up all ignored files and directories
 	[[ ! -d .build ]] || rm -rf .build
 
 .PHONY: it
-it: cs-fix-composer-normalize csfix cs test ## Fix code style and run unit tests
+it: cs-fix cs test ## Fix code style and run unit tests
 
 .PHONY: coverage
 coverage: vendor .build ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-fixer-dry-run cs-phpstan cs-psalm cs-phpmd cs-soft-require cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
+cs: cs-php cs-phpstan cs-psalm cs-phpmd cs-soft-require cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
 
-.PHONY: cs-fixer-dry-run
-cs-fixer-dry-run: vendor .build ## Run php-cs-fixer for code style analysis
+.PHONY: cs-php
+cs-php: vendor .build ## Run php-cs-fixer for code style analysis
 	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
 	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --format junit > .build/php-cs-fixer.junit.xml
 
@@ -72,12 +72,15 @@ cs-json: $(JSON_FILES) ## Run jq on every json file to ensure they are parsable 
 $(JSON_FILES):
 	$(JQ) . "$@"
 
+.PHONY: cs-fix ## Run all code style fixer that change files
+cs-fix: cs-fix-composer-normalize cs-fix-php
+
 .PHONY: cs-fix-composer-normalize
 cs-fix-composer-normalize: vendor ## Run composer-normalize for automatic composer.json style fixes
 	$(COMPOSER) normalize --diff composer.json
 
-.PHONY: csfix
-csfix: vendor .build ## Run php-cs-fixer for automatic code style fixes
+.PHONY: cs-fix-php
+cs-fix-php: vendor .build ## Run php-cs-fixer for automatic code style fixes
 	$(PHP) vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose
 
 .PHONY: infection
