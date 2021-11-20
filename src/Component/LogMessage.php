@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Component;
 /**
  * @method static string EMIT_NO_THROW()
  * @method static string EMIT_NO_EMITTER_FOR_TYPE()
+ * @method static string EMIT_NO_PRIMARY_KEY()
  * @method static string EXPLORE_NO_THROW()
  * @method static string EXPLORE_NO_EXPLORER_FOR_TYPE()
  * @method static string WEB_HTTP_HANDLE_NO_THROW()

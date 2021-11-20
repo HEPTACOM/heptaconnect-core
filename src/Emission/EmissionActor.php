@@ -69,13 +69,22 @@ class EmissionActor implements EmissionActorInterface
             /** @var DatasetEntityContract $entity */
             foreach ($stack->next($externalIds, $context) as $entity) {
                 foreach ($receptionRoutes as $receptionRoute) {
+                    $externalId = $entity->getPrimaryKey();
+
+                    if (\is_null($externalId)) {
+                        $this->logger->critical(LogMessage::EMIT_NO_PRIMARY_KEY(), [
+                            'type' => $stack->supports(),
+                            'stack' => $stack,
+                            'entity' => $entity,
+                            'code' => 1637434358,
+                        ]);
+
+                        continue;
+                    }
+
                     $jobs->push([
                         new Reception(
-                            new MappingComponentStruct(
-                                $context->getPortalNodeKey(),
-                                $stack->supports(),
-                                $entity->getPrimaryKey()
-                            ),
+                            new MappingComponentStruct($context->getPortalNodeKey(), $stack->supports(), $externalId),
                             $receptionRoute->getRoute(),
                             $entity
                         ),
