@@ -108,7 +108,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 throw new ReceptionJobHandlingException($job, 1636503505);
             }
 
-            if (!\in_array(RouteCapability::RECEPTION, $route->getCapabilities())) {
+            if (!\in_array(RouteCapability::RECEPTION, $route->getCapabilities(), true)) {
                 throw new ReceptionJobHandlingException($job, 1636503506);
             }
 
