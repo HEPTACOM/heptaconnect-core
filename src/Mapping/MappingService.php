@@ -5,14 +5,10 @@ namespace Heptacom\HeptaConnect\Core\Mapping;
 
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\MappingNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingExceptionRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryContract;
@@ -143,63 +139,6 @@ class MappingService implements MappingServiceInterface
         foreach ($createPayload as $mapping) {
             yield $mapping->getExternalId() => $mapping;
         }
-    }
-
-    public function ensurePersistence(MappingComponentCollection $mappingComponentCollection): void
-    {
-        $prePayload = new MappingComponentCollection();
-        $nodes = new MappingNodeKeyCollection();
-
-        foreach ($mappingComponentCollection->getPortalNodeKeys() as $portalNodeKey) {
-            $createMappingNodes = 0;
-            $portalNodeMappings = new MappingComponentCollection($mappingComponentCollection->filterByPortalNodeKey($portalNodeKey));
-
-            foreach ($portalNodeMappings->getEntityTypes() as $entityType) {
-                $datasetEntityMappings = new MappingComponentCollection($portalNodeMappings->filterByEntityType($entityType));
-                $externalIds = $datasetEntityMappings->getExternalIds();
-                $missingExternalIds = $this->mappingRepository->listUnsavedExternalIds(
-                    $portalNodeKey,
-                    $entityType,
-                    $externalIds
-                );
-
-                if ($missingExternalIds === []) {
-                    continue;
-                }
-
-                // TODO check if filtering is faster than new
-                $prePayload->push(\array_map(
-                    static fn (string $externalId) => new MappingComponentStruct($portalNodeKey, $entityType, $externalId),
-                    $missingExternalIds
-                ));
-
-                ++$createMappingNodes;
-            }
-
-            $nodes->push(
-                $this->mappingNodeRepository->createList($entityType, $portalNodeKey, $createMappingNodes)
-            );
-        }
-
-        $payload = new MappingCollection();
-        $prePayloadIterator = $prePayload->getIterator();
-        $nodesIterator = $nodes->getIterator();
-
-        for (; $prePayloadIterator->valid() && $nodesIterator->valid(); $prePayloadIterator->next(), $nodesIterator->next()) {
-            /** @var MappingComponentStructContract $prePayloadItem */
-            $prePayloadItem = $prePayloadIterator->current();
-            /** @var MappingNodeKeyInterface $nodesItemKey */
-            $nodesItemKey = $nodesIterator->current();
-            $mapping = new MappingStruct(
-                $prePayloadItem->getPortalNodeKey(),
-                new MappingNodeStruct($nodesItemKey, $prePayloadItem->getEntityType())
-            );
-
-            $mapping->setExternalId($prePayloadItem->getExternalId());
-            $payload->push([$mapping]);
-        }
-
-        $this->mappingRepository->createList($payload);
     }
 
     public function save(MappingInterface $mapping): void
