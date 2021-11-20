@@ -30,7 +30,7 @@ class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterfac
         /** @var ReceiverCollection $receivers */
         $receivers = $container->get(ReceiverCollection::class);
         /** @var ReceiverCollection $receiverDecorators */
-        $receiverDecorators = $container->get(ReceiverCollection::class.'.decorator');
+        $receiverDecorators = $container->get(ReceiverCollection::class . '.decorator');
         $receivers->push($receiverDecorators);
 
         return new ReceiverStackBuilder($receivers, $receiverDecorators, $entityType, $this->logger);

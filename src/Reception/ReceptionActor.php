@@ -71,7 +71,7 @@ class ReceptionActor implements ReceptionActorInterface
                         ];
                     }
 
-                    $this->logger->critical(LogMessage::RECEIVE_NO_THROW().'_INNER', [
+                    $this->logger->critical(LogMessage::RECEIVE_NO_THROW() . '_INNER', [
                         'exception' => $innerException,
                     ] + $errorContext);
                 }

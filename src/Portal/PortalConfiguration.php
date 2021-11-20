@@ -45,7 +45,7 @@ class PortalConfiguration extends ConfigurationContract
                 foreach ($unwrappables as $prefix => $unwrappable) {
                     if (\is_array($unwrappable)) {
                         foreach ($unwrappable as $key => $value) {
-                            $newUnwrappables[$prefix.'.'.$key] = $value;
+                            $newUnwrappables[$prefix . '.' . $key] = $value;
                         }
                     }
 

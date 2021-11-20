@@ -31,7 +31,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         $cacheKey = $this->getCacheKey();
 
         if (\is_string($cacheKey)) {
-            $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class).'-'.$cacheKey);
+            $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class) . '-' . $cacheKey);
 
             if ($cacheItem->isHit()) {
                 return $cacheItem->get();
@@ -46,7 +46,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         if (!\is_null($this->composerJson)) {
             $workingDir = \dirname($this->composerJson);
 
-            if (!@\is_dir($workingDir.\DIRECTORY_SEPARATOR.'vendor')) {
+            if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
                 $workingDir = null;
             }
         }
@@ -161,14 +161,14 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
 
         foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
             foreach ($dirs as $dir) {
-                if (\is_dir($absolute = $installPath.\DIRECTORY_SEPARATOR.$dir)) {
+                if (\is_dir($absolute = $installPath . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
                 }
                 // TODO log. This is a weird case
 
                 if ($package instanceof RootPackageInterface
                     && !\is_null($workingDir)
-                    && \is_dir($absolute = $workingDir.\DIRECTORY_SEPARATOR.$dir)) {
+                    && \is_dir($absolute = $workingDir . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
                 }
             }

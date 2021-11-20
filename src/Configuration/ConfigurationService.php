@@ -114,6 +114,6 @@ class ConfigurationService implements ConfigurationServiceInterface
         $key = $this->keyGenerator->serialize($portalNodeKey);
         $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
 
-        return 'config.cache.'.$key;
+        return 'config.cache.' . $key;
     }
 }

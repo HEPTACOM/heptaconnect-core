@@ -226,7 +226,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             PortalStorageInterface::class => $this->portalStorageFactory->createPortalStorage($portalNodeKey),
             ResourceLockFacade::class => new ResourceLockFacade($this->resourceLocking),
             PortalNodeKeyInterface::class => $portalNodeKey,
-            ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::'.$this->storageKeyGenerator->serialize($portalNodeKey)),
+            ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::' . $this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
@@ -242,13 +242,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
-        $containerBuilder->setDefinition(EmitterCollection::class.'.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(EmitterCollection::class . '.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
         $containerBuilder->setDefinition(ExplorerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EXPLORER_TAG)]));
-        $containerBuilder->setDefinition(ExplorerCollection::class.'.decorator', new Definition(ExplorerCollection::class, [new TaggedIteratorArgument(self::EXPLORER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(ExplorerCollection::class . '.decorator', new Definition(ExplorerCollection::class, [new TaggedIteratorArgument(self::EXPLORER_DECORATOR_TAG)]));
         $containerBuilder->setDefinition(ReceiverCollection::class, new Definition(null, [new TaggedIteratorArgument(self::RECEIVER_TAG)]));
-        $containerBuilder->setDefinition(ReceiverCollection::class.'.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(ReceiverCollection::class . '.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
         $containerBuilder->setDefinition(HttpHandlerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_TAG)]));
-        $containerBuilder->setDefinition(HttpHandlerCollection::class.'.decorator', new Definition(HttpHandlerCollection::class, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_DECORATOR_TAG)]));
+        $containerBuilder->setDefinition(HttpHandlerCollection::class . '.decorator', new Definition(HttpHandlerCollection::class, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_DECORATOR_TAG)]));
 
         $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
             \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
@@ -320,7 +320,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $fileLoader->registerClasses(
                 new Definition(),
                 $namespace,
-                \rtrim($path, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.'*',
+                \rtrim($path, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . '*',
                 $exclude
             );
         }
@@ -340,7 +340,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             new PhpFileLoader($containerBuilder, $fileLocator),
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
-        $globPattern = $containerConfigurationPath.\DIRECTORY_SEPARATOR.'services.{yml,yaml,xml,php}';
+        $globPattern = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.{yml,yaml,xml,php}';
         $globbedFiles = \glob($globPattern, \GLOB_BRACE);
 
         if (!\is_array($globbedFiles)) {
@@ -360,7 +360,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     {
         $this->flowComponentBuilder->reset();
 
-        $globbedFiles = \glob($path.\DIRECTORY_SEPARATOR.'*.php');
+        $globbedFiles = \glob($path . \DIRECTORY_SEPARATOR . '*.php');
 
         if (!\is_array($globbedFiles)) {
             return;

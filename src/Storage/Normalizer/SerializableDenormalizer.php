@@ -23,7 +23,7 @@ class SerializableDenormalizer implements DenormalizerInterface
 
         try {
             $unserialize_callback_func = \ini_get('unserialize_callback_func');
-            \ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeClass');
+            \ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeClass');
 
             $result = \unserialize($data);
         } catch (\Throwable $exception) {

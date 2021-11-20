@@ -27,7 +27,7 @@ class PrefixFilesystem extends AbstractFilesystem
     {
         $prefix = \rtrim($this->prefix, '/');
         /** @var string $path */
-        $path = \preg_replace('#^'.\preg_quote($prefix, '#').'#', '', $path);
+        $path = \preg_replace('#^' . \preg_quote($prefix, '#') . '#', '', $path);
         $path = \ltrim($path, '/');
 
         return $path;
@@ -35,11 +35,11 @@ class PrefixFilesystem extends AbstractFilesystem
 
     public function preparePath(string $path): string
     {
-        return $this->prefix.$path;
+        return $this->prefix . $path;
     }
 
     private function normalizePrefix(string $prefix): string
     {
-        return \trim($prefix, '/').'/';
+        return \trim($prefix, '/') . '/';
     }
 }

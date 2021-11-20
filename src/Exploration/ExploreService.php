@@ -57,7 +57,7 @@ class ExploreService implements ExploreServiceInterface
                 continue;
             }
 
-            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType.'_NO_ID'))]);
+            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType . '_NO_ID'))]);
         }
 
         $this->jobDispatcher->dispatch($jobs);
@@ -113,7 +113,7 @@ class ExploreService implements ExploreServiceInterface
         /** @var ExplorerCollection $explorers */
         $explorers = $container->get(ExplorerCollection::class);
         /** @var ExplorerCollection $explorerDecorators */
-        $explorerDecorators = $container->get(ExplorerCollection::class.'.decorator');
+        $explorerDecorators = $container->get(ExplorerCollection::class . '.decorator');
         $explorers->push($explorerDecorators);
 
         return $explorers;

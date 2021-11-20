@@ -30,7 +30,7 @@ class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterfac
         /** @var ExplorerCollection $sources */
         $sources = $container->get(ExplorerCollection::class);
         /** @var ExplorerCollection $decorators */
-        $decorators = $container->get(ExplorerCollection::class.'.decorator');
+        $decorators = $container->get(ExplorerCollection::class . '.decorator');
 
         return new ExplorerStackBuilder($sources, $decorators, $entityType, $this->logger);
     }

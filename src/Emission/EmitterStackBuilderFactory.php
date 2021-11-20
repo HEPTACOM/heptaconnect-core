@@ -30,7 +30,7 @@ class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
         /** @var EmitterCollection $sources */
         $sources = $container->get(EmitterCollection::class);
         /** @var EmitterCollection $decorators */
-        $decorators = $container->get(EmitterCollection::class.'.decorator');
+        $decorators = $container->get(EmitterCollection::class . '.decorator');
 
         return new EmitterStackBuilder($sources, $decorators, $entityType, $this->logger);
     }

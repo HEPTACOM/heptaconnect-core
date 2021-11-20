@@ -140,7 +140,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
                     foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
                         foreach ($entities as $externalId => $entity) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_'.\md5(\join('_', [
+                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\join('_', [
                                     $sourcePortalKey,
                                     $targetPortalKey,
                                     $dataType,

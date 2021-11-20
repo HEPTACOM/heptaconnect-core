@@ -60,17 +60,17 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
 
     private function getParameterKey(string $configurationName): string
     {
-        return 'portal_config.'.$configurationName;
+        return 'portal_config.' . $configurationName;
     }
 
     private function getBindingKey(string $configurationName): string
     {
-        return '$config'.\str_replace(\str_split(self::CONFIG_KEY_SEPARATORS), '', \ucwords($configurationName, self::CONFIG_KEY_SEPARATORS));
+        return '$config' . \str_replace(\str_split(self::CONFIG_KEY_SEPARATORS), '', \ucwords($configurationName, self::CONFIG_KEY_SEPARATORS));
     }
 
     private function createBinding(string $configurationName): BoundArgument
     {
-        return new BoundArgument('%'.$this->getParameterKey($configurationName).'%');
+        return new BoundArgument('%' . $this->getParameterKey($configurationName) . '%');
     }
 
     private function getConstructorArgumentNames(Definition $definition): array
@@ -120,7 +120,7 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
         $parameters = $method->getParameters();
         $parameters = \array_filter($parameters, [$this, 'isParameterScalarish']);
 
-        return \array_map(static fn (\ReflectionParameter $p): string => '$'.$p->getName(), $parameters);
+        return \array_map(static fn (\ReflectionParameter $p): string => '$' . $p->getName(), $parameters);
     }
 
     private function isParameterScalarish(\ReflectionParameter $parameter): bool

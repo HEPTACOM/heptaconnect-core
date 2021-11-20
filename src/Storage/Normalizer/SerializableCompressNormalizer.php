@@ -9,7 +9,7 @@ class SerializableCompressNormalizer extends SerializableNormalizer
 {
     public function getType(): string
     {
-        return parent::getType().'+gzpress';
+        return parent::getType() . '+gzpress';
     }
 
     public function normalize($object, ?string $format = null, array $context = [])

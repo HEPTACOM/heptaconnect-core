@@ -69,6 +69,6 @@ class ResourceLocking extends ResourceLockingContract
             }
         }
 
-        return $prefix.$resourceKey;
+        return $prefix . $resourceKey;
     }
 }
