@@ -37,6 +37,7 @@ class EmissionActor implements EmissionActorInterface
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceptionRouteListActionInterface $receptionRouteListAction
     ) {
+        /* @phpstan-ignore-next-line */
         $this->jobDispatcher = $jobDispatcher;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
@@ -82,6 +83,7 @@ class EmissionActor implements EmissionActorInterface
                 }
             }
 
+            /* @phpstan-ignore-next-line */
             $this->jobDispatcher->dispatch($jobs);
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EMIT_NO_THROW(), [

@@ -10,7 +10,7 @@ class StreamPathContract
 
     public function buildPath(string $filename): string
     {
-        $prefix = \array_slice(str_split($filename, 2), 0, 3);
+        $prefix = \array_slice(\str_split($filename, 2), 0, 3);
         $parts = [self::STORAGE_LOCATION, ...$prefix, $filename];
 
         return \implode('/', $parts);

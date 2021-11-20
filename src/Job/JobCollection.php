@@ -13,6 +13,7 @@ class JobCollection extends AbstractCollection
 {
     protected function isValidItem($item): bool
     {
+        /* @phpstan-ignore-next-line */
         return $item instanceof JobContract;
     }
 }

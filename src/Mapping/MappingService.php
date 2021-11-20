@@ -74,6 +74,7 @@ class MappingService implements MappingServiceInterface
         $mappingExists = $mappingNodeKey instanceof MappingNodeKeyInterface;
 
         if (!$mappingExists) {
+            /* @phpstan-ignore-next-line */
             $mappingNodeKey = $this->mappingNodeRepository->create($entityType, $portalNodeKey);
         }
 
@@ -310,6 +311,7 @@ class MappingService implements MappingServiceInterface
         PortalNodeKeyInterface $portalNodeKey,
         string $externalId
     ): ?MappingNodeKeyInterface {
+        /* @phpstan-ignore-next-line */
         $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
             $entityType,
             $portalNodeKey,

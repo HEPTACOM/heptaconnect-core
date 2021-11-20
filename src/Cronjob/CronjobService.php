@@ -35,6 +35,7 @@ class CronjobService implements CronjobServiceInterface
         }
 
         try {
+            /* @phpstan-ignore-next-line ignored as deprecated */
             $nextExecution = CronExpression::factory($cronExpression)->getNextRunDate();
         } catch (\Throwable $t) {
             throw new InvalidCronExpressionException($cronExpression, $t);

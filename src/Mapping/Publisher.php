@@ -35,7 +35,7 @@ class Publisher implements PublisherInterface
     public function publishBatch(MappingComponentCollection $mappings): void
     {
         /** @var Emission[] $jobs */
-        $jobs = \iterable_to_array($mappings->map(static fn (MappingComponentStruct $mapping): Emission => new Emission($mapping)));
+        $jobs = \iterable_to_array($mappings->map(static fn (MappingComponentStruct $mapping, $_): Emission => new Emission($mapping)));
 
         if ($jobs === []) {
             return;
