@@ -130,7 +130,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 }
 
                 $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetPortalNodeKey());
-                $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
+                $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourcePortalNodeKey());
             } catch (ReceptionJobHandlingException|UnsupportedStorageKeyException $throwable) {
                 $this->logger->critical('Reception job preparation failed', [
                     'code' => $throwable->getCode(),
