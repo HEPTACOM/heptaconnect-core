@@ -29,6 +29,8 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Enum\RouteCapability;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 
 class ReceptionHandler implements ReceptionHandlerInterface
@@ -51,6 +53,8 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private RouteGetActionInterface $routeGetAction;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         LockFactory $lockFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
@@ -60,7 +64,8 @@ class ReceptionHandler implements ReceptionHandlerInterface
         ReceiveServiceInterface $receiveService,
         DeepObjectIteratorContract $objectIterator,
         JobRepositoryContract $jobRepository,
-        RouteGetActionInterface $routeGetAction
+        RouteGetActionInterface $routeGetAction,
+        LoggerInterface $logger
     ) {
         $this->lockFactory = $lockFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
@@ -71,6 +76,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
         $this->objectIterator = $objectIterator;
         $this->jobRepository = $jobRepository;
         $this->routeGetAction = $routeGetAction;
+        $this->logger = $logger;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
@@ -90,40 +96,49 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
         /** @var JobData $job */
         foreach ($jobs as $job) {
-            $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;
+            try {
+                $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;
 
-            if (!$routeKey instanceof RouteKeyInterface) {
-                throw new ReceptionJobHandlingException($job, 1636503503);
+                if (!$routeKey instanceof RouteKeyInterface) {
+                    throw new ReceptionJobHandlingException($job, 1636503503);
+                }
+
+                $entity = $job->getPayload()[Reception::ENTITY] ?? null;
+
+                if (!$entity instanceof DatasetEntityContract) {
+                    throw new ReceptionJobHandlingException($job, 1636503504);
+                }
+
+                $route = $routes[$this->storageKeyGenerator->serialize($routeKey)] ?? null;
+
+                if (!$route instanceof RouteGetResult) {
+                    throw new ReceptionJobHandlingException($job, 1636503505);
+                }
+
+                if (!\in_array(RouteCapability::RECEPTION, $route->getCapabilities(), true)) {
+                    throw new ReceptionJobHandlingException($job, 1636503506);
+                }
+
+                if ($route->getEntityType() !== \get_class($entity)) {
+                    throw new ReceptionJobHandlingException($job, 1636503507);
+                }
+
+                $externalId = $job->getMappingComponent()->getExternalId();
+
+                if ($externalId !== $entity->getPrimaryKey()) {
+                    throw new ReceptionJobHandlingException($job, 1636503508);
+                }
+
+                $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
+                $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
+            } catch (ReceptionJobHandlingException|UnsupportedStorageKeyException $throwable) {
+                $this->logger->critical('Reception job preparation failed', [
+                    'code' => $throwable->getCode(),
+                    'exception' => $throwable,
+                ]);
+
+                continue;
             }
-
-            $entity = $job->getPayload()[Reception::ENTITY] ?? null;
-
-            if (!$entity instanceof DatasetEntityContract) {
-                throw new ReceptionJobHandlingException($job, 1636503504);
-            }
-
-            $route = $routes[$this->storageKeyGenerator->serialize($routeKey)] ?? null;
-
-            if (!$route instanceof RouteGetResult) {
-                throw new ReceptionJobHandlingException($job, 1636503505);
-            }
-
-            if (!\in_array(RouteCapability::RECEPTION, $route->getCapabilities(), true)) {
-                throw new ReceptionJobHandlingException($job, 1636503506);
-            }
-
-            if ($route->getEntityType() !== \get_class($entity)) {
-                throw new ReceptionJobHandlingException($job, 1636503507);
-            }
-
-            $externalId = $job->getMappingComponent()->getExternalId();
-
-            if ($externalId !== $entity->getPrimaryKey()) {
-                throw new ReceptionJobHandlingException($job, 1636503508);
-            }
-
-            $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetKey());
-            $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourceKey());
 
             $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
                 'mapping' => $job->getMappingComponent(),
