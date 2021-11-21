@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContrac
 use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
 use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
+use Psr\Log\LoggerInterface;
 
 class SaveMappingsPostProcessor extends PostProcessorContract
 {
@@ -19,12 +20,16 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 
     private MappingPersisterContract $mappingPersister;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         DeepObjectIteratorContract $deepObjectIterator,
-        MappingPersisterContract $mappingPersister
+        MappingPersisterContract $mappingPersister,
+        LoggerInterface $logger
     ) {
         $this->deepObjectIterator = $deepObjectIterator;
         $this->mappingPersister = $mappingPersister;
+        $this->logger = $logger;
     }
 
     public function handle(PostReceptionEvent $event): void
@@ -74,12 +79,24 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
 
             if (!$mapping instanceof PrimaryKeySharingMappingStruct) {
-                // no mapping
+                $this->logger->critical('Unknown mapping origin', [
+                    'code' => 1637527920,
+                    'firstForeignKey' => $firstForeignKey,
+                    'externalId' => $externalId,
+                    'entityType' => \get_class($entity),
+                ]);
+
                 continue;
             }
 
             if ($mapping->getExternalId() === null) {
-                // unmappable
+                $this->logger->critical('Invalid mapping origin', [
+                    'code' => 1637527921,
+                    'firstForeignKey' => $firstForeignKey,
+                    'externalId' => $externalId,
+                    'entityType' => \get_class($entity),
+                ]);
+
                 continue;
             }
 
