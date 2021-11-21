@@ -85,7 +85,7 @@ class EmissionActor implements EmissionActorInterface
                     $jobs->push([
                         new Reception(
                             new MappingComponentStruct($context->getPortalNodeKey(), $stack->supports(), $externalId),
-                            $receptionRoute->getRoute(),
+                            $receptionRoute->getRouteKey(),
                             $entity
                         ),
                     ]);
