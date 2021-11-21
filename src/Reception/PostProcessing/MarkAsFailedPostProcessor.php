@@ -46,6 +46,7 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
                 $logger->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
                     'throwable' => $data->getThrowable(),
                     'data' => $data,
+                    'code' => 1637456198,
                 ]);
             }
         }
