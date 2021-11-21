@@ -91,7 +91,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
         $routes = [];
 
         foreach ($routeDatas as $routeData) {
-            $routes[$this->storageKeyGenerator->serialize($routeData->getKey())] = $routeData;
+            $routes[$this->storageKeyGenerator->serialize($routeData->getRouteKey())] = $routeData;
         }
 
         /** @var JobData $job */
