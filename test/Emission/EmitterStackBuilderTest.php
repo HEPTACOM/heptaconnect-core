@@ -84,7 +84,7 @@ class EmitterStackBuilderTest extends TestCase
         $emitter2->method('supports')->willReturn(FooBarEntity::class);
 
         $stackBuilder = new EmitterStackBuilder(
-            new EmitterCollection([$emitter1]),
+            new EmitterCollection([$emitter1, $emitter2]),
             new EmitterCollection([$emitter2]),
             FooBarEntity::class,
             $this->createMock(LoggerInterface::class),

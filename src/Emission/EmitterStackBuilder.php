@@ -65,20 +65,22 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function pushSource(): self
     {
-        $lastEmitter = null;
+        $firstEmitter = null;
 
         foreach ($this->sourceEmitters->bySupport($this->entityType) as $emitter) {
-            $lastEmitter = $emitter;
+            $firstEmitter = $emitter;
+
+            break;
         }
 
-        if ($lastEmitter instanceof EmitterContract) {
+        if ($firstEmitter instanceof EmitterContract) {
             $this->logger->debug(\sprintf(
                 'EmitterStackBuilder: Pushed %s as source emitter.',
-                \get_class($lastEmitter)
+                \get_class($firstEmitter)
             ));
 
-            if (!\in_array($lastEmitter, $this->emitters, true)) {
-                $this->emitters[] = $lastEmitter;
+            if (!\in_array($firstEmitter, $this->emitters, true)) {
+                $this->emitters[] = $firstEmitter;
             }
         }
 

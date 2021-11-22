@@ -59,20 +59,22 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function pushSource(): self
     {
-        $last = null;
+        $first = null;
 
         foreach ($this->sources->bySupport($this->path) as $item) {
-            $last = $item;
+            $first = $item;
+
+            break;
         }
 
-        if ($last instanceof HttpHandlerContract) {
+        if ($first instanceof HttpHandlerContract) {
             $this->logger->debug(\sprintf(
                 'HttpHandlerStackBuilder: Pushed %s as source http handler.',
-                \get_class($last)
+                \get_class($first)
             ));
 
-            if (!\in_array($last, $this->selection, true)) {
-                $this->selection[] = $last;
+            if (!\in_array($first, $this->selection, true)) {
+                $this->selection[] = $first;
             }
         }
 

@@ -65,20 +65,22 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function pushSource(): self
     {
-        $lastReceiver = null;
+        $firstReceiver = null;
 
         foreach ($this->sourceReceivers->bySupport($this->entityType) as $receiver) {
-            $lastReceiver = $receiver;
+            $firstReceiver = $receiver;
+
+            break;
         }
 
-        if ($lastReceiver instanceof ReceiverContract) {
+        if ($firstReceiver instanceof ReceiverContract) {
             $this->logger->debug(\sprintf(
                 'ReceiverStackBuilder: Pushed %s as source receiver.',
-                \get_class($lastReceiver)
+                \get_class($firstReceiver)
             ));
 
-            if (!\in_array($lastReceiver, $this->receivers, true)) {
-                $this->receivers[] = $lastReceiver;
+            if (!\in_array($firstReceiver, $this->receivers, true)) {
+                $this->receivers[] = $firstReceiver;
             }
         }
 

@@ -82,7 +82,7 @@ class ExplorerStackBuilderTest extends TestCase
         $explorer2->method('supports')->willReturn(FooBarEntity::class);
 
         $stackBuilder = new ExplorerStackBuilder(
-            new ExplorerCollection([$explorer1]),
+            new ExplorerCollection([$explorer1, $explorer2]),
             new ExplorerCollection([$explorer2]),
             FooBarEntity::class,
             $this->createMock(LoggerInterface::class),

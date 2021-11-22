@@ -65,20 +65,22 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function pushSource(): self
     {
-        $lastExplorer = null;
+        $firstExplorer = null;
 
         foreach ($this->sourceExplorers->bySupport($this->entityType) as $explorer) {
-            $lastExplorer = $explorer;
+            $firstExplorer = $explorer;
+
+            break;
         }
 
-        if ($lastExplorer instanceof ExplorerContract) {
+        if ($firstExplorer instanceof ExplorerContract) {
             $this->logger->debug(\sprintf(
                 'ExplorerStackBuilder: Pushed %s as source explorer.',
-                \get_class($lastExplorer)
+                \get_class($firstExplorer)
             ));
 
-            if (!\in_array($lastExplorer, $this->explorers, true)) {
-                $this->explorers[] = $lastExplorer;
+            if (!\in_array($firstExplorer, $this->explorers, true)) {
+                $this->explorers[] = $firstExplorer;
             }
         }
 

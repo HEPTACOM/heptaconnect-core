@@ -86,7 +86,7 @@ class ReceiverStackBuilderTest extends TestCase
         $receiver2->method('supports')->willReturn(FooBarEntity::class);
 
         $stackBuilder = new ReceiverStackBuilder(
-            new ReceiverCollection([$receiver1]),
+            new ReceiverCollection([$receiver1, $receiver2]),
             new ReceiverCollection([$receiver2]),
             FooBarEntity::class,
             $this->createMock(LoggerInterface::class),
