@@ -216,7 +216,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
                             $targetMapping = (new MappingStruct($targetPortalNodeKey, new MappingNodeStruct(
                                 $mappingNodeKey,
                                 $dataType
-                            )))->setExternalId($externalId);
+                            )))->setExternalId((string) $externalId);
 
                             $mappedDatasetEntities->push([new MappedDatasetEntityStruct($targetMapping, $entities[$externalId]['entity'])]);
                         }

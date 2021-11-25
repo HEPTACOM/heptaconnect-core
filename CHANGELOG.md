@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fix type error during reception when entity with numeric primary key is received
+
 ## [0.8.1] - 2021-11-22
 
 ### Fixed
