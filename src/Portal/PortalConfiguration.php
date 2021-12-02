@@ -29,7 +29,7 @@ class PortalConfiguration extends ConfigurationContract
 
     public function keys(): array
     {
-        return \array_keys(\array_filter($this->flattened(), static fn ($value): bool => !\is_array($value)));
+        return \array_keys($this->flattened());
     }
 
     private function &flattened(): array
