@@ -3,7 +3,6 @@ PHP := $(shell which php) $(PHP_EXTRA_ARGS)
 COMPOSER := $(PHP) $(shell which composer) $(COMPOSER_EXTRA_ARGS)
 PHPUNIT_EXTRA_ARGS := --config=test/phpunit.xml
 PHPUNIT := $(PHP) vendor/bin/phpunit $(PHPUNIT_EXTRA_ARGS)
-CURL := $(shell which curl)
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -28,14 +27,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-phpmd cs-composer-unused ## Run every code style check target
-
-.PHONY: cs-phpmd
-cs-phpmd: vendor .build ## Run php mess detector for static code analysis
-	# TODO Re-add rulesets/unused.xml when phpmd fixes false-positive UnusedPrivateField
-	$(PHP) vendor/bin/phpmd --ignore-violations-on-exit src ansi rulesets/codesize.xml,rulesets/naming.xml
-	[[ -f .build/phpmd-junit.xslt ]] || $(CURL) https://phpmd.org/junit.xslt -o .build/phpmd-junit.xslt
-	$(PHP) vendor/bin/phpmd src xml rulesets/codesize.xml,rulesets/naming.xml | xsltproc .build/phpmd-junit.xslt - > .build/php-md.junit.xml
+cs: cs-composer-unused ## Run every code style check target
 
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor ## Run composer-unused to detect once-required packages that are not used anymore
