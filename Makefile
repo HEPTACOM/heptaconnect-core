@@ -14,7 +14,7 @@ help: ## List useful make targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: all
-all: clean it coverage infection ## Cleans up and runs typical tests and style analysis
+all: clean it coverage ## Cleans up and runs typical tests and style analysis
 
 .PHONY: clean
 clean: ## Cleans up all ignored files and directories
@@ -79,22 +79,12 @@ cs-fix-composer-normalize: vendor ## Run composer-normalize for automatic compos
 cs-fix-php: vendor .build ## Run php-cs-fixer for automatic code style fixes
 	$(PHP) vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose
 
-.PHONY: infection
-infection: test-setup-fixture run-infection test-clean-fixture ## Run infection tests
-
-.PHONY: run-infection
-run-infection: vendor .build
-	# Can be simplified when infection/infection#1283 is resolved
-	[[ -d .build/phpunit-logs ]] || mkdir -p .build/.phpunit-coverage
-	$(PHPUNIT) --coverage-xml=.build/.phpunit-coverage/index.xml --log-junit=.build/.phpunit-coverage/infection.junit.xml
-	$(PHP) vendor/bin/infection --min-covered-msi=80 --min-msi=80 --configuration=dev-ops/infection.json --coverage=../.build/.phpunit-coverage --show-mutations --no-interaction
-
 .PHONY: test
 test: test-setup-fixture run-phpunit test-clean-fixture ## Run phpunit for unit tests
 
 .PHONY: run-phpunit
 run-phpunit: vendor .build
-	$(PHPUNIT) --log-junit=.build/.phpunit-coverage/infection.junit.xml
+	$(PHPUNIT) --log-junit=.build/.phpunit-coverage/phpunit.junit.xml
 
 test/%Test.php: vendor
 	$(PHPUNIT) "$@"
