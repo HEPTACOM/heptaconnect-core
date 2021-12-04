@@ -1,0 +1,84 @@
+{
+    "name": "heptacom/heptaconnect-core",
+    "type": "library",
+    "description": "HEPTAconnect core processes",
+    "keywords": [
+        "heptaconnect",
+        "messaging"
+    ],
+    "version": "0.8.3",
+    "license": [
+        "AGPL-3.0-or-later",
+        "proprietary"
+    ],
+    "authors": [
+        {
+            "name": "HEPTACOM GmbH"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-hash": "*",
+        "ext-json": "*",
+        "ext-zlib": "*",
+        "bentools/iterable-functions": "^1.4",
+        "composer/composer": ">=1",
+        "dragonmantank/cron-expression": ">=3",
+        "heptacom/heptaconnect-dataset-base": "self.version",
+        "heptacom/heptaconnect-portal-base": "self.version",
+        "heptacom/heptaconnect-storage-base": "self.version",
+        "league/flysystem": "^1",
+        "php-http/discovery": "^1.0",
+        "psr/cache": "^1.0",
+        "psr/container": "^1.0",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0",
+        "psr/http-message": "^1.0",
+        "psr/log": "^1.1",
+        "ramsey/uuid": "^3.5 || ^4",
+        "symfony/config": "^4.4 || ^5.0",
+        "symfony/dependency-injection": "^4.4 || ^5.0",
+        "symfony/event-dispatcher": "^4.0 || ^5.0",
+        "symfony/lock": "^4.0 || ^5.0",
+        "symfony/messenger": "^4.0 || ^5.0",
+        "symfony/polyfill-php80": ">=1.15",
+        "symfony/yaml": "^4.4 || ^5.0"
+    },
+    "require-dev": {
+        "ergebnis/composer-normalize": ">=2.7",
+        "icanhazstring/composer-unused": ">=0.7",
+        "nyholm/psr7": ">=1",
+        "php-http/curl-client": ">=1",
+        "phpmd/phpmd": "@stable",
+        "phpunit/phpunit": ">=9.3 <10",
+        "symfony/cache": ">=2"
+    },
+    "extra": {
+        "unused": [
+            "bentools/iterable-functions"
+        ]
+    },
+    "autoload": {
+        "psr-4": {
+            "Heptacom\\HeptaConnect\\Core\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Heptacom\\HeptaConnect\\Core\\Test\\": "test/"
+        }
+    },
+    "repositories": {
+        "heptaconnect-sources": {
+            "type": "path",
+            "url": "../**"
+        }
+    },
+    "support": {
+        "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
+        "source": "https://github.com/HEPTACOM/heptaconnect-framework",
+        "docs": "https://connect.heptacom.de/",
+        "rss": "https://connect.heptacom.de/feed/rss2.xml"
+    },
+    "website": "https://heptaconnect.io"
+}

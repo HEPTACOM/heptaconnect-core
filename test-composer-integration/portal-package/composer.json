@@ -1,0 +1,25 @@
+{
+    "name": "heptacom-fixture/heptaconnect-portal-a",
+    "description": "Fixture",
+    "type": "library",
+    "keywords": [
+        "heptaconnect-portal",
+        "other-fancy-keyword"
+    ],
+    "require": {
+        "php": ">=7.4",
+        "heptacom/heptaconnect-portal-base": "@stable"
+    },
+    "autoload": {
+        "psr-4": {
+            "HeptacomFixture\\Portal\\A\\": "src/"
+        }
+    },
+    "extra": {
+        "heptaconnect": {
+            "portals": [
+                "HeptacomFixture\\Portal\\A\\Portal"
+            ]
+        }
+    }
+}
