@@ -44,12 +44,6 @@
         "symfony/polyfill-php80": ">=1.15",
         "symfony/yaml": "^4.4 || ^5.0"
     },
-    "require-dev": {
-        "nyholm/psr7": ">=1",
-        "php-http/curl-client": ">=1",
-        "phpunit/phpunit": ">=9.3 <10",
-        "symfony/cache": ">=2"
-    },
     "extra": {
         "unused": [
             "bentools/iterable-functions"
@@ -58,11 +52,6 @@
     "autoload": {
         "psr-4": {
             "Heptacom\\HeptaConnect\\Core\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Heptacom\\HeptaConnect\\Core\\Test\\": "test/"
         }
     },
     "repositories": {
