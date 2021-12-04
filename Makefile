@@ -30,7 +30,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-php cs-phpstan cs-psalm cs-phpmd cs-soft-require cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
+cs: cs-php cs-phpstan cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
 
 .PHONY: cs-php
 cs-php: vendor .build ## Run php-cs-fixer for code style analysis
@@ -56,10 +56,6 @@ cs-phpmd: vendor .build ## Run php mess detector for static code analysis
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor ## Run composer-unused to detect once-required packages that are not used anymore
 	$(COMPOSER) unused --no-progress
-
-.PHONY: cs-soft-require
-cs-soft-require: vendor .build ## Run composer-require-checker to detect library usage without requirement entry in composer.json
-	$(PHP) vendor/bin/composer-require-checker check --config-file=dev-ops/composer-soft-requirements.json composer.json
 
 .PHONY: cs-composer-normalize
 cs-composer-normalize: vendor ## Run composer-normalize for composer.json style analysis
