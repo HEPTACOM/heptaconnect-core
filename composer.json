@@ -86,8 +86,8 @@
         }
     },
     "support": {
-        "issues": "https://github.com/HEPTACOM/heptaconnect-core/issues",
-        "source": "https://github.com/HEPTACOM/heptaconnect-core",
+        "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
+        "source": "https://github.com/HEPTACOM/heptaconnect-framework",
         "docs": "https://connect.heptacom.de/",
         "rss": "https://connect.heptacom.de/feed/rss2.xml"
     },
