@@ -30,12 +30,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-php cs-phpstan cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
-
-.PHONY: cs-php
-cs-php: vendor .build ## Run php-cs-fixer for code style analysis
-	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --diff --verbose
-	$(PHP) vendor/bin/php-cs-fixer fix --dry-run --config=dev-ops/php_cs.php --format junit > .build/php-cs-fixer.junit.xml
+cs: cs-phpstan cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
 
 .PHONY: cs-phpstan
 cs-phpstan: vendor .build ## Run phpstan for static code analysis
@@ -69,15 +64,11 @@ $(JSON_FILES):
 	$(JQ) . "$@"
 
 .PHONY: cs-fix ## Run all code style fixer that change files
-cs-fix: cs-fix-composer-normalize cs-fix-php
+cs-fix: cs-fix-composer-normalize
 
 .PHONY: cs-fix-composer-normalize
 cs-fix-composer-normalize: vendor ## Run composer-normalize for automatic composer.json style fixes
 	$(COMPOSER) normalize --diff composer.json
-
-.PHONY: cs-fix-php
-cs-fix-php: vendor .build ## Run php-cs-fixer for automatic code style fixes
-	$(PHP) vendor/bin/php-cs-fixer fix --config=dev-ops/php_cs.php --diff --verbose
 
 .PHONY: test
 test: test-setup-fixture run-phpunit test-clean-fixture ## Run phpunit for unit tests
