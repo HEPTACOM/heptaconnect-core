@@ -45,7 +45,6 @@
         "symfony/yaml": "^4.4 || ^5.0"
     },
     "require-dev": {
-        "icanhazstring/composer-unused": ">=0.7",
         "nyholm/psr7": ">=1",
         "php-http/curl-client": ">=1",
         "phpunit/phpunit": ">=9.3 <10",
