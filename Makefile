@@ -30,11 +30,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-phpstan cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
-
-.PHONY: cs-phpstan
-cs-phpstan: vendor .build ## Run phpstan for static code analysis
-	$(PHP) vendor/bin/phpstan analyse -c dev-ops/phpstan.neon --error-format=junit
+cs: cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
 
 .PHONY: cs-psalm
 cs-psalm: vendor .build ## Run psalm for static code analysis
