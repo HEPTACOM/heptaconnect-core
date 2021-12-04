@@ -47,7 +47,6 @@
     "require-dev": {
         "dq5studios/psalm-junit": ">=2",
         "ergebnis/composer-normalize": ">=2.7",
-        "friendsofphp/php-cs-fixer": ">=2.17",
         "icanhazstring/composer-unused": ">=0.7",
         "mavimo/phpstan-junit": ">=0.3",
         "nyholm/psr7": ">=1",
