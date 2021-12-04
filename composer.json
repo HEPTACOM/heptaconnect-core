@@ -45,16 +45,13 @@
         "symfony/yaml": "^4.4 || ^5.0"
     },
     "require-dev": {
-        "dq5studios/psalm-junit": ">=2",
         "ergebnis/composer-normalize": ">=2.7",
         "icanhazstring/composer-unused": ">=0.7",
         "nyholm/psr7": ">=1",
         "php-http/curl-client": ">=1",
         "phpmd/phpmd": "@stable",
         "phpunit/phpunit": ">=9.3 <10",
-        "psalm/plugin-phpunit": ">=0.10",
-        "symfony/cache": ">=2",
-        "vimeo/psalm": ">=4"
+        "symfony/cache": ">=2"
     },
     "extra": {
         "unused": [
