@@ -48,7 +48,6 @@
         "icanhazstring/composer-unused": ">=0.7",
         "nyholm/psr7": ">=1",
         "php-http/curl-client": ">=1",
-        "phpmd/phpmd": "@stable",
         "phpunit/phpunit": ">=9.3 <10",
         "symfony/cache": ">=2"
     },
