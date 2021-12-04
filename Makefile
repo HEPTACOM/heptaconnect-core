@@ -21,14 +21,14 @@ clean: ## Cleans up all ignored files and directories
 	[[ ! -d .build ]] || rm -rf .build
 
 .PHONY: it
-it: cs-fix cs test ## Fix code style and run unit tests
+it: cs test ## Fix code style and run unit tests
 
 .PHONY: coverage
 coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-phpmd cs-composer-unused cs-composer-normalize ## Run every code style check target
+cs: cs-phpmd cs-composer-unused ## Run every code style check target
 
 .PHONY: cs-phpmd
 cs-phpmd: vendor .build ## Run php mess detector for static code analysis
@@ -40,17 +40,6 @@ cs-phpmd: vendor .build ## Run php mess detector for static code analysis
 .PHONY: cs-composer-unused
 cs-composer-unused: vendor ## Run composer-unused to detect once-required packages that are not used anymore
 	$(COMPOSER) unused --no-progress
-
-.PHONY: cs-composer-normalize
-cs-composer-normalize: vendor ## Run composer-normalize for composer.json style analysis
-	$(COMPOSER) normalize --diff --dry-run --no-check-lock --no-update-lock composer.json
-
-.PHONY: cs-fix ## Run all code style fixer that change files
-cs-fix: cs-fix-composer-normalize
-
-.PHONY: cs-fix-composer-normalize
-cs-fix-composer-normalize: vendor ## Run composer-normalize for automatic composer.json style fixes
-	$(COMPOSER) normalize --diff composer.json
 
 .PHONY: test
 test: test-setup-fixture run-phpunit test-clean-fixture ## Run phpunit for unit tests
