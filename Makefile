@@ -30,12 +30,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-psalm cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
-
-.PHONY: cs-psalm
-cs-psalm: vendor .build ## Run psalm for static code analysis
-	# Bug in psalm expects the cache directory to be in the project parent but is the config parent (https://github.com/vimeo/psalm/pull/3421)
-	cd dev-ops && $(PHP) ../vendor/bin/psalm -c $(shell pwd)/dev-ops/psalm.xml
+cs: cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
 
 .PHONY: cs-phpmd
 cs-phpmd: vendor .build ## Run php mess detector for static code analysis
