@@ -1,42 +1,10 @@
-# HEPTAconnect Core
+# [READONLY] HEPTAconnect Core
 #### This is part of HEPTACOM solutions for medium and large enterprises.
 
 ## Description
 
-This is the HEPTAconnect core package. Here are all processes and entrypoints combined.
-Read more in the [documentation](https://heptaconnect.io/).
-
-
-## System requirements
-
-* PHP 7.4 or above
-
-
-## Additional development requirements
-
-* Make
-* Any debugging/coverage php extension like xdebug or pcov
-
-
-## Contributing
-
-Thank you for considering contributing to this package! Be sure to sign the [CLA](./CLA.md) after creating the pull request. [![CLA assistant](https://cla-assistant.io/readme/badge/HEPTACOM/heptaconnect-core)](https://cla-assistant.io/HEPTACOM/heptaconnect-core)
-
-
-### Steps to contribute
-
-1. Fork the repository
-2. `git clone yourname/heptaconnect-core`
-3. Make your changes to master branch
-4. Create your Pull-Request
-
-
-### Check your changes
-
-1. Check and fix code style `make csfix && make cs`
-2. Check tests `make test`
-3. Check whether test code coverage is same or higher `make coverage`
-4. Check whether tests can find future obscurities `make infection`
+This is the split up of the HEPTAconnect core package. Here are all processes and entrypoints combined.
+Read more in the [documentation](https://heptaconnect.io/) and the contribution package of [the HEPTAconnect framework](https://github.com/HEPTACOM/heptaconnect-framework).
 
 
 ## License
