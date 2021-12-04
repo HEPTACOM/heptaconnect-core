@@ -6,7 +6,6 @@
         "heptaconnect",
         "messaging"
     ],
-    "version": "0.8.3",
     "license": [
         "AGPL-3.0-or-later",
         "proprietary"
