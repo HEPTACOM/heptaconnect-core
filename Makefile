@@ -4,8 +4,6 @@ COMPOSER := $(PHP) $(shell which composer) $(COMPOSER_EXTRA_ARGS)
 PHPUNIT_EXTRA_ARGS := --config=test/phpunit.xml
 PHPUNIT := $(PHP) vendor/bin/phpunit $(PHPUNIT_EXTRA_ARGS)
 CURL := $(shell which curl)
-JQ := $(shell which jq)
-JSON_FILES := $(shell find . -name '*.json' -not -path './vendor/*')
 
 .DEFAULT_GOAL := help
 .PHONY: help
@@ -30,7 +28,7 @@ coverage: vendor .build test-refresh-fixture ## Run phpunit coverage tests
 	$(PHPUNIT) --coverage-text
 
 .PHONY: cs
-cs: cs-phpmd cs-composer-unused cs-composer-normalize cs-json ## Run every code style check target
+cs: cs-phpmd cs-composer-unused cs-composer-normalize ## Run every code style check target
 
 .PHONY: cs-phpmd
 cs-phpmd: vendor .build ## Run php mess detector for static code analysis
@@ -46,13 +44,6 @@ cs-composer-unused: vendor ## Run composer-unused to detect once-required packag
 .PHONY: cs-composer-normalize
 cs-composer-normalize: vendor ## Run composer-normalize for composer.json style analysis
 	$(COMPOSER) normalize --diff --dry-run --no-check-lock --no-update-lock composer.json
-
-.PHONY: cs-json
-cs-json: $(JSON_FILES) ## Run jq on every json file to ensure they are parsable and therefore valid
-
-.PHONY: $(JSON_FILES)
-$(JSON_FILES):
-	$(JQ) . "$@"
 
 .PHONY: cs-fix ## Run all code style fixer that change files
 cs-fix: cs-fix-composer-normalize
