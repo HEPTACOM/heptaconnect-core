@@ -50,7 +50,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Heptacom\\HeptaConnect\\Core\\": "src/"
+            "Heptacom\\HeptaConnect\\Core\\": ""
         }
     },
     "repositories": {
