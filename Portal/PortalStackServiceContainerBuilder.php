@@ -208,11 +208,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
             PortalExtensionCollection::class => $portalExtensions,
-            ClientInterface::class => Psr18ClientDiscovery::find(),
-            RequestFactoryInterface::class => Psr17FactoryDiscovery::findRequestFactory(),
-            UriFactoryInterface::class => Psr17FactoryDiscovery::findUriFactory(),
-            ResponseFactoryInterface::class => Psr17FactoryDiscovery::findResponseFactory(),
-            StreamFactoryInterface::class => Psr17FactoryDiscovery::findStreamFactory(),
             LoggerInterface::class => new PortalLogger(
                 $this->logger,
                 \sprintf('[%s] ', $this->storageKeyGenerator->serialize($portalNodeKey)),
@@ -221,8 +216,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
                 ]
             ),
             NormalizationRegistryContract::class => $this->normalizationRegistry,
-            DeepCloneContract::class => new DeepCloneContract(),
-            DeepObjectIteratorContract::class => new DeepObjectIteratorContract(),
             PortalStorageInterface::class => $this->portalStorageFactory->createPortalStorage($portalNodeKey),
             ResourceLockFacade::class => new ResourceLockFacade($this->resourceLocking),
             PortalNodeKeyInterface::class => $portalNodeKey,
@@ -240,6 +233,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ]);
         }
 
+        $containerBuilder->setDefinition(DeepCloneContract::class, new Definition());
+        $containerBuilder->setDefinition(DeepObjectIteratorContract::class, new Definition());
+        $containerBuilder->setDefinition(ClientInterface::class, (new Definition())->setFactory([Psr18ClientDiscovery::class, 'find']));
+        $containerBuilder->setDefinition(RequestFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findRequestFactory']));
+        $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
+        $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
+        $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
         $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
         $containerBuilder->setDefinition(EmitterCollection::class . '.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
