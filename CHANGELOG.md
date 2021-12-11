@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.3] - 2021-12-02
 
+### Fixed
+
 - Fix auto-wiring array values from portal configuration
 
 ## [0.8.2] - 2021-11-25
