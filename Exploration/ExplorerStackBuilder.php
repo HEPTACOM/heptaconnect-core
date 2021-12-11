@@ -12,9 +12,9 @@ use Psr\Log\LoggerInterface;
 
 class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 {
-    private ExplorerCollection $sourceExplorers;
+    private ?ExplorerContract $source;
 
-    private ExplorerCollection $explorerDecorators;
+    private ExplorerCollection $decorators;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
@@ -32,13 +32,13 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
     public function __construct(
-        ExplorerCollection $sourceExplorers,
-        ExplorerCollection $explorerDecorators,
+        ExplorerCollection $sources,
         string $entityType,
         LoggerInterface $logger
     ) {
-        $this->sourceExplorers = $sourceExplorers;
-        $this->explorerDecorators = $explorerDecorators;
+        $sources = new ExplorerCollection($sources->bySupport($entityType));
+        $this->source = $sources->shift();
+        $this->decorators = $sources;
         $this->entityType = $entityType;
         $this->logger = $logger;
     }
@@ -65,22 +65,14 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function pushSource(): self
     {
-        $firstExplorer = null;
-
-        foreach ($this->sourceExplorers->bySupport($this->entityType) as $explorer) {
-            $firstExplorer = $explorer;
-
-            break;
-        }
-
-        if ($firstExplorer instanceof ExplorerContract) {
+        if ($this->source instanceof ExplorerContract) {
             $this->logger->debug(\sprintf(
                 'ExplorerStackBuilder: Pushed %s as source explorer.',
-                \get_class($firstExplorer)
+                \get_class($this->source)
             ));
 
-            if (!\in_array($firstExplorer, $this->explorers, true)) {
-                $this->explorers[] = $firstExplorer;
+            if (!\in_array($this->source, $this->explorers, true)) {
+                $this->explorers[] = $this->source;
             }
         }
 
@@ -89,7 +81,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->explorerDecorators->bySupport($this->entityType) as $explorer) {
+        foreach ($this->decorators as $explorer) {
             $this->logger->debug(\sprintf(
                 'ExplorerStackBuilder: Pushed %s as decorator explorer.',
                 \get_class($explorer)
