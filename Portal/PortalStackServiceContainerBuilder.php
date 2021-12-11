@@ -9,14 +9,12 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilde
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
-use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -29,15 +27,12 @@ use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
-use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
-use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
@@ -52,7 +47,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -63,23 +57,15 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
 {
-    public const STATUS_REPORTER_TAG = 'heptaconnect.flow_component.status_reporter';
+    public const STATUS_REPORTER_SOURCE_TAG = 'heptaconnect.flow_component.status_reporter_source';
 
-    public const EMITTER_TAG = 'heptaconnect.flow_component.emitter';
+    public const EMITTER_SOURCE_TAG = 'heptaconnect.flow_component.emitter_source';
 
-    public const EMITTER_DECORATOR_TAG = 'heptaconnect.flow_component.emitter_decorator';
+    public const EXPLORER_SOURCE_TAG = 'heptaconnect.flow_component.explorer_source';
 
-    public const EXPLORER_TAG = 'heptaconnect.flow_component.explorer';
+    public const RECEIVER_SOURCE_TAG = 'heptaconnect.flow_component.receiver_source';
 
-    public const EXPLORER_DECORATOR_TAG = 'heptaconnect.flow_component.explorer_decorator';
-
-    public const RECEIVER_TAG = 'heptaconnect.flow_component.receiver';
-
-    public const RECEIVER_DECORATOR_TAG = 'heptaconnect.flow_component.receiver_decorator';
-
-    public const WEB_HTTP_HANDLER_TAG = 'heptaconnect.flow_component.web_http_handler';
-
-    public const WEB_HTTP_HANDLER_DECORATOR_TAG = 'heptaconnect.flow_component.web_http_handler';
+    public const WEB_HTTP_HANDLER_SOURCE_TAG = 'heptaconnect.flow_component.web_http_handler_source';
 
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
@@ -94,8 +80,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     private ProfilerFactoryContract $profilerFactory;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private FlowComponent $flowComponentBuilder;
 
     private FilesystemFactory $filesystemFactory;
 
@@ -114,7 +98,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ResourceLockingContract $resourceLocking,
         ProfilerFactoryContract $profilerFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        FlowComponent $flowComponentBuilder,
         FilesystemFactory $filesystemFactory,
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
@@ -126,7 +109,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->resourceLocking = $resourceLocking;
         $this->profilerFactory = $profilerFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->flowComponentBuilder = $flowComponentBuilder;
         $this->filesystemFactory = $filesystemFactory;
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
@@ -144,14 +126,9 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder = new ContainerBuilder();
 
         $seenDefinitions = [];
-        $packageStep = 0;
-        $emitterTag = self::EMITTER_TAG;
-        $explorerTag = self::EXPLORER_TAG;
-        $receiverTag = self::RECEIVER_TAG;
-        $webHttpHandlerTag = self::WEB_HTTP_HANDLER_TAG;
         $prototypedIds = [];
         $definedIds = [];
-        $flowBuilderIds = [];
+        $flowBuilderFiles = [];
 
         /** @var PortalContract|PortalExtensionContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
@@ -167,24 +144,18 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
                 $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
             });
-            $flowBuilderIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerBuilder): void {
-                $this->registerFlowComponentsFromBuilder($containerBuilder, $flowComponentsPath);
-            });
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
             $seenDefinitions = $containerBuilder->getDefinitions();
-            $this->tagDefinitionsByPriority($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_TAG, -100 * $packageStep);
-            $this->tagDefinitionsByPriority($newDefinitions, EmitterContract::class, $emitterTag, -100 * $packageStep);
-            $this->tagDefinitionsByPriority($newDefinitions, ExplorerContract::class, $explorerTag, -100 * $packageStep);
-            $this->tagDefinitionsByPriority($newDefinitions, ReceiverContract::class, $receiverTag, -100 * $packageStep);
-            $this->tagDefinitionsByPriority($newDefinitions, HttpHandlerContract::class, $webHttpHandlerTag, -100 * $packageStep);
+            $packageClass = \get_class($package);
 
-            $emitterTag = self::EMITTER_DECORATOR_TAG;
-            $explorerTag = self::EXPLORER_DECORATOR_TAG;
-            $receiverTag = self::RECEIVER_DECORATOR_TAG;
-            $webHttpHandlerTag = self::WEB_HTTP_HANDLER_DECORATOR_TAG;
-            ++$packageStep;
+            $this->tagDefinitionSource($newDefinitions, ExplorerContract::class, self::EXPLORER_SOURCE_TAG, $packageClass);
+            $this->tagDefinitionSource($newDefinitions, EmitterContract::class, self::EMITTER_SOURCE_TAG, $packageClass);
+            $this->tagDefinitionSource($newDefinitions, ReceiverContract::class, self::RECEIVER_SOURCE_TAG, $packageClass);
+            $this->tagDefinitionSource($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_SOURCE_TAG, $packageClass);
+            $this->tagDefinitionSource($newDefinitions, HttpHandlerContract::class, self::WEB_HTTP_HANDLER_SOURCE_TAG, $packageClass);
+            $flowBuilderFiles[$packageClass] = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php') ?: [];
         }
 
         foreach ($containerBuilder->getDefinitions() as $definition) {
@@ -240,16 +211,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
         $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
         $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
-        $containerBuilder->setDefinition(StatusReporterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::STATUS_REPORTER_TAG)]));
-        $containerBuilder->setDefinition(EmitterCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EMITTER_TAG)]));
-        $containerBuilder->setDefinition(EmitterCollection::class . '.decorator', new Definition(EmitterCollection::class, [new TaggedIteratorArgument(self::EMITTER_DECORATOR_TAG)]));
-        $containerBuilder->setDefinition(ExplorerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::EXPLORER_TAG)]));
-        $containerBuilder->setDefinition(ExplorerCollection::class . '.decorator', new Definition(ExplorerCollection::class, [new TaggedIteratorArgument(self::EXPLORER_DECORATOR_TAG)]));
-        $containerBuilder->setDefinition(ReceiverCollection::class, new Definition(null, [new TaggedIteratorArgument(self::RECEIVER_TAG)]));
-        $containerBuilder->setDefinition(ReceiverCollection::class . '.decorator', new Definition(ReceiverCollection::class, [new TaggedIteratorArgument(self::RECEIVER_DECORATOR_TAG)]));
-        $containerBuilder->setDefinition(HttpHandlerCollection::class, new Definition(null, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_TAG)]));
-        $containerBuilder->setDefinition(HttpHandlerCollection::class . '.decorator', new Definition(HttpHandlerCollection::class, [new TaggedIteratorArgument(self::WEB_HTTP_HANDLER_DECORATOR_TAG)]));
 
+        $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
         $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
             \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
         ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
@@ -293,8 +256,9 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     /**
      * @param Definition[] $definitions
      * @psalm-param class-string $interface
+     * @psalm-param class-string $packageClass
      */
-    private function tagDefinitionsByPriority(array $definitions, string $interface, string $tag, int $priority): void
+    private function tagDefinitionSource(array $definitions, string $interface, string $tag, string $packageClass): void
     {
         foreach ($definitions as $id => $definition) {
             $class = $definition->getClass() ?? (string) $id;
@@ -304,7 +268,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             }
 
             $definition->clearTag($tag);
-            $definition->addTag($tag, ['priority' => $priority]);
+            $definition->addTag($tag, ['source' => $packageClass]);
         }
     }
 
@@ -353,38 +317,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             } catch (\Throwable $throwable) {
                 throw new DelegatingLoaderLoadException($serviceDefinitionPath, $throwable);
             }
-        }
-    }
-
-    private function registerFlowComponentsFromBuilder(ContainerBuilder $containerBuilder, string $path): void
-    {
-        $this->flowComponentBuilder->reset();
-
-        $globbedFiles = \glob($path . \DIRECTORY_SEPARATOR . '*.php');
-
-        if (!\is_array($globbedFiles)) {
-            return;
-        }
-
-        foreach ($globbedFiles as $flowComponentScript) {
-            // prevent access to object context
-            (static function (string $file): void {
-                include $file;
-            })($flowComponentScript);
-        }
-
-        $flowComponents = [
-            ...$this->flowComponentBuilder->buildExplorers(),
-            ...$this->flowComponentBuilder->buildEmitters(),
-            ...$this->flowComponentBuilder->buildReceivers(),
-            ...$this->flowComponentBuilder->buildStatusReporters(),
-            ...$this->flowComponentBuilder->buildHttpHandlers(),
-        ];
-
-        foreach ($flowComponents as $flowComponent) {
-            $this->setSyntheticServices($containerBuilder, [
-                \bin2hex(\random_bytes(16)) => $flowComponent,
-            ]);
         }
     }
 
