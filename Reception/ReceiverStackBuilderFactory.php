@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
 
+use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
@@ -27,12 +28,14 @@ class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterfac
         string $entityType
     ): ReceiverStackBuilderInterface {
         $container = $this->portalContainerFactory->create($portalNodeKey);
-        /** @var ReceiverCollection $receivers */
-        $receivers = $container->get(ReceiverCollection::class);
-        /** @var ReceiverCollection $receiverDecorators */
-        $receiverDecorators = $container->get(ReceiverCollection::class . '.decorator');
-        $receivers->push($receiverDecorators);
+        /** @var FlowComponentRegistry $flowComponentRegistry */
+        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $components = new ReceiverCollection();
 
-        return new ReceiverStackBuilder($receivers, $receiverDecorators, $entityType, $this->logger);
+        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
+            $components->push($flowComponentRegistry->getReceivers($source));
+        }
+
+        return new ReceiverStackBuilder($components, $entityType, $this->logger);
     }
 }

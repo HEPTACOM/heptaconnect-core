@@ -12,7 +12,7 @@ use Psr\Log\LoggerInterface;
 
 class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 {
-    private HttpHandlerCollection $sources;
+    private ?HttpHandlerContract $source;
 
     private HttpHandlerCollection $decorators;
 
@@ -27,12 +27,12 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function __construct(
         HttpHandlerCollection $sources,
-        HttpHandlerCollection $decorators,
         string $path,
         LoggerInterface $logger
     ) {
-        $this->sources = $sources;
-        $this->decorators = $decorators;
+        $sources = new HttpHandlerCollection($sources->bySupport($path));
+        $this->source = $sources->shift();
+        $this->decorators = $sources;
         $this->path = $path;
         $this->logger = $logger;
     }
@@ -59,22 +59,14 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function pushSource(): self
     {
-        $first = null;
-
-        foreach ($this->sources->bySupport($this->path) as $item) {
-            $first = $item;
-
-            break;
-        }
-
-        if ($first instanceof HttpHandlerContract) {
+        if ($this->source instanceof HttpHandlerContract) {
             $this->logger->debug(\sprintf(
                 'HttpHandlerStackBuilder: Pushed %s as source http handler.',
-                \get_class($first)
+                \get_class($this->source)
             ));
 
-            if (!\in_array($first, $this->selection, true)) {
-                $this->selection[] = $first;
+            if (!\in_array($this->source, $this->selection, true)) {
+                $this->selection[] = $this->source;
             }
         }
 
@@ -83,7 +75,7 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->decorators->bySupport($this->path) as $item) {
+        foreach ($this->decorators as $item) {
             $this->logger->debug(\sprintf(
                 'HttpHandlerStackBuilder: Pushed %s as decorator http handler.',
                 \get_class($item)
