@@ -12,9 +12,9 @@ use Psr\Log\LoggerInterface;
 
 class EmitterStackBuilder implements EmitterStackBuilderInterface
 {
-    private EmitterCollection $sourceEmitters;
+    private ?EmitterContract $source;
 
-    private EmitterCollection $emitterDecorators;
+    private EmitterCollection $decorators;
 
     /**
      * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
@@ -32,13 +32,13 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
      * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      */
     public function __construct(
-        EmitterCollection $sourceEmitters,
-        EmitterCollection $emitterDecorators,
+        EmitterCollection $sources,
         string $entityType,
         LoggerInterface $logger
     ) {
-        $this->sourceEmitters = $sourceEmitters;
-        $this->emitterDecorators = $emitterDecorators;
+        $sources = new EmitterCollection($sources->bySupport($entityType));
+        $this->source = $sources->shift();
+        $this->decorators = $sources;
         $this->entityType = $entityType;
         $this->logger = $logger;
     }
@@ -65,22 +65,14 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function pushSource(): self
     {
-        $firstEmitter = null;
-
-        foreach ($this->sourceEmitters->bySupport($this->entityType) as $emitter) {
-            $firstEmitter = $emitter;
-
-            break;
-        }
-
-        if ($firstEmitter instanceof EmitterContract) {
+        if ($this->source instanceof EmitterContract) {
             $this->logger->debug(\sprintf(
                 'EmitterStackBuilder: Pushed %s as source emitter.',
-                \get_class($firstEmitter)
+                \get_class($this->source)
             ));
 
-            if (!\in_array($firstEmitter, $this->emitters, true)) {
-                $this->emitters[] = $firstEmitter;
+            if (!\in_array($this->source, $this->emitters, true)) {
+                $this->emitters[] = $this->source;
             }
         }
 
@@ -89,7 +81,7 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function pushDecorators(): self
     {
-        foreach ($this->emitterDecorators->bySupport($this->entityType) as $emitter) {
+        foreach ($this->decorators as $emitter) {
             $this->logger->debug(\sprintf(
                 'EmitterStackBuilder: Pushed %s as decorator emitter.',
                 \get_class($emitter)
