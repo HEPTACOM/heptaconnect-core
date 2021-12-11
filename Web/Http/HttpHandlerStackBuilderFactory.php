@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
+use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterface;
@@ -27,11 +28,14 @@ class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryIn
         string $path
     ): HttpHandlerStackBuilderInterface {
         $container = $this->portalContainerFactory->create($portalNodeKey);
-        /** @var HttpHandlerCollection $sources */
-        $sources = $container->get(HttpHandlerCollection::class);
-        /** @var HttpHandlerCollection $decorators */
-        $decorators = $container->get(HttpHandlerCollection::class . '.decorator');
+        /** @var FlowComponentRegistry $flowComponentRegistry */
+        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $components = new HttpHandlerCollection();
 
-        return new HttpHandlerStackBuilder($sources, $decorators, $path, $this->logger);
+        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
+            $components->push($flowComponentRegistry->getWebHttpHandlers($source));
+        }
+
+        return new HttpHandlerStackBuilder($components, $path, $this->logger);
     }
 }
