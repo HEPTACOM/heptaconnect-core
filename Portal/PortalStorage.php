@@ -225,8 +225,15 @@ class PortalStorage implements PortalStorageInterface
 
             $result = $this->portalStorage->getMultiple($this->portalNodeKey, $keys);
 
-            foreach ($result as $key => &$value) {
-                $type = $this->portalStorage->getType($this->portalNodeKey, $key);
+            foreach ($result as $key => &$value) {                
+                try {
+                    $type = $this->portalStorage->getType($this->portalNodeKey, $key);
+                } catch (NotFoundException $exception) {
+                    unset($result[$key]);
+                    
+                    continue;
+                }
+                
                 $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
 
                 if (!$denormalizer instanceof DenormalizerInterface) {
