@@ -7,26 +7,19 @@ use Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\Message\JobMessage;
 use Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobPayloadRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Get\JobGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Get\JobGetCriteria;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class MessageHandler implements MessageSubscriberInterface
 {
-    private JobRepositoryContract $jobRepository;
-
-    private JobPayloadRepositoryContract $jobPayloadRepository;
+    private JobGetActionInterface $jobGetAction;
 
     private DelegatingJobActorContract $jobActor;
 
-    public function __construct(
-        JobRepositoryContract $jobRepository,
-        JobPayloadRepositoryContract $jobPayloadRepository,
-        DelegatingJobActorContract $jobActor
-    ) {
-        $this->jobRepository = $jobRepository;
-        $this->jobPayloadRepository = $jobPayloadRepository;
+    public function __construct(JobGetActionInterface $jobGetAction, DelegatingJobActorContract $jobActor)
+    {
+        $this->jobGetAction = $jobGetAction;
         $this->jobActor = $jobActor;
     }
 
@@ -40,18 +33,9 @@ class MessageHandler implements MessageSubscriberInterface
         /** @var JobDataCollection[] $jobs */
         $jobs = [];
 
-        /** @var JobKeyInterface $jobKey */
-        foreach ($message->getJobKeys() as $jobKey) {
-            try {
-                $job = $this->jobRepository->get($jobKey);
-                $payload = $job->getPayloadKey() !== null ? $this->jobPayloadRepository->get($job->getPayloadKey()) : null;
-            } catch (\Throwable $exception) {
-                // TODO log
-                continue;
-            }
-
+        foreach ($this->jobGetAction->get(new JobGetCriteria($message->getJobKeys())) as $job) {
             $jobs[$job->getJobType()] ??= new JobDataCollection();
-            $jobs[$job->getJobType()]->push([new JobData($job->getMapping(), $payload, $jobKey)]);
+            $jobs[$job->getJobType()]->push([new JobData($job->getMapping(), $job->getPayload(), $job->getJobKey())]);
         }
 
         foreach ($jobs as $type => $jobData) {
