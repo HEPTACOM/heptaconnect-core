@@ -6,57 +6,37 @@ namespace Heptacom\HeptaConnect\Core\Job;
 use Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\Message\JobMessage;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobContract;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobPayloadRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
-use Heptacom\HeptaConnect\Storage\Base\Repository\JobAdd;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreateActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreatePayloads;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class JobDispatcher extends JobDispatcherContract
 {
     private MessageBusInterface $bus;
 
-    private JobRepositoryContract $jobRepository;
+    private JobCreateActionInterface $jobCreateAction;
 
-    private JobPayloadRepositoryContract $jobPayloadRepository;
-
-    public function __construct(
-        MessageBusInterface $bus,
-        JobRepositoryContract $jobRepository,
-        JobPayloadRepositoryContract $jobPayloadRepository
-    ) {
+    public function __construct(MessageBusInterface $bus, JobCreateActionInterface $jobCreateAction)
+    {
         $this->bus = $bus;
-        $this->jobRepository = $jobRepository;
-        $this->jobPayloadRepository = $jobPayloadRepository;
+        $this->jobCreateAction = $jobCreateAction;
     }
 
     public function dispatch(JobCollection $jobs): void
     {
-        $payloads = [];
+        $createPayload = new JobCreatePayloads($jobs->map(
+            static fn (JobContract $j): JobCreatePayload =>
+                new JobCreatePayload($j->getType(), $j->getMappingComponent(), $j->getPayload())
+        ));
+        $createResult = $this->jobCreateAction->create($createPayload);
 
-        foreach ($jobs as $jobKey => $job) {
-            $payload = $job->getPayload();
-
-            if (\is_array($payload)) {
-                $payloads[$jobKey] = $payload;
-            }
-        }
-
-        $payloadKeys = $this->jobPayloadRepository->add($payloads);
-        $jobAdds = [];
-
-        /** @var JobContract $job */
-        foreach ($jobs as $jobKey => $job) {
-            $jobAdds[$jobKey] = new JobAdd($job->getType(), $job->getMappingComponent(), $payloadKeys[$jobKey] ?? null);
-        }
-
-        $jobKeys = \array_values($this->jobRepository->add($jobAdds));
-
-        if ($jobKeys === []) {
+        if ($createResult->count() === 0) {
             return;
         }
 
         $message = new JobMessage();
-        $message->getJobKeys()->push($jobKeys);
+        $message->getJobKeys()->push($createResult->column('getJobKey'));
         $this->bus->dispatch($message);
     }
 }
