@@ -35,7 +35,7 @@ class MessageHandler implements MessageSubscriberInterface
 
         foreach ($this->jobGetAction->get(new JobGetCriteria($message->getJobKeys())) as $job) {
             $jobs[$job->getJobType()] ??= new JobDataCollection();
-            $jobs[$job->getJobType()]->push([new JobData($job->getMapping(), $job->getPayload(), $job->getJobKey())]);
+            $jobs[$job->getJobType()]->push([new JobData($job->getMappingComponent(), $job->getPayload(), $job->getJobKey())]);
         }
 
         foreach ($jobs as $type => $jobData) {
