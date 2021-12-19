@@ -26,8 +26,7 @@ class JobDispatcher extends JobDispatcherContract
     public function dispatch(JobCollection $jobs): void
     {
         $createPayload = new JobCreatePayloads($jobs->map(
-            static fn (JobContract $j): JobCreatePayload =>
-                new JobCreatePayload($j->getType(), $j->getMappingComponent(), $j->getPayload())
+            static fn (JobContract $j): JobCreatePayload => new JobCreatePayload($j->getType(), $j->getMappingComponent(), $j->getPayload())
         ));
         $createResult = $this->jobCreateAction->create($createPayload);
 
