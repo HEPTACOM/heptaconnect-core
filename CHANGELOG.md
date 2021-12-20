@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobPayloadRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Get\JobGetActionInterface` to improve performance by batching job reading
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface` to improve performance by batching job state changes
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface` to improve performance by batching job state changes
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface` to improve performance by batching job state changes
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\JobDispatcher` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobPayloadRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreateActionInterface` to improve performance by batching job insertion
+
 ### Fixed
 
 - Provide portal node container services as definition instead of synthetic service to allow decoration for service ids `Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract`, `Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract`, `Psr\Http\Client\ClientInterface`, `Psr\Http\Message\RequestFactoryInterface`, `Psr\Http\Message\UriFactoryInterface`, `Psr\Http\Message\ResponseFactoryInterface` and `Psr\Http\Message\StreamFactoryInterface`
