@@ -8,19 +8,29 @@ use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 class EmissionHandler implements EmissionHandlerInterface
 {
     private EmitServiceInterface $emitService;
 
-    private JobRepositoryContract $jobRepository;
+    private JobStartActionInterface $jobStartAction;
 
-    public function __construct(EmitServiceInterface $emitService, JobRepositoryContract $jobRepository)
-    {
+    private JobFinishActionInterface $jobFinishAction;
+
+    public function __construct(
+        EmitServiceInterface $emitService,
+        JobStartActionInterface $jobStartAction,
+        JobFinishActionInterface $jobFinishAction
+    ) {
         $this->emitService = $emitService;
-        $this->jobRepository = $jobRepository;
+        $this->jobStartAction = $jobStartAction;
+        $this->jobFinishAction = $jobFinishAction;
     }
 
     public function triggerEmission(JobDataCollection $jobs): void
@@ -40,19 +50,11 @@ class EmissionHandler implements EmissionHandlerInterface
             $processedChunks = \array_chunk($processed[$dataType], 10);
 
             foreach ($emissionChunks as $chunkKey => $emissionChunk) {
-                $now = new \DateTimeImmutable();
+                $jobKeys = new JobKeyCollection($processedChunks[$chunkKey] ?? []);
 
-                foreach ($processedChunks[$chunkKey] ?? [] as $jobKey) {
-                    $this->jobRepository->start($jobKey, $now);
-                }
-
+                $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
                 $this->emitService->emit(new TypedMappingComponentCollection($dataType, $emissionChunk));
-
-                $now = new \DateTimeImmutable();
-
-                foreach ($processedChunks[$chunkKey] ?? [] as $jobKey) {
-                    $this->jobRepository->finish($jobKey, $now);
-                }
+                $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
             }
         }
     }

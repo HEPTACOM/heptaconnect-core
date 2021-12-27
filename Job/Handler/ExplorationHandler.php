@@ -7,8 +7,12 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\JobRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 class ExplorationHandler implements ExplorationHandlerInterface
 {
@@ -16,16 +20,20 @@ class ExplorationHandler implements ExplorationHandlerInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
-    private JobRepositoryContract $jobRepository;
+    private JobStartActionInterface $jobStartAction;
+
+    private JobFinishActionInterface $jobFinishAction;
 
     public function __construct(
         ExploreServiceInterface $exploreService,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        JobRepositoryContract $jobRepository
+        JobStartActionInterface $jobStartAction,
+        JobFinishActionInterface $jobFinishAction
     ) {
         $this->exploreService = $exploreService;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->jobRepository = $jobRepository;
+        $this->jobStartAction = $jobStartAction;
+        $this->jobFinishAction = $jobFinishAction;
     }
 
     public function triggerExplorations(JobDataCollection $jobs): void
@@ -51,19 +59,11 @@ class ExplorationHandler implements ExplorationHandlerInterface
                 continue;
             }
 
-            $now = new \DateTimeImmutable();
+            $jobKeys = new JobKeyCollection($jobKeys[$key]);
 
-            foreach ($jobKeys[$key] as $jobKey) {
-                $this->jobRepository->start($jobKey, $now);
-            }
-
+            $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
             $this->exploreService->explore($portalNodeKey, $type);
-
-            $now = new \DateTimeImmutable();
-
-            foreach ($jobKeys[$key] as $jobKey) {
-                $this->jobRepository->finish($jobKey, $now);
-            }
+            $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
         }
     }
 }
