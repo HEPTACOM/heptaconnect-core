@@ -21,7 +21,7 @@
         "ext-json": "*",
         "ext-zlib": "*",
         "bentools/iterable-functions": ">=1.4 <2",
-        "composer/composer": ">=1",
+        "composer/composer": ">=1.9",
         "dragonmantank/cron-expression": ">=3",
         "heptacom/heptaconnect-dataset-base": "self.version",
         "heptacom/heptaconnect-portal-base": "self.version",
