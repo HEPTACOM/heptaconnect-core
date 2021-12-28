@@ -40,7 +40,7 @@
         "symfony/event-dispatcher": "^4.0 || ^5.0",
         "symfony/lock": "^4.0 || ^5.0",
         "symfony/messenger": "^4.0 || ^5.0",
-        "symfony/polyfill-php80": ">=1.15",
+        "symfony/polyfill-php80": ">=1.16",
         "symfony/yaml": "^4.4 || ^5.0"
     },
     "extra": {
