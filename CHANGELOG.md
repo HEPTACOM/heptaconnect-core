@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Change composer dependency `bentools/iterable-functions: >=1 <2` to `bentools/iterable-functions: >=1.4 <2` to ensure availability of `\iterable_map` in a lowest-dependency-version installation
+- Change composer dependency `composer/composer: >=1` to `composer/composer: >=1.9` to ensure correct composer project and library parsing in a lowest-dependency-version installation
+- Change composer dependency `php-http/discovery: ^1.0` to `php-http/discovery: ^1.11` to ensure availability of `\Http\Discovery\Psr17FactoryDiscovery` and `\Http\Discovery\Psr17FactoryDiscovery::findUriFactory` in a lowest-dependency-version installation
+- Add composer dependency `symfony/event-dispatcher-contracts: >=1.1` to ensure availability of `\Symfony\Contracts\EventDispatcher\Event` in a lowest-dependency-version installation
+- Change composer dependency `symfony/polyfill-php80: >=1.15` to `symfony/polyfill-php80: >=1.16` to ensure availability of `\str_starts_with` a php 7.4 and lowest-dependency-version installation
+- Amend signature of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarDenormalizer::denormalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarDenormalizer::supportsDenormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarNormalizer::normalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarNormalizer::supportsNormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressDenormalizer::denormalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressDenormalizer::supportsDenormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableDenormalizer::denormalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableDenormalizer::supportsDenormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableNormalizer::normalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableNormalizer::supportsNormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::denormalize`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::supportsDenormalization`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer::normalize` and `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer::supportsNormalization` to allow installations of `symfony/serializer: >=4` and `symfony/serializer: >= 5`
+
 ## [0.8.4] - 2021-12-16
 
 ### Fixed
