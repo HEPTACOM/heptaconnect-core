@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use League\Flysystem\FilesystemInterface;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Uuid;
 
 class StreamNormalizer implements NormalizerInterface
@@ -57,11 +58,12 @@ class StreamNormalizer implements NormalizerInterface
         }
 
         $mediaId = $context['mediaId'] ?? null;
+        $filenameUuid = $mediaId === null ? Uuid::uuid4() : Uuid::uuid5(self::NS_FILENAME, $mediaId);
+        /** @var string|Hexadecimal $filename */
+        $filename = $filenameUuid->getHex();
 
-        if ($mediaId === null) {
-            $filename = (string) Uuid::uuid4()->getHex();
-        } else {
-            $filename = (string) Uuid::uuid5(self::NS_FILENAME, $mediaId)->getHex();
+        if (\class_exists(Hexadecimal::class) && $filename instanceof Hexadecimal) {
+            $filename = $filename->toString();
         }
 
         $stream = $object->copy()->detach();
