@@ -313,6 +313,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         array $psr4,
         array $exclude = []
     ): void {
+        $exclude = \array_filter($exclude, 'is_dir');
+
         foreach ($psr4 as $namespace => $path) {
             $fileLocator = new FileLocator($path);
             $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
