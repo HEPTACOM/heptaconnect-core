@@ -17,7 +17,7 @@ class SerializableNormalizer implements NormalizerInterface
     /**
      * @return string
      */
-    public function normalize($object, ?string $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!$this->supportsNormalization($object)) {
             throw new InvalidArgumentException();
@@ -26,7 +26,7 @@ class SerializableNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
-    public function supportsNormalization($data, ?string $format = null)
+    public function supportsNormalization($data, $format = null)
     {
         if ($data instanceof StreamInterface) {
             return false;
