@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1637607653` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder::findOrigin` when emitter is a short-notation emitter and has no configured callback
 - Add exception code `1637607654` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder::findOrigin` when emitter class cannot be read via reflection
 - Add exception code `1637607655` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder::findOrigin` when emitter class does not belong to a physical file
+- Add exception code `1637421327` in `\Heptacom\HeptaConnect\Core\Exploration\ExplorerCodeOriginFinder::findOrigin` when explorer is a short-notation explorer and has no configured callback
+- Add exception code `1637421328` in `\Heptacom\HeptaConnect\Core\Exploration\ExplorerCodeOriginFinder::findOrigin` when explorer class cannot be read via reflection
+- Add exception code `1637421329` in `\Heptacom\HeptaConnect\Core\Exploration\ExplorerCodeOriginFinder::findOrigin` when explorer class does not belong to a physical file
 
 ### Changed
 
