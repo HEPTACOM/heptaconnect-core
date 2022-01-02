@@ -61,6 +61,11 @@
             "Heptacom\\HeptaConnect\\Core\\": ""
         }
     },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
+    },
     "extra": {
         "unused": [
             "bentools/iterable-functions"
