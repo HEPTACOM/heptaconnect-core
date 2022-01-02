@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switch storage access in `\Heptacom\HeptaConnect\Core\Portal\PortalRegistry` from `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\PortalNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\Get\PortalNodeGetActionInterface`
 - Use portal node container tags `heptaconnect.flow_component.status_reporter_source`, `heptaconnect.flow_component.emitter_source`, `heptaconnect.flow_component.explorer_source`, `heptaconnect.flow_component.receiver_source`, `heptaconnect.flow_component.web_http_handler_source` instead of `heptaconnect.flow_component.emitter`, `heptaconnect.flow_component.emitter_decorator`, `heptaconnect.flow_component.explorer`, `heptaconnect.flow_component.explorer_decorator`, `heptaconnect.flow_component.receiver`, `heptaconnect.flow_component.receiver_decorator` and `heptaconnect.flow_component.web_http_handler` to collect flow component services
 - Short-noted flow components by portals load on first flow component usage instead on container building using `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry`
+- Add dependency onto `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\Find\PortalExtensionFindActionInterface` into `\Heptacom\HeptaConnect\Core\Portal\PortalRegistry` for loading portal extension availability
 
 ### Fixed
 
