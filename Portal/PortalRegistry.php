@@ -69,7 +69,7 @@ class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
 
         if (!isset($this->cache['portalExtensions'][$portalClass])) {
-            $extensions = $this->portalLoader->getPortalExtensions()->filterSupported($portalClass);
+            $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
             if ($extensions->count()) {
                 $portalExtensionFindResult = $this->portalExtensionFindAction->find($portalNodeKey);
