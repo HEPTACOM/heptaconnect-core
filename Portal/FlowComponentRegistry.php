@@ -48,12 +48,12 @@ class FlowComponentRegistry
     private array $flowBuilderFiles;
 
     /**
-     * @param array<class-string, ExplorerCollection> $sourcedExplorers
-     * @param array<class-string, EmitterCollection> $sourcedEmitters
-     * @param array<class-string, ReceiverCollection> $sourcedReceivers
+     * @param array<class-string, ExplorerCollection>       $sourcedExplorers
+     * @param array<class-string, EmitterCollection>        $sourcedEmitters
+     * @param array<class-string, ReceiverCollection>       $sourcedReceivers
      * @param array<class-string, StatusReporterCollection> $sourcedStatusReporters
-     * @param array<class-string, HttpHandlerCollection> $sourcedWebHttpHandlers
-     * @param array<class-string, string[]> $flowBuilderFiles
+     * @param array<class-string, HttpHandlerCollection>    $sourcedWebHttpHandlers
+     * @param array<class-string, string[]>                 $flowBuilderFiles
      */
     public function __construct(
         array $sourcedExplorers,
@@ -106,32 +106,6 @@ class FlowComponentRegistry
         return new HttpHandlerCollection($this->sourcedWebHttpHandlers[$source] ?? []);
     }
 
-    private function loadSource(string $source): void
-    {
-        $files = $this->flowBuilderFiles[$source] ?? [];
-
-        if ($files !== []) {
-            $flowBuilder = new FlowComponent();
-
-            $flowBuilder->reset();
-
-            foreach ($files as $file) {
-                // prevent access to object context
-                (static function (string $file): void {
-                    include $file;
-                })($file);
-            }
-
-            ($this->sourcedExplorers[$source] ??= new ExplorerCollection())->push($flowBuilder->buildExplorers());
-            ($this->sourcedEmitters[$source] ??= new EmitterCollection())->push($flowBuilder->buildEmitters());
-            ($this->sourcedReceivers[$source] ??= new ReceiverCollection())->push($flowBuilder->buildReceivers());
-            ($this->sourcedStatusReporters[$source] ??= new StatusReporterCollection())->push($flowBuilder->buildStatusReporters());
-            ($this->sourcedWebHttpHandlers[$source] ??= new HttpHandlerCollection())->push($flowBuilder->buildHttpHandlers());
-
-            unset($this->flowBuilderFiles[$source]);
-        }
-    }
-
     /**
      * @return class-string[]
      */
@@ -163,5 +137,31 @@ class FlowComponentRegistry
         }
 
         return $result;
+    }
+
+    private function loadSource(string $source): void
+    {
+        $files = $this->flowBuilderFiles[$source] ?? [];
+
+        if ($files !== []) {
+            $flowBuilder = new FlowComponent();
+
+            $flowBuilder->reset();
+
+            foreach ($files as $file) {
+                // prevent access to object context
+                (static function (string $file): void {
+                    include $file;
+                })($file);
+            }
+
+            ($this->sourcedExplorers[$source] ??= new ExplorerCollection())->push($flowBuilder->buildExplorers());
+            ($this->sourcedEmitters[$source] ??= new EmitterCollection())->push($flowBuilder->buildEmitters());
+            ($this->sourcedReceivers[$source] ??= new ReceiverCollection())->push($flowBuilder->buildReceivers());
+            ($this->sourcedStatusReporters[$source] ??= new StatusReporterCollection())->push($flowBuilder->buildStatusReporters());
+            ($this->sourcedWebHttpHandlers[$source] ??= new HttpHandlerCollection())->push($flowBuilder->buildHttpHandlers());
+
+            unset($this->flowBuilderFiles[$source]);
+        }
     }
 }
