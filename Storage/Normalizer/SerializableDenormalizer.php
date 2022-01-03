@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -23,7 +24,7 @@ class SerializableDenormalizer implements DenormalizerInterface
 
         try {
             $unserialize_callback_func = \ini_get('unserialize_callback_func');
-            \ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeClass');
+            \ini_set('unserialize_callback_func', self::class . '::handleUnserializeClass');
 
             $result = \unserialize($data);
         } catch (\Throwable $exception) {

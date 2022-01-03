@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -27,6 +28,6 @@ class ScalarNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, $format = null)
     {
-        return \is_bool($data) || \is_string($data) || \is_null($data) || \is_float($data) || \is_int($data);
+        return \is_bool($data) || \is_string($data) || $data === null || \is_float($data) || \is_int($data);
     }
 }
