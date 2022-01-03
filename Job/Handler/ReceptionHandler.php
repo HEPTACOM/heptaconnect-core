@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
@@ -163,12 +164,12 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
                     foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
                         foreach ($entities as $externalId => $entity) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\join('_', [
-                                    $sourcePortalKey,
-                                    $targetPortalKey,
-                                    $dataType,
-                                    $externalId,
-                                ])));
+                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
+                                $sourcePortalKey,
+                                $targetPortalKey,
+                                $dataType,
+                                $externalId,
+                            ])));
 
                             if (!$lock->acquire()) {
                                 continue;
