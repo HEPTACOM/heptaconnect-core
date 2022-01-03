@@ -7,9 +7,9 @@ namespace Heptacom\HeptaConnect\Core\Job;
 use Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\Message\JobMessage;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobContract;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreateActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreatePayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Create\JobCreatePayloads;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class JobDispatcher extends JobDispatcherContract
