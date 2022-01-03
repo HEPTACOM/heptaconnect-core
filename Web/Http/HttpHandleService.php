@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http;
@@ -105,7 +106,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     private function getStack(PortalNodeKeyInterface $portalNodeKey, string $path): ?HttpHandlerStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $path]);
+        $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $path]);
 
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory

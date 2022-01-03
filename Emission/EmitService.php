@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission;
@@ -97,7 +98,7 @@ class EmitService implements EmitServiceInterface
      */
     private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?EmitterStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
+        $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->emissionStackCache)) {
             $builder = $this->emitterStackBuilderFactory
