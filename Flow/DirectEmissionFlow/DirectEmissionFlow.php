@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow;
@@ -51,7 +52,7 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
 
         /** @var DatasetEntityContract[] $unidentifiedEntities */
         $unidentifiedEntities = \iterable_to_array($entities->filter(
-            static fn (DatasetEntityContract $entity): bool => \is_null($entity->getPrimaryKey())
+            static fn (DatasetEntityContract $entity): bool => $entity->getPrimaryKey() === null
         ));
 
         foreach ($unidentifiedEntities as $unidentifiedEntity) {
@@ -65,7 +66,7 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
             /** @var string[] $externalIds */
             $externalIds = \array_filter(\iterable_to_array($entitiesByType->map(
                 static fn (DatasetEntityContract $entity): ?string => $entity->getPrimaryKey()
-            )), static fn (?string $primaryKey): bool => !\is_null($primaryKey));
+            )), static fn (?string $primaryKey): bool => $primaryKey !== null);
 
             try {
                 $directEmitter = new DirectEmitter($type);
@@ -90,7 +91,7 @@ class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwa
         return $result;
     }
 
-    public function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
