@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission;
@@ -71,7 +72,7 @@ class EmissionActor implements EmissionActorInterface
                 foreach ($receptionRoutes as $receptionRoute) {
                     $externalId = $entity->getPrimaryKey();
 
-                    if (\is_null($externalId)) {
+                    if ($externalId === null) {
                         $this->logger->critical(LogMessage::EMIT_NO_PRIMARY_KEY(), [
                             'type' => $stack->supports(),
                             'stack' => $stack,
