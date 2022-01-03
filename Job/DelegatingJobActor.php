@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job;
@@ -34,12 +35,15 @@ class DelegatingJobActor extends DelegatingJobActorContract
         switch ($type) {
             case Emission::class:
                 $this->emissionHandler->triggerEmission($jobs);
+
                 break;
             case Reception::class:
                 $this->receptionHandler->triggerReception($jobs);
+
                 break;
             case Exploration::class:
                 $this->explorationHandler->triggerExplorations($jobs);
+
                 break;
         }
     }

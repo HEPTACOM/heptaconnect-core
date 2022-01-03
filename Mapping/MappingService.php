@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
@@ -105,7 +106,8 @@ class MappingService implements MappingServiceInterface
                 unset($newExternalIds[$match]);
                 yield $mappedExternalId => (new MappingStruct(
                     $portalNodeKey,
-                    new MappingNodeStruct($mappingNodeKey, $entityType))
+                    new MappingNodeStruct($mappingNodeKey, $entityType)
+                )
                 )->setExternalId($mappedExternalId);
             }
         }
