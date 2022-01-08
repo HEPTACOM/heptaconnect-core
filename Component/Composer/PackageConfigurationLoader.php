@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
@@ -43,7 +44,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         $factory = new Factory();
         $workingDir = null;
 
-        if (!\is_null($this->composerJson)) {
+        if ($this->composerJson !== null) {
             $workingDir = \dirname($this->composerJson);
 
             if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
@@ -167,7 +168,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 // TODO log. This is a weird case
 
                 if ($package instanceof RootPackageInterface
-                    && !\is_null($workingDir)
+                    && $workingDir !== null
                     && \is_dir($absolute = $workingDir . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
                 }

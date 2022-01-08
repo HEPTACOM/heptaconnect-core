@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception;
@@ -107,7 +108,7 @@ class ReceiveService implements ReceiveServiceInterface
      */
     private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
+        $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
