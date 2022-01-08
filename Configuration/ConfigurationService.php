@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Configuration;
@@ -60,7 +61,7 @@ class ConfigurationService implements ConfigurationServiceInterface
 
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
 
-        if (\is_null($configuration)) {
+        if ($configuration === null) {
             $data = null;
         } else {
             $data = $this->storage->getConfiguration($portalNodeKey);
@@ -82,10 +83,11 @@ class ConfigurationService implements ConfigurationServiceInterface
         foreach ($nullArray as $key => $value) {
             if (\is_array($value) && \array_key_exists($key, $editable)) {
                 $editable[$key] = $this->removeStorageKeysWhenValueIsNull($editable[$key], $value);
+
                 continue;
             }
 
-            if (!\is_null($value)) {
+            if ($value !== null) {
                 continue;
             }
 
