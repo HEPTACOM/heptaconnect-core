@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -31,8 +32,8 @@ class SerializableCompressDenormalizer implements DenormalizerInterface
 
     public function supportsDenormalization($data, $type, $format = null)
     {
-        return $type === $this->getType() &&
-            $this->serializableDenormalizer->supportsDenormalization(
+        return $type === $this->getType()
+            && $this->serializableDenormalizer->supportsDenormalization(
                 \gzuncompress($data),
                 $this->serializableDenormalizer->getType(),
                 $format

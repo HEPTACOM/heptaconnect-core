@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
@@ -59,7 +60,7 @@ class StatusReportingService implements StatusReportingServiceInterface
         $result = [];
         $topics = [];
 
-        if (\is_null($topic)) {
+        if ($topic === null) {
             /** @var StatusReporterContract $statusReporter */
             foreach ($statusReporters as $statusReporter) {
                 $topics[] = $statusReporter->supportsTopic();
@@ -119,7 +120,7 @@ class StatusReportingService implements StatusReportingServiceInterface
         StatusReporterCollection $statusReporters,
         string $topic
     ): StatusReporterStackInterface {
-        $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
+        $cacheKey = \md5(\implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
             $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters);
