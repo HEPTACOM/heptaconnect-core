@@ -1,12 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Exception;
 
 use Heptacom\HeptaConnect\Core\Job\JobData;
-use RuntimeException;
 
-class ReceptionJobHandlingException extends RuntimeException
+class ReceptionJobHandlingException extends \RuntimeException
 {
     private JobData $jobData;
 
