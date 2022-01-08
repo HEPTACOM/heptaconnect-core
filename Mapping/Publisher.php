@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
@@ -27,7 +28,9 @@ class Publisher implements PublisherInterface
     ): void {
         $this->jobDispatcher->dispatch(new JobCollection([
             new Emission(new MappingComponentStruct(
-                $portalNodeId, $entityType, $externalId
+                $portalNodeId,
+                $entityType,
+                $externalId
             )),
         ]));
     }
