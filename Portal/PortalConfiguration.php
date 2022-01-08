@@ -34,7 +34,7 @@ class PortalConfiguration extends ConfigurationContract
 
     private function &flattened(): array
     {
-        if (\is_null($this->flat)) {
+        if ($this->flat === null) {
             $this->flat = [];
 
             $unwrappables = ['' => $this->configuration];

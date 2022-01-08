@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
@@ -6,12 +7,12 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\Get\PortalNodeGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\Get\PortalNodeGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExtensionFindActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 
@@ -25,6 +26,8 @@ class PortalRegistry implements PortalRegistryInterface
 
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
+    private PortalExtensionFindActionInterface $portalExtensionFindAction;
+
     private array $cache = [
         'classes' => [],
         'portals' => [],
@@ -35,12 +38,14 @@ class PortalRegistry implements PortalRegistryInterface
         PortalFactoryContract $portalFactory,
         ComposerPortalLoader $portalLoader,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        PortalNodeGetActionInterface $portalNodeGetAction
+        PortalNodeGetActionInterface $portalNodeGetAction,
+        PortalExtensionFindActionInterface $portalExtensionFindAction
     ) {
         $this->portalFactory = $portalFactory;
         $this->portalLoader = $portalLoader;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->portalNodeGetAction = $portalNodeGetAction;
+        $this->portalExtensionFindAction = $portalExtensionFindAction;
     }
 
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
@@ -64,11 +69,15 @@ class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
 
         if (!isset($this->cache['portalExtensions'][$portalClass])) {
-            $extensions = $this->portalLoader->getPortalExtensions();
+            $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
-            $extensions = $extensions->filter(fn (PortalExtensionContract $extension) => \is_a($extension->supports(), $portalClass, true));
+            if ($extensions->count()) {
+                $portalExtensionFindResult = $this->portalExtensionFindAction->find($portalNodeKey);
 
-            $this->cache['portalExtensions'][$portalClass] = new PortalExtensionCollection(\iterable_to_array($extensions));
+                $extensions = new PortalExtensionCollection($extensions->filter([$portalExtensionFindResult, 'isActive']));
+            }
+
+            $this->cache['portalExtensions'][$portalClass] = $extensions;
         }
 
         return $this->cache['portalExtensions'][$portalClass];
