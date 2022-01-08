@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
@@ -20,13 +21,13 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishPayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartPayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetCriteria;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetResult;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
@@ -163,12 +164,12 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
                     foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
                         foreach ($entities as $externalId => $entity) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\join('_', [
-                                    $sourcePortalKey,
-                                    $targetPortalKey,
-                                    $dataType,
-                                    $externalId,
-                                ])));
+                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
+                                $sourcePortalKey,
+                                $targetPortalKey,
+                                $dataType,
+                                $externalId,
+                            ])));
 
                             if (!$lock->acquire()) {
                                 continue;
