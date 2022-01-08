@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
@@ -58,9 +59,9 @@ class DirectEmitter extends EmitterContract
         $type = $this->supports();
 
         yield from $this->entities->filter(
-            static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey()) &&
-                \in_array($entity->getPrimaryKey(), $externalIds, true) &&
-                \is_a($entity, $type)
+            static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey())
+                && \in_array($entity->getPrimaryKey(), $externalIds, true)
+                && \is_a($entity, $type)
         );
     }
 }

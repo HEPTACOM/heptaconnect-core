@@ -1,20 +1,26 @@
 {
     "name": "heptacom/heptaconnect-core",
-    "type": "library",
     "description": "HEPTAconnect core processes",
-    "keywords": [
-        "heptaconnect",
-        "messaging"
-    ],
     "license": [
         "AGPL-3.0-or-later",
         "proprietary"
+    ],
+    "type": "library",
+    "keywords": [
+        "heptaconnect",
+        "messaging"
     ],
     "authors": [
         {
             "name": "HEPTACOM GmbH"
         }
     ],
+    "support": {
+        "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
+        "source": "https://github.com/HEPTACOM/heptaconnect-framework",
+        "docs": "https://connect.heptacom.de/",
+        "rss": "https://connect.heptacom.de/feed/rss2.xml"
+    },
     "require": {
         "php": ">=7.4",
         "ext-hash": "*",
@@ -44,27 +50,26 @@
         "symfony/polyfill-php80": ">=1.16",
         "symfony/yaml": "^4.4 || ^5.0"
     },
-    "extra": {
-        "unused": [
-            "bentools/iterable-functions"
-        ]
-    },
-    "autoload": {
-        "psr-4": {
-            "Heptacom\\HeptaConnect\\Core\\": ""
-        }
-    },
     "repositories": {
         "heptaconnect-sources": {
             "type": "path",
             "url": "../**"
         }
     },
-    "support": {
-        "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
-        "source": "https://github.com/HEPTACOM/heptaconnect-framework",
-        "docs": "https://connect.heptacom.de/",
-        "rss": "https://connect.heptacom.de/feed/rss2.xml"
+    "autoload": {
+        "psr-4": {
+            "Heptacom\\HeptaConnect\\Core\\": ""
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
+    },
+    "extra": {
+        "unused": [
+            "bentools/iterable-functions"
+        ]
     },
     "website": "https://heptaconnect.io"
 }

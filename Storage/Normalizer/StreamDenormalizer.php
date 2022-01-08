@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -43,7 +44,7 @@ class StreamDenormalizer implements DenormalizerInterface
 
         $resource = $this->filesystem->readStream($this->streamPath->buildPath($data));
 
-        if ($resource == false) {
+        if ($resource === false) {
             throw new UnexpectedValueException('File can not be read from', 1637101289);
         }
 
