@@ -48,19 +48,19 @@ class FlowComponentCodeOriginFinderLogger extends AbstractLogger
         $this->httpHandlerCodeOriginFinder = $httpHandlerCodeOriginFinder;
     }
 
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = []): void
     {
         foreach ($context as $key => &$value) {
             try {
                 if ($value instanceof EmitterContract) {
                     $value = (string) $this->emitterCodeOriginFinder->findOrigin($value);
-                } else if ($value instanceof ExplorerContract) {
+                } elseif ($value instanceof ExplorerContract) {
                     $value = (string) $this->explorerCodeOriginFinder->findOrigin($value);
-                } else if ($value instanceof ReceiverContract) {
+                } elseif ($value instanceof ReceiverContract) {
                     $value = (string) $this->receiverCodeOriginFinder->findOrigin($value);
-                } else if ($value instanceof StatusReporterContract) {
+                } elseif ($value instanceof StatusReporterContract) {
                     $value = (string) $this->statusReporterCodeOriginFinder->findOrigin($value);
-                } else if ($value instanceof HttpHandlerContract) {
+                } elseif ($value instanceof HttpHandlerContract) {
                     $value = (string) $this->httpHandlerCodeOriginFinder->findOrigin($value);
                 }
             } catch (\Throwable $throwable) {
