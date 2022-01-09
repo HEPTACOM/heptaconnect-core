@@ -1,24 +1,21 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
 
-use Closure;
 use Heptacom\HeptaConnect\Portal\Base\Builder\Component\StatusReporter;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\CodeOrigin;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionFunction;
 
 class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderInterface
 {
     public function findOrigin(StatusReporterContract $statusReporter): CodeOrigin
     {
         if ($statusReporter instanceof StatusReporter) {
-            /** @var array<Closure|null> $closures */
+            /** @var array<\Closure|null> $closures */
             $closures = [
                 $statusReporter->getRunMethod(),
             ];
@@ -26,15 +23,15 @@ class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderIn
             $lastReflectionException = null;
 
             foreach ($closures as $closure) {
-                if ($closure instanceof Closure) {
+                if ($closure instanceof \Closure) {
                     try {
-                        $reflection = new ReflectionFunction($closure);
+                        $reflection = new \ReflectionFunction($closure);
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
                             return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
                         }
-                    } catch (ReflectionException $e) {
+                    } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
                     }
                 }
@@ -44,13 +41,13 @@ class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderIn
         }
 
         try {
-            $reflection = new ReflectionClass($statusReporter);
+            $reflection = new \ReflectionClass($statusReporter);
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
                 return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
             }
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($statusReporter, 1641079372, $e);
         }
 
