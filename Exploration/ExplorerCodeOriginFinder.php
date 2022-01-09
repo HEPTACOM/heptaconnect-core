@@ -1,24 +1,21 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
-use Closure;
 use Heptacom\HeptaConnect\Portal\Base\Builder\Component\Explorer;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\CodeOrigin;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound;
-use ReflectionClass;
-use ReflectionException;
-use ReflectionFunction;
 
 class ExplorerCodeOriginFinder implements ExplorerCodeOriginFinderInterface
 {
     public function findOrigin(ExplorerContract $explorer): CodeOrigin
     {
         if ($explorer instanceof Explorer) {
-            /** @var array<Closure|null> $closures */
+            /** @var array<\Closure|null> $closures */
             $closures = [
                 $explorer->getRunMethod(),
                 $explorer->getIsAllowedMethod(),
@@ -27,15 +24,15 @@ class ExplorerCodeOriginFinder implements ExplorerCodeOriginFinderInterface
             $lastReflectionException = null;
 
             foreach ($closures as $closure) {
-                if ($closure instanceof Closure) {
+                if ($closure instanceof \Closure) {
                     try {
-                        $reflection = new ReflectionFunction($closure);
+                        $reflection = new \ReflectionFunction($closure);
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
                             return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
                         }
-                    } catch (ReflectionException $e) {
+                    } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
                     }
                 }
@@ -45,13 +42,13 @@ class ExplorerCodeOriginFinder implements ExplorerCodeOriginFinderInterface
         }
 
         try {
-            $reflection = new ReflectionClass($explorer);
+            $reflection = new \ReflectionClass($explorer);
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
                 return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
             }
-        } catch (ReflectionException $e) {
+        } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($explorer, 1637421328, $e);
         }
 

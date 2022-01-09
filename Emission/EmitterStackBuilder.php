@@ -57,8 +57,9 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
                 \sprintf(
                     'EmitterStackBuilder: Tried to push an arbitrary emitter, but it does not support type %s.',
                     $this->entityType,
-                ), [
-                'emitter' => $emitter,
+                ),
+                [
+                    'emitter' => $emitter,
                 ]
             );
         }
