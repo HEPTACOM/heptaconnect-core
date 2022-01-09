@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Core\Bridge\Portal\PortalContainerServiceProviderInterface;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
@@ -15,6 +14,7 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefiniti
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
@@ -34,7 +34,7 @@ use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterCon
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -210,24 +210,20 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         $containerBuilder->setDefinition(DeepCloneContract::class, new Definition());
         $containerBuilder->setDefinition(DeepObjectIteratorContract::class, new Definition());
+        $containerBuilder->setDefinition(ClientInterface::class, (new Definition())->setFactory([Psr18ClientDiscovery::class, 'find']));
         $containerBuilder->setDefinition(RequestFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findRequestFactory']));
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
         $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
         $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
         $containerBuilder->setDefinition(
-            HttpClientInterface::class,
+            HttpClientContract::class,
             (new Definition())
-                ->setFactory([
-                    new Reference(PortalContainerServiceProviderInterface::class),
-                    'createHttpClient'
-                ])
+                ->setClass(HttpClient::class)
                 ->setArguments([
-                    new Reference(PortalNodeKeyInterface::class),
-                    (new Definition())->setFactory([Psr18ClientDiscovery::class, 'find']),
-                    new Reference(LoggerInterface::class),
+                    new Reference(ClientInterface::class),
+                    new Reference(UriFactoryInterface::class),
                 ])
         );
-        $containerBuilder->setAlias(ClientInterface::class, HttpClientInterface::class);
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
         $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
