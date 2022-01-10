@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Portal node extensions can supply source flow components for data types that have not been introduced by the decorated portal
+- All aliases in the dependency-injection container for portals are now public. This enables injection of aliased services in short-notation flow-components.
 
 ### Removed
 
