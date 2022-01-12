@@ -8,8 +8,8 @@ use Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\Message\JobMessage;
 use Heptacom\HeptaConnect\Core\Job\Contract\DelegatingJobActorContract;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Get\JobGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Get\JobGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class MessageHandler implements MessageSubscriberInterface
