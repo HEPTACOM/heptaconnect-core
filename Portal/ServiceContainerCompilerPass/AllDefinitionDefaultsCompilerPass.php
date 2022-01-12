@@ -43,5 +43,9 @@ class AllDefinitionDefaultsCompilerPass implements CompilerPassInterface
                 ]);
             }
         }
+
+        foreach ($container->getAliases() as $alias) {
+            $alias->setPublic(true);
+        }
     }
 }

@@ -47,18 +47,21 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function push(ReceiverContract $receiver): self
     {
         if (\is_a($this->entityType, $receiver->supports(), true)) {
-            $this->logger->debug(\sprintf(
-                'ReceiverStackBuilder: Pushed %s as arbitrary receiver.',
-                \get_class($receiver)
-            ));
+            $this->logger->debug('ReceiverStackBuilder: Pushed an arbitrary receiver.', [
+                'receiver' => $receiver,
+            ]);
 
             $this->receivers[] = $receiver;
         } else {
-            $this->logger->debug(\sprintf(
-                'ReceiverStackBuilder: Tried to push %s as arbitrary receiver, but it does not support type %s.',
-                \get_class($receiver),
-                $this->entityType,
-            ));
+            $this->logger->debug(
+                \sprintf(
+                    'ReceiverStackBuilder: Tried to push an arbitrary receiver, but it does not support type %s.',
+                    $this->entityType,
+                ),
+                [
+                    'receiver' => $receiver,
+                ]
+            );
         }
 
         return $this;
@@ -67,10 +70,9 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function pushSource(): self
     {
         if ($this->source instanceof ReceiverContract) {
-            $this->logger->debug(\sprintf(
-                'ReceiverStackBuilder: Pushed %s as source receiver.',
-                \get_class($this->source)
-            ));
+            $this->logger->debug('ReceiverStackBuilder: Pushed the source receiver.', [
+                'receiver' => $this->source,
+            ]);
 
             if (!\in_array($this->source, $this->receivers, true)) {
                 $this->receivers[] = $this->source;
@@ -83,10 +85,9 @@ class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $receiver) {
-            $this->logger->debug(\sprintf(
-                'ReceiverStackBuilder: Pushed %s as decorator receiver.',
-                \get_class($receiver)
-            ));
+            $this->logger->debug('ReceiverStackBuilder: Pushed a decorator receiver.', [
+                'receiver' => $receiver,
+            ]);
 
             if (!\in_array($receiver, $this->receivers, true)) {
                 $this->receivers[] = $receiver;
