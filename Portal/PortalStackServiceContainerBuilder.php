@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefiniti
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
@@ -33,6 +34,7 @@ use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterCon
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -55,6 +57,7 @@ use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
 {
@@ -212,6 +215,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
         $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
         $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
+        $containerBuilder->setDefinition(
+            HttpClientContract::class,
+            (new Definition())
+                ->setClass(HttpClient::class)
+                ->setArguments([
+                    new Reference(ClientInterface::class),
+                    new Reference(UriFactoryInterface::class),
+                ])
+                ->addMethodCall('withExceptionTriggers', \range(400, 599), true)
+                ->addMethodCall('withMaxRedirect', [20], true)
+                ->addMethodCall('withMaxRetry', [2], true)
+                ->addMethodCall('withMaxWaitTimeout', [], true)
+        );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
         $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
