@@ -41,18 +41,21 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function push(HttpHandlerContract $httpHandler): self
     {
         if ($this->path === $httpHandler->getPath()) {
-            $this->logger->debug(\sprintf(
-                'HttpHandlerStackBuilder: Pushed %s as arbitrary http handler.',
-                \get_class($httpHandler)
-            ));
+            $this->logger->debug('HttpHandlerStackBuilder: Pushed an arbitrary http handler.', [
+                'web_http_handler' => $httpHandler,
+            ]);
 
             $this->selection[] = $httpHandler;
         } else {
-            $this->logger->debug(\sprintf(
-                'HttpHandlerStackBuilder: Tried to push %s as arbitrary http handler, but it does not support path %s.',
-                \get_class($httpHandler),
-                $this->path,
-            ));
+            $this->logger->debug(
+                \sprintf(
+                    'HttpHandlerStackBuilder: Tried to push an arbitrary http handler, but it does not support path %s.',
+                    $this->path,
+                ),
+                [
+                    'web_http_handler' => $httpHandler,
+                ]
+            );
         }
 
         return $this;
@@ -61,10 +64,9 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function pushSource(): self
     {
         if ($this->source instanceof HttpHandlerContract) {
-            $this->logger->debug(\sprintf(
-                'HttpHandlerStackBuilder: Pushed %s as source http handler.',
-                \get_class($this->source)
-            ));
+            $this->logger->debug('HttpHandlerStackBuilder: Pushed the source http handler.', [
+                'web_http_handler' => $this->source,
+            ]);
 
             if (!\in_array($this->source, $this->selection, true)) {
                 $this->selection[] = $this->source;
@@ -77,10 +79,9 @@ class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $item) {
-            $this->logger->debug(\sprintf(
-                'HttpHandlerStackBuilder: Pushed %s as decorator http handler.',
-                \get_class($item)
-            ));
+            $this->logger->debug('HttpHandlerStackBuilder: Pushed a decorator http handler.', [
+                'web_http_handler' => $this->source,
+            ]);
 
             if (!\in_array($item, $this->selection, true)) {
                 $this->selection[] = $item;

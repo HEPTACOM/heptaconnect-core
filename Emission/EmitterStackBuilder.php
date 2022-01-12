@@ -47,18 +47,21 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function push(EmitterContract $emitter): self
     {
         if (\is_a($this->entityType, $emitter->supports(), true)) {
-            $this->logger->debug(\sprintf(
-                'EmitterStackBuilder: Pushed %s as arbitrary emitter.',
-                \get_class($emitter)
-            ));
+            $this->logger->debug('EmitterStackBuilder: Pushed an arbitrary emitter.', [
+                'emitter' => $emitter,
+            ]);
 
             $this->emitters[] = $emitter;
         } else {
-            $this->logger->debug(\sprintf(
-                'EmitterStackBuilder: Tried to push %s as arbitrary emitter, but it does not support type %s.',
-                \get_class($emitter),
-                $this->entityType,
-            ));
+            $this->logger->debug(
+                \sprintf(
+                    'EmitterStackBuilder: Tried to push an arbitrary emitter, but it does not support type %s.',
+                    $this->entityType,
+                ),
+                [
+                    'emitter' => $emitter,
+                ]
+            );
         }
 
         return $this;
@@ -67,10 +70,9 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function pushSource(): self
     {
         if ($this->source instanceof EmitterContract) {
-            $this->logger->debug(\sprintf(
-                'EmitterStackBuilder: Pushed %s as source emitter.',
-                \get_class($this->source)
-            ));
+            $this->logger->debug('EmitterStackBuilder: Pushed the source emitter.', [
+                'emitter' => $this->source,
+            ]);
 
             if (!\in_array($this->source, $this->emitters, true)) {
                 $this->emitters[] = $this->source;
@@ -83,10 +85,9 @@ class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $emitter) {
-            $this->logger->debug(\sprintf(
-                'EmitterStackBuilder: Pushed %s as decorator emitter.',
-                \get_class($emitter)
-            ));
+            $this->logger->debug('EmitterStackBuilder: Pushed a decorator emitter.', [
+                'emitter' => $emitter,
+            ]);
 
             if (!\in_array($emitter, $this->emitters, true)) {
                 $this->emitters[] = $emitter;
