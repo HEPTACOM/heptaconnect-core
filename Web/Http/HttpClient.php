@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\Support\HttpException;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Exception\HttpException;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
