@@ -123,7 +123,7 @@ class StatusReportingService implements StatusReportingServiceInterface
         $cacheKey = \md5(\implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters);
+            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters, $this->logger);
         }
 
         return clone $this->statusReporterStackCache[$cacheKey];
