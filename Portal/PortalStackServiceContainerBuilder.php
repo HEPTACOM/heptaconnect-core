@@ -223,7 +223,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
                     new Reference(ClientInterface::class),
                     new Reference(UriFactoryInterface::class),
                 ])
-                ->addMethodCall('withExceptionTriggers', [...\range(400, 599)], true)
+                ->addMethodCall('withExceptionTriggers', \range(400, 599), true)
                 ->addMethodCall('withMaxRedirect', [20], true)
                 ->addMethodCall('withMaxRetry', [2], true)
                 ->addMethodCall('withMaxWaitTimeout', [], true)
