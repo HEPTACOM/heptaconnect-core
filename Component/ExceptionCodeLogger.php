@@ -17,10 +17,9 @@ class ExceptionCodeLogger extends AbstractLogger
     public function log($level, $message, array $context = [])
     {
         $codeMessage = '';
-        if (!empty($context)) {
-            $exception = $context[0];
-            if ($exception instanceof \Exception) {
-                $codeMessage = '['.\get_class($exception).'Code: '.$exception->getCode().'] ';
+        foreach ($context as $throwable) {
+            if ($throwable instanceof \Throwable) {
+                $codeMessage .= '['.\get_class($throwable).' Code: '.$throwable->getCode().'] ';
             }
         }
         $this->decorated->log($level, $codeMessage.$message, $context);
