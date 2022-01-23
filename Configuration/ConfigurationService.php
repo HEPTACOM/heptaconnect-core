@@ -7,7 +7,13 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Get\PortalNodeConfigurationGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Get\PortalNodeConfigurationGetResult;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\PortalNodeConfigurationSetPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\PortalNodeConfigurationSetPayloads;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationSetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -16,22 +22,26 @@ class ConfigurationService implements ConfigurationServiceInterface
 {
     private PortalRegistryInterface $portalRegistry;
 
-    private ConfigurationStorageContract $storage;
-
     private CacheItemPoolInterface $cache;
 
     private StorageKeyGeneratorContract $keyGenerator;
 
+    private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
+
+    private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
+
     public function __construct(
         PortalRegistryInterface $portalRegistry,
-        ConfigurationStorageContract $storage,
         CacheItemPoolInterface $cache,
-        StorageKeyGeneratorContract $keyGenerator
+        StorageKeyGeneratorContract $keyGenerator,
+        PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
+        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet
     ) {
         $this->portalRegistry = $portalRegistry;
-        $this->storage = $storage;
         $this->cache = $cache;
         $this->keyGenerator = $keyGenerator;
+        $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
+        $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
@@ -40,7 +50,7 @@ class ConfigurationService implements ConfigurationServiceInterface
 
         if (!$cachedConfig->isHit()) {
             $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-            $config = $template->resolve($this->storage->getConfiguration($portalNodeKey));
+            $config = $template->resolve($this->getPortalNodeConfigurationInternal($portalNodeKey));
 
             $this->cache->save($cachedConfig->set($config));
         } else {
@@ -64,7 +74,7 @@ class ConfigurationService implements ConfigurationServiceInterface
         if ($configuration === null) {
             $data = null;
         } else {
-            $data = $this->storage->getConfiguration($portalNodeKey);
+            $data = $this->getPortalNodeConfigurationInternal($portalNodeKey);
             $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration ?? []);
             $configuration = $this->removeStorageKeysWhenValueIsNull($configuration, $configuration ?? []);
             $data = \array_replace_recursive($data, $configuration);
@@ -72,7 +82,9 @@ class ConfigurationService implements ConfigurationServiceInterface
             $template->resolve($data);
         }
 
-        $this->storage->setConfiguration($portalNodeKey, $data);
+        $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+            new PortalNodeConfigurationSetPayload($portalNodeKey, $data),
+        ]));
     }
 
     /**
@@ -117,5 +129,17 @@ class ConfigurationService implements ConfigurationServiceInterface
         $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
 
         return 'config.cache.' . $key;
+    }
+
+    private function getPortalNodeConfigurationInternal(PortalNodeKeyInterface $portalNodeKey): array
+    {
+        $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
+
+        /** @var PortalNodeConfigurationGetResult $configuration */
+        foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
+            return $configuration->getValue();
+        }
+
+        return [];
     }
 }
