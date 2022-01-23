@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use instance of `\Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract` in log context instead of its class in the message in `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder` logger usage
 - Use instance of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract` in log context instead of its class in the message in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder` logger usage
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService` from `\Heptacom\HeptaConnect\Storage\Base\Contract\ConfigurationStorageContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationGetActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationSetActionInterface` to improve performance on reading and writing portal node configuration
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Mapping\MappingMapActionInterface` as previous service is renamed
 
 ### Fixed
 
