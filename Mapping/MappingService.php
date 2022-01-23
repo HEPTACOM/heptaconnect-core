@@ -62,33 +62,6 @@ class MappingService implements MappingServiceInterface
         }
     }
 
-    public function get(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $externalId
-    ): MappingInterface {
-        $mappingNodeKey = $this->getMappingNodeKey($entityType, $portalNodeKey, $externalId);
-        $mappingExists = $mappingNodeKey instanceof MappingNodeKeyInterface;
-
-        if (!$mappingExists) {
-            /* @phpstan-ignore-next-line */
-            $mappingNodeKey = $this->mappingNodeRepository->create($entityType, $portalNodeKey);
-        }
-
-        $mapping = (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $entityType)))
-            ->setExternalId($externalId);
-
-        if (!$mappingExists) {
-            $this->mappingRepository->create(
-                $mapping->getPortalNodeKey(),
-                $mapping->getMappingNodeKey(),
-                $mapping->getExternalId()
-            );
-        }
-
-        return $mapping;
-    }
-
     public function getListByExternalIds(
         string $entityType,
         PortalNodeKeyInterface $portalNodeKey,
@@ -143,40 +116,6 @@ class MappingService implements MappingServiceInterface
         }
     }
 
-    public function save(MappingInterface $mapping): void
-    {
-        $mappingKeys = $this->mappingRepository->listByNodes(
-            $mapping->getMappingNodeKey(),
-            $mapping->getPortalNodeKey()
-        );
-
-        foreach ($mappingKeys as $mappingKey) {
-            $this->mappingRepository->updateExternalId($mappingKey, $mapping->getExternalId());
-
-            return;
-        }
-
-        $this->mappingRepository->create(
-            $mapping->getPortalNodeKey(),
-            $mapping->getMappingNodeKey(),
-            $mapping->getExternalId()
-        );
-    }
-
-    public function reflect(MappingInterface $mapping, PortalNodeKeyInterface $portalNodeKey): MappingInterface
-    {
-        $this->createIfNeeded($mapping);
-        $mappingKeys = $this->mappingRepository->listByNodes($mapping->getMappingNodeKey(), $portalNodeKey);
-
-        foreach ($mappingKeys as $mappingKey) {
-            return $this->mappingRepository->read($mappingKey);
-        }
-
-        $mappingNode = new MappingNodeStruct($mapping->getMappingNodeKey(), $mapping->getEntityType());
-
-        return new MappingStruct($portalNodeKey, $mappingNode);
-    }
-
     public function merge(MappingNodeKeyInterface $mergeFrom, MappingNodeKeyInterface $mergeInto): void
     {
         try {
@@ -227,42 +166,5 @@ class MappingService implements MappingServiceInterface
         } catch (UnsupportedStorageKeyException $e) {
             throw new MappingNodeAreUnmergableException($mergeFrom, $mergeInto, $e);
         }
-    }
-
-    private function createIfNeeded(MappingInterface $mapping): void
-    {
-        $mappingKeys = $this->mappingRepository->listByNodes(
-            $mapping->getMappingNodeKey(),
-            $mapping->getPortalNodeKey()
-        );
-
-        foreach ($mappingKeys as $_) {
-            return;
-        }
-
-        $this->mappingRepository->create(
-            $mapping->getPortalNodeKey(),
-            $mapping->getMappingNodeKey(),
-            $mapping->getExternalId()
-        );
-    }
-
-    private function getMappingNodeKey(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $externalId
-    ): ?MappingNodeKeyInterface {
-        /* @phpstan-ignore-next-line */
-        $ids = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalId(
-            $entityType,
-            $portalNodeKey,
-            $externalId
-        );
-
-        foreach ($ids as $id) {
-            return $id;
-        }
-
-        return null;
     }
 }
