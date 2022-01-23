@@ -1,6 +1,6 @@
 <?php
 
-namespace Heptacom\HeptaConnect\Core\Component;
+namespace Heptacom\HeptaConnect\Core\Component\Logger;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
