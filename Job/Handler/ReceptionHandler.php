@@ -23,12 +23,13 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Mapping\Map\MappingMapPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Mapping\MappingMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -46,8 +47,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private EntityReflectorContract $entityReflector;
 
-    private EntityMapperContract $entityMapper;
-
     private MappingNodeRepositoryContract $mappingNodeRepository;
 
     private ReceiveServiceInterface $receiveService;
@@ -62,23 +61,24 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private JobFinishActionInterface $jobFinishAction;
 
+    private MappingMapActionInterface $mappingMapAction;
+
     public function __construct(
         LockFactory $lockFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EntityReflectorContract $entityReflector,
-        EntityMapperContract $entityMapper,
         MappingNodeRepositoryContract $mappingNodeRepository,
         ReceiveServiceInterface $receiveService,
         DeepObjectIteratorContract $objectIterator,
         RouteGetActionInterface $routeGetAction,
         LoggerInterface $logger,
         JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction
+        JobFinishActionInterface $jobFinishAction,
+        MappingMapActionInterface $mappingMapAction
     ) {
         $this->lockFactory = $lockFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->entityReflector = $entityReflector;
-        $this->entityMapper = $entityMapper;
         $this->mappingNodeRepository = $mappingNodeRepository;
         $this->receiveService = $receiveService;
         $this->objectIterator = $objectIterator;
@@ -86,6 +86,7 @@ class ReceptionHandler implements ReceptionHandlerInterface
         $this->logger = $logger;
         $this->jobStartAction = $jobStartAction;
         $this->jobFinishAction = $jobFinishAction;
+        $this->mappingMapAction = $mappingMapAction;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
@@ -203,8 +204,10 @@ class ReceptionHandler implements ReceptionHandlerInterface
                         $rawEntities = $this->objectIterator->iterate($rawEntities);
                         /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
                         $filteredEntityObjects = new DatasetEntityCollection($rawEntities);
-                        // TODO inspect memory raise
-                        $mappedEntities = $this->entityMapper->mapEntities($filteredEntityObjects, $sourcePortalNodeKey);
+                        // TODO inspect memory raise - probably fixed by new storage
+                        $mappedEntities = $this->mappingMapAction
+                            ->map(new MappingMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
+                            ->getMappedDatasetEntityCollection();
                         // TODO: improve performance
                         $this->entityReflector->reflectEntities($mappedEntities, $targetPortalNodeKey);
 
