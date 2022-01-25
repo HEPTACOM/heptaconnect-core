@@ -22,8 +22,8 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Action\Mapping\Map\MappingMapPayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Mapping\MappingMapActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
@@ -45,7 +45,7 @@ class ExplorationActor implements ExplorationActorInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
-    private MappingMapActionInterface $mappingMapAction;
+    private IdentityMapActionInterface $identityMapAction;
 
     public function __construct(
         LoggerInterface $logger,
@@ -54,7 +54,7 @@ class ExplorationActor implements ExplorationActorInterface
         PublisherInterface $publisher,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        MappingMapActionInterface $mappingMapAction
+        IdentityMapActionInterface $identityMapAction
     ) {
         $this->logger = $logger;
         $this->emissionActor = $emissionActor;
@@ -62,7 +62,7 @@ class ExplorationActor implements ExplorationActorInterface
         $this->publisher = $publisher;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->mappingMapAction = $mappingMapAction;
+        $this->identityMapAction = $identityMapAction;
     }
 
     public function performExploration(
@@ -190,7 +190,7 @@ class ExplorationActor implements ExplorationActorInterface
             \implode(',', $primaryKeys)
         ));
 
-        $mapResult = $this->mappingMapAction->map(new MappingMapPayload($portalNodeKey, $this->factorizeMappableEntities($entityType, $primaryKeys)));
+        $mapResult = $this->identityMapAction->map(new IdentityMapPayload($portalNodeKey, $this->factorizeMappableEntities($entityType, $primaryKeys)));
 
         $this->emissionActor->performEmission(
             $mapResult->getMappedDatasetEntityCollection()->map(static fn (MappedDatasetEntityStruct $me): ?string => $me->getMapping()->getExternalId()),
@@ -218,7 +218,7 @@ class ExplorationActor implements ExplorationActorInterface
 
         $entities = $this->factorizeMappableEntities($entityType, $externalIds);
 
-        $mapResult = $this->mappingMapAction->map(new MappingMapPayload($portalNodeKey, $entities));
+        $mapResult = $this->identityMapAction->map(new IdentityMapPayload($portalNodeKey, $entities));
         $this->publisher->publishBatch(new MappingComponentCollection($mapResult->getMappedDatasetEntityCollection()->map(
             static fn (MappedDatasetEntityStruct $me): MappingComponentStruct => new MappingComponentStruct(
                 $me->getMapping()->getPortalNodeKey(),
