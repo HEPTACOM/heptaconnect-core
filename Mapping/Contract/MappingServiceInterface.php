@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Mapping\Contract;
 
 use Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
@@ -16,19 +15,6 @@ interface MappingServiceInterface
         MappingNodeKeyInterface $mappingNodeKey,
         \Throwable $exception
     ): void;
-
-    /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
-     *
-     * @return MappingInterface[]
-     *
-     * @psalm-return iterable<string, \Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface>
-     */
-    public function getListByExternalIds(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeKey,
-        array $externalIds
-    ): iterable;
 
     /**
      * @throws MappingNodeAreUnmergableException

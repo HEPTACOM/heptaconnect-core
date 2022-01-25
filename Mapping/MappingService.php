@@ -16,7 +16,6 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingRepositoryCont
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
-use Heptacom\HeptaConnect\Storage\Base\MappingCollection;
 use Psr\Log\LoggerInterface;
 
 class MappingService implements MappingServiceInterface
@@ -59,60 +58,6 @@ class MappingService implements MappingServiceInterface
                 'portalNodeKey' => $this->storageKeyGenerator->serialize($portalNodeKey),
                 'outerException' => $throwable,
             ]);
-        }
-    }
-
-    public function getListByExternalIds(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeKey,
-        array $externalIds
-    ): iterable {
-        $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-            $entityType,
-            $portalNodeKey,
-            $externalIds
-        );
-        $newExternalIds = $externalIds;
-
-        foreach ($mappingNodeKeys as $mappedExternalId => $mappingNodeKey) {
-            if (($match = \array_search($mappedExternalId, $newExternalIds, true)) !== false) {
-                unset($newExternalIds[$match]);
-                yield $mappedExternalId => (new MappingStruct(
-                    $portalNodeKey,
-                    new MappingNodeStruct($mappingNodeKey, $entityType)
-                )
-                )->setExternalId($mappedExternalId);
-            }
-        }
-
-        $newMappingNodeKeys = $this->mappingNodeRepository->createList($entityType, $portalNodeKey, \count($newExternalIds));
-        $newMappingNodeKeysIterator = $newMappingNodeKeys->getIterator();
-        $createPayload = new MappingCollection();
-
-        foreach ($newExternalIds as $newExternalId) {
-            if (!$newMappingNodeKeysIterator->valid()) {
-                break;
-            }
-
-            $mappingNodeKey = $newMappingNodeKeysIterator->current();
-
-            if (!$mappingNodeKey instanceof MappingNodeKeyInterface) {
-                continue;
-            }
-
-            $createPayload->push([
-                (new MappingStruct($portalNodeKey, new MappingNodeStruct($mappingNodeKey, $entityType)))
-                    ->setExternalId($newExternalId),
-            ]);
-
-            $newMappingNodeKeysIterator->next();
-        }
-
-        $this->mappingRepository->createList($createPayload);
-
-        /** @var MappingStruct $mapping */
-        foreach ($createPayload as $mapping) {
-            yield $mapping->getExternalId() => $mapping;
         }
     }
 
