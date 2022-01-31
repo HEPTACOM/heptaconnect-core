@@ -67,7 +67,8 @@
     },
     "extra": {
         "unused": [
-            "bentools/iterable-functions"
+            "bentools/iterable-functions",
+            "symfony/polyfill-php80"
         ]
     },
     "website": "https://heptaconnect.io"
