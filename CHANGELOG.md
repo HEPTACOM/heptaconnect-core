@@ -67,7 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::get` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::get`
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::save` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::save`
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::reflect` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::reflect`
-- Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Mapping\MappingMapActionInterface::map`
+- Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface::map`
 
 ## [0.8.5] - 2021-12-28
 
