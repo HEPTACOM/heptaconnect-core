@@ -10,8 +10,12 @@ use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract;
-use Heptacom\HeptaConnect\Storage\Base\MappingPersistPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistCreatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistDeletePayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistPayloadCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistUpdatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
@@ -19,17 +23,17 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 {
     private DeepObjectIteratorContract $deepObjectIterator;
 
-    private MappingPersisterContract $mappingPersister;
+    private IdentityPersistActionInterface $identityPersistAction;
 
     private LoggerInterface $logger;
 
     public function __construct(
         DeepObjectIteratorContract $deepObjectIterator,
-        MappingPersisterContract $mappingPersister,
+        IdentityPersistActionInterface $identityPersistAction,
         LoggerInterface $logger
     ) {
         $this->deepObjectIterator = $deepObjectIterator;
-        $this->mappingPersister = $mappingPersister;
+        $this->identityPersistAction = $identityPersistAction;
         $this->logger = $logger;
     }
 
@@ -54,7 +58,7 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             return;
         }
 
-        $payload = new MappingPersistPayload($targetPortalNodeKey);
+        $payload = new IdentityPersistPayload($targetPortalNodeKey, new IdentityPersistPayloadCollection());
 
         foreach ($this->deepObjectIterator->iterate($receivedEntityData) as $entity) {
             if (!$entity instanceof DatasetEntityContract) {
@@ -102,14 +106,20 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             }
 
             if ($firstForeignKey === null && $externalId !== null) {
-                $payload->create($mapping->getMappingNodeKey(), $externalId);
+                $payload->getMappingPersistPayloads()->push([
+                    new IdentityPersistCreatePayload($mapping->getMappingNodeKey(), $externalId),
+                ]);
             } elseif ($externalId === null) {
-                $payload->delete($mapping->getMappingNodeKey());
+                $payload->getMappingPersistPayloads()->push([
+                    new IdentityPersistDeletePayload($mapping->getMappingNodeKey()),
+                ]);
             } else {
-                $payload->update($mapping->getMappingNodeKey(), $externalId);
+                $payload->getMappingPersistPayloads()->push([
+                    new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId),
+                ]);
             }
         }
 
-        $this->mappingPersister->persist($payload);
+        $this->identityPersistAction->persist($payload);
     }
 }
