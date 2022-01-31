@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Heptacom\HeptaConnect\Core\Component\Logger;
 
 use Psr\Log\AbstractLogger;
@@ -14,14 +16,14 @@ class ExceptionCodeLogger extends AbstractLogger
         $this->decorated = $decorated;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         $codeMessage = '';
         foreach ($context as $throwable) {
             if ($throwable instanceof \Throwable) {
-                $codeMessage .= '['.\get_class($throwable).' Code: '.$throwable->getCode().'] ';
+                $codeMessage .= '[' . \get_class($throwable) . ' Code: ' . $throwable->getCode() . '] ';
             }
         }
-        $this->decorated->log($level, $codeMessage.$message, $context);
+        $this->decorated->log($level, $codeMessage . $message, $context);
     }
 }
