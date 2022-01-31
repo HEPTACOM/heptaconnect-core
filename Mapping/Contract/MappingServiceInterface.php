@@ -18,15 +18,6 @@ interface MappingServiceInterface
     ): void;
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
-     */
-    public function get(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeKey,
-        string $externalId
-    ): MappingInterface;
-
-    /**
      * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
      *
      * @return MappingInterface[]
@@ -38,10 +29,6 @@ interface MappingServiceInterface
         PortalNodeKeyInterface $portalNodeKey,
         array $externalIds
     ): iterable;
-
-    public function save(MappingInterface $mapping): void;
-
-    public function reflect(MappingInterface $mapping, PortalNodeKeyInterface $portalNodeKey): MappingInterface;
 
     /**
      * @throws MappingNodeAreUnmergableException
