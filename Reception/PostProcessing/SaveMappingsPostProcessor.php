@@ -23,17 +23,17 @@ class SaveMappingsPostProcessor extends PostProcessorContract
 {
     private DeepObjectIteratorContract $deepObjectIterator;
 
-    private IdentityPersistActionInterface $mappingPersistAction;
+    private IdentityPersistActionInterface $identityPersistAction;
 
     private LoggerInterface $logger;
 
     public function __construct(
         DeepObjectIteratorContract $deepObjectIterator,
-        IdentityPersistActionInterface $mappingPersistAction,
+        IdentityPersistActionInterface $identityPersistAction,
         LoggerInterface $logger
     ) {
         $this->deepObjectIterator = $deepObjectIterator;
-        $this->mappingPersistAction = $mappingPersistAction;
+        $this->identityPersistAction = $identityPersistAction;
         $this->logger = $logger;
     }
 
@@ -120,6 +120,6 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             }
         }
 
-        $this->mappingPersistAction->persist($payload);
+        $this->identityPersistAction->persist($payload);
     }
 }
