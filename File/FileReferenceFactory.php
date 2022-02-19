@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
 use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -18,14 +19,22 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 {
     private StreamFactoryInterface $streamFactory;
 
-    private StreamNormalizer $streamNormalizer;
+    private ?StreamNormalizer $streamNormalizer = null;
+
+    private NormalizationRegistryContract $normalizationRegistryContract;
 
     public function __construct(
         StreamFactoryInterface $streamFactory,
-        StreamNormalizer $streamNormalizer
+        NormalizationRegistryContract $normalizationRegistryContract
     ) {
         $this->streamFactory = $streamFactory;
-        $this->streamNormalizer = $streamNormalizer;
+        $this->normalizationRegistryContract = $normalizationRegistryContract;
+
+        $streamNormalizer = $this->normalizationRegistryContract->getNormalizerByType('stream');
+
+        if ($streamNormalizer instanceof StreamNormalizer) {
+            $this->streamNormalizer = $streamNormalizer;
+        }
     }
 
     public function fromPublicUrl(string $publicUrl): FileReferenceContract
