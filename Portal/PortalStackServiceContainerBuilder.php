@@ -323,14 +323,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             new PhpFileLoader($containerBuilder, $fileLocator),
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
-        $globPattern = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.{yml,yaml,xml,php}';
-        $globbedFiles = \glob($globPattern, \GLOB_BRACE);
+        $directory = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.';
+        $files = [
+            $directory . 'yml',
+            $directory . 'yaml',
+            $directory . 'xml',
+            $directory . 'php',
+        ];
 
-        if (!\is_array($globbedFiles)) {
-            return;
-        }
+        foreach ($files as $serviceDefinitionPath) {
+            if (!\is_file($serviceDefinitionPath)) {
+                continue;
+            }
 
-        foreach ($globbedFiles as $serviceDefinitionPath) {
             try {
                 $delegatingLoader->load($serviceDefinitionPath);
             } catch (\Throwable $throwable) {
