@@ -106,15 +106,15 @@ class SaveMappingsPostProcessor extends PostProcessorContract
             }
 
             if ($firstForeignKey === null && $externalId !== null) {
-                $payload->getMappingPersistPayloads()->push([
+                $payload->getIdentityPersistPayloads()->push([
                     new IdentityPersistCreatePayload($mapping->getMappingNodeKey(), $externalId),
                 ]);
             } elseif ($externalId === null) {
-                $payload->getMappingPersistPayloads()->push([
+                $payload->getIdentityPersistPayloads()->push([
                     new IdentityPersistDeletePayload($mapping->getMappingNodeKey()),
                 ]);
             } else {
-                $payload->getMappingPersistPayloads()->push([
+                $payload->getIdentityPersistPayloads()->push([
                     new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId),
                 ]);
             }
