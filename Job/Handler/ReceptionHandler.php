@@ -209,7 +209,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
                         $mappedEntities = $this->identityMapAction
                             ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
                             ->getMappedDatasetEntityCollection();
-                        // TODO: improve performance
                         $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
                         $externalIds = \array_map(
