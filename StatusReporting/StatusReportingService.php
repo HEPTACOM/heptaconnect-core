@@ -61,7 +61,6 @@ class StatusReportingService implements StatusReportingServiceInterface
         $topics = [];
 
         if ($topic === null) {
-            /** @var StatusReporterContract $statusReporter */
             foreach ($statusReporters as $statusReporter) {
                 $topics[] = $statusReporter->supportsTopic();
             }

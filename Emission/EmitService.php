@@ -61,7 +61,6 @@ class EmitService implements EmitServiceInterface
         $emittingPortalNodes = [];
         $entityType = $mappingComponents->getType();
 
-        /** @var MappingComponentStructContract $mapping */
         foreach ($mappingComponents as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 

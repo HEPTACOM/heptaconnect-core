@@ -64,7 +64,6 @@ class ComposerPortalLoader
     {
         $result = new PortalExtensionCollection();
 
-        /** @var PackageConfiguration $package */
         foreach ($this->getPackageConfigurationsCached() as $package) {
             $portalExtensions = (array) ($package->getConfiguration()['portalExtensions'] ?? []);
 
