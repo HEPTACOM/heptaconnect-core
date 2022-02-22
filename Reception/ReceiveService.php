@@ -17,6 +17,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
 class ReceiveService implements ReceiveServiceInterface
@@ -28,12 +29,12 @@ class ReceiveService implements ReceiveServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface|null>
+     * @var array<array-key, ReceiverStackInterface|null>
      */
     private array $receiverStackCache = [];
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface>
+     * @var array<array-key, ReceiveContextInterface>
      */
     private array $receiveContextCache = [];
 
@@ -70,7 +71,7 @@ class ReceiveService implements ReceiveServiceInterface
 
             $receivingPortalNodes[] = $portalNodeKey;
 
-            /** @var iterable<array-key, \Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $portalNodeEntities */
+            /** @var iterable<array-key, DatasetEntityContract> $portalNodeEntities */
             $portalNodeEntities = \iterable_map(
                 $mappedDatasetEntities->filter(
                     static function (MappedDatasetEntityStruct $mappedDatasetEntityStruct) use ($portalNodeKey): bool {
@@ -102,9 +103,9 @@ class ReceiveService implements ReceiveServiceInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      *
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     * @throws UnsupportedStorageKeyException
      */
     private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
     {

@@ -25,7 +25,7 @@ class StatusReportingService implements StatusReportingServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
+     * @return array<array-key, StatusReporterStackInterface>
      */
     private array $statusReporterStackCache = [];
 
