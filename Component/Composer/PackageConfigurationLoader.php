@@ -124,7 +124,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     }
 
     /**
-     * @return iterable<\Composer\Package\CompletePackageInterface>
+     * @return iterable<CompletePackageInterface>
      */
     private function iteratePackages(Composer $composer): iterable
     {
