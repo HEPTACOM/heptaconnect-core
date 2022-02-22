@@ -25,6 +25,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
 class ExplorationActor implements ExplorationActorInterface
@@ -172,9 +173,9 @@ class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      *
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     * @throws UnsupportedStorageKeyException
      */
     private function flushDirectEmissions(
         EmitterStackInterface $emissionStack,
@@ -200,9 +201,9 @@ class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      *
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     * @throws UnsupportedStorageKeyException
      */
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
@@ -229,7 +230,7 @@ class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      * @param string[]                                                                         $primaryKeys
      */
     private function factorizeMappableEntities(string $entityType, array $primaryKeys): TypedDatasetEntityCollection
