@@ -46,7 +46,6 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
             [$externalId]
         );
 
-        /** @var MappingNodeKeyInterface $mappingNodeKey */
         foreach ($mappingNodeKeys as $mappingNodeKey) {
             $this->mappingService->addException(
                 $this->getPortalNodeKey(),
