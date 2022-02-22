@@ -43,7 +43,6 @@ class ExplorationHandler implements ExplorationHandlerInterface
         $types = [];
         $jobKeys = [];
 
-        /** @var JobData $job */
         foreach ($jobs as $job) {
             $mapping = $job->getMappingComponent();
             $key = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());

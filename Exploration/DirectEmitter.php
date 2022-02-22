@@ -48,6 +48,9 @@ class DirectEmitter extends EmitterContract
         return $this->supports;
     }
 
+    /**
+     * @psalm-return DatasetEntityCollection<DatasetEntityContract>
+     */
     public function getEntities(): DatasetEntityCollection
     {
         return $this->entities;
