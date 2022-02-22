@@ -21,8 +21,8 @@ class NormalizationRegistry extends NormalizationRegistryContract
     private array $denormalizer;
 
     /**
-     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface> $normalizer
-     * @psalm-param iterable<int, \Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface> $denormalizer
+     * @psalm-param iterable<int, NormalizerInterface> $normalizer
+     * @psalm-param iterable<int, DenormalizerInterface> $denormalizer
      */
     public function __construct(iterable $normalizer, iterable $denormalizer)
     {
