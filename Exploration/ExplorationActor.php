@@ -231,7 +231,7 @@ class ExplorationActor implements ExplorationActorInterface
 
     /**
      * @param class-string<DatasetEntityContract> $entityType
-     * @param string[]                                                                         $primaryKeys
+     * @param string[]                            $primaryKeys
      */
     private function factorizeMappableEntities(string $entityType, array $primaryKeys): TypedDatasetEntityCollection
     {
