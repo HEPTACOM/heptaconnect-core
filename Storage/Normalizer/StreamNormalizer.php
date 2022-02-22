@@ -44,6 +44,9 @@ class StreamNormalizer implements NormalizerInterface
         return $data instanceof SerializableStream;
     }
 
+    /**
+     * @psalm-return 'stream'
+     */
     public function getType(): string
     {
         return 'stream';

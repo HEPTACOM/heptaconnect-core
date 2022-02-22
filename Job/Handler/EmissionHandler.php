@@ -40,7 +40,6 @@ class EmissionHandler implements EmissionHandlerInterface
         /** @var JobKeyInterface[][] $processed */
         $processed = [];
 
-        /** @var JobData $job */
         foreach ($jobs as $job) {
             $emissions[$job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
             $processed[$job->getMappingComponent()->getEntityType()][] = $job->getJobKey();

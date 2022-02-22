@@ -101,7 +101,6 @@ class ExploreService implements ExploreServiceInterface
     {
         $types = [];
 
-        /** @var ExplorerContract $explorer */
         foreach ($explorers as $explorer) {
             $types[$explorer->supports()] = true;
         }
