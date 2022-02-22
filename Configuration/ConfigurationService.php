@@ -135,7 +135,6 @@ class ConfigurationService implements ConfigurationServiceInterface
     {
         $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
-        /** @var PortalNodeConfigurationGetResult $configuration */
         foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
             return $configuration->getValue();
         }
