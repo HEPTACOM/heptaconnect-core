@@ -67,7 +67,6 @@ class EmissionActor implements EmissionActorInterface
         try {
             $jobs = new JobCollection();
 
-            /** @var DatasetEntityContract $entity */
             foreach ($stack->next($externalIds, $context) as $entity) {
                 foreach ($receptionRoutes as $receptionRoute) {
                     $externalId = $entity->getPrimaryKey();

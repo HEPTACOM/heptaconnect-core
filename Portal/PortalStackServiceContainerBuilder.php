@@ -246,6 +246,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     /**
      * @param callable():void $registration
+     *
+     * @return string[]
+     *
+     * @psalm-return array<string>
      */
     private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array
     {
@@ -349,18 +353,18 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $automaticLoadedDefinitionsToRemove = [];
 
         foreach ($containerBuilder->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? (string) $id;
+            $class = $definition->getClass() ?? $id;
 
             if (!\class_exists($class)) {
                 continue;
             }
 
             if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string) $id;
+                $automaticLoadedDefinitionsToRemove[] = $id;
             }
 
             if (\is_a($class, PortalExtensionContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string) $id;
+                $automaticLoadedDefinitionsToRemove[] = $id;
             }
         }
 

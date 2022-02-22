@@ -61,7 +61,6 @@ class ReceiveService implements ReceiveServiceInterface
         $receivingPortalNodes = [];
         $type = $mappedDatasetEntities->getType();
 
-        /** @var MappedDatasetEntityStruct $mappedDatasetEntity */
         foreach ($mappedDatasetEntities as $mappedDatasetEntity) {
             $portalNodeKey = $mappedDatasetEntity->getMapping()->getPortalNodeKey();
 
