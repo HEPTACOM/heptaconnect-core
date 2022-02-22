@@ -10,6 +10,8 @@ use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Psr\Log\LoggerInterface;
@@ -42,7 +44,7 @@ class ComposerPortalLoader
         foreach ($this->getPackageConfigurationsCached() as $package) {
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
-            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> $portal */
+            /** @var class-string<PortalContract> $portal */
             foreach ($portals as $portal) {
                 try {
                     $portalCollection->push([$this->portalFactory->instantiatePortal($portal)]);
@@ -66,7 +68,7 @@ class ComposerPortalLoader
         foreach ($this->getPackageConfigurationsCached() as $package) {
             $portalExtensions = (array) ($package->getConfiguration()['portalExtensions'] ?? []);
 
-            /** @var class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract> $portalExtension */
+            /** @var class-string<PortalExtensionContract> $portalExtension */
             foreach ($portalExtensions as $portalExtension) {
                 try {
                     $result->push([$this->portalFactory->instantiatePortalExtension($portalExtension)]);
