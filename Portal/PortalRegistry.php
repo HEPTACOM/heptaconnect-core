@@ -90,6 +90,9 @@ class PortalRegistry implements PortalRegistryInterface
         return $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->getPortalNodeClass($portalNodeKey));
     }
 
+    /**
+     * @return class-string<PortalContract>|null
+     */
     private function getPortalNodeClass(PortalNodeKeyInterface $portalNodeKey): ?string
     {
         $nodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey])));
