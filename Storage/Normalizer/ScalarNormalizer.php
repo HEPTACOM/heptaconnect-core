@@ -9,6 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentExc
 
 class ScalarNormalizer implements NormalizerInterface
 {
+    /**
+     * @psalm-return 'scalar'
+     */
     public function getType(): string
     {
         return 'scalar';

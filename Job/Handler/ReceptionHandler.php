@@ -105,7 +105,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $routes[$this->storageKeyGenerator->serialize($routeData->getRouteKey())] = $routeData;
         }
 
-        /** @var JobData $job */
         foreach ($jobs as $job) {
             try {
                 $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;

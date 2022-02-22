@@ -239,7 +239,6 @@ class ExplorationActor implements ExplorationActorInterface
         $entityFactory = new \ReflectionClass($entityType);
 
         foreach ($primaryKeys as $primaryKey) {
-            /** @var DatasetEntityContract $entity */
             $entity = $entityFactory->newInstanceWithoutConstructor();
             \Closure::bind(function (DatasetEntityContract $entity): void {
                 $entity->attachments = new AttachmentCollection();
