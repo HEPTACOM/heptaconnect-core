@@ -25,22 +25,30 @@ class ConfigurationService implements ConfigurationServiceInterface
 
     private StorageKeyGeneratorContract $keyGenerator;
 
+    private StorageKeyGeneratorContract $aliasKeyGenerator;
+
     private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
 
     private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
+
+    private ConfigurationFileReader $configurationFileReader;
 
     public function __construct(
         PortalRegistryInterface $portalRegistry,
         CacheItemPoolInterface $cache,
         StorageKeyGeneratorContract $keyGenerator,
+        StorageKeyGeneratorContract $aliasKeyGenerator,
         PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet
+        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
+        ConfigurationFileReader $configurationFileReader
     ) {
         $this->portalRegistry = $portalRegistry;
         $this->cache = $cache;
         $this->keyGenerator = $keyGenerator;
+        $this->aliasKeyGenerator = $aliasKeyGenerator;
         $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
         $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
+        $this->configurationFileReader = $configurationFileReader;
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
@@ -135,6 +143,12 @@ class ConfigurationService implements ConfigurationServiceInterface
         $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
         foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
+            $alias = $this->aliasKeyGenerator->serialize($portalNodeKey);
+
+            if (\in_array($alias, $this->configurationFileReader->getAlias(), true)) {
+                return $this->configurationFileReader->callConfigurationScript($alias, $configuration->getValue());
+            }
+
             return $configuration->getValue();
         }
 
