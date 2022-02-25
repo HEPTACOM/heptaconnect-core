@@ -7,27 +7,36 @@ namespace Heptacom\HeptaConnect\Core\File;
 use Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
+use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
-use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 class FileReferenceFactory extends FileReferenceFactoryContract
 {
+    private PortalNodeKeyInterface $portalNodeKey;
+
     private StreamFactoryInterface $streamFactory;
 
     private NormalizationRegistryContract $normalizationRegistry;
 
+    private RequestStorage $requestStorage;
+
     public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
         StreamFactoryInterface $streamFactory,
-        NormalizationRegistryContract $normalizationRegistry
+        NormalizationRegistryContract $normalizationRegistry,
+        RequestStorage $requestStorage
     ) {
+        $this->portalNodeKey = $portalNodeKey;
         $this->streamFactory = $streamFactory;
         $this->normalizationRegistry = $normalizationRegistry;
+        $this->requestStorage = $requestStorage;
     }
 
     public function fromPublicUrl(string $publicUrl): FileReferenceContract
@@ -37,12 +46,9 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     public function fromRequest(RequestInterface $request): FileReferenceContract
     {
-        // TODO: Implement requestStorage
+        $requestKey = $this->requestStorage->persist($this->portalNodeKey, $request);
 
-        /** @var FileReferenceRequestKeyInterface $requestId */
-        $requestId = null; // TODO: $this->requestStorage->store($request);
-
-        return new RequestFileReference($requestId);
+        return new RequestFileReference($requestKey);
     }
 
     public function fromContents(
