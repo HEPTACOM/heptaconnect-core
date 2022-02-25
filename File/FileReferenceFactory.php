@@ -8,30 +8,36 @@ use Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
 use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer;
+use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
-use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 class FileReferenceFactory extends FileReferenceFactoryContract
 {
+    private PortalNodeKeyInterface $portalNodeKey;
+
     private StreamFactoryInterface $streamFactory;
+
+    private RequestStorage $requestStorage;
 
     private ?StreamNormalizer $streamNormalizer = null;
 
-    private NormalizationRegistryContract $normalizationRegistryContract;
-
     public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
         StreamFactoryInterface $streamFactory,
+        RequestStorage $requestStorage,
         NormalizationRegistryContract $normalizationRegistryContract
     ) {
+        $this->portalNodeKey = $portalNodeKey;
         $this->streamFactory = $streamFactory;
-        $this->normalizationRegistryContract = $normalizationRegistryContract;
+        $this->requestStorage = $requestStorage;
 
-        $streamNormalizer = $this->normalizationRegistryContract->getNormalizerByType('stream');
+        $streamNormalizer = $normalizationRegistryContract->getNormalizerByType('stream');
 
         if ($streamNormalizer instanceof StreamNormalizer) {
             $this->streamNormalizer = $streamNormalizer;
@@ -45,12 +51,9 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     public function fromRequest(RequestInterface $request): FileReferenceContract
     {
-        // TODO: Implement requestStorage
+        $requestKey = $this->requestStorage->persist($this->portalNodeKey, $request);
 
-        /** @var FileReferenceRequestKeyInterface $requestId */
-        $requestId = null; // TODO: $this->requestStorage->store($request);
-
-        return new RequestFileReference($requestId);
+        return new RequestFileReference($requestKey);
     }
 
     public function fromContents(
