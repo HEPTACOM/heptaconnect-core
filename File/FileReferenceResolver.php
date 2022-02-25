@@ -12,11 +12,11 @@ use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference;
-use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer;
 use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
@@ -24,8 +24,6 @@ use Psr\Http\Message\RequestFactoryInterface;
 
 class FileReferenceResolver extends FileReferenceResolverContract
 {
-    private ?StreamDenormalizer $streamDenormalizer = null;
-
     private HttpClientContract $httpClient;
 
     private RequestFactoryInterface $requestFactory;
@@ -35,6 +33,8 @@ class FileReferenceResolver extends FileReferenceResolverContract
     private FileContentsUrlProviderInterface $fileContentsUrlProvider;
 
     private FileRequestUrlProviderInterface $fileRequestUrlProvider;
+
+    private NormalizationRegistryContract $normalizationRegistry;
 
     private RequestStorage $requestStorage;
 
@@ -52,13 +52,8 @@ class FileReferenceResolver extends FileReferenceResolverContract
         $this->portalNodeKey = $portalNodeKey;
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
+        $this->normalizationRegistry = $normalizationRegistryContract;
         $this->requestStorage = $requestStorage;
-
-        $streamDenormalizer = $normalizationRegistryContract->getDenormalizer('stream');
-
-        if ($streamDenormalizer instanceof StreamDenormalizer) {
-            $this->streamDenormalizer = $streamDenormalizer;
-        }
     }
 
     public function resolve(FileReferenceContract $fileReference): ResolvedFileReferenceContract
@@ -78,7 +73,9 @@ class FileReferenceResolver extends FileReferenceResolverContract
                 $this->requestStorage
             );
         } elseif ($fileReference instanceof ContentsFileReference) {
-            if (!$this->streamDenormalizer instanceof StreamDenormalizer) {
+            $streamDenormalizer = $this->normalizationRegistry->getDenormalizer($fileReference->getNormalizationType());
+
+            if (!$streamDenormalizer instanceof DenormalizerInterface) {
                 // TODO: Add custom exception code (and message)
                 throw new \Exception('Some shit was fucked up');
             }
@@ -86,7 +83,7 @@ class FileReferenceResolver extends FileReferenceResolverContract
             return new ResolvedContentsFileReference(
                 $fileReference->getNormalizedStream(),
                 $fileReference->getMimeType(),
-                $this->streamDenormalizer,
+                $streamDenormalizer,
                 $this->portalNodeKey,
                 $this->fileContentsUrlProvider
             );
