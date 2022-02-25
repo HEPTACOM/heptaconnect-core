@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileRefere
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference;
 use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer;
+use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
@@ -35,19 +36,23 @@ class FileReferenceResolver extends FileReferenceResolverContract
 
     private FileRequestUrlProviderInterface $fileRequestUrlProvider;
 
+    private RequestStorage $requestStorage;
+
     public function __construct(
         HttpClientContract $httpClient,
         RequestFactoryInterface $requestFactory,
         PortalNodeKeyInterface $portalNodeKey,
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        NormalizationRegistryContract $normalizationRegistryContract
+        NormalizationRegistryContract $normalizationRegistryContract,
+        RequestStorage $requestStorage
     ) {
         $this->httpClient = $httpClient;
         $this->requestFactory = $requestFactory;
         $this->portalNodeKey = $portalNodeKey;
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
+        $this->requestStorage = $requestStorage;
 
         $streamDenormalizer = $normalizationRegistryContract->getDenormalizer('stream');
 
@@ -69,7 +74,8 @@ class FileReferenceResolver extends FileReferenceResolverContract
                 $fileReference->getRequestId(),
                 $this->httpClient,
                 $this->portalNodeKey,
-                $this->fileRequestUrlProvider
+                $this->fileRequestUrlProvider,
+                $this->requestStorage
             );
         } elseif ($fileReference instanceof ContentsFileReference) {
             if (!$this->streamDenormalizer instanceof StreamDenormalizer) {
