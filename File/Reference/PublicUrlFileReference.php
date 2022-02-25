@@ -15,7 +15,7 @@ class PublicUrlFileReference extends FileReferenceContract
         $this->publicUrl = $publicUrl;
     }
 
-    public function getPublicUrl(): ?string
+    public function getPublicUrl(): string
     {
         return $this->publicUrl;
     }

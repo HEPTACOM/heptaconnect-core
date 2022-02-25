@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
+use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
@@ -44,16 +45,28 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     public function fromRequest(RequestInterface $request): FileReferenceContract
     {
-        // TODO: Ensure, that $request is serializable
+        // TODO: Implement requestStorage
 
-        return new RequestFileReference($request);
+        /** @var FileReferenceRequestKeyInterface $requestId */
+        $requestId = null; // TODO: $this->requestStorage->store($request);
+
+        return new RequestFileReference($requestId);
     }
 
-    public function fromContents(string $contents): FileReferenceContract
-    {
-        $stream = new SerializableStream($this->streamFactory->createStream($contents));
-        $normalizedStream = $this->streamNormalizer->normalize($stream);
+    public function fromContents(
+        string $contents,
+        string $mimeType = 'application/octet-stream'
+    ): FileReferenceContract {
+        if (!$this->streamNormalizer instanceof StreamNormalizer) {
+            // TODO: Add code and message here
+            throw new \Exception('This makes no sense');
+        }
 
-        return new ContentsFileReference($normalizedStream);
+        $stream = $this->streamFactory->createStream($contents);
+        $stream->rewind();
+
+        $normalizedStream = $this->streamNormalizer->normalize(new SerializableStream($stream));
+
+        return new ContentsFileReference($normalizedStream, $mimeType);
     }
 }

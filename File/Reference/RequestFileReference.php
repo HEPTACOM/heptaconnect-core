@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\File\Reference;
 
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
-use Psr\Http\Message\RequestInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
 
 class RequestFileReference extends FileReferenceContract
 {
-    private RequestInterface $request;
+    private FileReferenceRequestKeyInterface $requestId;
 
-    public function __construct(RequestInterface $request)
+    public function __construct(FileReferenceRequestKeyInterface $requestId)
     {
-        $this->request = $request;
+        $this->requestId = $requestId;
     }
 
-    public function getRequest(): ?RequestInterface
+    public function getRequestId(): FileReferenceRequestKeyInterface
     {
-        return $this->request;
+        return $this->requestId;
     }
 }

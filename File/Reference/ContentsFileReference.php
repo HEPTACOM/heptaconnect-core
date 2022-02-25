@@ -10,13 +10,21 @@ class ContentsFileReference extends FileReferenceContract
 {
     private string $normalizedStream;
 
-    public function __construct(string $normalizedStream)
+    private string $mimeType;
+
+    public function __construct(string $normalizedStream, string $mimeType)
     {
         $this->normalizedStream = $normalizedStream;
+        $this->mimeType = $mimeType;
     }
 
-    public function getNormalizedStream(): ?string
+    public function getNormalizedStream(): string
     {
         return $this->normalizedStream;
+    }
+
+    public function getMimeType(): string
+    {
+        return $this->mimeType;
     }
 }
