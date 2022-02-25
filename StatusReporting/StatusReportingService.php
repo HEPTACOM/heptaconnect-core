@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
@@ -25,7 +24,7 @@ class StatusReportingService implements StatusReportingServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
+     * @return array<array-key, StatusReporterStackInterface>
      */
     private array $statusReporterStackCache = [];
 
@@ -61,7 +60,6 @@ class StatusReportingService implements StatusReportingServiceInterface
         $topics = [];
 
         if ($topic === null) {
-            /** @var StatusReporterContract $statusReporter */
             foreach ($statusReporters as $statusReporter) {
                 $topics[] = $statusReporter->supportsTopic();
             }

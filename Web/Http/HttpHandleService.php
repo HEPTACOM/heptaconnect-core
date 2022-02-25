@@ -24,12 +24,12 @@ use Ramsey\Uuid\Uuid;
 class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface|null>
+     * @var array<array-key, HttpHandlerStackInterface|null>
      */
     private array $stackCache = [];
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface>
+     * @var array<array-key, HttpHandleContextInterface>
      */
     private array $contextCache = [];
 

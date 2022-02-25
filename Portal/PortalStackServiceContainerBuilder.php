@@ -280,6 +280,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     /**
      * @param callable():void $registration
+     *
+     * @return string[]
+     *
+     * @psalm-return array<string>
      */
     private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array
     {
@@ -357,14 +361,19 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             new PhpFileLoader($containerBuilder, $fileLocator),
         ]);
         $delegatingLoader = new DelegatingLoader($loaderResolver);
-        $globPattern = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.{yml,yaml,xml,php}';
-        $globbedFiles = \glob($globPattern, \GLOB_BRACE);
+        $directory = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.';
+        $files = [
+            $directory . 'yml',
+            $directory . 'yaml',
+            $directory . 'xml',
+            $directory . 'php',
+        ];
 
-        if (!\is_array($globbedFiles)) {
-            return;
-        }
+        foreach ($files as $serviceDefinitionPath) {
+            if (!\is_file($serviceDefinitionPath)) {
+                continue;
+            }
 
-        foreach ($globbedFiles as $serviceDefinitionPath) {
             try {
                 $delegatingLoader->load($serviceDefinitionPath);
             } catch (\Throwable $throwable) {
@@ -378,18 +387,18 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $automaticLoadedDefinitionsToRemove = [];
 
         foreach ($containerBuilder->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? (string) $id;
+            $class = $definition->getClass() ?? $id;
 
             if (!\class_exists($class)) {
                 continue;
             }
 
             if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string) $id;
+                $automaticLoadedDefinitionsToRemove[] = $id;
             }
 
             if (\is_a($class, PortalExtensionContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = (string) $id;
+                $automaticLoadedDefinitionsToRemove[] = $id;
             }
         }
 

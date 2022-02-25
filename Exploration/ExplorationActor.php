@@ -9,18 +9,23 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
+use Heptacom\HeptaConnect\Dataset\Base\AttachmentCollection;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\DependencyCollection;
+use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
 class ExplorationActor implements ExplorationActorInterface
@@ -30,8 +35,6 @@ class ExplorationActor implements ExplorationActorInterface
     public const CHUNK_SIZE_PUBLICATION = 50;
 
     private LoggerInterface $logger;
-
-    private MappingServiceInterface $mappingService;
 
     private EmissionActorInterface $emissionActor;
 
@@ -43,22 +46,24 @@ class ExplorationActor implements ExplorationActorInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    private IdentityMapActionInterface $identityMapAction;
+
     public function __construct(
         LoggerInterface $logger,
-        MappingServiceInterface $mappingService,
         EmissionActorInterface $emissionActor,
         EmitContextFactoryInterface $emitContextFactory,
         PublisherInterface $publisher,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        IdentityMapActionInterface $identityMapAction
     ) {
         $this->logger = $logger;
-        $this->mappingService = $mappingService;
         $this->emissionActor = $emissionActor;
         $this->emitContextFactory = $emitContextFactory;
         $this->publisher = $publisher;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->identityMapAction = $identityMapAction;
     }
 
     public function performExploration(
@@ -168,9 +173,9 @@ class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      *
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     * @throws UnsupportedStorageKeyException
      */
     private function flushDirectEmissions(
         EmitterStackInterface $emissionStack,
@@ -186,14 +191,19 @@ class ExplorationActor implements ExplorationActorInterface
             \implode(',', $primaryKeys)
         ));
 
-        \iterable_filter($this->mappingService->getListByExternalIds($entityType, $portalNodeKey, $primaryKeys));
-        $this->emissionActor->performEmission($primaryKeys, clone $emissionStack, $emitContext);
+        $mapResult = $this->identityMapAction->map(new IdentityMapPayload($portalNodeKey, $this->factorizeMappableEntities($entityType, $primaryKeys)));
+
+        $this->emissionActor->performEmission(
+            $mapResult->getMappedDatasetEntityCollection()->map(static fn (MappedDatasetEntityStruct $me): ?string => $me->getMapping()->getExternalId()),
+            clone $emissionStack,
+            $emitContext
+        );
     }
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      *
-     * @throws \Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException
+     * @throws UnsupportedStorageKeyException
      */
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
@@ -207,19 +217,38 @@ class ExplorationActor implements ExplorationActorInterface
             \implode(',', $externalIds)
         ));
 
-        $this->publisher->publishBatch(new MappingComponentCollection($this->iterableValues(\iterable_map(
-            $this->mappingService->getListByExternalIds($entityType, $portalNodeKey, $externalIds),
-            static fn (MappingInterface $mapping): MappingComponentStruct => new MappingComponentStruct($portalNodeKey, $entityType, $mapping->getExternalId())
-        ))));
+        $entities = $this->factorizeMappableEntities($entityType, $externalIds);
+
+        $mapResult = $this->identityMapAction->map(new IdentityMapPayload($portalNodeKey, $entities));
+        $this->publisher->publishBatch(new MappingComponentCollection($mapResult->getMappedDatasetEntityCollection()->map(
+            static fn (MappedDatasetEntityStruct $me): MappingComponentStruct => new MappingComponentStruct(
+                $me->getMapping()->getPortalNodeKey(),
+                $me->getMapping()->getEntityType(),
+                $me->getMapping()->getExternalId()
+            )
+        )));
     }
 
     /**
-     * @TODO replace with iterable_values from bentools v2
+     * @param class-string<DatasetEntityContract> $entityType
+     * @param string[]                            $primaryKeys
      */
-    private function iterableValues(iterable $i): iterable
+    private function factorizeMappableEntities(string $entityType, array $primaryKeys): TypedDatasetEntityCollection
     {
-        foreach ($i as $item) {
-            yield $item;
+        $result = new TypedDatasetEntityCollection($entityType);
+        $entityFactory = new \ReflectionClass($entityType);
+
+        foreach ($primaryKeys as $primaryKey) {
+            $entity = $entityFactory->newInstanceWithoutConstructor();
+            \Closure::bind(function (DatasetEntityContract $entity): void {
+                $entity->attachments = new AttachmentCollection();
+                $entity->dependencies = new DependencyCollection();
+            }, null, $entity)($entity);
+            $entity->setPrimaryKey($primaryKey);
+
+            $result->push([$entity]);
         }
+
+        return $result;
     }
 }

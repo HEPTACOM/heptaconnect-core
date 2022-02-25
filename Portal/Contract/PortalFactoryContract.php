@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 abstract class PortalFactoryContract
 {
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> $class
+     * @psalm-param class-string<PortalContract> $class
      *
      * @throws AbstractInstantiationException
      */
@@ -45,7 +45,7 @@ abstract class PortalFactoryContract
     }
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract> $class
+     * @psalm-param class-string<PortalExtensionContract> $class
      *
      * @throws AbstractInstantiationException
      */

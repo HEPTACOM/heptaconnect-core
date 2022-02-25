@@ -7,7 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
 use Psr\Container\ContainerInterface;
 
@@ -46,7 +45,6 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
             [$externalId]
         );
 
-        /** @var MappingNodeKeyInterface $mappingNodeKey */
         foreach ($mappingNodeKeys as $mappingNodeKey) {
             $this->mappingService->addException(
                 $this->getPortalNodeKey(),

@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Component\Composer;
 use Heptacom\HeptaConnect\Dataset\Base\Support\AbstractCollection;
 
 /**
- * @extends \Heptacom\HeptaConnect\Dataset\Base\Support\AbstractCollection<\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration>
+ * @extends AbstractCollection<PackageConfiguration>
  */
 class PackageConfigurationCollection extends AbstractCollection
 {
