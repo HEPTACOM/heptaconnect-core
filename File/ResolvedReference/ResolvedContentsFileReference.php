@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\File\ResolvedReference;
 
 use Heptacom\HeptaConnect\Core\Bridge\File\FileContentsUrlProviderInterface;
-use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Psr\Http\Message\StreamInterface;
 
 class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 {
@@ -15,7 +16,7 @@ class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 
     private string $mimeType;
 
-    private StreamDenormalizer $streamDenormalizer;
+    private DenormalizerInterface $denormalizer;
 
     private PortalNodeKeyInterface $portalNodeKey;
 
@@ -24,13 +25,13 @@ class ResolvedContentsFileReference extends ResolvedFileReferenceContract
     public function __construct(
         string $normalizedStream,
         string $mimeType,
-        StreamDenormalizer $streamDenormalizer,
+        DenormalizerInterface $denormalizer,
         PortalNodeKeyInterface $portalNodeKey,
         FileContentsUrlProviderInterface $fileContentsUrlProvider
     ) {
         $this->normalizedStream = $normalizedStream;
         $this->mimeType = $mimeType;
-        $this->streamDenormalizer = $streamDenormalizer;
+        $this->denormalizer = $denormalizer;
         $this->portalNodeKey = $portalNodeKey;
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
     }
@@ -46,6 +47,12 @@ class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 
     public function getContents(): string
     {
-        return $this->streamDenormalizer->denormalize($this->normalizedStream, 'stream')->getContents();
+        $stream = $this->denormalizer->denormalize($this->normalizedStream, $this->denormalizer->getType());
+
+        if (!$stream instanceof StreamInterface) {
+            throw new \Exception('Stream is not a stream');
+        }
+
+        return $stream->getContents();
     }
 }

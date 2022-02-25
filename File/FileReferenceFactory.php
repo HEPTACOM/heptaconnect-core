@@ -7,11 +7,11 @@ namespace Heptacom\HeptaConnect\Core\File;
 use Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
-use Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer;
 use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Http\Message\RequestInterface;
@@ -23,25 +23,20 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     private StreamFactoryInterface $streamFactory;
 
-    private RequestStorage $requestStorage;
+    private NormalizationRegistryContract $normalizationRegistry;
 
-    private ?StreamNormalizer $streamNormalizer = null;
+    private RequestStorage $requestStorage;
 
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
         StreamFactoryInterface $streamFactory,
-        RequestStorage $requestStorage,
-        NormalizationRegistryContract $normalizationRegistryContract
+        NormalizationRegistryContract $normalizationRegistry,
+        RequestStorage $requestStorage
     ) {
         $this->portalNodeKey = $portalNodeKey;
         $this->streamFactory = $streamFactory;
+        $this->normalizationRegistry = $normalizationRegistry;
         $this->requestStorage = $requestStorage;
-
-        $streamNormalizer = $normalizationRegistryContract->getNormalizerByType('stream');
-
-        if ($streamNormalizer instanceof StreamNormalizer) {
-            $this->streamNormalizer = $streamNormalizer;
-        }
     }
 
     public function fromPublicUrl(string $publicUrl): FileReferenceContract
@@ -60,16 +55,18 @@ class FileReferenceFactory extends FileReferenceFactoryContract
         string $contents,
         string $mimeType = 'application/octet-stream'
     ): FileReferenceContract {
-        if (!$this->streamNormalizer instanceof StreamNormalizer) {
+        $stream = $this->streamFactory->createStream($contents);
+        $stream->rewind();
+        $serializableStream = new SerializableStream($stream);
+        $streamNormalizer = $this->normalizationRegistry->getNormalizer($serializableStream);
+
+        if (!$streamNormalizer instanceof NormalizerInterface) {
             // TODO: Add code and message here
             throw new \Exception('This makes no sense');
         }
 
-        $stream = $this->streamFactory->createStream($contents);
-        $stream->rewind();
+        $normalizedStream = $streamNormalizer->normalize($serializableStream);
 
-        $normalizedStream = $this->streamNormalizer->normalize(new SerializableStream($stream));
-
-        return new ContentsFileReference($normalizedStream, $mimeType);
+        return new ContentsFileReference($normalizedStream, $streamNormalizer->getType(), $mimeType);
     }
 }
