@@ -6,7 +6,6 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
-use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
@@ -105,7 +104,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $routes[$this->storageKeyGenerator->serialize($routeData->getRouteKey())] = $routeData;
         }
 
-        /** @var JobData $job */
         foreach ($jobs as $job) {
             try {
                 $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;

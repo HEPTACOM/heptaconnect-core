@@ -27,6 +27,9 @@ class StreamDenormalizer implements DenormalizerInterface
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
     }
 
+    /**
+     * @psalm-return 'stream'
+     */
     public function getType(): string
     {
         return 'stream';
