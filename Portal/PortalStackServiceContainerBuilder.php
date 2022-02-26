@@ -251,10 +251,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ->setArguments([
                 new Reference(HttpClientContract::class),
                 new Reference(RequestFactoryInterface::class),
-                new Reference(PortalNodeKeyInterface::class),
                 new Reference(FileContentsUrlProviderInterface::class),
                 new Reference(FileRequestUrlProviderInterface::class),
                 new Reference(NormalizationRegistryContract::class),
+                new Reference(RequestStorage::class),
             ])
         );
         $containerBuilder->setDefinition(
