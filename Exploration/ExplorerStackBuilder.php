@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
@@ -18,7 +19,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     private ExplorerCollection $decorators;
 
     /**
-     * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
+     * @var class-string<DatasetEntityContract>
      */
     private string $entityType;
 
@@ -30,7 +31,7 @@ class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     private array $explorers = [];
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @param class-string<DatasetEntityContract> $entityType
      */
     public function __construct(
         ExplorerCollection $sources,
