@@ -18,7 +18,6 @@ use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Psr\Http\Message\RequestFactoryInterface;
 
@@ -27,8 +26,6 @@ class FileReferenceResolver extends FileReferenceResolverContract
     private HttpClientContract $httpClient;
 
     private RequestFactoryInterface $requestFactory;
-
-    private PortalNodeKeyInterface $portalNodeKey;
 
     private FileContentsUrlProviderInterface $fileContentsUrlProvider;
 
@@ -41,7 +38,6 @@ class FileReferenceResolver extends FileReferenceResolverContract
     public function __construct(
         HttpClientContract $httpClient,
         RequestFactoryInterface $requestFactory,
-        PortalNodeKeyInterface $portalNodeKey,
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
         NormalizationRegistryContract $normalizationRegistryContract,
@@ -49,7 +45,6 @@ class FileReferenceResolver extends FileReferenceResolverContract
     ) {
         $this->httpClient = $httpClient;
         $this->requestFactory = $requestFactory;
-        $this->portalNodeKey = $portalNodeKey;
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->normalizationRegistry = $normalizationRegistryContract;
