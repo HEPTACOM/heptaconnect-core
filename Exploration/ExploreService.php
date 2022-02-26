@@ -14,7 +14,7 @@ use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -92,7 +92,7 @@ class ExploreService implements ExploreServiceInterface
     }
 
     /**
-     * @psalm-return array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>>
+     * @psalm-return array<array-key, class-string<DatasetEntityContract>>
      *
      * @return array|string[]
      */
@@ -100,7 +100,6 @@ class ExploreService implements ExploreServiceInterface
     {
         $types = [];
 
-        /** @var ExplorerContract $explorer */
         foreach ($explorers as $explorer) {
             $types[$explorer->supports()] = true;
         }

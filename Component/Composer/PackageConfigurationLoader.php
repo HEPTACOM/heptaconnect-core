@@ -63,7 +63,6 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             }
         }
 
-        /** @var CompletePackageInterface $packageInstance */
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             $config = new PackageConfiguration();
             $heptaconnectKeywords = \array_filter(
@@ -124,7 +123,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     }
 
     /**
-     * @return iterable<\Composer\Package\CompletePackageInterface>
+     * @return iterable<CompletePackageInterface>
      */
     private function iteratePackages(Composer $composer): iterable
     {
@@ -134,7 +133,6 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
-            /** @var array $package */
             foreach ($packageLockData as $package) {
                 $packageInstance = $locker->getLockedRepository()->findPackage($package['name'], $package['version']);
 
