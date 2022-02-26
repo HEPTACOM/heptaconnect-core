@@ -18,28 +18,26 @@ class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 
     private DenormalizerInterface $denormalizer;
 
-    private PortalNodeKeyInterface $portalNodeKey;
-
     private FileContentsUrlProviderInterface $fileContentsUrlProvider;
 
     public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
         string $normalizedStream,
         string $mimeType,
         DenormalizerInterface $denormalizer,
-        PortalNodeKeyInterface $portalNodeKey,
         FileContentsUrlProviderInterface $fileContentsUrlProvider
     ) {
+        parent::__construct($portalNodeKey);
         $this->normalizedStream = $normalizedStream;
         $this->mimeType = $mimeType;
         $this->denormalizer = $denormalizer;
-        $this->portalNodeKey = $portalNodeKey;
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
     }
 
     public function getPublicUrl(): string
     {
         return (string) $this->fileContentsUrlProvider->resolve(
-            $this->portalNodeKey,
+            $this->getPortalNodeKey(),
             $this->normalizedStream,
             $this->mimeType
         );

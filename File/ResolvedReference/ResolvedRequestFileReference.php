@@ -17,22 +17,20 @@ class ResolvedRequestFileReference extends ResolvedFileReferenceContract
 
     private ClientInterface $client;
 
-    private PortalNodeKeyInterface $portalNodeKey;
-
     private FileRequestUrlProviderInterface $fileRequestUrlProvider;
 
     private RequestStorage $requestStorage;
 
     public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
         FileReferenceRequestKeyInterface $requestId,
         ClientInterface $client,
-        PortalNodeKeyInterface $portalNodeKey,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
         RequestStorage $requestStorage
     ) {
+        parent::__construct($portalNodeKey);
         $this->requestId = $requestId;
         $this->client = $client;
-        $this->portalNodeKey = $portalNodeKey;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->requestStorage = $requestStorage;
     }
@@ -40,12 +38,12 @@ class ResolvedRequestFileReference extends ResolvedFileReferenceContract
     public function getPublicUrl(): string
     {
         // TODO: Add token for one-time permission
-        return (string) $this->fileRequestUrlProvider->resolve($this->portalNodeKey, $this->requestId);
+        return (string) $this->fileRequestUrlProvider->resolve($this->getPortalNodeKey(), $this->requestId);
     }
 
     public function getContents(): string
     {
-        $request = $this->requestStorage->load($this->portalNodeKey, $this->requestId);
+        $request = $this->requestStorage->load($this->getPortalNodeKey(), $this->requestId);
 
         return $this->client->sendRequest($request)->getBody()->getContents();
     }
