@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\File\Reference;
 
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 class ContentsFileReference extends FileReferenceContract
 {
@@ -14,8 +15,13 @@ class ContentsFileReference extends FileReferenceContract
 
     private string $mimeType;
 
-    public function __construct(string $normalizedStream, string $normalizationType, string $mimeType)
-    {
+    public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
+        string $normalizedStream,
+        string $normalizationType,
+        string $mimeType
+    ) {
+        parent::__construct($portalNodeKey);
         $this->normalizedStream = $normalizedStream;
         $this->normalizationType = $normalizationType;
         $this->mimeType = $mimeType;

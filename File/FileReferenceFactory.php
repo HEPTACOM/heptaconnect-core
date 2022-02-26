@@ -41,14 +41,14 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     public function fromPublicUrl(string $publicUrl): FileReferenceContract
     {
-        return new PublicUrlFileReference($publicUrl);
+        return new PublicUrlFileReference($this->portalNodeKey, $publicUrl);
     }
 
     public function fromRequest(RequestInterface $request): FileReferenceContract
     {
         $requestKey = $this->requestStorage->persist($this->portalNodeKey, $request);
 
-        return new RequestFileReference($requestKey);
+        return new RequestFileReference($this->portalNodeKey, $requestKey);
     }
 
     public function fromContents(
@@ -67,6 +67,6 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
         $normalizedStream = $streamNormalizer->normalize($serializableStream);
 
-        return new ContentsFileReference($normalizedStream, $streamNormalizer->getType(), $mimeType);
+        return new ContentsFileReference($this->portalNodeKey, $normalizedStream, $streamNormalizer->getType(), $mimeType);
     }
 }

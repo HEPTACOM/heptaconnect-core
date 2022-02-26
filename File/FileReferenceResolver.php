@@ -60,15 +60,16 @@ class FileReferenceResolver extends FileReferenceResolverContract
     {
         if ($fileReference instanceof PublicUrlFileReference) {
             return new ResolvedPublicUrlFileReference(
+                $fileReference->getPortalNodeKey(),
                 $fileReference->getPublicUrl(),
                 $this->httpClient,
                 $this->requestFactory
             );
         } elseif ($fileReference instanceof RequestFileReference) {
             return new ResolvedRequestFileReference(
+                $fileReference->getPortalNodeKey(),
                 $fileReference->getRequestId(),
                 $this->httpClient,
-                $this->portalNodeKey,
                 $this->fileRequestUrlProvider,
                 $this->requestStorage
             );
@@ -81,10 +82,10 @@ class FileReferenceResolver extends FileReferenceResolverContract
             }
 
             return new ResolvedContentsFileReference(
+                $fileReference->getPortalNodeKey(),
                 $fileReference->getNormalizedStream(),
                 $fileReference->getMimeType(),
                 $streamDenormalizer,
-                $this->portalNodeKey,
                 $this->fileContentsUrlProvider
             );
         }
