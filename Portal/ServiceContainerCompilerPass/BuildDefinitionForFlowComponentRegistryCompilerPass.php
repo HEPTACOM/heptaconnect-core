@@ -49,6 +49,11 @@ class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPas
         ]));
     }
 
+    /**
+     * @return Definition[]
+     *
+     * @psalm-return array<Definition>
+     */
     private function groupServices(string $collectionClass, array $groupServiceIds): array
     {
         return \array_map(static fn (array $refs): Definition => (new Definition($collectionClass))->setArguments([$refs]), $groupServiceIds);
