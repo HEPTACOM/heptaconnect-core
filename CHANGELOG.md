@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Emission\EmitContext` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous services are removed
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous services are removed
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous service is removed
+- Split argument in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface::receive` of type `\Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection` into `\Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection` and `\Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface` to state target portal clearly
 
 ### Deprecated
 
@@ -73,6 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface::map`
 - Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::merge`, `\Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException` and `\Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityOverviewActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface`
 - Remove unused `\Heptacom\HeptaConnect\Core\Router\CumulativeMappingException`
+- Remove dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
 
 ### Fixed
 
