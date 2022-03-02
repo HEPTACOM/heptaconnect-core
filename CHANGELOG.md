@@ -53,6 +53,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityReflectActionInterface` as previous service is renamed
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor` from `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface`
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsPostProcessor` from `\Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface` as previous service is renamed
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` from `\Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface`
 
 ### Deprecated
 
