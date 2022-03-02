@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Clear\PortalNodeStorageClearCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Delete\PortalNodeStorageDeleteCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\NotFoundException;
 use Psr\Log\LoggerInterface;
@@ -19,6 +24,10 @@ class PortalStorage implements PortalStorageInterface
 
     private PortalStorageContract $portalStorage;
 
+    private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction;
+
+    private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction;
+
     private LoggerInterface $logger;
 
     private PortalNodeKeyInterface $portalNodeKey;
@@ -26,11 +35,15 @@ class PortalStorage implements PortalStorageInterface
     public function __construct(
         NormalizationRegistryContract $normalizationRegistry,
         PortalStorageContract $portalStorage,
+        PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
+        PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
         LoggerInterface $logger,
         PortalNodeKeyInterface $portalNodeKey
     ) {
         $this->normalizationRegistry = $normalizationRegistry;
         $this->portalStorage = $portalStorage;
+        $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
+        $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
         $this->logger = $logger;
         $this->portalNodeKey = $portalNodeKey;
     }
@@ -45,7 +58,8 @@ class PortalStorage implements PortalStorageInterface
             try {
                 $value = $this->portalStorage->getValue($this->portalNodeKey, $key);
             } catch (NotFoundException $exception) {
-                $this->portalStorage->unset($this->portalNodeKey, $key);
+                $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection([(string) $key]));
+                $this->portalNodeStorageDeleteAction->delete($criteria);
 
                 return $default;
             }
@@ -70,7 +84,8 @@ class PortalStorage implements PortalStorageInterface
             $result = $denormalizer->denormalize($value, $type);
 
             if ($result === null) {
-                $this->portalStorage->unset($this->portalNodeKey, $key);
+                $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection([(string) $key]));
+                $this->portalNodeStorageDeleteAction->delete($criteria);
             }
 
             return $result;
@@ -169,7 +184,8 @@ class PortalStorage implements PortalStorageInterface
     public function delete($key): bool
     {
         try {
-            $this->portalStorage->unset($this->portalNodeKey, $key);
+            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection([(string) $key]));
+            $this->portalNodeStorageDeleteAction->delete($criteria);
 
             return true;
         } catch (\Throwable $throwable) {
@@ -203,7 +219,8 @@ class PortalStorage implements PortalStorageInterface
     public function clear(): bool
     {
         try {
-            $this->portalStorage->clear($this->portalNodeKey);
+            $criteria = new PortalNodeStorageClearCriteria($this->portalNodeKey);
+            $this->portalNodeStorageClearAction->clear($criteria);
 
             return true;
         } catch (\Throwable $throwable) {
@@ -349,7 +366,8 @@ class PortalStorage implements PortalStorageInterface
     public function deleteMultiple($keys): bool
     {
         try {
-            $this->portalStorage->deleteMultiple($this->portalNodeKey, \iterable_to_array($keys));
+            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection($keys));
+            $this->portalNodeStorageDeleteAction->delete($criteria);
 
             return true;
         } catch (\Throwable $throwable) {
