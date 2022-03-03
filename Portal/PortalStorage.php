@@ -195,22 +195,6 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @deprecated
-     */
-    public function canGet(string $type): bool
-    {
-        return $this->normalizationRegistry->getDenormalizer($type) instanceof DenormalizerInterface;
-    }
-
-    /**
-     * @deprecated
-     */
-    public function canSet(string $type): bool
-    {
-        return $this->normalizationRegistry->getNormalizerByType($type) instanceof NormalizerInterface;
-    }
-
     public function clear(): bool
     {
         try {
