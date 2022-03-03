@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegist
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 use Psr\Log\LoggerInterface;
 
@@ -22,6 +23,8 @@ class PortalStorageFactory
 
     private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction;
 
+    private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -29,12 +32,14 @@ class PortalStorageFactory
         PortalStorageContract $portalStorage,
         PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
+        PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
         LoggerInterface $logger
     ) {
         $this->normalizationRegistry = $normalizationRegistry;
         $this->portalStorage = $portalStorage;
         $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
         $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
+        $this->portalNodeStorageGetAction = $portalNodeStorageGetAction;
         $this->logger = $logger;
     }
 
@@ -45,6 +50,7 @@ class PortalStorageFactory
             $this->portalStorage,
             $this->portalNodeStorageClearAction,
             $this->portalNodeStorageDeleteAction,
+            $this->portalNodeStorageGetAction,
             $this->logger,
             $portalNodeKey
         );
