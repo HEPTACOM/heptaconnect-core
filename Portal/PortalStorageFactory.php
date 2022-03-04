@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 use Psr\Log\LoggerInterface;
 
@@ -25,6 +26,8 @@ class PortalStorageFactory
 
     private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction;
 
+    private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -33,6 +36,7 @@ class PortalStorageFactory
         PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
         PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
+        PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
         LoggerInterface $logger
     ) {
         $this->normalizationRegistry = $normalizationRegistry;
@@ -40,6 +44,7 @@ class PortalStorageFactory
         $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
         $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
         $this->portalNodeStorageGetAction = $portalNodeStorageGetAction;
+        $this->portalNodeStorageSetAction = $portalNodeStorageSetAction;
         $this->logger = $logger;
     }
 
@@ -51,6 +56,7 @@ class PortalStorageFactory
             $this->portalNodeStorageClearAction,
             $this->portalNodeStorageDeleteAction,
             $this->portalNodeStorageGetAction,
+            $this->portalNodeStorageSetAction,
             $this->logger,
             $portalNodeKey
         );
