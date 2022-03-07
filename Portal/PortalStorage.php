@@ -366,6 +366,6 @@ class PortalStorage implements PortalStorageInterface
             return null;
         }
 
-        return new PortalNodeStorageSetItem($key, $normalizer->getType(), $normalizedValue, $ttl);
+        return new PortalNodeStorageSetItem($key, $normalizedValue, $normalizer->getType(), $ttl);
     }
 }
