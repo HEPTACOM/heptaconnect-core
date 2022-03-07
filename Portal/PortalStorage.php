@@ -14,27 +14,29 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Clear\PortalNode
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Delete\PortalNodeStorageDeleteCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetResult;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Listing\PortalNodeStorageListCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Listing\PortalNodeStorageListResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItem;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItems;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageListActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract;
 use Psr\Log\LoggerInterface;
 
 class PortalStorage implements PortalStorageInterface
 {
     private NormalizationRegistryContract $normalizationRegistry;
 
-    private PortalStorageContract $portalStorage;
-
     private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction;
 
     private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction;
 
     private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction;
+
+    private PortalNodeStorageListActionInterface $portalNodeStorageListAction;
 
     private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction;
 
@@ -44,19 +46,19 @@ class PortalStorage implements PortalStorageInterface
 
     public function __construct(
         NormalizationRegistryContract $normalizationRegistry,
-        PortalStorageContract $portalStorage,
         PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
         PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
+        PortalNodeStorageListActionInterface $portalNodeStorageListAction,
         PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
         LoggerInterface $logger,
         PortalNodeKeyInterface $portalNodeKey
     ) {
         $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalStorage = $portalStorage;
         $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
         $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
         $this->portalNodeStorageGetAction = $portalNodeStorageGetAction;
+        $this->portalNodeStorageListAction = $portalNodeStorageListAction;
         $this->portalNodeStorageSetAction = $portalNodeStorageSetAction;
         $this->logger = $logger;
         $this->portalNodeKey = $portalNodeKey;
@@ -128,21 +130,24 @@ class PortalStorage implements PortalStorageInterface
 
     public function list(): iterable
     {
-        foreach ($this->portalStorage->list($this->portalNodeKey) as $key => $item) {
-            $value = $item['value'];
-            $type = $item['type'];
+        $criteria = new PortalNodeStorageListCriteria($this->portalNodeKey);
 
-            $denormalizer = $this->normalizationRegistry->getDenormalizer($type);
+        try {
+            foreach ($this->portalNodeStorageListAction->list($criteria) as $result) {
+                $value = $this->unpackGetResult($result);
 
-            if (!$denormalizer instanceof DenormalizerInterface) {
-                continue;
+                if ($value === null) {
+                    continue;
+                }
+
+                yield $result->getStorageKey() => $value;
             }
-
-            if (!$denormalizer->supportsDenormalization($value, $type)) {
-                continue;
-            }
-
-            yield $key => $denormalizer->denormalize($value, $type);
+        } catch (\Throwable $throwable) {
+            $this->logger->error('Failed listing values from the portal storage', [
+                'code' => 1646383738,
+                'exception' => $throwable,
+                'portalNodeKey' => $this->portalNodeKey,
+            ]);
         }
     }
 
@@ -300,7 +305,10 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    private function unpackGetResult(PortalNodeStorageGetResult $getResult)
+    /**
+     * @param PortalNodeStorageGetResult|PortalNodeStorageListResult $getResult
+     */
+    private function unpackGetResult($getResult)
     {
         $denormalizer = $this->normalizationRegistry->getDenormalizer($getResult->getType());
 
