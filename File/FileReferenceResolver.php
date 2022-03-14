@@ -19,12 +19,11 @@ use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
+use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Message\RequestFactoryInterface;
 
 class FileReferenceResolver extends FileReferenceResolverContract
 {
-    private HttpClientContract $httpClient;
-
     private RequestFactoryInterface $requestFactory;
 
     private FileContentsUrlProviderInterface $fileContentsUrlProvider;
@@ -35,20 +34,24 @@ class FileReferenceResolver extends FileReferenceResolverContract
 
     private RequestStorage $requestStorage;
 
+    private ?HttpClientContract $httpClient = null;
+
     public function __construct(
-        HttpClientContract $httpClient,
-        RequestFactoryInterface $requestFactory,
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        NormalizationRegistryContract $normalizationRegistryContract,
+        NormalizationRegistryContract $normalizationRegistry,
         RequestStorage $requestStorage
     ) {
-        $this->httpClient = $httpClient;
-        $this->requestFactory = $requestFactory;
+        $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
-        $this->normalizationRegistry = $normalizationRegistryContract;
+        $this->normalizationRegistry = $normalizationRegistry;
         $this->requestStorage = $requestStorage;
+    }
+
+    public function setHttpClient(HttpClientContract $httpClient)
+    {
+        $this->httpClient = $httpClient;
     }
 
     public function resolve(FileReferenceContract $fileReference): ResolvedFileReferenceContract

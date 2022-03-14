@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Core\Bridge\File\FileRequestUrlProviderInterface;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
-use Heptacom\HeptaConnect\Core\File\FileReferenceResolver;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
@@ -108,6 +107,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private RequestStorage $requestStorage;
 
+    private FileReferenceResolverContract $fileReferenceResolver;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -121,7 +122,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        RequestStorage $requestStorage
+        RequestStorage $requestStorage,
+        FileReferenceResolverContract $fileReferenceResolver
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -136,6 +138,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->requestStorage = $requestStorage;
+        $this->fileReferenceResolver = $fileReferenceResolver;
     }
 
     /**
@@ -221,6 +224,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             FileContentsUrlProviderInterface::class => $this->fileContentsUrlProvider,
             FileRequestUrlProviderInterface::class => $this->fileRequestUrlProvider,
             RequestStorage::class => $this->requestStorage,
+            FileReferenceResolverContract::class => clone $this->fileReferenceResolver
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
@@ -242,17 +246,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ->setArguments([
                 new Reference(PortalNodeKeyInterface::class),
                 new Reference(StreamFactoryInterface::class),
-                new Reference(NormalizationRegistryContract::class),
-                new Reference(RequestStorage::class),
-            ])
-        );
-        $containerBuilder->setDefinition(FileReferenceResolverContract::class, (new Definition())
-            ->setClass(FileReferenceResolver::class)
-            ->setArguments([
-                new Reference(HttpClientContract::class),
-                new Reference(RequestFactoryInterface::class),
-                new Reference(FileContentsUrlProviderInterface::class),
-                new Reference(FileRequestUrlProviderInterface::class),
                 new Reference(NormalizationRegistryContract::class),
                 new Reference(RequestStorage::class),
             ])
