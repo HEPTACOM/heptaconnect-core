@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\File\FileReferenceResolver;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
+use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Container\ContainerInterface;
 
@@ -46,6 +49,14 @@ class PortalStackServiceContainerFactory
         );
         $result->compile();
         $this->portalContainers[$key] = $result;
+
+        $fileReferenceResolver = $result->get(FileReferenceResolverContract::class);
+
+        if ($fileReferenceResolver instanceof FileReferenceResolver) {
+            /** @var HttpClientContract $httpClient */
+            $httpClient = $result->get(HttpClientContract::class);
+            $fileReferenceResolver->setHttpClient($httpClient);
+        }
 
         return $result;
     }
