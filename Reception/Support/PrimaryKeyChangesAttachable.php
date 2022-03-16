@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception\Support;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachableInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface;
 
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
     /**
-     * @psalm-var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @psalm-var class-string<DatasetEntityContract> $entityType
      */
     private string $entityType;
 
@@ -19,7 +20,7 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
     private ?string $foreignKey = null;
 
     /**
-     * @psalm-param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $entityType
+     * @psalm-param class-string<DatasetEntityContract> $entityType
      */
     public function __construct(string $entityType)
     {
