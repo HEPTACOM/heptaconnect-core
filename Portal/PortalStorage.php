@@ -217,12 +217,17 @@ class PortalStorage implements PortalStorageInterface
         $keysArray = \array_values(\array_map('strval', \iterable_to_array($keys)));
         $criteria = new PortalNodeStorageGetCriteria($this->portalNodeKey, new StringCollection($keysArray));
         $notReturnedKeys = \array_fill_keys($keysArray, true);
+        $deleteCriteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection([]));
 
         try {
             foreach ($this->portalNodeStorageGetAction->get($criteria) as $getResult) {
                 unset($notReturnedKeys[$getResult->getStorageKey()]);
 
                 $value = $this->unpackGetResult($getResult);
+
+                if ($value === null) {
+                    $deleteCriteria->getStorageKeys()->push([$getResult->getStorageKey()]);
+                }
 
                 yield $getResult->getStorageKey() => $value ?? $default;
             }
@@ -234,6 +239,8 @@ class PortalStorage implements PortalStorageInterface
                 'keys' => $keys,
             ]);
         }
+
+        $this->portalNodeStorageDeleteAction->delete($deleteCriteria);
 
         $notReturnedStorageKeys = \array_map('strval', \array_keys($notReturnedKeys));
 
