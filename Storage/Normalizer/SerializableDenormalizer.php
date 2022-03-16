@@ -9,6 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentExc
 
 class SerializableDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @psalm-return 'serializable'
+     */
     public function getType(): string
     {
         return 'serializable';
