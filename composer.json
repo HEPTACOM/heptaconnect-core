@@ -18,8 +18,8 @@
     "support": {
         "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
         "source": "https://github.com/HEPTACOM/heptaconnect-framework",
-        "docs": "https://connect.heptacom.de/",
-        "rss": "https://connect.heptacom.de/feed/rss2.xml"
+        "docs": "https://heptaconnect.io/",
+        "rss": "https://heptaconnect.io/news/rss2.xml"
     },
     "require": {
         "php": ">=7.4",
@@ -28,7 +28,6 @@
         "ext-zlib": "*",
         "bentools/iterable-functions": ">=1.4 <2",
         "composer/composer": ">=1.9",
-        "dragonmantank/cron-expression": ">=3",
         "heptacom/heptaconnect-dataset-base": "self.version",
         "heptacom/heptaconnect-portal-base": "self.version",
         "heptacom/heptaconnect-storage-base": "self.version",
@@ -68,7 +67,8 @@
     },
     "extra": {
         "unused": [
-            "bentools/iterable-functions"
+            "bentools/iterable-functions",
+            "symfony/polyfill-php80"
         ]
     },
     "website": "https://heptaconnect.io"
