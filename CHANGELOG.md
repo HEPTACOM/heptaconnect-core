@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add logger decorator `\Heptacom\HeptaConnect\Core\Component\Logger\FlowComponentCodeOriginFinderLogger` that replaces instances of `\Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract`, `\Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract`, `\Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract`, `\Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract` and `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract` within the context with their code origin
 - Add new service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract` to portal node container as an alternative to `Psr\Http\Client\ClientInterface` with behaviour by configuration e.g. that can throw `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Exception\HttpException` on certain status code
 - Add class `\Heptacom\HeptaConnect\Core\Component\Logger\ExceptionCodeLogger` intended as a decorator to prepend the exception code to log messages if available
+- Add contract `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` migrated from `\Heptacom\HeptaConnect\Storage\Base\Contract\ResourceLockStorageContract`
+- Add implementation `\Heptacom\HeptaConnect\Core\Parallelization\ResourceLockStorage` for `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` that depends on `symfony/lock` which is already required
 
 ### Changed
 
