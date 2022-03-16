@@ -157,7 +157,7 @@ class PortalStorage implements PortalStorageInterface
             $storageKeys = new StringCollection([(string) $key]);
             $getCriteria = new PortalNodeStorageGetCriteria($this->portalNodeKey, $storageKeys);
 
-            foreach (\iterable_to_array($this->portalNodeStorageGetAction->get($getCriteria)) as $getResult) {
+            foreach ($this->portalNodeStorageGetAction->get($getCriteria) as $getResult) {
                 return $this->unpackGetResult($getResult) !== null;
             }
 
