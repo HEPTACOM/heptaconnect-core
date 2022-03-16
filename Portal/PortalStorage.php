@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Delete\PortalNod
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Listing\PortalNodeStorageListCriteria;
-use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Listing\PortalNodeStorageListResult;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\PortalNodeStorageItemContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItem;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItems;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetPayload;
@@ -316,10 +316,7 @@ class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param PortalNodeStorageGetResult|PortalNodeStorageListResult $getResult
-     */
-    private function unpackGetResult($getResult)
+    private function unpackGetResult(PortalNodeStorageItemContract $getResult)
     {
         $denormalizer = $this->normalizationRegistry->getDenormalizer($getResult->getType());
 
