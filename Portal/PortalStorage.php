@@ -273,7 +273,7 @@ class PortalStorage implements PortalStorageInterface
     public function deleteMultiple($keys): bool
     {
         try {
-            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection($keys));
+            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection(\array_values(\array_map('strval', \iterable_to_array($keys)))));
             $this->portalNodeStorageDeleteAction->delete($criteria);
 
             return true;
