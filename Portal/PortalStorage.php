@@ -214,7 +214,7 @@ class PortalStorage implements PortalStorageInterface
     public function getMultiple($keys, $default = null): iterable
     {
         /** @var array<int, string> $keysArray */
-        $keysArray = \array_values(\iterable_to_array($keys));
+        $keysArray = \array_values(\array_map('strval', \iterable_to_array($keys)));
         $criteria = new PortalNodeStorageGetCriteria($this->portalNodeKey, new StringCollection($keysArray));
         $notReturnedKeys = \array_fill_keys($keysArray, true);
 
@@ -235,8 +235,12 @@ class PortalStorage implements PortalStorageInterface
             ]);
         }
 
-        foreach (\array_keys($notReturnedKeys) as $key) {
-            yield $key => $default;
+        $notReturnedStorageKeys = \array_map('strval', \array_keys($notReturnedKeys));
+
+        if ($notReturnedStorageKeys !== []) {
+            foreach ($notReturnedStorageKeys as $key) {
+                yield $key => $default;
+            }
         }
     }
 
