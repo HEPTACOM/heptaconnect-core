@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
@@ -48,9 +49,14 @@ class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPas
         ]));
     }
 
+    /**
+     * @return Definition[]
+     *
+     * @psalm-return array<Definition>
+     */
     private function groupServices(string $collectionClass, array $groupServiceIds): array
     {
-        return \array_map(static fn (array $refs): Definition => (new Definition($collectionClass))->setArguments($refs), $groupServiceIds);
+        return \array_map(static fn (array $refs): Definition => (new Definition($collectionClass))->setArguments([$refs]), $groupServiceIds);
     }
 
     private function getServiceReferencesGroupedBySource(ContainerBuilder $container, string $tag): array
@@ -59,7 +65,7 @@ class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPas
         $serviceIds = $container->findTaggedServiceIds($tag);
 
         foreach ($serviceIds as $serviceId => $tagData) {
-            $groupKey = $tagData['source'] ?? null;
+            $groupKey = $tagData[0]['source'] ?? null;
 
             if ($groupKey !== null) {
                 $grouped[$groupKey][] = new Reference($serviceId);
