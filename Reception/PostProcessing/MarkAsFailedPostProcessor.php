@@ -6,21 +6,24 @@ namespace Heptacom\HeptaConnect\Core\Reception\PostProcessing;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\PostProcessorContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
+use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayloads;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
 class MarkAsFailedPostProcessor extends PostProcessorContract
 {
-    private MappingServiceInterface $mappingService;
+    private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
     private LoggerInterface $logger;
 
-    public function __construct(MappingServiceInterface $mappingService, LoggerInterface $logger)
+    public function __construct(IdentityErrorCreateActionInterface $identityErrorCreateAction, LoggerInterface $logger)
     {
-        $this->mappingService = $mappingService;
+        $this->identityErrorCreateAction = $identityErrorCreateAction;
         $this->logger = $logger;
     }
 
@@ -36,11 +39,14 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
             $mapping = $data->getEntity()->getAttachment(PrimaryKeySharingMappingStruct::class);
 
             if ($mapping instanceof MappingInterface) {
-                $this->mappingService->addException(
+                $mappingComponent = new MappingComponentStruct(
                     $event->getContext()->getPortalNodeKey(),
-                    $mapping->getMappingNodeKey(),
-                    $data->getThrowable()
+                    $mapping->getEntityType(),
+                    $mapping->getExternalId()
                 );
+                $payload = new IdentityErrorCreatePayload($mappingComponent, $data->getThrowable());
+
+                $this->identityErrorCreateAction->create(new IdentityErrorCreatePayloads([$payload]));
             } else {
                 $logger = $event->getContext()->getContainer()->get(LoggerInterface::class) ?? $this->logger;
 
