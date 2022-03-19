@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 class MessageHandler implements MessageSubscriberInterface
@@ -18,10 +19,16 @@ class MessageHandler implements MessageSubscriberInterface
 
     private DelegatingJobActorContract $jobActor;
 
-    public function __construct(JobGetActionInterface $jobGetAction, DelegatingJobActorContract $jobActor)
-    {
+    private LoggerInterface $logger;
+
+    public function __construct(
+        JobGetActionInterface $jobGetAction,
+        DelegatingJobActorContract $jobActor,
+        LoggerInterface $logger
+    ) {
         $this->jobGetAction = $jobGetAction;
         $this->jobActor = $jobActor;
+        $this->logger = $logger;
     }
 
     public static function getHandledMessages(): iterable
@@ -34,13 +41,30 @@ class MessageHandler implements MessageSubscriberInterface
         /** @var JobDataCollection[] $jobs */
         $jobs = [];
 
-        foreach ($this->jobGetAction->get(new JobGetCriteria($message->getJobKeys())) as $job) {
-            $jobs[$job->getJobType()] ??= new JobDataCollection();
-            $jobs[$job->getJobType()]->push([new JobData($job->getMappingComponent(), $job->getPayload(), $job->getJobKey())]);
+        try {
+            foreach ($this->jobGetAction->get(new JobGetCriteria($message->getJobKeys())) as $job) {
+                $jobs[$job->getJobType()] ??= new JobDataCollection();
+                $jobs[$job->getJobType()]->push([new JobData($job->getMappingComponent(), $job->getPayload(), $job->getJobKey())]);
+            }
+        } catch (\Throwable $throwable) {
+            $this->logger->emergency('Jobs can not be loaded to be processed', [
+                'jobKeys' => \iterable_to_array($message->getJobKeys()),
+                'exception' => $throwable,
+                'code' => 1647396033,
+            ]);
         }
 
         foreach ($jobs as $type => $jobData) {
-            $this->jobActor->performJobs($type, $jobData);
+            try {
+                $this->jobActor->performJobs($type, $jobData);
+            } catch (\Throwable $throwable) {
+                $this->logger->emergency('Jobs can not be processed', [
+                    'type' => $type,
+                    'exception' => $throwable,
+                    'jobData' => \iterable_to_array($jobData->column('getJobKey')),
+                    'code' => 1647396034,
+                ]);
+            }
         }
     }
 }
