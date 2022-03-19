@@ -1,35 +1,32 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
-use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
-use Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct;
-use Heptacom\HeptaConnect\Core\Mapping\MappingStruct;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\MappedDatasetEntityStruct;
-use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\RouteKeyCollection;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Finish\JobFinishPayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\Start\JobStartPayload;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetCriteria;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\Get\RouteGetResult;
-use Heptacom\HeptaConnect\Storage\Base\Contract\EntityMapperContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Reflect\IdentityReflectPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityReflectActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Enum\RouteCapability;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
@@ -43,12 +40,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
-    private EntityReflectorContract $entityReflector;
-
-    private EntityMapperContract $entityMapper;
-
-    private MappingNodeRepositoryContract $mappingNodeRepository;
-
     private ReceiveServiceInterface $receiveService;
 
     private DeepObjectIteratorContract $objectIterator;
@@ -61,30 +52,32 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
     private JobFinishActionInterface $jobFinishAction;
 
+    private IdentityMapActionInterface $identityMapAction;
+
+    private IdentityReflectActionInterface $identityReflectAction;
+
     public function __construct(
         LockFactory $lockFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
-        EntityReflectorContract $entityReflector,
-        EntityMapperContract $entityMapper,
-        MappingNodeRepositoryContract $mappingNodeRepository,
         ReceiveServiceInterface $receiveService,
         DeepObjectIteratorContract $objectIterator,
         RouteGetActionInterface $routeGetAction,
         LoggerInterface $logger,
         JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction
+        JobFinishActionInterface $jobFinishAction,
+        IdentityMapActionInterface $identityMapAction,
+        IdentityReflectActionInterface $identityReflectAction
     ) {
         $this->lockFactory = $lockFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->entityReflector = $entityReflector;
-        $this->entityMapper = $entityMapper;
-        $this->mappingNodeRepository = $mappingNodeRepository;
         $this->receiveService = $receiveService;
         $this->objectIterator = $objectIterator;
         $this->routeGetAction = $routeGetAction;
         $this->logger = $logger;
         $this->jobStartAction = $jobStartAction;
         $this->jobFinishAction = $jobFinishAction;
+        $this->identityMapAction = $identityMapAction;
+        $this->identityReflectAction = $identityReflectAction;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
@@ -102,7 +95,6 @@ class ReceptionHandler implements ReceptionHandlerInterface
             $routes[$this->storageKeyGenerator->serialize($routeData->getRouteKey())] = $routeData;
         }
 
-        /** @var JobData $job */
         foreach ($jobs as $job) {
             try {
                 $routeKey = $job->getPayload()[Reception::ROUTE_KEY] ?? null;
@@ -163,12 +155,12 @@ class ReceptionHandler implements ReceptionHandlerInterface
                 foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
                     foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
                         foreach ($entities as $externalId => $entity) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\join('_', [
-                                    $sourcePortalKey,
-                                    $targetPortalKey,
-                                    $dataType,
-                                    $externalId,
-                                ])));
+                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
+                                $sourcePortalKey,
+                                $targetPortalKey,
+                                $dataType,
+                                $externalId,
+                            ])));
 
                             if (!$lock->acquire()) {
                                 continue;
@@ -198,45 +190,20 @@ class ReceptionHandler implements ReceptionHandlerInterface
 
                         /** @var DatasetEntityContract[] $rawEntities */
                         $rawEntities = \array_column($entities, 'entity');
-                        /** @var array<DatasetEntityContract|object> $rawEntities */
-                        $rawEntities = $this->objectIterator->iterate($rawEntities);
+                        /** @var array<DatasetEntityContract|object> $allEntities */
+                        $allEntities = $this->objectIterator->iterate($rawEntities);
                         /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
-                        $filteredEntityObjects = new DatasetEntityCollection($rawEntities);
-                        // TODO inspect memory raise
-                        $mappedEntities = $this->entityMapper->mapEntities($filteredEntityObjects, $sourcePortalNodeKey);
-                        // TODO: improve performance
-                        $this->entityReflector->reflectEntities($mappedEntities, $targetPortalNodeKey);
+                        $filteredEntityObjects = new DatasetEntityCollection($allEntities);
+                        // TODO inspect memory raise - probably fixed by new storage
+                        $mappedEntities = $this->identityMapAction
+                            ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
+                            ->getMappedDatasetEntityCollection();
+                        $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
-                        $externalIds = \array_map(
-                            static fn (MappingComponentStructContract $m): string => $m->getExternalId(),
-                            \array_column($entities, 'mapping')
-                        );
-                        $mappingNodeKeys = \iterable_to_array($this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-                            $dataType,
-                            $sourcePortalNodeKey,
-                            $externalIds,
-                        ));
-
-                        $mappedDatasetEntities = new TypedMappedDatasetEntityCollection($dataType);
-
-                        foreach ($mappingNodeKeys as $externalId => $mappingNodeKey) {
-                            // TODO: evaluate whether this is still required
-                            $targetMapping = (new MappingStruct($targetPortalNodeKey, new MappingNodeStruct(
-                                $mappingNodeKey,
-                                $dataType
-                            )))->setExternalId((string) $externalId);
-
-                            $mappedDatasetEntities->push([new MappedDatasetEntityStruct($targetMapping, $entities[$externalId]['entity'])]);
-                        }
-
-                        $jobKeys = new JobKeyCollection();
-
-                        foreach (\array_keys($mappingNodeKeys) as $externalId) {
-                            $jobKeys->push([$entities[$externalId]['jobKey']]);
-                        }
+                        $jobKeys = new JobKeyCollection(\array_values(\array_column($entities, 'jobKey')));
 
                         $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                        $this->receiveService->receive($mappedDatasetEntities);
+                        $this->receiveService->receive(new TypedDatasetEntityCollection($dataType, $rawEntities), $targetPortalNodeKey);
                         $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                     }
                 }

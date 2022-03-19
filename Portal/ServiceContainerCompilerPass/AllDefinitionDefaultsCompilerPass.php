@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
@@ -41,6 +42,10 @@ class AllDefinitionDefaultsCompilerPass implements CompilerPassInterface
                     new Reference(ProfilerContract::class),
                 ]);
             }
+        }
+
+        foreach ($container->getAliases() as $alias) {
+            $alias->setPublic(true);
         }
     }
 }
