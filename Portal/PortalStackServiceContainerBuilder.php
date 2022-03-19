@@ -107,7 +107,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private RequestStorage $requestStorage;
 
-    private FileReferenceResolverContract $fileReferenceResolver;
+    private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     public function __construct(
         LoggerInterface $logger,
@@ -122,8 +122,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        RequestStorage $requestStorage,
-        FileReferenceResolverContract $fileReferenceResolver
+        RequestStorage $requestStorage
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -138,7 +137,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->requestStorage = $requestStorage;
-        $this->fileReferenceResolver = $fileReferenceResolver;
     }
 
     /**
@@ -277,6 +275,11 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
     {
         $this->directEmissionFlow = $directEmissionFlow;
+    }
+
+    public function setFileReferenceResolver(FileReferenceResolverContract $fileReferenceResolver): void
+    {
+        $this->fileReferenceResolver = $fileReferenceResolver;
     }
 
     /**
