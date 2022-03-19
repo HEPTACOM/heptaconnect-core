@@ -222,7 +222,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             FileContentsUrlProviderInterface::class => $this->fileContentsUrlProvider,
             FileRequestUrlProviderInterface::class => $this->fileRequestUrlProvider,
             RequestStorage::class => $this->requestStorage,
-            FileReferenceResolverContract::class => clone $this->fileReferenceResolver
+            FileReferenceResolverContract::class => $this->fileReferenceResolver
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
