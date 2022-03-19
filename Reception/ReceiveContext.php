@@ -22,6 +22,8 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
 
     private PostProcessorDataBag $postProcessingBag;
 
+    private array $postProcessors;
+
     public function __construct(
         ContainerInterface $container,
         ?array $configuration,
@@ -30,12 +32,15 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
     ) {
         parent::__construct($container, $configuration);
         $this->entityStatus = $entityStatus;
+        $this->postProcessors = $postProcessors;
         $this->postProcessingBag = new PostProcessorDataBag();
-        $this->eventDispatcher = new EventDispatcher();
+        $this->initializeEventDispatcher();
+    }
 
-        foreach ($postProcessors as $postProcessor) {
-            $this->eventDispatcher->addSubscriber($postProcessor);
-        }
+    public function __clone()
+    {
+        $this->postProcessingBag = new PostProcessorDataBag();
+        $this->initializeEventDispatcher();
     }
 
     public function getPostProcessingBag(): PostProcessorDataBag
@@ -56,5 +61,14 @@ class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContext
     public function getEventDispatcher(): EventDispatcherInterface
     {
         return $this->eventDispatcher;
+    }
+
+    private function initializeEventDispatcher(): void
+    {
+        $this->eventDispatcher = new EventDispatcher();
+
+        foreach ($this->postProcessors as $postProcessor) {
+            $this->eventDispatcher->addSubscriber($postProcessor);
+        }
     }
 }
