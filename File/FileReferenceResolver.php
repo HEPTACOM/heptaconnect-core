@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference;
+use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
@@ -34,40 +35,49 @@ class FileReferenceResolver extends FileReferenceResolverContract
 
     private RequestStorage $requestStorage;
 
-    private ?HttpClientContract $httpClient = null;
+    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
     public function __construct(
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
         NormalizationRegistryContract $normalizationRegistry,
-        RequestStorage $requestStorage
+        RequestStorage $requestStorage,
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->normalizationRegistry = $normalizationRegistry;
         $this->requestStorage = $requestStorage;
-    }
-
-    public function setHttpClient(HttpClientContract $httpClient)
-    {
-        $this->httpClient = $httpClient;
+        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function resolve(FileReferenceContract $fileReference): ResolvedFileReferenceContract
     {
         if ($fileReference instanceof PublicUrlFileReference) {
+            $portalNodeKey = $fileReference->getPortalNodeKey();
+            $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+
+            /** @var HttpClientContract $httpClient */
+            $httpClient = $container->get(HttpClientContract::class);
+
             return new ResolvedPublicUrlFileReference(
-                $fileReference->getPortalNodeKey(),
+                $portalNodeKey,
                 $fileReference->getPublicUrl(),
-                $this->httpClient,
+                $httpClient,
                 $this->requestFactory
             );
         } elseif ($fileReference instanceof RequestFileReference) {
+            $portalNodeKey = $fileReference->getPortalNodeKey();
+            $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
+
+            /** @var HttpClientContract $httpClient */
+            $httpClient = $container->get(HttpClientContract::class);
+
             return new ResolvedRequestFileReference(
-                $fileReference->getPortalNodeKey(),
+                $portalNodeKey,
                 $fileReference->getRequestId(),
-                $this->httpClient,
+                $httpClient,
                 $this->fileRequestUrlProvider,
                 $this->requestStorage
             );
