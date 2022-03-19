@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
@@ -8,7 +9,6 @@ use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
-use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
@@ -24,7 +24,7 @@ class StatusReportingService implements StatusReportingServiceInterface
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     /**
-     * @return array<array-key, \Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterStackInterface>
+     * @return array<array-key, StatusReporterStackInterface>
      */
     private array $statusReporterStackCache = [];
 
@@ -59,8 +59,7 @@ class StatusReportingService implements StatusReportingServiceInterface
         $result = [];
         $topics = [];
 
-        if (\is_null($topic)) {
-            /** @var StatusReporterContract $statusReporter */
+        if ($topic === null) {
             foreach ($statusReporters as $statusReporter) {
                 $topics[] = $statusReporter->supportsTopic();
             }
@@ -119,10 +118,10 @@ class StatusReportingService implements StatusReportingServiceInterface
         StatusReporterCollection $statusReporters,
         string $topic
     ): StatusReporterStackInterface {
-        $cacheKey = \md5(\join([$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
+        $cacheKey = \md5(\implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
 
         if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters);
+            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters, $this->logger);
         }
 
         return clone $this->statusReporterStackCache[$cacheKey];

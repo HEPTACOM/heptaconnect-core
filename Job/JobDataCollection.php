@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Job;
@@ -6,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Job;
 use Heptacom\HeptaConnect\Dataset\Base\Support\AbstractObjectCollection;
 
 /**
- * @extends \Heptacom\HeptaConnect\Dataset\Base\Support\AbstractObjectCollection<\Heptacom\HeptaConnect\Core\Job\JobData>
+ * @extends AbstractObjectCollection<JobData>
  */
 class JobDataCollection extends AbstractObjectCollection
 {

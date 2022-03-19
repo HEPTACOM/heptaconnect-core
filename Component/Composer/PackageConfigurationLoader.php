@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
@@ -43,7 +44,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
         $factory = new Factory();
         $workingDir = null;
 
-        if (!\is_null($this->composerJson)) {
+        if ($this->composerJson !== null) {
             $workingDir = \dirname($this->composerJson);
 
             if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
@@ -62,7 +63,6 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             }
         }
 
-        /** @var CompletePackageInterface $packageInstance */
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             $config = new PackageConfiguration();
             $heptaconnectKeywords = \array_filter(
@@ -123,7 +123,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
     }
 
     /**
-     * @return iterable<\Composer\Package\CompletePackageInterface>
+     * @return iterable<CompletePackageInterface>
      */
     private function iteratePackages(Composer $composer): iterable
     {
@@ -133,7 +133,6 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
             $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
-            /** @var array $package */
             foreach ($packageLockData as $package) {
                 $packageInstance = $locker->getLockedRepository()->findPackage($package['name'], $package['version']);
 
@@ -167,7 +166,7 @@ class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderI
                 // TODO log. This is a weird case
 
                 if ($package instanceof RootPackageInterface
-                    && !\is_null($workingDir)
+                    && $workingDir !== null
                     && \is_dir($absolute = $workingDir . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
                 }

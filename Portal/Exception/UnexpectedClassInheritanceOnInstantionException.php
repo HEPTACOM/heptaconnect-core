@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\Exception;
-
-use Throwable;
 
 class UnexpectedClassInheritanceOnInstantionException extends AbstractInstantiationException
 {
@@ -16,7 +15,7 @@ class UnexpectedClassInheritanceOnInstantionException extends AbstractInstantiat
      * @psalm-param class-string $class
      * @psalm-param class-string $expectedInheritedClass
      */
-    public function __construct(string $class, string $expectedInheritedClass, ?Throwable $previous = null)
+    public function __construct(string $class, string $expectedInheritedClass, ?\Throwable $previous = null)
     {
         parent::__construct($class, $previous);
 
