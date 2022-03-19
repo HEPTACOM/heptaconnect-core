@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalN
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageListActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 use Psr\Log\LoggerInterface;
 
 class PortalStorageFactory
@@ -50,6 +51,10 @@ class PortalStorageFactory
 
     public function createPortalStorage(PortalNodeKeyInterface $portalNodeKey): PortalStorageInterface
     {
+        if ($portalNodeKey instanceof PreviewPortalNodeKey) {
+            return new PreviewPortalNodeStorage();
+        }
+
         return new PortalStorage(
             $this->normalizationRegistry,
             $this->portalNodeStorageClearAction,
