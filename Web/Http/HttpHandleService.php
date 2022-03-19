@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http;
@@ -11,8 +12,8 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\WebHttpHandlerConfigurationFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -23,12 +24,12 @@ use Ramsey\Uuid\Uuid;
 class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface|null>
+     * @var array<array-key, HttpHandlerStackInterface|null>
      */
     private array $stackCache = [];
 
     /**
-     * @var array<array-key, \Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface>
+     * @var array<array-key, HttpHandleContextInterface>
      */
     private array $contextCache = [];
 
@@ -105,7 +106,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     private function getStack(PortalNodeKeyInterface $portalNodeKey, string $path): ?HttpHandlerStackInterface
     {
-        $cacheKey = \join([$this->storageKeyGenerator->serialize($portalNodeKey), $path]);
+        $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $path]);
 
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -43,6 +44,9 @@ class StreamNormalizer implements NormalizerInterface
         return $data instanceof SerializableStream;
     }
 
+    /**
+     * @psalm-return 'stream'
+     */
     public function getType(): string
     {
         return 'stream';

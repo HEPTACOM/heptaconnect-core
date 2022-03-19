@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -8,6 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentExc
 
 class ScalarNormalizer implements NormalizerInterface
 {
+    /**
+     * @psalm-return 'scalar'
+     */
     public function getType(): string
     {
         return 'scalar';
@@ -27,6 +31,6 @@ class ScalarNormalizer implements NormalizerInterface
 
     public function supportsNormalization($data, $format = null)
     {
-        return \is_bool($data) || \is_string($data) || \is_null($data) || \is_float($data) || \is_int($data);
+        return \is_bool($data) || \is_string($data) || $data === null || \is_float($data) || \is_int($data);
     }
 }

@@ -1,9 +1,8 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\Exception;
-
-use Throwable;
 
 abstract class AbstractInstantiationException extends \RuntimeException
 {
@@ -15,7 +14,7 @@ abstract class AbstractInstantiationException extends \RuntimeException
     /**
      * @psalm-param class-string $class
      */
-    public function __construct(string $class, ?Throwable $previous = null)
+    public function __construct(string $class, ?\Throwable $previous = null)
     {
         parent::__construct('Could not instantiate object', 0, $previous);
 

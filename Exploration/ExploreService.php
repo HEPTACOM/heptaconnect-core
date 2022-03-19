@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
@@ -13,7 +14,7 @@ use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -91,7 +92,7 @@ class ExploreService implements ExploreServiceInterface
     }
 
     /**
-     * @psalm-return array<array-key, class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>>
+     * @psalm-return array<array-key, class-string<DatasetEntityContract>>
      *
      * @return array|string[]
      */
@@ -99,7 +100,6 @@ class ExploreService implements ExploreServiceInterface
     {
         $types = [];
 
-        /** @var ExplorerContract $explorer */
         foreach ($explorers as $explorer) {
             $types[$explorer->supports()] = true;
         }
@@ -112,10 +112,12 @@ class ExploreService implements ExploreServiceInterface
         $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
         /** @var FlowComponentRegistry $flowComponentRegistry */
         $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $components = new ExplorerCollection();
 
-        return new ExplorerCollection(\array_merge([...\array_values(\array_map(
-            [$flowComponentRegistry, 'getExplorers'],
-            $flowComponentRegistry->getOrderedSources()
-        ))]));
+        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
+            $components->push($flowComponentRegistry->getExplorers($source));
+        }
+
+        return $components;
     }
 }

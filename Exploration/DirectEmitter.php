@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
@@ -12,17 +13,17 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 class DirectEmitter extends EmitterContract
 {
     /**
-     * @var class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
+     * @var class-string<DatasetEntityContract>
      */
     private string $supports;
 
     /**
-     * @psalm-var \Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract>
+     * @psalm-var DatasetEntityCollection<DatasetEntityContract>
      */
     private DatasetEntityCollection $entities;
 
     /**
-     * @param class-string<\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract> $supports
+     * @param class-string<DatasetEntityContract> $supports
      */
     public function __construct(string $supports)
     {
@@ -47,6 +48,9 @@ class DirectEmitter extends EmitterContract
         return $this->supports;
     }
 
+    /**
+     * @psalm-return DatasetEntityCollection<DatasetEntityContract>
+     */
     public function getEntities(): DatasetEntityCollection
     {
         return $this->entities;
@@ -58,9 +62,9 @@ class DirectEmitter extends EmitterContract
         $type = $this->supports();
 
         yield from $this->entities->filter(
-            static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey()) &&
-                \in_array($entity->getPrimaryKey(), $externalIds, true) &&
-                \is_a($entity, $type)
+            static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey())
+                && \in_array($entity->getPrimaryKey(), $externalIds, true)
+                && \is_a($entity, $type)
         );
     }
 }

@@ -1,25 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Parallelization;
 
+use Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Exception\ResourceIsLockedException;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\StorageKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\ResourceLockStorageContract;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
-/**
- * Resource locking is currently not working properly
- * as locks are released prematurely. This depends on
- * the underlying storage implementation. Currently
- * it is unclear whether a fix will require breaking
- * changes to the public api.
- *
- * @internal
- */
-class ResourceLocking extends ResourceLockingContract
+final class ResourceLocking extends ResourceLockingContract
 {
     private ResourceLockStorageContract $resourceLockStorage;
 
