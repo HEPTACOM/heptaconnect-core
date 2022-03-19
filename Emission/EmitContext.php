@@ -4,31 +4,29 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission;
 
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
+use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayloads;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 use Psr\Container\ContainerInterface;
 
 class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
 {
-    private MappingServiceInterface $mappingService;
-
-    private MappingNodeRepositoryContract $mappingNodeRepository;
+    private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
     private bool $directEmission;
 
     public function __construct(
         ContainerInterface $container,
         ?array $configuration,
-        MappingServiceInterface $mappingService,
-        MappingNodeRepositoryContract $mappingNodeRepository,
+        IdentityErrorCreateActionInterface $identityErrorCreateAction,
         bool $directEmission
     ) {
         parent::__construct($container, $configuration);
 
-        $this->mappingService = $mappingService;
-        $this->mappingNodeRepository = $mappingNodeRepository;
+        $this->identityErrorCreateAction = $identityErrorCreateAction;
         $this->directEmission = $directEmission;
     }
 
@@ -39,18 +37,9 @@ class EmitContext extends AbstractPortalNodeContext implements EmitContextInterf
 
     public function markAsFailed(string $externalId, string $entityType, \Throwable $throwable): void
     {
-        $mappingNodeKeys = $this->mappingNodeRepository->listByTypeAndPortalNodeAndExternalIds(
-            $entityType,
-            $this->getPortalNodeKey(),
-            [$externalId]
-        );
+        $mappingComponent = new MappingComponentStruct($this->getPortalNodeKey(), $entityType, $externalId);
+        $payload = new IdentityErrorCreatePayloads([new IdentityErrorCreatePayload($mappingComponent, $throwable)]);
 
-        foreach ($mappingNodeKeys as $mappingNodeKey) {
-            $this->mappingService->addException(
-                $this->getPortalNodeKey(),
-                $mappingNodeKey,
-                $throwable
-            );
-        }
+        $this->identityErrorCreateAction->create($payload);
     }
 }
