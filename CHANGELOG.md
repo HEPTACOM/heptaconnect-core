@@ -32,6 +32,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add logger decorator `\Heptacom\HeptaConnect\Core\Component\Logger\FlowComponentCodeOriginFinderLogger` that replaces instances of `\Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract`, `\Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract`, `\Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract`, `\Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract` and `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract` within the context with their code origin
 - Add new service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract` to portal node container as an alternative to `Psr\Http\Client\ClientInterface` with behaviour by configuration e.g. that can throw `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Exception\HttpException` on certain status code
 - Add class `\Heptacom\HeptaConnect\Core\Component\Logger\ExceptionCodeLogger` intended as a decorator to prepend the exception code to log messages if available
+- Add log message code `1647396033` in `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler::handleJob` when jobs from message cannot be loaded
+- Add log message code `1647396034` in `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler::handleJob` when jobs from message cannot be processed
+- Add contract `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` migrated from `\Heptacom\HeptaConnect\Storage\Base\Contract\ResourceLockStorageContract`
+- Add implementation `\Heptacom\HeptaConnect\Core\Parallelization\ResourceLockStorage` for `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` that depends on `symfony/lock` which is already required
+- Add log message code `1646383738` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when reading portal node storage entries fails
+- Add implementation `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage` for the interface `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface` to support interactions on `\Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey`
 
 ### Changed
 
@@ -53,6 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` from `\Heptacom\HeptaConnect\Storage\Base\Contract\EntityReflectorContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityReflectActionInterface` as previous service is renamed
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor` from `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface`
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsPostProcessor` from `\Heptacom\HeptaConnect\Storage\Base\MappingPersister\Contract\MappingPersisterContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface` as previous service is renamed
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` from `\Heptacom\HeptaConnect\Storage\Base\Contract\PortalStorageContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface`, `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageDeleteActionInterface`, `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageGetActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageListActionInterface`, `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface`
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Emission\EmitContext` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous services are removed
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous services are removed
+- Replace dependencies in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous service is removed
+- Split argument in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface::receive` of type `\Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection` into `\Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection` and `\Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface` to state target portal clearly
 
 ### Deprecated
 
@@ -66,8 +77,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::get` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::get`
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::save` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::save`
 - Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::reflect` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::reflect`
+- Remove unused implementation `\Heptacom\HeptaConnect\Core\Mapping\MappingService::addException` of `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::addException`
 - Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::getListByExternalIds` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface::map`
 - Remove `\Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface::merge`, `\Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeAreUnmergableException` and `\Heptacom\HeptaConnect\Core\Mapping\Exception\MappingNodeNotCreatedException` in favour of `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityOverviewActionInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface`
+- Remove log message code `1631563639`, `1631563699`, `1631565446` and `1631565376` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage`
+- Remove deprecated methods `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canSet` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canGet`
+- Remove unused `\Heptacom\HeptaConnect\Core\Router\CumulativeMappingException`
+- Remove dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
 
 ### Fixed
 
@@ -75,6 +91,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - All aliases in the dependency-injection container for portals are now public. This enables injection of aliased services in short-notation flow-components.
 
 ### Security
+
+## [0.8.6] - 2022-03-07
+
+### Fixed
+
+- Prevent leak of `\Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag` into subsequent iterations of `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor::performReception`. Every entry of `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedData` is now only handled once.
 
 ## [0.8.5] - 2021-12-28
 

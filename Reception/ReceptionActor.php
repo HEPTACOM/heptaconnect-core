@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
 use Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsData;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
-use Heptacom\HeptaConnect\Core\Router\CumulativeMappingException;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -59,14 +58,6 @@ class ReceptionActor implements ReceptionActorInterface
                 'stack' => $stack,
                 'exception' => $exception,
             ]);
-
-            if ($exception instanceof CumulativeMappingException) {
-                foreach ($exception->getExceptions() as $innerException) {
-                    $this->logger->critical(LogMessage::RECEIVE_NO_THROW() . '_INNER', [
-                        'exception' => $innerException,
-                    ]);
-                }
-            }
         } finally {
             $context->getEventDispatcher()->dispatch(new PostReceptionEvent($context));
 
