@@ -10,6 +10,9 @@ use Psr\Http\Message\StreamInterface;
 
 class SerializableNormalizer implements NormalizerInterface
 {
+    /**
+     * @psalm-return 'serializable'
+     */
     public function getType(): string
     {
         return 'serializable';

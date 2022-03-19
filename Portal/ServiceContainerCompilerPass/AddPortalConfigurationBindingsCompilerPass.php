@@ -112,6 +112,11 @@ class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterfac
         return \array_merge([], ...$result);
     }
 
+    /**
+     * @return string[]
+     *
+     * @psalm-return array<int, string>
+     */
     private function extractParameterParameterNames(?\ReflectionMethod $method): array
     {
         if (!$method instanceof \ReflectionMethod) {
