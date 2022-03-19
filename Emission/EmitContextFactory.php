@@ -6,11 +6,10 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
-use Heptacom\HeptaConnect\Core\Mapping\Contract\MappingServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 
 class EmitContextFactory implements EmitContextFactoryInterface
 {
@@ -18,20 +17,16 @@ class EmitContextFactory implements EmitContextFactoryInterface
 
     private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
-    private MappingServiceInterface $mappingService;
-
-    private MappingNodeRepositoryContract $mappingNodeRepository;
+    private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
     public function __construct(
         ConfigurationServiceInterface $configurationService,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        MappingServiceInterface $mappingService,
-        MappingNodeRepositoryContract $mappingNodeRepository
+        IdentityErrorCreateActionInterface $identityErrorCreateAction
     ) {
         $this->configurationService = $configurationService;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->mappingService = $mappingService;
-        $this->mappingNodeRepository = $mappingNodeRepository;
+        $this->identityErrorCreateAction = $identityErrorCreateAction;
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey, bool $directEmission = false): EmitContextInterface
@@ -39,8 +34,7 @@ class EmitContextFactory implements EmitContextFactoryInterface
         return new EmitContext(
             $this->portalStackServiceContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey),
-            $this->mappingService,
-            $this->mappingNodeRepository,
+            $this->identityErrorCreateAction,
             $directEmission
         );
     }
