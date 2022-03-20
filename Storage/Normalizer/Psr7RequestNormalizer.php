@@ -25,7 +25,10 @@ class Psr7RequestNormalizer implements NormalizerInterface
     public function normalize($object, string $format = null, array $context = [])
     {
         if (!$object instanceof RequestInterface) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException(
+                'Psr7RequestNormalizer can only normalize request objects. Got: ' . \get_class($object),
+                1647789809
+            );
         }
 
         return \json_encode([

@@ -85,8 +85,10 @@ class FileReferenceResolver extends FileReferenceResolverContract
             $streamDenormalizer = $this->normalizationRegistry->getDenormalizer($fileReference->getNormalizationType());
 
             if (!$streamDenormalizer instanceof DenormalizerInterface) {
-                // TODO: Add custom exception code (and message)
-                throw new \Exception('Some shit was fucked up');
+                throw new \LogicException(
+                    'The NormalizationRegistry is missing a denormalizer for streams.',
+                    1647788896
+                );
             }
 
             return new ResolvedContentsFileReference(
@@ -98,7 +100,9 @@ class FileReferenceResolver extends FileReferenceResolverContract
             );
         }
 
-        // TODO: Add custom exception code
-        throw new \Exception('Unsupported source');
+        throw new \InvalidArgumentException(
+            'FileReference of unsupported source: ' . \get_class($fileReference),
+            1647789133
+        );
     }
 }

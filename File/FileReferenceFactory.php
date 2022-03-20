@@ -61,8 +61,10 @@ class FileReferenceFactory extends FileReferenceFactoryContract
         $streamNormalizer = $this->normalizationRegistry->getNormalizer($serializableStream);
 
         if (!$streamNormalizer instanceof NormalizerInterface) {
-            // TODO: Add code and message here
-            throw new \Exception('This makes no sense');
+            throw new \LogicException(
+                'The NormalizationRegistry is missing a normalizer for streams.',
+                1647788744
+            );
         }
 
         $normalizedStream = $streamNormalizer->normalize($serializableStream);

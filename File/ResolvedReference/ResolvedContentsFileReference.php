@@ -48,7 +48,10 @@ class ResolvedContentsFileReference extends ResolvedFileReferenceContract
         $stream = $this->denormalizer->denormalize($this->normalizedStream, $this->denormalizer->getType());
 
         if (!$stream instanceof StreamInterface) {
-            throw new \Exception('Stream is not a stream');
+            throw new \UnexpectedValueException(
+                'Denormalizing a normalized stream failed: ' . $this->normalizedStream,
+                1647789503
+            );
         }
 
         return $stream->getContents();
