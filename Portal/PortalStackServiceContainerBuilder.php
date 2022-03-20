@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
-use Heptacom\HeptaConnect\Core\Bridge\File\FileContentsUrlProviderInterface;
-use Heptacom\HeptaConnect\Core\Bridge\File\FileRequestUrlProviderInterface;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
@@ -101,10 +99,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
 
-    private FileContentsUrlProviderInterface $fileContentsUrlProvider;
-
-    private FileRequestUrlProviderInterface $fileRequestUrlProvider;
-
     private RequestStorage $requestStorage;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
@@ -120,8 +114,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        FileContentsUrlProviderInterface $fileContentsUrlProvider,
-        FileRequestUrlProviderInterface $fileRequestUrlProvider,
         RequestStorage $requestStorage
     ) {
         $this->logger = $logger;
@@ -134,8 +126,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
         $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
-        $this->fileContentsUrlProvider = $fileContentsUrlProvider;
-        $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->requestStorage = $requestStorage;
     }
 
@@ -199,6 +189,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         $portalConfiguration = new PortalConfiguration($configuration ?? []);
 
+        $fileReferenceFactory = new FileReferenceFactory(
+            $portalNodeKey,
+            Psr17FactoryDiscovery::findStreamFactory(),
+            $this->normalizationRegistry,
+            $this->requestStorage
+        );
+
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
@@ -219,10 +216,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
-            FileContentsUrlProviderInterface::class => $this->fileContentsUrlProvider,
-            FileRequestUrlProviderInterface::class => $this->fileRequestUrlProvider,
-            RequestStorage::class => $this->requestStorage,
-            FileReferenceResolverContract::class => $this->fileReferenceResolver
+            FileReferenceFactoryContract::class => $fileReferenceFactory,
+            FileReferenceResolverContract::class => $this->fileReferenceResolver,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
@@ -239,15 +234,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
         $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
         $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
-        $containerBuilder->setDefinition(FileReferenceFactoryContract::class, (new Definition())
-            ->setClass(FileReferenceFactory::class)
-            ->setArguments([
-                new Reference(PortalNodeKeyInterface::class),
-                new Reference(StreamFactoryInterface::class),
-                new Reference(NormalizationRegistryContract::class),
-                new Reference(RequestStorage::class),
-            ])
-        );
         $containerBuilder->setDefinition(
             HttpClientContract::class,
             (new Definition())
