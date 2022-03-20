@@ -38,6 +38,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Parallelization\ResourceLockStorage` for `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` that depends on `symfony/lock` which is already required
 - Add log message code `1646383738` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when reading portal node storage entries fails
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage` for the interface `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface` to support interactions on `\Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey`
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\FileContentsUrlProviderInterface` to provide public urls for normalized streams
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\FileRequestUrlProviderInterface` to prode public urls for serialized requests
+- Add class `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory` to create file references from public urls, request objects or file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver` to resolve file references for read operations
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from a public url
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from a PSR-7 request object
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from a public url
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from a PSR-7 request object
+- Add class `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` to deserialize instances of `\Psr\Http\Message\RequestInterface`
+- Add class `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` to serialize instances of `\Psr\Http\Message\RequestInterface`
+- Add class `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` to persist and load instances of `\Psr\Http\Message\RequestInterface`
 - Add exception code `1647788744` in `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory::fromContents` when the NormalizationRegistry is missing a normalizer for streams
 - Add exception code `1647788896` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the NormalizationRegistry is missing a denormalizer for streams
 - Add exception code `1647789133` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the FileReference has an unsupported source
