@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\FileReference\RequestPersist\FileR
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\FileReference\FileReferenceGetRequestActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\FileReference\FileReferencePersistRequestActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\FileReferenceRequestKeyCollection;
 use Psr\Http\Message\RequestInterface;
 
@@ -27,16 +28,20 @@ class RequestStorage
 
     private FileReferencePersistRequestActionInterface $persistRequestAction;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         Psr7RequestNormalizer $normalizer,
         Psr7RequestDenormalizer $denormalizer,
         FileReferenceGetRequestActionInterface $getRequestAction,
-        FileReferencePersistRequestActionInterface $persistRequestAction
+        FileReferencePersistRequestActionInterface $persistRequestAction,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->normalizer = $normalizer;
         $this->denormalizer = $denormalizer;
         $this->getRequestAction = $getRequestAction;
         $this->persistRequestAction = $persistRequestAction;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function load(
@@ -62,15 +67,20 @@ class RequestStorage
             );
 
             if (!$request instanceof RequestInterface) {
-                // TODO: Add code and message
-                throw new \Exception();
+                throw new \UnexpectedValueException(
+                    'Denormalizing a serialized request failed: ' . $requestResult->getSerializedRequest(),
+                    1647790094
+                );
             }
 
             return $request;
         }
 
-        // TODO: Add code and message
-        throw new \Exception();
+        throw new \RuntimeException(\sprintf(
+            'Unable to find serialized request. FileReferenceRequestKey: %s; PortalNodeKey: %s',
+            $this->storageKeyGenerator->serialize($fileReferenceRequestKey),
+            $this->storageKeyGenerator->serialize($portalNodeKey)
+        ), 1647791094);
     }
 
     public function persist(
@@ -87,8 +97,10 @@ class RequestStorage
             ->getFileReferenceRequestKey(self::DEFAULT_KEY);
 
         if (!$fileReferenceRequestKey instanceof FileReferenceRequestKeyInterface) {
-            // TODO: Add code and message
-            throw new \Exception();
+            throw new \UnexpectedValueException(
+                'Persisting serialized request failed: ' . $serializedRequest,
+                1647791390
+            );
         }
 
         return $fileReferenceRequestKey;
