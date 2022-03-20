@@ -40,6 +40,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage` for the interface `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface` to support interactions on `\Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey`
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` to define a contract for changing portal node configurations
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\ClosureInstructionToken` that changes portal node configuration by the given closure
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper` to generate closures for processing configuration sources like json files and environment variables
 
 ### Changed
 
