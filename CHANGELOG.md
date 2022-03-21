@@ -41,10 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` to define a contract for changing portal node configurations
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\ClosureInstructionToken` that changes portal node configuration by the given closure
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper` to generate closures for processing configuration sources like json files and environment variables
+- Add exception code `1647801828` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::ini` when the ini file can not be loaded and parsed
+- Add exception code `1647801829` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be loaded and parsed
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config` to collect `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` in a short-notation manner
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface` to identify services that provide `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract`
 - Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionFileLoader` to provide `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` using `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config`
+- Add exception code `1645611612` in `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionFileLoader::loadInstructions` when referenced file can not be loaded
 - Add `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` as `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface` to change portal node configuration by instructions from given `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface` instances
+- Add log message code `1647826121` in `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` when an error happens during instruction loading
 
 ### Changed
 

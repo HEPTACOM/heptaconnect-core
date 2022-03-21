@@ -144,8 +144,10 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
             try {
                 $result[] = $instructionLoader->loadInstructions();
             } catch (\Throwable $throwable) {
-                $this->logger->critical('', [
+                $this->logger->critical('Failed loading instructions', [
+                    'class' => \get_class($instructionLoader),
                     'exception' => $throwable,
+                    'code' => 1647826121,
                 ]);
             }
         }
