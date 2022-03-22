@@ -13,8 +13,8 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConf
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
-use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
@@ -99,7 +99,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
 
-    private RequestStorage $requestStorage;
+    private RequestStorageContract $requestStorage;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
@@ -114,7 +114,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        RequestStorage $requestStorage
+        RequestStorageContract $requestStorage
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;

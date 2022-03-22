@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage;
 
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer;
 use Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -16,7 +17,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\FileReferenceRequestKeyCollection;
 use Psr\Http\Message\RequestInterface;
 
-class RequestStorage
+final class RequestStorage extends RequestStorageContract
 {
     private const DEFAULT_KEY = 'default';
 
