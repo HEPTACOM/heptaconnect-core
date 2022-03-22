@@ -55,8 +55,8 @@ class RequestStorage
 
         foreach ($requestResults as $requestResult) {
             if (
-                !$requestResult->getPortalNodeKey()->equals($portalNodeKey) ||
-                !$requestResult->getRequestKey()->equals($fileReferenceRequestKey)
+                !$requestResult->getPortalNodeKey()->equals($portalNodeKey)
+                || !$requestResult->getRequestKey()->equals($fileReferenceRequestKey)
             ) {
                 continue;
             }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
@@ -9,7 +10,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 class Psr7RequestNormalizer implements NormalizerInterface
 {
-    public function supportsNormalization($data, string $format = null)
+    public function supportsNormalization($data, ?string $format = null)
     {
         return $data instanceof RequestInterface;
     }
@@ -22,7 +23,7 @@ class Psr7RequestNormalizer implements NormalizerInterface
     /**
      * @return string
      */
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         if (!$object instanceof RequestInterface) {
             throw new InvalidArgumentException(
