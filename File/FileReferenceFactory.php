@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\File;
 use Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference;
-use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
@@ -25,13 +25,13 @@ class FileReferenceFactory extends FileReferenceFactoryContract
 
     private NormalizationRegistryContract $normalizationRegistry;
 
-    private RequestStorage $requestStorage;
+    private RequestStorageContract $requestStorage;
 
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
         StreamFactoryInterface $streamFactory,
         NormalizationRegistryContract $normalizationRegistry,
-        RequestStorage $requestStorage
+        RequestStorageContract $requestStorage
     ) {
         $this->portalNodeKey = $portalNodeKey;
         $this->streamFactory = $streamFactory;
