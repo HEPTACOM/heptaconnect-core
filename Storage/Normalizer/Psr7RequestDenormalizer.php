@@ -30,7 +30,7 @@ class Psr7RequestDenormalizer implements DenormalizerInterface
     /**
      * @return RequestInterface
      */
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $requestData = \json_decode(
             $data,
@@ -51,7 +51,7 @@ class Psr7RequestDenormalizer implements DenormalizerInterface
         return $request;
     }
 
-    public function supportsDenormalization($data, string $type, string $format = null)
+    public function supportsDenormalization($data, string $type, ?string $format = null)
     {
         if ($type !== $this->getType() || !\is_string($data)) {
             return false;
