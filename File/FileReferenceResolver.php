@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileRefere
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference;
 use Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Core\Storage\RequestStorage;
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
@@ -33,7 +33,7 @@ class FileReferenceResolver extends FileReferenceResolverContract
 
     private NormalizationRegistryContract $normalizationRegistry;
 
-    private RequestStorage $requestStorage;
+    private RequestStorageContract $requestStorage;
 
     private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
 
@@ -41,7 +41,7 @@ class FileReferenceResolver extends FileReferenceResolverContract
         FileContentsUrlProviderInterface $fileContentsUrlProvider,
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
         NormalizationRegistryContract $normalizationRegistry,
-        RequestStorage $requestStorage,
+        RequestStorageContract $requestStorage,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
