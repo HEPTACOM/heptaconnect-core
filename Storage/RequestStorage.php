@@ -55,13 +55,6 @@ final class RequestStorage extends RequestStorageContract
         ));
 
         foreach ($requestResults as $requestResult) {
-            if (
-                !$requestResult->getPortalNodeKey()->equals($portalNodeKey)
-                || !$requestResult->getRequestKey()->equals($fileReferenceRequestKey)
-            ) {
-                continue;
-            }
-
             $request = $this->denormalizer->denormalize(
                 $requestResult->getSerializedRequest(),
                 'psr7-request'
