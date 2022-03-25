@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
 use Psr\Http\Client\ClientInterface;
 
-class ResolvedRequestFileReference extends ResolvedFileReferenceContract
+final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
 {
     private FileReferenceRequestKeyInterface $requestId;
 

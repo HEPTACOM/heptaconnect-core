@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
-class FileReferenceFactory extends FileReferenceFactoryContract
+final class FileReferenceFactory extends FileReferenceFactoryContract
 {
     private PortalNodeKeyInterface $portalNodeKey;
 
