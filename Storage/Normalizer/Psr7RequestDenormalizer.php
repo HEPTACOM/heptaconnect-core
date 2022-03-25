@@ -58,12 +58,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
         }
 
         try {
-            \json_decode(
-                $data,
-                true,
-                512,
-                \JSON_INVALID_UTF8_IGNORE | \JSON_THROW_ON_ERROR
-            );
+            $this->denormalize($data, $type, $format);
 
             return true;
         } catch (\Throwable $exception) {
