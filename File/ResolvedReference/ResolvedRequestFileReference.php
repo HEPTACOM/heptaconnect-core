@@ -37,7 +37,6 @@ final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
 
     public function getPublicUrl(): string
     {
-        // TODO: Add token for one-time permission
         return (string) $this->fileRequestUrlProvider->resolve($this->getPortalNodeKey(), $this->requestId);
     }
 
