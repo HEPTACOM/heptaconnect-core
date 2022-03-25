@@ -21,20 +21,6 @@ class Publisher implements PublisherInterface
         $this->jobDispatcher = $jobDispatcher;
     }
 
-    public function publish(
-        string $entityType,
-        PortalNodeKeyInterface $portalNodeId,
-        string $externalId
-    ): void {
-        $this->jobDispatcher->dispatch(new JobCollection([
-            new Emission(new MappingComponentStruct(
-                $portalNodeId,
-                $entityType,
-                $externalId
-            )),
-        ]));
-    }
-
     public function publishBatch(MappingComponentCollection $mappings): void
     {
         /** @var Emission[] $jobs */
