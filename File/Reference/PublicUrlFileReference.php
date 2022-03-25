@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\File\Reference;
 use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-class PublicUrlFileReference extends FileReferenceContract
+final class PublicUrlFileReference extends FileReferenceContract
 {
     private string $publicUrl;
 
