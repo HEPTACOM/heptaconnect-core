@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
 
-class RequestFileReference extends FileReferenceContract
+final class RequestFileReference extends FileReferenceContract
 {
     private FileReferenceRequestKeyInterface $requestId;
 
