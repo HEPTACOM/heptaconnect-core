@@ -23,7 +23,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Message\RequestFactoryInterface;
 
-class FileReferenceResolver extends FileReferenceResolverContract
+final class FileReferenceResolver extends FileReferenceResolverContract
 {
     private RequestFactoryInterface $requestFactory;
 
