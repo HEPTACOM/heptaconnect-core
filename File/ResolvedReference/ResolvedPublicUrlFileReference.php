@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 
-class ResolvedPublicUrlFileReference extends ResolvedFileReferenceContract
+final class ResolvedPublicUrlFileReference extends ResolvedFileReferenceContract
 {
     private string $publicUrl;
 

@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterfa
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Http\Message\StreamInterface;
 
-class ResolvedContentsFileReference extends ResolvedFileReferenceContract
+final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 {
     private string $normalizedStream;
 
