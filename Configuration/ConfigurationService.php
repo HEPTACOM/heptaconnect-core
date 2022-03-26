@@ -124,7 +124,7 @@ class ConfigurationService implements ConfigurationServiceInterface
 
     private function getConfigCacheKey(PortalNodeKeyInterface $portalNodeKey): string
     {
-        $key = $this->keyGenerator->serialize($portalNodeKey);
+        $key = $this->keyGenerator->serialize($portalNodeKey->withoutAlias());
         $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
 
         return 'config.cache.' . $key;
