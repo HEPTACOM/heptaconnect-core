@@ -51,7 +51,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
         return $request;
     }
 
-    public function supportsDenormalization($data, string $type, ?string $format = null)
+    public function supportsDenormalization($data, $type, $format = null)
     {
         if ($type !== $this->getType() || !\is_string($data)) {
             return false;
