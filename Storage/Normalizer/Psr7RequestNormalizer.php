@@ -23,7 +23,7 @@ final class Psr7RequestNormalizer implements NormalizerInterface
     /**
      * @return string
      */
-    public function normalize($object, ?string $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = [])
     {
         if (!$object instanceof RequestInterface) {
             throw new InvalidArgumentException(
