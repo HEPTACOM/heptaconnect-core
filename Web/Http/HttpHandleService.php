@@ -67,6 +67,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
     {
+        $portalNodeKey = $portalNodeKey->withoutAlias();
         $path = $request->getUri()->getPath();
         $response = $this->responseFactory->createResponse(501);
         // TODO push onto global logging context stack

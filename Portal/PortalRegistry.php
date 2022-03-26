@@ -85,7 +85,7 @@ class PortalRegistry implements PortalRegistryInterface
 
     private function getPortalNodeClassCached(PortalNodeKeyInterface $portalNodeKey): ?string
     {
-        $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey));
+        $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias()));
 
         return $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->getPortalNodeClass($portalNodeKey));
     }
