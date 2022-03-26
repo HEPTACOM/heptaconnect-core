@@ -98,7 +98,7 @@ class PortalNodeConfigurationHelper
     }
 
     /**
-     * @return array|mixed|null
+     * @psalm-return mixed
      */
     private function resolveDotPath(string $path, array $payload)
     {
