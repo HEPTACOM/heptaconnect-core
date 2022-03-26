@@ -10,7 +10,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 final class Psr7RequestNormalizer implements NormalizerInterface
 {
-    public function supportsNormalization($data, ?string $format = null)
+    public function supportsNormalization($data, $format = null)
     {
         return $data instanceof RequestInterface;
     }
