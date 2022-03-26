@@ -6,17 +6,21 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
+use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
+use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -95,6 +99,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
 
+    private RequestStorageContract $requestStorage;
+
+    private ?FileReferenceResolverContract $fileReferenceResolver = null;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -105,7 +113,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         FilesystemFactory $filesystemFactory,
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
-        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory
+        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        RequestStorageContract $requestStorage
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -117,6 +126,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
         $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
+        $this->requestStorage = $requestStorage;
     }
 
     /**
@@ -180,6 +190,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         $portalConfiguration = new PortalConfiguration($configuration ?? []);
 
+        $fileReferenceFactory = new FileReferenceFactory(
+            $portalNodeKey,
+            Psr17FactoryDiscovery::findStreamFactory(),
+            $this->normalizationRegistry,
+            $this->requestStorage
+        );
+
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
@@ -200,6 +217,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
+            FileReferenceFactoryContract::class => $fileReferenceFactory,
+            FileReferenceResolverContract::class => $this->fileReferenceResolver,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
@@ -243,6 +262,11 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
     {
         $this->directEmissionFlow = $directEmissionFlow;
+    }
+
+    public function setFileReferenceResolver(FileReferenceResolverContract $fileReferenceResolver): void
+    {
+        $this->fileReferenceResolver = $fileReferenceResolver;
     }
 
     /**
