@@ -47,8 +47,10 @@ class ConfigurationService implements ConfigurationServiceInterface
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-        $configuration = $this->getPortalNodeConfigurationInternal($portalNodeKey);
-        $configuration = $this->processReadConfiguration($portalNodeKey, $configuration);
+        $configuration = $this->processReadConfiguration(
+            $portalNodeKey,
+            fn () => $this->getPortalNodeConfigurationInternal($portalNodeKey)
+        );
 
         return $template->resolve($configuration);
     }
@@ -118,10 +120,8 @@ class ConfigurationService implements ConfigurationServiceInterface
         return [];
     }
 
-    private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, array $configuration): array
+    private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
-        $read = static fn (): array => $configuration;
-
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $readConfiguration = $read;
             $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
