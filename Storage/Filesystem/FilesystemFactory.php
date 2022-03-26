@@ -24,7 +24,7 @@ class FilesystemFactory
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): FilesystemInterface
     {
-        $portalNodeId = $this->storageKeyGenerator->serialize($portalNodeKey);
+        $portalNodeId = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
         /** @var string $portalNodeId */
         $portalNodeId = \preg_replace('/[^a-zA-Z0-9]/', '_', $portalNodeId);
 
