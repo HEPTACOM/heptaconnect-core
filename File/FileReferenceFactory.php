@@ -69,6 +69,13 @@ final class FileReferenceFactory extends FileReferenceFactoryContract
 
         $normalizedStream = $streamNormalizer->normalize($serializableStream);
 
+        if (!\is_string($normalizedStream)) {
+            throw new \LogicException(
+                'Unable to serialize the given file contents.',
+                1648315863
+            );
+        }
+
         return new ContentsFileReference($this->portalNodeKey, $normalizedStream, $streamNormalizer->getType(), $mimeType);
     }
 }
