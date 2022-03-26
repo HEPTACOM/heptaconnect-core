@@ -21,6 +21,7 @@ interface FileRequestUrlProviderInterface
      *   are not limited to):
      *   - The URI **MAY** expire after a certain time has elapsed.
      *   - The URI **MAY** expire after it has been accessed a certain number of times.
+     *   - The origin portal node of the file reference **MAY** be deleted.
      */
     public function resolve(
         PortalNodeKeyInterface $portalNodeKey,
