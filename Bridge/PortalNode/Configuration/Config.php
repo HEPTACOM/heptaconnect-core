@@ -20,6 +20,11 @@ class Config
      */
     private static array $instructions = [];
 
+    public function __construct()
+    {
+        self::$instructions = [];
+    }
+
     /**
      * Uses the given configuration array as complete configuration.
      *
