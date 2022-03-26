@@ -103,28 +103,16 @@ class Config
      */
     public static function reset(string $query, $payload): void
     {
-        $deepUnset = static function (array &$array, array $unsetInstructions) use (&$deepUnset): void {
-            foreach ($unsetInstructions as $parent => $key) {
-                if (\is_array($key)) {
-                    if (isset($array[$parent])) {
-                        $deepUnset($array[$parent], $key);
-                    }
-                } else {
-                    unset($array[$key]);
-                }
-            }
-        };
-
         if (\is_array($payload)) {
             $array = $payload;
             $payload = static fn () => $array;
         }
 
         if ($payload instanceof \Closure) {
-            self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($deepUnset, $payload): array {
+            self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($payload): array {
                 $config = $loadConfig();
 
-                $deepUnset($config, $payload());
+                self::unsetArrayByKeys($config, $payload());
 
                 return $config;
             });
@@ -150,5 +138,18 @@ class Config
         self::$instructions = [];
 
         return $result;
+    }
+
+    private static function unsetArrayByKeys(array &$array, array $unsetInstructions): void
+    {
+        foreach ($unsetInstructions as $parent => $key) {
+            if (\is_array($key)) {
+                if (isset($array[$parent])) {
+                    self::unsetArrayByKeys($array[$parent], $key);
+                }
+            } else {
+                unset($array[$key]);
+            }
+        }
     }
 }
