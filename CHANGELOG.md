@@ -52,6 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add class `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` to serialize instances of `\Psr\Http\Message\RequestInterface`
 - Add contract `\Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract` with implementation in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` to persist and load instances of `\Psr\Http\Message\RequestInterface`
 - Add exception code `1647788744` in `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory::fromContents` when the NormalizationRegistry is missing a normalizer for streams
+- Add exception code `1648315863` in `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory::fromContents` when the normalizer is unable to serialize the given file contents
 - Add exception code `1647788896` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the NormalizationRegistry is missing a denormalizer for streams
 - Add exception code `1647789133` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the FileReference has an unsupported source
 - Add exception code `1647789503` in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference::getContents` when denormalizing a normalized stream fails
