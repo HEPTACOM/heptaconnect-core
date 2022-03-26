@@ -96,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove deprecated methods `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canSet` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canGet`
 - Remove unused `\Heptacom\HeptaConnect\Core\Router\CumulativeMappingException`
 - Remove dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+- Remove deprecated method `Heptacom\HeptaConnect\Core\Mapping\Publisher::publish` inherited from `Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface::publish`
 
 ### Fixed
 
