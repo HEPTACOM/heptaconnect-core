@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 
-class EmitContextFactory implements EmitContextFactoryInterface
+final class EmitContextFactory implements EmitContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 

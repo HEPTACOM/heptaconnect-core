@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-class HttpHandlingActor implements HttpHandlingActorInterface
+final class HttpHandlingActor implements HttpHandlingActorInterface
 {
     private LoggerInterface $logger;
 

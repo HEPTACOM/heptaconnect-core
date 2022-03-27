@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
+final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
 {
     private array $prototypedIds;
 

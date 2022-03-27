@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterfa
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
-class EmissionHandler implements EmissionHandlerInterface
+final class EmissionHandler implements EmissionHandlerInterface
 {
     private EmitServiceInterface $emitService;
 

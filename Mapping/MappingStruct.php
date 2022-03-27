@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterfac
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
-class MappingStruct implements MappingInterface
+final class MappingStruct implements MappingInterface
 {
     private ?string $externalId = null;
 
