@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErr
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
-class MarkAsFailedPostProcessor extends PostProcessorContract
+final class MarkAsFailedPostProcessor extends PostProcessorContract
 {
     private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 

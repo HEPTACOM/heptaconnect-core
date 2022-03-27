@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 
-class Publisher implements PublisherInterface
+final class Publisher implements PublisherInterface
 {
     private JobDispatcherContract $jobDispatcher;
 

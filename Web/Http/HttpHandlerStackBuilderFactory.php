@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Psr\Log\LoggerInterface;
 
-class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
+final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
 {
     private PortalStackServiceContainerFactory $portalContainerFactory;
 
