@@ -26,7 +26,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalN
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface;
 use Psr\Log\LoggerInterface;
 
-class PortalStorage implements PortalStorageInterface
+final class PortalStorage implements PortalStorageInterface
 {
     private NormalizationRegistryContract $normalizationRegistry;
 

@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
-class StatusReportingService implements StatusReportingServiceInterface
+final class StatusReportingService implements StatusReportingServiceInterface
 {
     private LoggerInterface $logger;
 

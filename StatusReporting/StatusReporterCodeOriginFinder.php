@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 
-class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderInterface
+final class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderInterface
 {
     public function findOrigin(StatusReporterContract $statusReporter): CodeOrigin
     {

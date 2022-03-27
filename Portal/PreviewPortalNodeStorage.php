@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 
-class PreviewPortalNodeStorage implements PortalStorageInterface
+final class PreviewPortalNodeStorage implements PortalStorageInterface
 {
     public function get($key, $default = null)
     {

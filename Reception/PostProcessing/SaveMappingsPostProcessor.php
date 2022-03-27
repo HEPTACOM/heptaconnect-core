@@ -19,7 +19,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistA
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
-class SaveMappingsPostProcessor extends PostProcessorContract
+final class SaveMappingsPostProcessor extends PostProcessorContract
 {
     private DeepObjectIteratorContract $deepObjectIterator;
 

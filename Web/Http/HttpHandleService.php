@@ -21,7 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
-class HttpHandleService implements HttpHandleServiceInterface
+final class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
      * @var array<array-key, HttpHandlerStackInterface|null>

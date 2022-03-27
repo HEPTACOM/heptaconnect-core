@@ -14,7 +14,7 @@ use Psr\Container\ContainerInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
-class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
+final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
     private EntityStatusContract $entityStatus;
 

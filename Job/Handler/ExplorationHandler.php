@@ -14,7 +14,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterfa
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
-class ExplorationHandler implements ExplorationHandlerInterface
+final class ExplorationHandler implements ExplorationHandlerInterface
 {
     private ExploreServiceInterface $exploreService;
 
