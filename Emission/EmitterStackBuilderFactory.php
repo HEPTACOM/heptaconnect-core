@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
+final class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInterface
 {
     private PortalStackServiceContainerFactory $portalContainerFactory;
 

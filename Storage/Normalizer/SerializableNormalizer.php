@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use Psr\Http\Message\StreamInterface;
 
-class SerializableNormalizer implements NormalizerInterface
+final class SerializableNormalizer implements NormalizerInterface
 {
     /**
      * @psalm-return 'serializable'
