@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 
-class PortalConfiguration extends ConfigurationContract
+final class PortalConfiguration extends ConfigurationContract
 {
     private array $configuration;
 

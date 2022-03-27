@@ -28,7 +28,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
-class ExplorationActor implements ExplorationActorInterface
+final class ExplorationActor implements ExplorationActorInterface
 {
     public const CHUNK_SIZE_EMISSION = 10;
 

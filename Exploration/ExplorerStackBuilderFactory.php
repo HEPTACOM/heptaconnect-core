@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterface
+final class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterface
 {
     private PortalStackServiceContainerFactory $portalContainerFactory;
 

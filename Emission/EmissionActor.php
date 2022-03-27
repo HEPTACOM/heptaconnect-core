@@ -18,7 +18,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\ReceptionRouteListA
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
-class EmissionActor implements EmissionActorInterface
+final class EmissionActor implements EmissionActorInterface
 {
     /**
      * @deprecated extract message bus from core
