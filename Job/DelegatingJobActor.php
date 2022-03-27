@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 
-class DelegatingJobActor extends DelegatingJobActorContract
+final class DelegatingJobActor extends DelegatingJobActorContract
 {
     private EmissionHandlerInterface $emissionHandler;
 
