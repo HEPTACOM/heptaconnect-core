@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterfa
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 
-class NormalizationRegistry extends NormalizationRegistryContract
+final class NormalizationRegistry extends NormalizationRegistryContract
 {
     /**
      * @var array|NormalizerInterface[]

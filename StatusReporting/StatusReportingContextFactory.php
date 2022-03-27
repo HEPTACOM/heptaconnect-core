@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFa
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-class StatusReportingContextFactory implements StatusReportingContextFactoryInterface
+final class StatusReportingContextFactory implements StatusReportingContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 

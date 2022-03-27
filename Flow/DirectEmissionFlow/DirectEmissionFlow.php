@@ -21,7 +21,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
-class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwareInterface, ProfilerAwareInterface
+final class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwareInterface, ProfilerAwareInterface
 {
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 

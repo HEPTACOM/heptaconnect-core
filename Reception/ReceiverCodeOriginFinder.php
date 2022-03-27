@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 
-class ReceiverCodeOriginFinder implements ReceiverCodeOriginFinderInterface
+final class ReceiverCodeOriginFinder implements ReceiverCodeOriginFinderInterface
 {
     public function findOrigin(ReceiverContract $receiver): CodeOrigin
     {

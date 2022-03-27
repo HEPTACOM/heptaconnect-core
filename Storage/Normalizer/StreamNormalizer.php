@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Uuid;
 
-class StreamNormalizer implements NormalizerInterface
+final class StreamNormalizer implements NormalizerInterface
 {
     /**
      * @deprecated use \Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract::STORAGE_LOCATION

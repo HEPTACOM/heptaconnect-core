@@ -16,7 +16,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetA
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 
-class PortalRegistry implements PortalRegistryInterface
+final class PortalRegistry implements PortalRegistryInterface
 {
     private PortalFactoryContract $portalFactory;
 
