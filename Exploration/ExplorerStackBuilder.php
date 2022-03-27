@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Psr\Log\LoggerInterface;
 
-class ExplorerStackBuilder implements ExplorerStackBuilderInterface
+final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 {
     private ?ExplorerContract $source;
 

@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
+final class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
 {
     private PortalStackServiceContainerFactory $portalContainerFactory;
 
