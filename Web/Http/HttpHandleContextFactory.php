@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterfa
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 
-class HttpHandleContextFactory implements HttpHandleContextFactoryInterface
+final class HttpHandleContextFactory implements HttpHandleContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 

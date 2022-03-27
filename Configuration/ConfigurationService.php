@@ -16,7 +16,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\P
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationSetActionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ConfigurationService implements ConfigurationServiceInterface
+final class ConfigurationService implements ConfigurationServiceInterface
 {
     private PortalRegistryInterface $portalRegistry;
 

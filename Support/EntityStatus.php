@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 
-class EntityStatus extends EntityStatusContract
+final class EntityStatus extends EntityStatusContract
 {
     public function isMappedByEmitter(DatasetEntityContract $entity): bool
     {
