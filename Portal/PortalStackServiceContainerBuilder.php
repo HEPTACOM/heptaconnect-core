@@ -137,6 +137,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         PortalExtensionCollection $portalExtensions,
         PortalNodeKeyInterface $portalNodeKey
     ): ContainerBuilder {
+        $portalNodeKey = $portalNodeKey->withAlias();
         $containerBuilder = new ContainerBuilder();
 
         $seenDefinitions = [];
