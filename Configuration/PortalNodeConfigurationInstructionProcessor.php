@@ -97,7 +97,15 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
         try {
             return $this->storageKeyGenerator->deserialize($query)->equals($portalNodeKey);
         } catch (UnsupportedStorageKeyException $e) {
-            return $this->storageKeyGenerator->serialize($portalNodeKey) === $query;
+            if ($this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias()) === $query) {
+                return true;
+            }
+
+            if ($this->storageKeyGenerator->serialize($portalNodeKey->withAlias()) === $query) {
+                return true;
+            }
+
+            return false;
         }
     }
 
