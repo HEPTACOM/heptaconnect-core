@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityError
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 use Psr\Container\ContainerInterface;
 
-class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
+final class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
 {
     private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
