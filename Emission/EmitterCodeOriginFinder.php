@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\CodeOrigin;
 use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound;
 
-class EmitterCodeOriginFinder implements EmitterCodeOriginFinderInterface
+final class EmitterCodeOriginFinder implements EmitterCodeOriginFinderInterface
 {
     public function findOrigin(EmitterContract $emitter): CodeOrigin
     {

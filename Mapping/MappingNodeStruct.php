@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
-class MappingNodeStruct implements MappingNodeStructInterface
+final class MappingNodeStruct implements MappingNodeStructInterface
 {
     private MappingNodeKeyInterface $id;
 

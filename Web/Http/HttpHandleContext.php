@@ -7,6 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 
-class HttpHandleContext extends AbstractPortalNodeContext implements HttpHandleContextInterface
+final class HttpHandleContext extends AbstractPortalNodeContext implements HttpHandleContextInterface
 {
 }

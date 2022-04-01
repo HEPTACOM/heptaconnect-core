@@ -18,7 +18,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
-class ReceiveService implements ReceiveServiceInterface
+final class ReceiveService implements ReceiveServiceInterface
 {
     private ReceiveContextFactoryInterface $receiveContextFactory;
 
