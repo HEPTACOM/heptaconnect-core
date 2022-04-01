@@ -50,7 +50,7 @@ final class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigura
 
     private function getConfigCacheKey(PortalNodeKeyInterface $portalNodeKey): string
     {
-        $key = $this->storageKeyGenerator->serialize($portalNodeKey);
+        $key = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
         $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
 
         return 'config.cache.' . $key;
