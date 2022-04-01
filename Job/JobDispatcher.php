@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobCreateActionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class JobDispatcher extends JobDispatcherContract
+final class JobDispatcher extends JobDispatcherContract
 {
     private MessageBusInterface $bus;
 

@@ -14,7 +14,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
-class HttpClient extends HttpClientContract implements LoggerAwareInterface
+final class HttpClient extends HttpClientContract implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 

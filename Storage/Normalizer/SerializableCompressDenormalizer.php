@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 
-class SerializableCompressDenormalizer implements DenormalizerInterface
+final class SerializableCompressDenormalizer implements DenormalizerInterface
 {
     private DenormalizerInterface $serializableDenormalizer;
 

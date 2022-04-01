@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 
-class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderInterface
+final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderInterface
 {
     public function findOrigin(HttpHandlerContract $httpHandler): CodeOrigin
     {
