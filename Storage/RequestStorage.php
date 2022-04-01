@@ -71,9 +71,10 @@ final class RequestStorage extends RequestStorageContract
         }
 
         throw new \RuntimeException(\sprintf(
-            'Unable to find serialized request. FileReferenceRequestKey: %s; PortalNodeKey: %s',
+            'Unable to find serialized request. FileReferenceRequestKey: %s; PortalNodeKey: %s (%s)',
             $this->storageKeyGenerator->serialize($fileReferenceRequestKey),
-            $this->storageKeyGenerator->serialize($portalNodeKey)
+            $this->storageKeyGenerator->serialize($portalNodeKey->withAlias()),
+            $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias())
         ), 1647791094);
     }
 
