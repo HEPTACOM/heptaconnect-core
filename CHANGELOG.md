@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.9.0.0] - 2022-04-02
+
+### Added
+
 - Implement `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerCodeOriginFinderInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder`
 - Add exception code `1637607699` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler is a short-notation http handler and has no configured callback
 - Add exception code `1637607700` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler class cannot be read via reflection
@@ -100,8 +114,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract caching of `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService` into new class `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationCacheProcessor` using the `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface` interface
 - Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`, `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService`, `\Heptacom\HeptaConnect\Core\Emission\EmissionActor`, `\Heptacom\HeptaConnect\Core\Emission\EmitContext`, `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory`, `\Heptacom\HeptaConnect\Core\Emission\EmitService`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Exploration\DirectEmitter`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContext`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContextFactory`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreService`, `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionFlow`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`, `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor`, `\Heptacom\HeptaConnect\Core\Job\JobDispatcher`, `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct`, `\Heptacom\HeptaConnect\Core\Mapping\MappingStruct`, `\Heptacom\HeptaConnect\Core\Mapping\Publisher`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\PortalConfiguration`, `\Heptacom\HeptaConnect\Core\Portal\PortalFactory`, `\Heptacom\HeptaConnect\Core\Portal\PortalRegistry`, `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`, `\Heptacom\HeptaConnect\Core\Portal\PortalStorage`, `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage`, `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor`, `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsPostProcessor`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContextFactory`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveService`, `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContext`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContextFactory`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`, `\Heptacom\HeptaConnect\Core\Support\EntityStatus`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContextFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor`
 
-### Deprecated
-
 ### Removed
 
 - Remove separation of source flow components and decorator flow components in `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder`. First flow component in list is always the source
@@ -125,8 +137,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Portal node extensions can supply source flow components for data types that have not been introduced by the decorated portal
 - All aliases in the dependency-injection container for portals are now public. This enables injection of aliased services in short-notation flow-components.
-
-### Security
 
 ## [0.8.6] - 2022-03-07
 
