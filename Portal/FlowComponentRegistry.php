@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
@@ -107,6 +106,10 @@ class FlowComponentRegistry
     }
 
     /**
+     * Returns an ordered array of FQCNs for the portal class and all supporting portal extension classes that
+     * contribute flow components to the current portal container. The first item will be the FQCN of the portal class.
+     * The supporting portal extension FQCNs will be ordered lexicographically.
+     *
      * @return class-string[]
      */
     public function getOrderedSources(): array
@@ -123,14 +126,14 @@ class FlowComponentRegistry
                 ...\array_keys($this->flowBuilderFiles),
             ]);
             \usort($result, static function (string $a, string $b): int {
-                $aT = \is_a($a, PortalExtensionContract::class, true);
-                $bT = \is_a($b, PortalContract::class, true);
+                $aT = (int) \is_a($a, PortalContract::class, true);
+                $bT = (int) \is_a($b, PortalContract::class, true);
 
                 if ($aT === $bT) {
                     return \strcmp($a, $b);
                 }
 
-                return $aT ? 1 : -1;
+                return $bT <=> $aT;
             });
 
             $this->orderedSources = $result;
