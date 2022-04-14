@@ -40,7 +40,7 @@ final class MarkAsFailedPostProcessor extends PostProcessorContract
 
             if ($mapping instanceof MappingInterface) {
                 $mappingComponent = new MappingComponentStruct(
-                    $event->getContext()->getPortalNodeKey(),
+                    $mapping->getPortalNodeKey(),
                     $mapping->getEntityType(),
                     $mapping->getExternalId()
                 );
