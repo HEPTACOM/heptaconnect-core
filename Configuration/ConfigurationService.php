@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\Portal
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\PortalNodeConfigurationSetPayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationSetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ConfigurationService implements ConfigurationServiceInterface
@@ -111,6 +112,10 @@ final class ConfigurationService implements ConfigurationServiceInterface
 
     private function getPortalNodeConfigurationInternal(PortalNodeKeyInterface $portalNodeKey): array
     {
+        if ($portalNodeKey instanceof PreviewPortalNodeKey) {
+            return [];
+        }
+
         $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
         foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
