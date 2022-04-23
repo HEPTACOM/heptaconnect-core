@@ -68,8 +68,9 @@ final class PortalRegistry implements PortalRegistryInterface
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
+        $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
 
-        if (!isset($this->cache['portalExtensions'][$portalClass])) {
+        if (!isset($this->cache['portalExtensions'][$cacheKey])) {
             $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
             if ($extensions->count()) {
@@ -78,10 +79,10 @@ final class PortalRegistry implements PortalRegistryInterface
                 $extensions = new PortalExtensionCollection($extensions->filter([$portalExtensionFindResult, 'isActive']));
             }
 
-            $this->cache['portalExtensions'][$portalClass] = $extensions;
+            $this->cache['portalExtensions'][$cacheKey] = $extensions;
         }
 
-        return $this->cache['portalExtensions'][$portalClass];
+        return $this->cache['portalExtensions'][$cacheKey];
     }
 
     private function getPortalNodeClassCached(PortalNodeKeyInterface $portalNodeKey): ?string
