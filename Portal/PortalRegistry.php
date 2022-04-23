@@ -51,17 +51,18 @@ final class PortalRegistry implements PortalRegistryInterface
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
+        $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
 
-        if (!isset($this->cache['portals'][$portalClass])) {
+        if (!isset($this->cache['portals'][$cacheKey])) {
             if (!\is_a($portalClass, PortalContract::class, true)) {
                 throw new InvalidPortalNodeKeyException($portalNodeKey);
             }
 
             /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */
-            $this->cache['portals'][$portalClass] = $this->portalFactory->instantiatePortal($portalClass);
+            $this->cache['portals'][$cacheKey] = $this->portalFactory->instantiatePortal($portalClass);
         }
 
-        return $this->cache['portals'][$portalClass];
+        return $this->cache['portals'][$cacheKey];
     }
 
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
