@@ -15,6 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExt
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
+use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 
 final class PortalRegistry implements PortalRegistryInterface
 {
@@ -73,7 +74,7 @@ final class PortalRegistry implements PortalRegistryInterface
         if (!isset($this->cache['portalExtensions'][$cacheKey])) {
             $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
-            if ($extensions->count()) {
+            if ($extensions->count() > 0 && !$portalNodeKey instanceof PreviewPortalNodeKey) {
                 $portalExtensionFindResult = $this->portalExtensionFindAction->find($portalNodeKey);
 
                 $extensions = new PortalExtensionCollection($extensions->filter([$portalExtensionFindResult, 'isActive']));
@@ -97,6 +98,10 @@ final class PortalRegistry implements PortalRegistryInterface
      */
     private function getPortalNodeClass(PortalNodeKeyInterface $portalNodeKey): ?string
     {
+        if ($portalNodeKey instanceof PreviewPortalNodeKey) {
+            return $portalNodeKey->getPortalType();
+        }
+
         $nodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey])));
 
         foreach ($nodes as $portalNode) {
