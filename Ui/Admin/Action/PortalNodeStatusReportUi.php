@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportPayloads;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface;
 
@@ -18,7 +18,7 @@ final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionIn
         $this->statusReportingService = $statusReportingService;
     }
 
-    public function report(PortalNodeStatusReportPayloads $payloads): iterable
+    public function report(PortalNodeStatusReportPayload $payloads): iterable
     {
         $portalNodeKey = $payloads->getPortalNodeKey();
 
