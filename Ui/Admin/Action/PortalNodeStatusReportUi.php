@@ -33,7 +33,7 @@ final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionIn
 
             unset($result[$topic]);
 
-            yield new PortalNodeStatusReportResult($portalNodeKey, $topic, $success, $result);
+            yield $topic => new PortalNodeStatusReportResult($portalNodeKey, $topic, $success, $result);
         }
     }
 }
