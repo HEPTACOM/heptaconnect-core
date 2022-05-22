@@ -24,7 +24,12 @@ final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionIn
 
         foreach (\array_unique($payloads->getTopics()) as $topic) {
             $result = $this->statusReportingService->report($portalNodeKey, $topic)[$topic] ?? [];
-            $success = (bool)($result[$topic] ?? false);
+
+            if ($result === []) {
+                continue;
+            }
+
+            $success = (bool) ($result[$topic] ?? false);
 
             unset($result[$topic]);
 
