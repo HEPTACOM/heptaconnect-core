@@ -141,8 +141,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $containerBuilder = new ContainerBuilder();
 
         $seenDefinitions = [];
-        $prototypedIds = [];
-        $definedIds = [];
         $flowBuilderFiles = [];
 
         /** @var PackageContract $package */
@@ -150,15 +148,20 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $containerConfigurationPath = $package->getContainerConfigurationPath();
             $flowComponentsPath = $package->getFlowComponentsPath();
 
-            $prototypedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
+            $prototypedIds = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
                 $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
                     $containerConfigurationPath,
                     $flowComponentsPath,
                 ]);
             });
-            $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
+            $definedIds = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
                 $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
             });
+
+            $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
+                \array_diff($prototypedIds, $definedIds),
+                $package->getContainerExcludedClasses()
+            ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -250,9 +253,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
-        $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
-            \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
-        ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
