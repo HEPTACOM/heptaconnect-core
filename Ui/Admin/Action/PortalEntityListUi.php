@@ -48,12 +48,12 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
         $portalNodeKey = new PreviewPortalNodeKey($criteria->getPortal());
 
         $entityType = $criteria->getFilterSupportedEntityType();
-        $entityFilter = static fn (iterable $fcs): iterable => $fcs;
+        $entityFilter = static fn (iterable $flowComponents): iterable => $flowComponents;
 
         if ($entityType !== null) {
-            $entityFilter = static fn (iterable $fcs): iterable => \iterable_filter(
-                $fcs,
-                static fn ($fc): bool => $fc->supports() === $entityType
+            $entityFilter = static fn (iterable $flowComponents): iterable => \iterable_filter(
+                $flowComponents,
+                static fn ($flowComponent): bool => $flowComponent->supports() === $entityType
             );
         }
 
