@@ -25,8 +25,8 @@ use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowCont
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
@@ -145,7 +145,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $definedIds = [];
         $flowBuilderFiles = [];
 
-        /** @var PortalContract|PortalExtensionContract $package */
+        /** @var PackageContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
             $containerConfigurationPath = $package->getContainerConfigurationPath();
             $flowComponentsPath = $package->getFlowComponentsPath();
@@ -384,11 +384,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 continue;
             }
 
-            if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = $id;
-            }
-
-            if (\is_a($class, PortalExtensionContract::class, true)) {
+            if (\is_a($class, PackageContract::class, true)) {
                 $automaticLoadedDefinitionsToRemove[] = $id;
             }
         }
