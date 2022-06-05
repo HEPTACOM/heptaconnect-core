@@ -134,7 +134,16 @@ final class PortalStorage implements PortalStorageInterface
 
         try {
             foreach ($this->portalNodeStorageListAction->list($criteria) as $result) {
-                $value = $this->unpackGetResult($result);
+                try {
+                    $value = $this->unpackGetResult($result);
+                } catch (\Throwable $throwable) {
+                    $this->logger->error('Failed unpack a portal storage value for listing', [
+                        'code' => 1651338559,
+                        'exception' => $throwable,
+                        'portalNodeKey' => $this->portalNodeKey,
+                    ]);
+                    continue;
+                }
 
                 if ($value === null) {
                     continue;
@@ -334,7 +343,19 @@ final class PortalStorage implements PortalStorageInterface
             return null;
         }
 
-        return $denormalizer->denormalize($getResult->getValue(), $getResult->getType());
+        try {
+            return $denormalizer->denormalize($getResult->getValue(), $getResult->getType());
+        } catch (\Throwable $throwable) {
+            $this->logger->error('Failed denormalizing a portal storage value', [
+                'code' => 1651338621,
+                'exception' => $throwable,
+                'portalNodeKey' => $this->portalNodeKey,
+                'key' => $getResult->getStorageKey(),
+                'type' => $getResult->getType(),
+            ]);
+        }
+
+        return null;
     }
 
     private function packSetItem(string $key, $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem

@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
+- Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
+
 ### Changed
 
 - Move decision of exclusion by class for automatically created portal node container services from `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass` into `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::getContainerExcludedClasses`
@@ -21,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix reception of multiple entities with the same identity within a single batch in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
 - Add fallback value for the reported topic in `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService::reportSingleTopic`
+- Skip broken entries in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` instead of returning an empty list
 
 ### Security
 
