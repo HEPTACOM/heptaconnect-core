@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalExtension\Activate\PortalExtensionActivatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
@@ -28,18 +27,22 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
 
     private PortalExtensionActivateActionInterface $portalExtensionActivateAction;
 
+    private PackageQueryMatcherInterface $packageQueryMatcher;
+
     private ComposerPortalLoader $portalLoader;
 
     public function __construct(
         PortalNodeGetActionInterface $portalNodeGetAction,
         PortalExtensionFindActionInterface $portalExtensionFindAction,
         PortalExtensionActivateActionInterface $portalExtensionActivateAction,
+        PackageQueryMatcherInterface $packageQueryMatcher,
         ComposerPortalLoader $portalLoader
     ) {
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->portalExtensionFindAction = $portalExtensionFindAction;
         $this->portalExtensionActivateAction = $portalExtensionActivateAction;
         $this->portalLoader = $portalLoader;
+        $this->packageQueryMatcher = $packageQueryMatcher;
     }
 
     public function activate(PortalNodeExtensionActivatePayload $payloads): void
@@ -52,20 +55,23 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
             $portalExtensions = $this->portalLoader->getPortalExtensions();
             $portalExtensionState = $this->portalExtensionFindAction->find($portalNodeKey);
 
-            foreach ($payloads->getPortalExtensionClasses() as $portalExtensionClass) {
+            foreach ($payloads->getPortalExtensionQuery() as $portalExtensionClass) {
                 if (!\class_exists($portalExtensionClass)) {
                     throw new PortalExtensionMissingException($portalExtensionClass, 1650142325);
                 }
 
-                $portalClass = $portalNodeGetResult->getPortalClass();
-                $portalExtension = $this->getPortalExtensionByType($portalExtensions->bySupport($portalClass), $portalExtensionClass);
+                $portalExtensions = $portalExtensions->bySupport($portalNodeGetResult->getPortalClass());
 
-                if ($portalExtension === null) {
+                if ($portalExtensions->count() === 0) {
                     throw new PortalExtensionDoesNotSupportPortalNodeException($portalNodeKey, $portalExtensionClass, 1650142326);
                 }
 
-                if ($portalExtensionState->isActive($portalExtension)) {
-                    throw new PortalExtensionIsAlreadyActiveOnPortalNodeException($portalNodeKey, $portalExtensionClass, 1650142327);
+                $portalExtensions = $this->packageQueryMatcher->matchPortalExtensions($portalExtensionClass, $portalExtensions);
+
+                foreach ($portalExtensions as $portalExtension) {
+                    if ($portalExtensionState->isActive($portalExtension)) {
+                        throw new PortalExtensionIsAlreadyActiveOnPortalNodeException($portalNodeKey, $portalExtensionClass, 1650142327);
+                    }
                 }
 
                 $portalExtensionActivePayload->addExtension($portalExtensionClass);
@@ -81,21 +87,5 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
         }
 
         throw new PortalNodeMissingException($portalNodeKey, 1650142328);
-    }
-
-    /**
-     * @param class-string<PortalExtensionContract> $portalExtensionClass
-     */
-    private function getPortalExtensionByType(
-        PortalExtensionCollection $extensions,
-        string $portalExtensionClass
-    ): ?PortalExtensionContract {
-        foreach ($extensions as $portalExtension) {
-            if ($portalExtension instanceof $portalExtensionClass) {
-                return $portalExtension;
-            }
-        }
-
-        return null;
     }
 }
