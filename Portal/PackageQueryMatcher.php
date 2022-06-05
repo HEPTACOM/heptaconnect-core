@@ -35,9 +35,8 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
             ));
         } catch (UnsupportedStorageKeyException $e) {
             return new PortalNodeKeyCollection($portalNodeKeys->filter(
-                fn (PortalNodeKeyInterface $key): bool =>
-                    $this->storageKeyGenerator->serialize($key->withAlias()) === $query ||
-                    $this->storageKeyGenerator->serialize($key->withoutAlias()) === $query
+                fn (PortalNodeKeyInterface $key): bool => $this->storageKeyGenerator->serialize($key->withAlias()) === $query
+                    || $this->storageKeyGenerator->serialize($key->withoutAlias()) === $query
             ));
         }
     }
