@@ -33,6 +33,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.9.0.2] - 2022-04-23
+
+### Fixed
+
+- Portal instances and portal extension instances are not shared across multiple portal node service containers anymore. If these instances are used stateful, portal node A can affect portal node B. All packages we provide have been checked negative against stateful usage of portal and portal extension instances.
+- Portal extension stacks are now built for each portal node instead for each portal. This resulted in portal node service containers with active portal extension that have not been set active for the stack's portal node. It only occurs when more than one portal node service containers of the same portal is created in a single PHP process e.g. a message consumption process.
+- Portal node configuration for preview portal nodes are now loaded statically again
+- Portal node service container for preview portal nodes are now loaded statically again
+
+## [0.9.0.1] - 2022-04-19
+
+### Fixed
+
+- Fix order of portals and portal extensions in `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry`
+- Fix creating identity error messages in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor::handle`
+- Fix a critical error when writing portal node configuration
+
 ## [0.9.0.0] - 2022-04-02
 
 ### Added
