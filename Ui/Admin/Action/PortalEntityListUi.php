@@ -33,10 +33,10 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
 
         return \iterable_map(
             $this->portalNodeEntityListUiAction->list($portalNodeCriteria),
-            static fn (PortalNodeEntityListResult $r) => new PortalEntityListResult(
-                $r->getCodeOrigin(),
-                $r->getSupportedEntityType(),
-                $r->getFlowComponentClass()
+            static fn (PortalNodeEntityListResult $result) => new PortalEntityListResult(
+                $result->getCodeOrigin(),
+                $result->getSupportedEntityType(),
+                $result->getFlowComponentClass()
             )
         );
     }
