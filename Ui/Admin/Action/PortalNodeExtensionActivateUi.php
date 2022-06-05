@@ -41,13 +41,13 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->portalExtensionFindAction = $portalExtensionFindAction;
         $this->portalExtensionActivateAction = $portalExtensionActivateAction;
-        $this->portalLoader = $portalLoader;
         $this->packageQueryMatcher = $packageQueryMatcher;
+        $this->portalLoader = $portalLoader;
     }
 
-    public function activate(PortalNodeExtensionActivatePayload $payloads): void
+    public function activate(PortalNodeExtensionActivatePayload $payload): void
     {
-        $portalNodeKey = $payloads->getPortalNodeKey();
+        $portalNodeKey = $payload->getPortalNodeKey();
         $portalNodeGetCriteria = new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
         foreach ($this->portalNodeGetAction->get($portalNodeGetCriteria) as $portalNodeGetResult) {
@@ -55,7 +55,7 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
             $portalExtensions = $this->portalLoader->getPortalExtensions();
             $portalExtensionState = $this->portalExtensionFindAction->find($portalNodeKey);
 
-            foreach ($payloads->getPortalExtensionQuery() as $portalExtensionClass) {
+            foreach ($payload->getPortalExtensionQuery() as $portalExtensionClass) {
                 if (!\class_exists($portalExtensionClass)) {
                     throw new PortalExtensionMissingException($portalExtensionClass, 1650142325);
                 }

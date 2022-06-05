@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -47,7 +49,9 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
             return new PortalCollection();
         }
 
-        return new PortalCollection($portals->filter(static fn (object $object): bool => $object instanceof $query));
+        return new PortalCollection($portals->filter(
+            static fn (PortalContract $portal): bool => $portal instanceof $query
+        ));
     }
 
     public function matchPortalExtensions(string $query, PortalExtensionCollection $portalExtensions): PortalExtensionCollection
@@ -57,7 +61,7 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
         }
 
         return new PortalExtensionCollection($portalExtensions->filter(
-            static fn (object $object): bool => $object instanceof $query
+            static fn (PortalExtensionContract $portalExtension): bool => $portalExtension instanceof $query
         ));
     }
 }
