@@ -16,7 +16,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Psr\Log\LoggerInterface;
 
-class ReceptionActor implements ReceptionActorInterface
+final class ReceptionActor implements ReceptionActorInterface
 {
     private LoggerInterface $logger;
 

@@ -21,7 +21,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
-class HttpHandleService implements HttpHandleServiceInterface
+final class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
      * @var array<array-key, HttpHandlerStackInterface|null>
@@ -67,6 +67,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
     {
+        $portalNodeKey = $portalNodeKey->withoutAlias();
         $path = $request->getUri()->getPath();
         $response = $this->responseFactory->createResponse(501);
         // TODO push onto global logging context stack
@@ -106,7 +107,7 @@ class HttpHandleService implements HttpHandleServiceInterface
 
     private function getStack(PortalNodeKeyInterface $portalNodeKey, string $path): ?HttpHandlerStackInterface
     {
-        $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $path]);
+        $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey) . $path;
 
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory
