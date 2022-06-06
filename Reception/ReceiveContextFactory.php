@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 
-class ReceiveContextFactory implements ReceiveContextFactoryInterface
+final class ReceiveContextFactory implements ReceiveContextFactoryInterface
 {
     private ConfigurationServiceInterface $configurationService;
 

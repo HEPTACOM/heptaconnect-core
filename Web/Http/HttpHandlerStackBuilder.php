@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStack;
 use Psr\Log\LoggerInterface;
 
-class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
+final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 {
     private ?HttpHandlerContract $source;
 

@@ -12,7 +12,7 @@ use League\Flysystem\FilesystemInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
-class StreamDenormalizer implements DenormalizerInterface
+final class StreamDenormalizer implements DenormalizerInterface
 {
     private FilesystemInterface $filesystem;
 
