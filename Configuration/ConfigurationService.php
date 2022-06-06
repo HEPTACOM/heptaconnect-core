@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
+use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -13,61 +14,50 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\Portal
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Set\PortalNodeConfigurationSetPayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationSetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Psr\Cache\CacheItemPoolInterface;
+use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ConfigurationService implements ConfigurationServiceInterface
+final class ConfigurationService implements ConfigurationServiceInterface
 {
     private PortalRegistryInterface $portalRegistry;
-
-    private CacheItemPoolInterface $cache;
-
-    private StorageKeyGeneratorContract $keyGenerator;
 
     private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
 
     private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
 
+    /**
+     * @var PortalNodeConfigurationProcessorInterface[]
+     */
+    private array $configurationProcessors;
+
+    /**
+     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationFileReader
+     */
     public function __construct(
         PortalRegistryInterface $portalRegistry,
-        CacheItemPoolInterface $cache,
-        StorageKeyGeneratorContract $keyGenerator,
         PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet
+        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
+        iterable $configurationProcessors
     ) {
         $this->portalRegistry = $portalRegistry;
-        $this->cache = $cache;
-        $this->keyGenerator = $keyGenerator;
         $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
         $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
+        $this->configurationProcessors = \iterable_to_array($configurationProcessors);
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
-        $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
+        $template = $this->getMergedConfigurationTemplate($portalNodeKey);
+        $configuration = $this->processReadConfiguration(
+            $portalNodeKey,
+            fn () => $this->getPortalNodeConfigurationInternal($portalNodeKey)
+        );
 
-        if (!$cachedConfig->isHit()) {
-            $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-            $config = $template->resolve($this->getPortalNodeConfigurationInternal($portalNodeKey));
-
-            $this->cache->save($cachedConfig->set($config));
-        } else {
-            $config = $cachedConfig->get();
-        }
-
-        return $config;
+        return $template->resolve($configuration);
     }
 
     public function setPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
-        $cachedConfigKey = $this->getConfigCacheKey($portalNodeKey);
-        $cachedConfig = $this->cache->getItem($cachedConfigKey);
-
-        if ($cachedConfig->isHit()) {
-            $this->cache->deleteItem($cachedConfigKey);
-        }
-
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
 
         if ($configuration === null) {
@@ -81,9 +71,7 @@ class ConfigurationService implements ConfigurationServiceInterface
             $template->resolve($data);
         }
 
-        $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
-            new PortalNodeConfigurationSetPayload($portalNodeKey, $data),
-        ]));
+        $this->processWriteConfiguration($portalNodeKey, $data);
     }
 
     /**
@@ -122,16 +110,12 @@ class ConfigurationService implements ConfigurationServiceInterface
         return $template;
     }
 
-    private function getConfigCacheKey(PortalNodeKeyInterface $portalNodeKey): string
-    {
-        $key = $this->keyGenerator->serialize($portalNodeKey);
-        $key = \str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '', $key);
-
-        return 'config.cache.' . $key;
-    }
-
     private function getPortalNodeConfigurationInternal(PortalNodeKeyInterface $portalNodeKey): array
     {
+        if ($portalNodeKey instanceof PreviewPortalNodeKey) {
+            return [];
+        }
+
         $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
         foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
@@ -139,5 +123,29 @@ class ConfigurationService implements ConfigurationServiceInterface
         }
 
         return [];
+    }
+
+    private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
+    {
+        foreach ($this->configurationProcessors as $configurationProcessor) {
+            $readConfiguration = $read;
+            $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
+        }
+
+        return $read();
+    }
+
+    private function processWriteConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
+    {
+        $write = fn (array $c) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+            new PortalNodeConfigurationSetPayload($portalNodeKey, $c),
+        ]));
+
+        foreach ($this->configurationProcessors as $configurationProcessor) {
+            $writeConfiguration = $write;
+            $write = static fn (array $c) => $configurationProcessor->write($portalNodeKey, $c, $writeConfiguration);
+        }
+
+        $write($configuration ?? []);
     }
 }

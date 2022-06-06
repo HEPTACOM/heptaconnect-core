@@ -6,23 +6,27 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
+use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
+use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
+use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
+use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
@@ -59,7 +63,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
-class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
+final class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
 {
     public const STATUS_REPORTER_SOURCE_TAG = 'heptaconnect.flow_component.status_reporter_source';
 
@@ -95,6 +99,10 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
     private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
 
+    private RequestStorageContract $requestStorage;
+
+    private ?FileReferenceResolverContract $fileReferenceResolver = null;
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -105,7 +113,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         FilesystemFactory $filesystemFactory,
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
-        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory
+        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        RequestStorageContract $requestStorage
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -117,6 +126,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         $this->configurationService = $configurationService;
         $this->publisher = $publisher;
         $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
+        $this->requestStorage = $requestStorage;
     }
 
     /**
@@ -127,27 +137,31 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         PortalExtensionCollection $portalExtensions,
         PortalNodeKeyInterface $portalNodeKey
     ): ContainerBuilder {
+        $portalNodeKey = $portalNodeKey->withAlias();
         $containerBuilder = new ContainerBuilder();
 
         $seenDefinitions = [];
-        $prototypedIds = [];
-        $definedIds = [];
         $flowBuilderFiles = [];
 
-        /** @var PortalContract|PortalExtensionContract $package */
+        /** @var PackageContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
             $containerConfigurationPath = $package->getContainerConfigurationPath();
             $flowComponentsPath = $package->getFlowComponentsPath();
 
-            $prototypedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
+            $prototypedIds = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
                 $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
                     $containerConfigurationPath,
                     $flowComponentsPath,
                 ]);
             });
-            $definedIds[] = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
+            $definedIds = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
                 $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
             });
+
+            $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
+                \array_diff($prototypedIds, $definedIds),
+                $package->getContainerExcludedClasses()
+            ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
@@ -179,6 +193,13 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
 
         $portalConfiguration = new PortalConfiguration($configuration ?? []);
 
+        $fileReferenceFactory = new FileReferenceFactory(
+            $portalNodeKey,
+            Psr17FactoryDiscovery::findStreamFactory(),
+            $this->normalizationRegistry,
+            $this->requestStorage
+        );
+
         $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
@@ -199,6 +220,8 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
             ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
+            FileReferenceFactoryContract::class => $fileReferenceFactory,
+            FileReferenceResolverContract::class => $this->fileReferenceResolver,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
@@ -230,9 +253,6 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
         );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
-        $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
-            \array_diff(\array_merge([], ...$prototypedIds), \array_merge([], ...$definedIds))
-        ), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
@@ -242,6 +262,11 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
     public function setDirectEmissionFlow(DirectEmissionFlowContract $directEmissionFlow): void
     {
         $this->directEmissionFlow = $directEmissionFlow;
+    }
+
+    public function setFileReferenceResolver(FileReferenceResolverContract $fileReferenceResolver): void
+    {
+        $this->fileReferenceResolver = $fileReferenceResolver;
     }
 
     /**
@@ -359,11 +384,7 @@ class PortalStackServiceContainerBuilder implements PortalStackServiceContainerB
                 continue;
             }
 
-            if (\is_a($class, PortalContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = $id;
-            }
-
-            if (\is_a($class, PortalExtensionContract::class, true)) {
+            if (\is_a($class, PackageContract::class, true)) {
                 $automaticLoadedDefinitionsToRemove[] = $id;
             }
         }

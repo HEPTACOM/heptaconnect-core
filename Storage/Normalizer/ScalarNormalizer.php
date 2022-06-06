@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 
-class ScalarNormalizer implements NormalizerInterface
+final class ScalarNormalizer implements NormalizerInterface
 {
     /**
      * @psalm-return 'scalar'

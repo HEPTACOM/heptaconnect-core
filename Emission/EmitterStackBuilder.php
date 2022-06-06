@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Psr\Log\LoggerInterface;
 
-class EmitterStackBuilder implements EmitterStackBuilderInterface
+final class EmitterStackBuilder implements EmitterStackBuilderInterface
 {
     private ?EmitterContract $source;
 

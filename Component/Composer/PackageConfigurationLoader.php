@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
+final class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
 {
     private ?string $composerJson;
 

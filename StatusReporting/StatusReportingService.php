@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Log\LoggerInterface;
 
-class StatusReportingService implements StatusReportingServiceInterface
+final class StatusReportingService implements StatusReportingServiceInterface
 {
     private LoggerInterface $logger;
 
@@ -96,7 +96,7 @@ class StatusReportingService implements StatusReportingServiceInterface
         $stack = $this->getStatusReporterStack($portalNodeKey, $topicStatusReporters, $topic);
 
         try {
-            return $stack->next($context);
+            return \array_merge([$topic => false], $stack->next($context));
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::STATUS_REPORT_NO_THROW(), [
                 'topic' => $topic,

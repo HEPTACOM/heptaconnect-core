@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErr
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 use Psr\Log\LoggerInterface;
 
-class MarkAsFailedPostProcessor extends PostProcessorContract
+final class MarkAsFailedPostProcessor extends PostProcessorContract
 {
     private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
@@ -40,7 +40,7 @@ class MarkAsFailedPostProcessor extends PostProcessorContract
 
             if ($mapping instanceof MappingInterface) {
                 $mappingComponent = new MappingComponentStruct(
-                    $event->getContext()->getPortalNodeKey(),
+                    $mapping->getPortalNodeKey(),
                     $mapping->getEntityType(),
                     $mapping->getExternalId()
                 );

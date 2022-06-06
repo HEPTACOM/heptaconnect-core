@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Psr\Log\LoggerInterface;
 
-class ReceiverStackBuilder implements ReceiverStackBuilderInterface
+final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 {
     private ?ReceiverContract $source;
 

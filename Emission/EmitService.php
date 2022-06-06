@@ -20,7 +20,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
-class EmitService implements EmitServiceInterface
+final class EmitService implements EmitServiceInterface
 {
     private EmitContextFactoryInterface $emitContextFactory;
 
