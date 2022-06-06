@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAdd
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeAliasIsAlreadyAssignedException;
 
-class PortalNodeAddUi implements PortalNodeAddUiActionInterface
+final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
 {
     private PortalNodeCreateActionInterface $portalNodeCreateAction;
 
