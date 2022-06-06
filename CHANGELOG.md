@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+- Move decision of exclusion by class for automatically created portal node container services from `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass` into `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::getContainerExcludedClasses`
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+- Fix reception of multiple entities with the same identity within a single batch in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+- Add fallback value for the reported topic in `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService::reportSingleTopic`
+
+### Security
+
+## [0.9.0.2] - 2022-04-23
+
+### Fixed
+
+- Portal instances and portal extension instances are not shared across multiple portal node service containers anymore. If these instances are used stateful, portal node A can affect portal node B. All packages we provide have been checked negative against stateful usage of portal and portal extension instances.
+- Portal extension stacks are now built for each portal node instead for each portal. This resulted in portal node service containers with active portal extension that have not been set active for the stack's portal node. It only occurs when more than one portal node service containers of the same portal is created in a single PHP process e.g. a message consumption process.
+- Portal node configuration for preview portal nodes are now loaded statically again
+- Portal node service container for preview portal nodes are now loaded statically again
+
+## [0.9.0.1] - 2022-04-19
+
+### Fixed
+
+- Fix order of portals and portal extensions in `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry`
+- Fix creating identity error messages in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor::handle`
+- Fix a critical error when writing portal node configuration
+
+## [0.9.0.0] - 2022-04-02
+
+### Added
+
 - Implement `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerCodeOriginFinderInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder`
 - Add exception code `1637607699` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler is a short-notation http handler and has no configured callback
 - Add exception code `1637607700` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler class cannot be read via reflection
@@ -38,6 +74,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Parallelization\ResourceLockStorage` for `\Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContract` that depends on `symfony/lock` which is already required
 - Add log message code `1646383738` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when reading portal node storage entries fails
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage` for the interface `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface` to support interactions on `\Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey`
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\FileContentsUrlProviderInterface` to provide public URLs for normalized streams
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\FileRequestUrlProviderInterface` to prode public URLs for serialized requests
+- Add class `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory` to create file references from public URLs, request objects or file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver` to resolve file references for read operations
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\ContentsFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\PublicUrlFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from a public URL
+- Add class `\Heptacom\HeptaConnect\Core\File\Reference\RequestFileReference` as implementation of `\Heptacom\HeptaConnect\Dataset\Base\File\FileReferenceContract` that is created from a PSR-7 request object
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from file contents
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from a public URL
+- Add class `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract` for file references that were created from a PSR-7 request object
+- Add class `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` to deserialize instances of `\Psr\Http\Message\RequestInterface`
+- Add class `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` to serialize instances of `\Psr\Http\Message\RequestInterface`
+- Add contract `\Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract` with implementation in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` to persist and load instances of `\Psr\Http\Message\RequestInterface`
+- Add exception code `1647788744` in `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory::fromContents` when the NormalizationRegistry is missing a normalizer for streams
+- Add exception code `1648315863` in `\Heptacom\HeptaConnect\Core\File\FileReferenceFactory::fromContents` when the normalizer is unable to serialize the given file contents
+- Add exception code `1647788896` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the NormalizationRegistry is missing a denormalizer for streams
+- Add exception code `1647789133` in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver::resolve` when the FileReference has an unsupported source
+- Add exception code `1647789503` in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference::getContents` when denormalizing a normalized stream fails
+- Add exception code `1647789809` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer::normalize` when trying to normalize anything other than a request object
+- Add exception code `1647790094` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage::load` when denormalizing a serialized request fails
+- Add exception code `1647791094` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage::load` when a serialized request is not found
+- Add exception code `1647791390` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage::persist` when persisting a serialized request fails
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` to define a contract for changing portal node configurations
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\ClosureInstructionToken` that changes portal node configuration by the given closure
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper` to generate closures for processing configuration sources like json files and environment variables
+- Add exception code `1647801828` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::ini` when the ini file can not be loaded and parsed
+- Add exception code `1647801829` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be loaded and parsed
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config` to collect `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` in a short-notation manner
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface` to identify services that provide `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract`
+- Add `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionFileLoader` to provide `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract` using `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config`
+- Add exception code `1645611612` in `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionFileLoader::loadInstructions` when referenced file can not be loaded
+- Add `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` as `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface` to change portal node configuration by instructions from given `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface` instances
+- Add log message code `1647826121` in `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` when an error happens during instruction loading
 
 ### Changed
 
@@ -64,8 +133,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` and `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous services are removed
 - Replace dependencies in `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor` from `\Heptacom\HeptaConnect\Storage\Core\Mapping\Contract\MappingServiceInterface` to `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface` as previous service is removed
 - Split argument in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface::receive` of type `\Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappedDatasetEntityCollection` into `\Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection` and `\Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface` to state target portal clearly
-
-### Deprecated
+- Extract caching of `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService` into new class `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationCacheProcessor` using the `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface` interface
+- Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`, `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService`, `\Heptacom\HeptaConnect\Core\Emission\EmissionActor`, `\Heptacom\HeptaConnect\Core\Emission\EmitContext`, `\Heptacom\HeptaConnect\Core\Emission\EmitContextFactory`, `\Heptacom\HeptaConnect\Core\Emission\EmitService`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilder`, `\Heptacom\HeptaConnect\Core\Emission\EmitterStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Exploration\DirectEmitter`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorationActor`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContext`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContextFactory`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilder`, `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreService`, `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionFlow`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`, `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor`, `\Heptacom\HeptaConnect\Core\Job\JobDispatcher`, `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct`, `\Heptacom\HeptaConnect\Core\Mapping\MappingStruct`, `\Heptacom\HeptaConnect\Core\Mapping\Publisher`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass`, `\Heptacom\HeptaConnect\Core\Portal\PortalConfiguration`, `\Heptacom\HeptaConnect\Core\Portal\PortalFactory`, `\Heptacom\HeptaConnect\Core\Portal\PortalRegistry`, `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`, `\Heptacom\HeptaConnect\Core\Portal\PortalStorage`, `\Heptacom\HeptaConnect\Core\Portal\PreviewPortalNodeStorage`, `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor`, `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsPostProcessor`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContextFactory`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilder`, `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveService`, `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContext`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContextFactory`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\ScalarNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer`, `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer`, `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`, `\Heptacom\HeptaConnect\Core\Support\EntityStatus`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContextFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor`
 
 ### Removed
 
@@ -84,13 +153,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove deprecated methods `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canSet` and `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::canGet`
 - Remove unused `\Heptacom\HeptaConnect\Core\Router\CumulativeMappingException`
 - Remove dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Repository\MappingNodeRepositoryContract` in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+- Remove deprecated method `Heptacom\HeptaConnect\Core\Mapping\Publisher::publish` inherited from `Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface::publish`
 
 ### Fixed
 
 - Portal node extensions can supply source flow components for data types that have not been introduced by the decorated portal
 - All aliases in the dependency-injection container for portals are now public. This enables injection of aliased services in short-notation flow-components.
-
-### Security
 
 ## [0.8.6] - 2022-03-07
 
