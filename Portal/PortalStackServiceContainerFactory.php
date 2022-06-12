@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -30,13 +31,13 @@ class PortalStackServiceContainerFactory
         $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
-    public function create(PortalNodeKeyInterface $portalNodeKey): ContainerInterface
+    public function create(PortalNodeKeyInterface $portalNodeKey): PortalNodeContainerFacadeContract
     {
         $key = $this->storageKeyGenerator->serialize($portalNodeKey);
         $result = $this->portalContainers[$key] ?? null;
 
         if ($result instanceof ContainerInterface) {
-            return $result;
+            return new PortalNodeContainerFacade($result);
         }
 
         $result = $this->portalStackServiceContainerBuilder->build(
@@ -47,6 +48,6 @@ class PortalStackServiceContainerFactory
         $result->compile();
         $this->portalContainers[$key] = $result;
 
-        return $result;
+        return new PortalNodeContainerFacade($result);
     }
 }

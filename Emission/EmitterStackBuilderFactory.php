@@ -6,7 +6,6 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -28,9 +27,7 @@ final class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInte
         PortalNodeKeyInterface $portalNodeKey,
         string $entityType
     ): EmitterStackBuilderInterface {
-        $container = $this->portalContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalContainerFactory->create($portalNodeKey)->getFlowComponentRegistry();
         $components = new EmitterCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {

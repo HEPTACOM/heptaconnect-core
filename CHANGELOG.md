@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface`
@@ -19,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node
 
 ### Changed
+
+- Argument of type `\Psr\Container\ContainerInterface` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::__construct`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContext::__construct`, `\Heptacom\HeptaConnect\Core\Emission\EmitContext::__construct`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext::__construct`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContext::__construct` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext::__construct` is expected of type `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` instead
+- Return type of `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory::create` is now `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` which inherits the previous return type
 
 ### Deprecated
 

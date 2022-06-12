@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
@@ -93,9 +92,9 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
 
     private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $components = new ExplorerCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {
@@ -107,9 +106,9 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
 
     private function getEmitters(PortalNodeKeyInterface $portalNodeKey): EmitterCollection
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $components = new EmitterCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {
@@ -121,9 +120,9 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
 
     private function getReceivers(PortalNodeKeyInterface $portalNodeKey): ReceiverCollection
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $components = new ReceiverCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {

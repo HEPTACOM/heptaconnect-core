@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
-use Psr\Container\ContainerInterface;
 
 final class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
 {
@@ -19,12 +19,12 @@ final class EmitContext extends AbstractPortalNodeContext implements EmitContext
     private bool $directEmission;
 
     public function __construct(
-        ContainerInterface $container,
+        PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,
         IdentityErrorCreateActionInterface $identityErrorCreateAction,
         bool $directEmission
     ) {
-        parent::__construct($container, $configuration);
+        parent::__construct($containerFacade, $configuration);
 
         $this->identityErrorCreateAction = $identityErrorCreateAction;
         $this->directEmission = $directEmission;
