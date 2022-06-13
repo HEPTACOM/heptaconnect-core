@@ -19,6 +19,9 @@ class PortalStackServiceContainerFactory
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
+    /**
+     * @var PortalNodeContainerFacadeContract[]
+     */
     private array $portalContainers = [];
 
     public function __construct(
@@ -36,18 +39,19 @@ class PortalStackServiceContainerFactory
         $key = $this->storageKeyGenerator->serialize($portalNodeKey);
         $result = $this->portalContainers[$key] ?? null;
 
-        if ($result instanceof ContainerInterface) {
-            return new PortalNodeContainerFacade($result);
+        if ($result instanceof PortalNodeContainerFacadeContract) {
+            return $result;
         }
 
-        $result = $this->portalStackServiceContainerBuilder->build(
+        $container = $this->portalStackServiceContainerBuilder->build(
             $this->portalRegistry->getPortal($portalNodeKey),
             $this->portalRegistry->getPortalExtensions($portalNodeKey),
             $portalNodeKey
         );
-        $result->compile();
-        $this->portalContainers[$key] = $result;
+        $container->compile();
+        $result = new PortalNodeContainerFacade($container);
+        $this->portalContainers[$key] = result;
 
-        return new PortalNodeContainerFacade($result);
+        return $result;
     }
 }
