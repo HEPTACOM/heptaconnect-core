@@ -12,7 +12,6 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
@@ -109,9 +108,9 @@ final class ExploreService implements ExploreServiceInterface
 
     protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $components = new ExplorerCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {

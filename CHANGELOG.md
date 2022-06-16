@@ -9,13 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStatusReportUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
+- Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
 - Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node
@@ -28,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
 
 ### Changed
+
+- Argument of type `\Psr\Container\ContainerInterface` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::__construct`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreContext::__construct`, `\Heptacom\HeptaConnect\Core\Emission\EmitContext::__construct`, `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext::__construct`, `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingContext::__construct` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext::__construct` is expected of type `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` instead
+- Return type of `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory::create` is now `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` which inherits the previous return type
 
 ### Deprecated
 
