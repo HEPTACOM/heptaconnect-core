@@ -119,7 +119,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     throw new ReceptionJobHandlingException($job, 1636503506);
                 }
 
-                if ($route->getEntityType() !== \get_class($entity)) {
+                if ($route->getEntityType()->same($entity::class())) {
                     throw new ReceptionJobHandlingException($job, 1636503507);
                 }
 
@@ -140,7 +140,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                 continue;
             }
 
-            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
                 'mapping' => $job->getMappingComponent(),
                 'entity' => $entity,
                 'jobKey' => $job->getJobKey(),

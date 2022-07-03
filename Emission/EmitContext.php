@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayload;
@@ -37,7 +38,7 @@ final class EmitContext extends AbstractPortalNodeContext implements EmitContext
 
     public function markAsFailed(string $externalId, string $entityType, \Throwable $throwable): void
     {
-        $mappingComponent = new MappingComponentStruct($this->getPortalNodeKey(), $entityType, $externalId);
+        $mappingComponent = new MappingComponentStruct($this->getPortalNodeKey(), new EntityTypeClassString($entityType), $externalId);
         $payload = new IdentityErrorCreatePayloads([new IdentityErrorCreatePayload($mappingComponent, $throwable)]);
 
         $this->identityErrorCreateAction->create($payload);

@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\AttachmentCollection;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DependencyCollection;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
@@ -67,7 +68,7 @@ final class ExplorationActor implements ExplorationActorInterface
     }
 
     public function performExploration(
-        string $entityType,
+        EntityTypeClassString $entityType,
         ExplorerStackInterface $stack,
         ExploreContextInterface $context
     ): void {
@@ -173,15 +174,13 @@ final class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     *
      * @throws UnsupportedStorageKeyException
      */
     private function flushDirectEmissions(
         EmitterStackInterface $emissionStack,
         EmitContextInterface $emitContext,
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityType,
+        EntityTypeClassString $entityType,
         array $primaryKeys
     ): void {
         $this->logger->debug(\sprintf(
@@ -201,13 +200,11 @@ final class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     *
      * @throws UnsupportedStorageKeyException
      */
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityType,
+        EntityTypeClassString $entityType,
         array $externalIds
     ): void {
         $this->logger->debug(\sprintf(
@@ -230,13 +227,12 @@ final class ExplorationActor implements ExplorationActorInterface
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     * @param string[]                            $primaryKeys
+     * @param string[] $primaryKeys
      */
-    private function factorizeMappableEntities(string $entityType, array $primaryKeys): TypedDatasetEntityCollection
+    private function factorizeMappableEntities(EntityTypeClassString $entityType, array $primaryKeys): TypedDatasetEntityCollection
     {
         $result = new TypedDatasetEntityCollection($entityType);
-        $entityFactory = new \ReflectionClass($entityType);
+        $entityFactory = new \ReflectionClass($entityType->getClassString());
 
         foreach ($primaryKeys as $primaryKey) {
             $entity = $entityFactory->newInstanceWithoutConstructor();

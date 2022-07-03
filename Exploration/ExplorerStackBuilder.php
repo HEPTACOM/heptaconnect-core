@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
@@ -18,10 +18,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     private ExplorerCollection $decorators;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
+    private EntityTypeClassString $entityType;
 
     private LoggerInterface $logger;
 
@@ -30,12 +27,9 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
      */
     private array $explorers = [];
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
     public function __construct(
         ExplorerCollection $sources,
-        string $entityType,
+        EntityTypeClassString $entityType,
         LoggerInterface $logger
     ) {
         $sources = new ExplorerCollection($sources->bySupport($entityType));
@@ -47,7 +41,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function push(ExplorerContract $explorer): self
     {
-        if (\is_a($this->entityType, $explorer->supports(), true)) {
+        if ($this->entityType->same($explorer->getSupportedEntityType())) {
             $this->logger->debug('ExplorerStackBuilder: Pushed an arbitrary explorer.', [
                 'explorer' => $explorer,
             ]);

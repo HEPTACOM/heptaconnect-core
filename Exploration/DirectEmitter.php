@@ -6,26 +6,21 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 
 final class DirectEmitter extends EmitterContract
 {
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $supports;
+    private EntityTypeClassString $supports;
 
     /**
      * @psalm-var DatasetEntityCollection<DatasetEntityContract>
      */
     private DatasetEntityCollection $entities;
 
-    /**
-     * @param class-string<DatasetEntityContract> $supports
-     */
-    public function __construct(string $supports)
+    public function __construct(EntityTypeClassString $supports)
     {
         $this->supports = $supports;
         $this->entities = new DatasetEntityCollection();
@@ -45,7 +40,7 @@ final class DirectEmitter extends EmitterContract
 
     public function supports(): string
     {
-        return $this->supports;
+        return $this->supports->getClassString();
     }
 
     /**

@@ -13,7 +13,8 @@ use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -53,12 +54,12 @@ final class ExploreService implements ExploreServiceInterface
     {
         $jobs = new JobCollection();
 
-        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType => $supportedEntityType) {
             if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
                 continue;
             }
 
-            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType . '_NO_ID'))]);
+            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedEntityType, $supportedEntityType . '_NO_ID'))]);
         }
 
         $this->jobDispatcher->dispatch($jobs);
@@ -68,42 +69,42 @@ final class ExploreService implements ExploreServiceInterface
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
-        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType => $supportedEntityType) {
             if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
                 continue;
             }
 
             $builder = $this->explorerStackBuilderFactory
-                ->createExplorerStackBuilder($portalNodeKey, $supportedType)
+                ->createExplorerStackBuilder($portalNodeKey, $supportedEntityType)
                 ->pushSource()
                 ->pushDecorators();
 
             if ($builder->isEmpty()) {
                 $this->logger->critical(LogMessage::EXPLORE_NO_EXPLORER_FOR_TYPE(), [
-                    'type' => $supportedType,
+                    'type' => $supportedEntityType,
                 ]);
 
                 continue;
             }
 
-            $this->explorationActor->performExploration($supportedType, $builder->build(), $context);
+            $this->explorationActor->performExploration($supportedEntityType, $builder->build(), $context);
         }
     }
 
     /**
-     * @psalm-return array<array-key, class-string<DatasetEntityContract>>
-     *
-     * @return array|string[]
+     * @return array<class-string, EntityTypeClassString>
      */
     protected static function getSupportedTypes(ExplorerCollection $explorers): array
     {
         $types = [];
 
+        /** @var ExplorerContract $explorer */
         foreach ($explorers as $explorer) {
-            $types[$explorer->supports()] = true;
+            $type = $explorer->getSupportedEntityType();
+            $types[$type->getClassString()] = $type;
         }
 
-        return \array_keys($types);
+        return $types;
     }
 
     protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection

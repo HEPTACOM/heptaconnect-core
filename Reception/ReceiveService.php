@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
@@ -60,7 +60,7 @@ final class ReceiveService implements ReceiveServiceInterface
             return;
         }
 
-        $type = $entities->getType();
+        $type = $entities->getEntityType();
         $stack = $this->getReceiverStack($portalNodeKey, $type);
 
         if (!$stack instanceof ReceiverStackInterface) {
@@ -76,12 +76,12 @@ final class ReceiveService implements ReceiveServiceInterface
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     *
      * @throws UnsupportedStorageKeyException
      */
-    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
-    {
+    private function getReceiverStack(
+        PortalNodeKeyInterface $portalNodeKey,
+        EntityTypeClassString $entityType
+    ): ?ReceiverStackInterface {
         $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {

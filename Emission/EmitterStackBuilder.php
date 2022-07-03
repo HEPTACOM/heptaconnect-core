@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -18,10 +18,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     private EmitterCollection $decorators;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
+    private EntityTypeClassString $entityType;
 
     private LoggerInterface $logger;
 
@@ -30,12 +27,9 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
      */
     private array $emitters = [];
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
     public function __construct(
         EmitterCollection $sources,
-        string $entityType,
+        EntityTypeClassString $entityType,
         LoggerInterface $logger
     ) {
         $sources = new EmitterCollection($sources->bySupport($entityType));
@@ -47,7 +41,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function push(EmitterContract $emitter): self
     {
-        if (\is_a($this->entityType, $emitter->supports(), true)) {
+        if ($this->entityType->same($emitter->getSupportedEntityType())) {
             $this->logger->debug('EmitterStackBuilder: Pushed an arbitrary emitter.', [
                 'emitter' => $emitter,
             ]);

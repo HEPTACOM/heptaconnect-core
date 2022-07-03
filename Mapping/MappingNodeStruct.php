@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Support\EntityTypeClassString;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
@@ -12,15 +12,9 @@ final class MappingNodeStruct implements MappingNodeStructInterface
 {
     private MappingNodeKeyInterface $id;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
+    private EntityTypeClassString $entityType;
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
-    public function __construct(MappingNodeKeyInterface $id, string $entityType)
+    public function __construct(MappingNodeKeyInterface $id, EntityTypeClassString $entityType)
     {
         $this->id = $id;
         $this->entityType = $entityType;
@@ -38,18 +32,12 @@ final class MappingNodeStruct implements MappingNodeStructInterface
         return $this;
     }
 
-    /**
-     * @return class-string<DatasetEntityContract>
-     */
-    public function getEntityType(): string
+    public function getEntityType(): EntityTypeClassString
     {
         return $this->entityType;
     }
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
-    public function setEntityType(string $entityType): self
+    public function setEntityType(EntityTypeClassString $entityType): self
     {
         $this->entityType = $entityType;
 
