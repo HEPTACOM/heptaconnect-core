@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
@@ -80,7 +80,7 @@ final class ReceiveService implements ReceiveServiceInterface
      */
     private function getReceiverStack(
         PortalNodeKeyInterface $portalNodeKey,
-        EntityTypeClassString $entityType
+        EntityType $entityType
     ): ?ReceiverStackInterface {
         $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 

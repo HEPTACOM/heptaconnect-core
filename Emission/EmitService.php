@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
@@ -95,7 +95,7 @@ final class EmitService implements EmitServiceInterface
     /**
      * @throws UnsupportedStorageKeyException
      */
-    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, EntityTypeClassString $entityType): ?EmitterStackInterface
+    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ?EmitterStackInterface
     {
         $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 

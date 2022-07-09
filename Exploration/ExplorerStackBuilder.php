@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
@@ -18,7 +18,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     private ExplorerCollection $decorators;
 
-    private EntityTypeClassString $entityType;
+    private EntityType $entityType;
 
     private LoggerInterface $logger;
 
@@ -29,7 +29,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function __construct(
         ExplorerCollection $sources,
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         LoggerInterface $logger
     ) {
         $sources = new ExplorerCollection($sources->bySupport($entityType));

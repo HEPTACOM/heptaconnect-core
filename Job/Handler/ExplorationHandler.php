@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassStringCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
@@ -64,7 +64,7 @@ final class ExplorationHandler implements ExplorationHandlerInterface
             $jobKeys = new JobKeyCollection($jobKeys[$key]);
 
             $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-            $this->exploreService->explore($portalNodeKey, new EntityTypeClassStringCollection($type));
+            $this->exploreService->explore($portalNodeKey, new EntityTypeCollection($type));
             $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
         }
     }

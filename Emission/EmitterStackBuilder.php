@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -18,7 +18,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     private EmitterCollection $decorators;
 
-    private EntityTypeClassString $entityType;
+    private EntityType $entityType;
 
     private LoggerInterface $logger;
 
@@ -29,7 +29,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function __construct(
         EmitterCollection $sources,
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         LoggerInterface $logger
     ) {
         $sources = new EmitterCollection($sources->bySupport($entityType));

@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
@@ -53,7 +53,7 @@ final class EmissionHandler implements EmissionHandlerInterface
                 $jobKeys = new JobKeyCollection($processedChunks[$chunkKey] ?? []);
 
                 $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                $this->emitService->emit(new TypedMappingComponentCollection(new EntityTypeClassString($dataType), $emissionChunk));
+                $this->emitService->emit(new TypedMappingComponentCollection(new EntityType($dataType), $emissionChunk));
                 $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
             }
         }

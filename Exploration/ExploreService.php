@@ -13,9 +13,7 @@ use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassStringCollection;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -51,10 +49,8 @@ final class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher = $jobDispatcher;
     }
 
-    public function dispatchExploreJob(
-        PortalNodeKeyInterface $portalNodeKey,
-        ?EntityTypeClassStringCollection $entityTypes = null
-    ): void {
+    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
+    {
         $jobs = new JobCollection();
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
@@ -68,10 +64,8 @@ final class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher->dispatch($jobs);
     }
 
-    public function explore(
-        PortalNodeKeyInterface $portalNodeKey,
-        ?EntityTypeClassStringCollection $entityTypes = null
-    ): void {
+    public function explore(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
+    {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
@@ -96,9 +90,9 @@ final class ExploreService implements ExploreServiceInterface
         }
     }
 
-    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeClassStringCollection
+    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
     {
-        return new EntityTypeClassStringCollection($explorers->column('getSupportedEntityType'));
+        return new EntityTypeCollection($explorers->column('getSupportedEntityType'));
     }
 
     protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection

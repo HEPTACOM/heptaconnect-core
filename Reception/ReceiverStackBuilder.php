@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
@@ -20,7 +20,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     private LoggerInterface $logger;
 
-    private EntityTypeClassString $entityType;
+    private EntityType $entityType;
 
     /**
      * @var ReceiverContract[]
@@ -29,7 +29,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function __construct(
         ReceiverCollection $sources,
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         LoggerInterface $logger
     ) {
         $sources = new ReceiverCollection($sources->bySupport($entityType));

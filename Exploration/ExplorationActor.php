@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\AttachmentCollection;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DependencyCollection;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
@@ -68,7 +68,7 @@ final class ExplorationActor implements ExplorationActorInterface
     }
 
     public function performExploration(
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         ExplorerStackInterface $stack,
         ExploreContextInterface $context
     ): void {
@@ -180,7 +180,7 @@ final class ExplorationActor implements ExplorationActorInterface
         EmitterStackInterface $emissionStack,
         EmitContextInterface $emitContext,
         PortalNodeKeyInterface $portalNodeKey,
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         array $primaryKeys
     ): void {
         $this->logger->debug(\sprintf(
@@ -204,7 +204,7 @@ final class ExplorationActor implements ExplorationActorInterface
      */
     private function flushPublications(
         PortalNodeKeyInterface $portalNodeKey,
-        EntityTypeClassString $entityType,
+        EntityType $entityType,
         array $externalIds
     ): void {
         $this->logger->debug(\sprintf(
@@ -229,7 +229,7 @@ final class ExplorationActor implements ExplorationActorInterface
     /**
      * @param string[] $primaryKeys
      */
-    private function factorizeMappableEntities(EntityTypeClassString $entityType, array $primaryKeys): TypedDatasetEntityCollection
+    private function factorizeMappableEntities(EntityType $entityType, array $primaryKeys): TypedDatasetEntityCollection
     {
         $result = new TypedDatasetEntityCollection($entityType);
         $entityFactory = new \ReflectionClass($entityType->getClassString());

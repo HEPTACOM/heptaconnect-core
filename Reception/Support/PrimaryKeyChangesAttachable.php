@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Reception\Support;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachableInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface;
-use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
@@ -20,14 +20,14 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
 
     private ?string $foreignKey = null;
 
-    public function __construct(EntityTypeClassString $entityType)
+    public function __construct(EntityType $entityType)
     {
         $this->entityType = $entityType->getClassString();
     }
 
-    public function getForeignEntityType(): EntityTypeClassString
+    public function getForeignEntityType(): EntityType
     {
-        return new EntityTypeClassString($this->entityType);
+        return new EntityType($this->entityType);
     }
 
     public function getForeignKeys(): array
