@@ -38,17 +38,17 @@ final class DirectEmitter extends EmitterContract
         yield from $this->emitNext($stack, $externalIds, $context);
     }
 
-    protected function supports(): string
-    {
-        return $this->supports->getClassString();
-    }
-
     /**
      * @psalm-return DatasetEntityCollection<DatasetEntityContract>
      */
     public function getEntities(): DatasetEntityCollection
     {
         return $this->entities;
+    }
+
+    protected function supports(): string
+    {
+        return $this->supports->getClassString();
     }
 
     protected function batch(iterable $externalIds, EmitContextInterface $context): iterable
