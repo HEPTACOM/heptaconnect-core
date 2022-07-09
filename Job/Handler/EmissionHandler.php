@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
@@ -40,9 +41,10 @@ final class EmissionHandler implements EmissionHandlerInterface
         /** @var JobKeyInterface[][] $processed */
         $processed = [];
 
+        /** @var JobData $job */
         foreach ($jobs as $job) {
-            $emissions[$job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
-            $processed[$job->getMappingComponent()->getEntityType()][] = $job->getJobKey();
+            $emissions[(string) $job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
+            $processed[(string) $job->getMappingComponent()->getEntityType()][] = $job->getJobKey();
         }
 
         foreach ($emissions as $dataType => $emission) {
