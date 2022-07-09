@@ -38,7 +38,7 @@ final class DirectEmitter extends EmitterContract
         yield from $this->emitNext($stack, $externalIds, $context);
     }
 
-    public function supports(): string
+    protected function supports(): string
     {
         return $this->supports->getClassString();
     }
