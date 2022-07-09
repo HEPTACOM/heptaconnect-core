@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassString;
+use Heptacom\HeptaConnect\Dataset\Base\EntityTypeClassStringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
@@ -50,61 +51,54 @@ final class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher = $jobDispatcher;
     }
 
-    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
-    {
+    public function dispatchExploreJob(
+        PortalNodeKeyInterface $portalNodeKey,
+        ?EntityTypeClassStringCollection $entityTypes = null
+    ): void {
         $jobs = new JobCollection();
 
-        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType => $supportedEntityType) {
-            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
                 continue;
             }
 
-            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedEntityType, $supportedEntityType . '_NO_ID'))]);
+            $jobs->push([new Exploration(new MappingComponentStruct($portalNodeKey, $supportedType, $supportedType . '_NO_ID'))]);
         }
 
         $this->jobDispatcher->dispatch($jobs);
     }
 
-    public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
-    {
+    public function explore(
+        PortalNodeKeyInterface $portalNodeKey,
+        ?EntityTypeClassStringCollection $entityTypes = null
+    ): void {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
-        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType => $supportedEntityType) {
-            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+        foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
+            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
                 continue;
             }
 
             $builder = $this->explorerStackBuilderFactory
-                ->createExplorerStackBuilder($portalNodeKey, $supportedEntityType)
+                ->createExplorerStackBuilder($portalNodeKey, $supportedType)
                 ->pushSource()
                 ->pushDecorators();
 
             if ($builder->isEmpty()) {
                 $this->logger->critical(LogMessage::EXPLORE_NO_EXPLORER_FOR_TYPE(), [
-                    'type' => $supportedEntityType,
+                    'type' => $supportedType,
                 ]);
 
                 continue;
             }
 
-            $this->explorationActor->performExploration($supportedEntityType, $builder->build(), $context);
+            $this->explorationActor->performExploration($supportedType, $builder->build(), $context);
         }
     }
 
-    /**
-     * @return array<class-string, EntityTypeClassString>
-     */
-    protected static function getSupportedTypes(ExplorerCollection $explorers): array
+    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeClassStringCollection
     {
-        $types = [];
-
-        /** @var ExplorerContract $explorer */
-        foreach ($explorers as $explorer) {
-            $type = $explorer->getSupportedEntityType();
-            $types[$type->getClassString()] = $type;
-        }
-
-        return $types;
+        return new EntityTypeClassStringCollection($explorers->column('getSupportedEntityType'));
     }
 
     protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
