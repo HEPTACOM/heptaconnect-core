@@ -41,7 +41,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function push(ReceiverContract $receiver): self
     {
-        if ($this->entityType->same($receiver->getSupportedEntityType())) {
+        if ($this->entityType->equals($receiver->getSupportedEntityType())) {
             $this->logger->debug('ReceiverStackBuilder: Pushed an arbitrary receiver.', [
                 'receiver' => $receiver,
             ]);

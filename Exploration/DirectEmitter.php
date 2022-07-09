@@ -48,7 +48,7 @@ final class DirectEmitter extends EmitterContract
 
     protected function supports(): string
     {
-        return $this->supports->getClassString();
+        return (string) $this->supports;
     }
 
     protected function batch(iterable $externalIds, EmitContextInterface $context): iterable

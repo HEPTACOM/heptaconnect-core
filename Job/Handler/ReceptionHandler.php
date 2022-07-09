@@ -119,7 +119,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     throw new ReceptionJobHandlingException($job, 1636503506);
                 }
 
-                if (!$route->getEntityType()->same($entity::class())) {
+                if (!$route->getEntityType()->equals($entity::class())) {
                     throw new ReceptionJobHandlingException($job, 1636503507);
                 }
 

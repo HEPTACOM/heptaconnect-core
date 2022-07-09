@@ -232,7 +232,7 @@ final class ExplorationActor implements ExplorationActorInterface
     private function factorizeMappableEntities(EntityType $entityType, array $primaryKeys): TypedDatasetEntityCollection
     {
         $result = new TypedDatasetEntityCollection($entityType);
-        $entityFactory = new \ReflectionClass($entityType->getClassString());
+        $entityFactory = new \ReflectionClass((string) $entityType);
 
         foreach ($primaryKeys as $primaryKey) {
             $entity = $entityFactory->newInstanceWithoutConstructor();

@@ -41,7 +41,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function push(ExplorerContract $explorer): self
     {
-        if ($this->entityType->same($explorer->getSupportedEntityType())) {
+        if ($this->entityType->equals($explorer->getSupportedEntityType())) {
             $this->logger->debug('ExplorerStackBuilder: Pushed an arbitrary explorer.', [
                 'explorer' => $explorer,
             ]);

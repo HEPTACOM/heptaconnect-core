@@ -41,7 +41,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function push(EmitterContract $emitter): self
     {
-        if ($this->entityType->same($emitter->getSupportedEntityType())) {
+        if ($this->entityType->equals($emitter->getSupportedEntityType())) {
             $this->logger->debug('EmitterStackBuilder: Pushed an arbitrary emitter.', [
                 'emitter' => $emitter,
             ]);

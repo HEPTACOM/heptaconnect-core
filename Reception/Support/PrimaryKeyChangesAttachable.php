@@ -22,7 +22,7 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
 
     public function __construct(EntityType $entityType)
     {
-        $this->entityType = $entityType->getClassString();
+        $this->entityType = (string) $entityType;
     }
 
     public function getForeignEntityType(): EntityType
