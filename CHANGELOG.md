@@ -34,10 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change `$dataTypes` parameter in `\Heptacom\HeptaConnect\Core\Exploration\ExploreService::explore`, `\Heptacom\HeptaConnect\Core\Exploration\ExploreService::dispatchExploreJob`, `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface::explore` and `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface::dispatchExploreJob` to be a `\Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection` instead of an array of string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
 - Change return type of `\Heptacom\HeptaConnect\Core\Mapping\MappingNodeStruct::getEntityType`, `\Heptacom\HeptaConnect\Core\Mapping\MappingStruct::getEntityType` and `\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable::getForeignEntityType` to be `\Heptacom\HeptaConnect\Dataset\Base\EntityType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
 - Update implementation `\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable` to match changes in `\Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface`
+- Change `$class` parameter in `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract::instantiatePortal` to be a `\Heptacom\HeptaConnect\Portal\Base\Portal\PortalType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
+- Change `$class` parameter in `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract::instantiatePortalExtension` to be a `\Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
 
 ### Deprecated
 
 ### Removed
+
+- Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException` and `\Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException` as their condition origin will occur earlier related to either `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException`, `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException` or `\Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException` will be thrown instead
 
 ### Fixed
 

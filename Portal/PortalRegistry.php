@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -14,7 +15,6 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriter
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExtensionFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Heptacom\HeptaConnect\Storage\Base\Exception\InvalidPortalNodeKeyException;
 use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 
 final class PortalRegistry implements PortalRegistryInterface
@@ -29,6 +29,13 @@ final class PortalRegistry implements PortalRegistryInterface
 
     private PortalExtensionFindActionInterface $portalExtensionFindAction;
 
+    /**
+     * @var array{
+     *     classes: array<string, PortalType>,
+     *     portals: array<string, PortalContract>,
+     *     portalExtensions: array
+     * }
+     */
     private array $cache = [
         'classes' => [],
         'portals' => [],
@@ -55,11 +62,6 @@ final class PortalRegistry implements PortalRegistryInterface
         $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
 
         if (!isset($this->cache['portals'][$cacheKey])) {
-            if (!\is_a($portalClass, PortalContract::class, true)) {
-                throw new InvalidPortalNodeKeyException($portalNodeKey);
-            }
-
-            /* @phpstan-ignore-next-line $portalClass is class-string<\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract> */
             $this->cache['portals'][$cacheKey] = $this->portalFactory->instantiatePortal($portalClass);
         }
 
@@ -86,17 +88,14 @@ final class PortalRegistry implements PortalRegistryInterface
         return $this->cache['portalExtensions'][$cacheKey];
     }
 
-    private function getPortalNodeClassCached(PortalNodeKeyInterface $portalNodeKey): ?string
+    private function getPortalNodeClassCached(PortalNodeKeyInterface $portalNodeKey): ?PortalType
     {
         $cacheKey = \md5($this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias()));
 
         return $this->cache['classes'][$cacheKey] ?? ($this->cache['classes'][$cacheKey] = $this->getPortalNodeClass($portalNodeKey));
     }
 
-    /**
-     * @return class-string<PortalContract>|null
-     */
-    private function getPortalNodeClass(PortalNodeKeyInterface $portalNodeKey): ?string
+    private function getPortalNodeClass(PortalNodeKeyInterface $portalNodeKey): ?PortalType
     {
         if ($portalNodeKey instanceof PreviewPortalNodeKey) {
             return $portalNodeKey->getPortalType();
@@ -105,7 +104,7 @@ final class PortalRegistry implements PortalRegistryInterface
         $nodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey])));
 
         foreach ($nodes as $portalNode) {
-            return $portalNode->getPortalClass();
+            return new PortalType((string) $portalNode->getPortalClass());
         }
 
         return null;
