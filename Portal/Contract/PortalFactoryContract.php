@@ -10,8 +10,8 @@ use Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInCon
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 
 abstract class PortalFactoryContract
 {
@@ -50,7 +50,7 @@ abstract class PortalFactoryContract
             throw new UnexpectedRequiredParameterInConstructorOnInstantionException((string) $class);
         }
 
-        $classString = $class->getClassString();
+        $classString = (string) $class;
 
         return new $classString();
     }

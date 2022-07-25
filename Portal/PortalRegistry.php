@@ -7,8 +7,8 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
@@ -31,10 +31,10 @@ final class PortalRegistry implements PortalRegistryInterface
 
     /**
      * @var array{
-     *     classes: array<string, PortalType>,
-     *     portals: array<string, PortalContract>,
-     *     portalExtensions: array
-     * }
+     *             classes: array<string, PortalType>,
+     *             portals: array<string, PortalContract>,
+     *             portalExtensions: array
+     *             }
      */
     private array $cache = [
         'classes' => [],

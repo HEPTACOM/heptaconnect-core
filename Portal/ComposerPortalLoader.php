@@ -13,12 +13,11 @@ use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException;
 use Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException;
 use Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Psr\Log\LoggerInterface;
 
 class ComposerPortalLoader
