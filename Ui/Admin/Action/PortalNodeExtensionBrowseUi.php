@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
@@ -73,11 +74,11 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         foreach ($portalNodeGetResults as $portalNodeGetResult) {
             $supportedExtensions = $this->portalLoader->getPortalExtensions()->bySupport($portalNodeGetResult->getPortalClass());
 
+            /** @var PortalExtensionContract $extension */
             foreach ($supportedExtensions as $extension) {
-                $extensionClass = \get_class($extension);
                 $isActive = $findResult->isActive($extension);
 
-                yield new PortalNodeExtensionBrowseResult($portalNodeKey, $isActive, $extensionClass);
+                yield new PortalNodeExtensionBrowseResult($portalNodeKey, $isActive, $extension::class());
             }
         }
     }
