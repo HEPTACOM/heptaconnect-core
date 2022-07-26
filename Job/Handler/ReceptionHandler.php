@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -188,6 +189,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                             continue;
                         }
 
+                        $entityType = new EntityType($dataType);
+
                         /** @var DatasetEntityContract[] $rawEntities */
                         $rawEntities = \array_column($entities, 'entity');
                         /** @var array<DatasetEntityContract|object> $allEntities */
@@ -203,7 +206,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                         $jobKeys = new JobKeyCollection(\array_values(\array_column($entities, 'jobKey')));
 
                         $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                        $this->receiveService->receive(new TypedDatasetEntityCollection($dataType, $rawEntities), $targetPortalNodeKey);
+                        $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
                         $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                     }
                 }

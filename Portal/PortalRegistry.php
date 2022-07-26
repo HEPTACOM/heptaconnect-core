@@ -61,7 +61,7 @@ final class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
         $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
 
-        if (!isset($this->cache['portals'][$cacheKey])) {
+        if ($portalClass !== null && !isset($this->cache['portals'][$cacheKey])) {
             $this->cache['portals'][$cacheKey] = $this->portalFactory->instantiatePortal($portalClass);
         }
 
@@ -73,7 +73,7 @@ final class PortalRegistry implements PortalRegistryInterface
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
         $cacheKey = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
 
-        if (!isset($this->cache['portalExtensions'][$cacheKey])) {
+        if ($portalClass !== null && !isset($this->cache['portalExtensions'][$cacheKey])) {
             $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
             if ($extensions->count() > 0 && !$portalNodeKey instanceof PreviewPortalNodeKey) {
