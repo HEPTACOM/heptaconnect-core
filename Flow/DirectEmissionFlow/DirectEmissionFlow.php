@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
 use Heptacom\HeptaConnect\Core\Exploration\DirectEmitter;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionResult;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\Exception\UnidentifiedEntityException;
@@ -62,18 +63,20 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
             $this->logger->error($exception->getMessage());
         }
 
+        /** @var class-string<DatasetEntityContract> $type */
         foreach ($entities->groupByType() as $type => $entitiesByType) {
+            $entityType = new EntityType($type);
             /** @var string[] $externalIds */
             $externalIds = \array_filter(\iterable_to_array($entitiesByType->map(
                 static fn (DatasetEntityContract $entity): ?string => $entity->getPrimaryKey()
             )), static fn (?string $primaryKey): bool => $primaryKey !== null);
 
             try {
-                $directEmitter = new DirectEmitter($type);
+                $directEmitter = new DirectEmitter($entityType);
                 $directEmitter->getEntities()->push($entitiesByType);
 
                 $emissionStack = $this->emitterStackBuilderFactory
-                    ->createEmitterStackBuilder($portalNodeKey, $type)
+                    ->createEmitterStackBuilder($portalNodeKey, $entityType)
                     ->push($directEmitter)
                     ->pushDecorators()
                     ->build();

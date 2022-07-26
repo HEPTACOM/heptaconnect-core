@@ -20,7 +20,7 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortal(PortalType $class): PortalContract
     {
-        return $this->instantiateObject($class);
+        return $this->instantiateObject((string) $class);
     }
 
     /**
@@ -28,30 +28,32 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortalExtension(PortalExtensionType $class): PortalExtensionContract
     {
-        return $this->instantiateObject($class);
+        return $this->instantiateObject((string) $class);
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T> $class
+     *
      * @throws AbstractInstantiationException
      *
-     * @return PortalContract|PortalExtensionContract
+     * @return T
      */
-    private function instantiateObject(ClassStringContract $class): object
+    private function instantiateObject(string $class): object
     {
-        $reflection = new \ReflectionClass((string) $class);
+        $reflection = new \ReflectionClass($class);
 
         if (!$reflection->isInstantiable()) {
-            throw new InaccessableConstructorOnInstantionException((string) $class);
+            throw new InaccessableConstructorOnInstantionException($class);
         }
 
         $ctor = $reflection->getConstructor();
 
         if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
-            throw new UnexpectedRequiredParameterInConstructorOnInstantionException((string) $class);
+            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($class);
         }
 
-        $classString = (string) $class;
-
-        return new $classString();
+        return new $class();
     }
 }

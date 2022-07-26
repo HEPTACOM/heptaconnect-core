@@ -49,6 +49,10 @@ class ComposerPortalLoader
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
             foreach ($portals as $portal) {
+                if (!\is_string($portal)) {
+                    continue;
+                }
+
                 try {
                     $portalCollection->push([$this->portalFactory->instantiatePortal(new PortalType($portal))]);
                 } catch (AbstractInstantiationException|InvalidSubtypeClassNameException|InvalidClassNameException $exception) {
