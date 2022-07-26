@@ -7,7 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\InaccessableConstructorOnInstantionException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
