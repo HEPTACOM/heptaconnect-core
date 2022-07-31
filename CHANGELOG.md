@@ -25,6 +25,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650718861` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when the portal node alias is already taken
 - Add exception code `1650718862` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation fails due to a storage exception
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface`
+- Add exception code `1659293800` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when reading known routes from storage fails
+- Add exception code `1659293801` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when route that does not exist is tried to be deleted
+- Add exception code `1659293802` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when deleting routes fails in storage
 
 ### Changed
 
