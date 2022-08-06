@@ -49,7 +49,7 @@ class PortalStackServiceContainerFactory
         );
         $container->compile();
         $result = new PortalNodeContainerFacade($container);
-        $this->portalContainers[$key] = result;
+        $this->portalContainers[$key] = $result;
 
         return $result;
     }
