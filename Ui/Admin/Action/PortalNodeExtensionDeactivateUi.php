@@ -6,6 +6,8 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionTypeCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalExtension\Deactivate\PortalExtensionDeactivatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
@@ -57,7 +59,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
             $portalExtensionDeactivatePayload = new PortalExtensionDeactivatePayload($portalNodeKey);
             $portalExtensions = $this->portalLoader->getPortalExtensions()->bySupport($portalNodeGetResult->getPortalClass());
             $portalExtensionState = $this->portalExtensionFindAction->find($portalNodeKey);
-            $alreadyInactiveExtensions = [];
+            $alreadyInactiveExtensions = new PortalExtensionTypeCollection();
 
             foreach ($payload->getPortalExtensionQueries() as $query) {
                 $queriedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
@@ -66,18 +68,19 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
                     throw new NoMatchForPackageQueryException($query, 1650731999);
                 }
 
+                /** @var PortalExtensionContract $portalExtension */
                 foreach ($queriedPortalExtensions as $portalExtension) {
-                    $portalExtensionClass = \get_class($portalExtension);
+                    $portalExtensionType = $portalExtension::class();
 
-                    if ($portalExtensionState->isActive($portalExtension)) {
-                        $portalExtensionDeactivatePayload->addExtension($portalExtensionClass);
+                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyInactiveExtensions->has($portalExtensionType)) {
+                        $portalExtensionDeactivatePayload->addExtension($portalExtensionType);
                     } else {
-                        $alreadyInactiveExtensions[] = $portalExtensionClass;
+                        $alreadyInactiveExtensions->push([$portalExtensionType]);
                     }
                 }
             }
 
-            if ($portalExtensionDeactivatePayload->getExtensions() === []) {
+            if ($portalExtensionDeactivatePayload->getExtensions()->count() < 1) {
                 throw new PortalExtensionsAreAlreadyInactiveOnPortalNodeException($portalNodeKey, $alreadyInactiveExtensions, 1650732000);
             }
 
