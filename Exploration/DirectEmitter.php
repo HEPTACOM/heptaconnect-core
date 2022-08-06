@@ -6,26 +6,21 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 
 final class DirectEmitter extends EmitterContract
 {
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $supports;
+    private EntityType $supports;
 
     /**
      * @psalm-var DatasetEntityCollection<DatasetEntityContract>
      */
     private DatasetEntityCollection $entities;
 
-    /**
-     * @param class-string<DatasetEntityContract> $supports
-     */
-    public function __construct(string $supports)
+    public function __construct(EntityType $supports)
     {
         $this->supports = $supports;
         $this->entities = new DatasetEntityCollection();
@@ -43,17 +38,17 @@ final class DirectEmitter extends EmitterContract
         yield from $this->emitNext($stack, $externalIds, $context);
     }
 
-    public function supports(): string
-    {
-        return $this->supports;
-    }
-
     /**
      * @psalm-return DatasetEntityCollection<DatasetEntityContract>
      */
     public function getEntities(): DatasetEntityCollection
     {
         return $this->entities;
+    }
+
+    protected function supports(): string
+    {
+        return (string) $this->supports;
     }
 
     protected function batch(iterable $externalIds, EmitContextInterface $context): iterable

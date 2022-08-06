@@ -52,7 +52,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
         if ($entityType !== null) {
             $entityFilter = static fn (iterable $flowComponents): iterable => \iterable_filter(
                 $flowComponents,
-                static fn ($flowComponent): bool => $flowComponent->supports() === $entityType
+                static fn ($flowComponent): bool => $entityType->equals($flowComponent->getSupportedEntityType())
             );
         }
 
@@ -61,7 +61,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
             foreach ($entityFilter($this->getExplorers($portalNodeKey)) as $flowComponent) {
                 yield new PortalEntityListResult(
                     $this->explorerCodeOriginFinder->findOrigin($flowComponent),
-                    $flowComponent->supports(),
+                    $flowComponent->getSupportedEntityType(),
                     ExplorerContract::class
                 );
             }
@@ -72,7 +72,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
             foreach ($entityFilter($this->getEmitters($portalNodeKey)) as $flowComponent) {
                 yield new PortalEntityListResult(
                     $this->emitterCodeOriginFinder->findOrigin($flowComponent),
-                    $flowComponent->supports(),
+                    $flowComponent->getSupportedEntityType(),
                     EmitterContract::class
                 );
             }
@@ -83,7 +83,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
             foreach ($entityFilter($this->getReceivers($portalNodeKey)) as $flowComponent) {
                 yield new PortalEntityListResult(
                     $this->receiverCodeOriginFinder->findOrigin($flowComponent),
-                    $flowComponent->supports(),
+                    $flowComponent->getSupportedEntityType(),
                     ReceiverContract::class
                 );
             }

@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
@@ -59,7 +59,7 @@ final class EmitService implements EmitServiceInterface
     public function emit(TypedMappingComponentCollection $mappingComponents): void
     {
         $emittingPortalNodes = [];
-        $entityType = $mappingComponents->getType();
+        $entityType = $mappingComponents->getEntityType();
 
         foreach ($mappingComponents as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
@@ -93,11 +93,9 @@ final class EmitService implements EmitServiceInterface
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     *
      * @throws UnsupportedStorageKeyException
      */
-    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?EmitterStackInterface
+    private function getEmitterStack(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ?EmitterStackInterface
     {
         $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
