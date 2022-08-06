@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStatusReportUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobRunUiActionInterface`
 - Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
@@ -25,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650718861` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when the portal node alias is already taken
 - Add exception code `1650718862` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation fails due to a storage exception
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
+- Add exception code `1659721163` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when one of the given jobs are not found in the job storage
+- Add exception code `1659721164` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when running the jobs fails at one point
 
 ### Changed
 
