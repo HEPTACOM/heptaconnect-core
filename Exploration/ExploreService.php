@@ -12,9 +12,8 @@ use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -50,12 +49,12 @@ final class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher = $jobDispatcher;
     }
 
-    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
+    public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
     {
         $jobs = new JobCollection();
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
-            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
                 continue;
             }
 
@@ -65,12 +64,12 @@ final class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher->dispatch($jobs);
     }
 
-    public function explore(PortalNodeKeyInterface $portalNodeKey, ?array $dataTypes = null): void
+    public function explore(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
-            if (\is_array($dataTypes) && !\in_array($supportedType, $dataTypes, true)) {
+            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
                 continue;
             }
 
@@ -91,27 +90,16 @@ final class ExploreService implements ExploreServiceInterface
         }
     }
 
-    /**
-     * @psalm-return array<array-key, class-string<DatasetEntityContract>>
-     *
-     * @return array|string[]
-     */
-    protected static function getSupportedTypes(ExplorerCollection $explorers): array
+    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
     {
-        $types = [];
-
-        foreach ($explorers as $explorer) {
-            $types[$explorer->supports()] = true;
-        }
-
-        return \array_keys($types);
+        return new EntityTypeCollection($explorers->column('getSupportedEntityType'));
     }
 
     protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $components = new ExplorerCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {
