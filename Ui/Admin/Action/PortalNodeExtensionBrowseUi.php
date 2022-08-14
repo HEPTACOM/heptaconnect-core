@@ -64,6 +64,9 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         }
     }
 
+    /**
+     * @return iterable<int, PortalNodeExtensionBrowseResult>
+     */
     private function iterateOverItems(PortalNodeKeyInterface $portalNodeKey): iterable
     {
         $findResult = $this->portalExtensionFindAction->find($portalNodeKey);
