@@ -29,7 +29,14 @@ final class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFi
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
-                            return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
+                            $startLine = $reflection->getStartLine();
+                            $endLine = $reflection->getEndLine();
+
+                            return new CodeOrigin(
+                                $filepath,
+                                $startLine !== false ? $startLine : -1,
+                                $endLine !== false ? $endLine : -1
+                            );
                         }
                     } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
@@ -45,7 +52,14 @@ final class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFi
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
-                return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
+                $startLine = $reflection->getStartLine();
+                $endLine = $reflection->getEndLine();
+
+                return new CodeOrigin(
+                    $filepath,
+                    $startLine !== false ? $startLine : -1,
+                    $endLine !== false ? $endLine : -1
+                );
             }
         } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($statusReporter, 1641079372, $e);

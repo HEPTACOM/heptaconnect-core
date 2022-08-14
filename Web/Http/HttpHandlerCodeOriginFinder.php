@@ -35,7 +35,14 @@ final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderIn
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
-                            return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
+                            $startLine = $reflection->getStartLine();
+                            $endLine = $reflection->getEndLine();
+
+                            return new CodeOrigin(
+                                $filepath,
+                                $startLine !== false ? $startLine : -1,
+                                $endLine !== false ? $endLine : -1
+                            );
                         }
                     } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
@@ -51,7 +58,14 @@ final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderIn
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
-                return new CodeOrigin($filepath, $reflection->getStartLine(), $reflection->getEndLine());
+                $startLine = $reflection->getStartLine();
+                $endLine = $reflection->getEndLine();
+
+                return new CodeOrigin(
+                    $filepath,
+                    $startLine !== false ? $startLine : -1,
+                    $endLine !== false ? $endLine : -1
+                );
             }
         } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($httpHandler, 1637607700, $e);

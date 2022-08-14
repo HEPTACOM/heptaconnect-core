@@ -170,7 +170,9 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $this->tagDefinitionSource($newDefinitions, ReceiverContract::class, self::RECEIVER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, HttpHandlerContract::class, self::WEB_HTTP_HANDLER_SOURCE_TAG, $packageClass);
-            $flowBuilderFiles[$packageClass] = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php') ?: [];
+
+            $globMatches = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php');
+            $flowBuilderFiles[$packageClass] = $globMatches !== false ? $globMatches : [];
         }
 
         foreach ($containerBuilder->getDefinitions() as $definition) {

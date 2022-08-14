@@ -66,7 +66,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             $config = new PackageConfiguration();
             $heptaconnectKeywords = \array_filter(
-                $packageInstance->getKeywords() ?? [],
+                $packageInstance->getKeywords(),
                 fn (string $k): bool => \str_starts_with($k, 'heptaconnect-')
             );
 
@@ -77,7 +77,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $config->setName($packageInstance->getName());
             $config->setTags(new StringCollection($heptaconnectKeywords));
 
-            $extra = $packageInstance->getExtra() ?? [];
+            $extra = $packageInstance->getExtra();
             $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
             if ($heptaconnect !== []) {
@@ -155,7 +155,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         CompletePackageInterface $package,
         ?string $workingDir
     ): iterable {
-        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload() ?? []);
+        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload());
         $installPath = $composer->getInstallationManager()->getInstallPath($package);
 
         foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
