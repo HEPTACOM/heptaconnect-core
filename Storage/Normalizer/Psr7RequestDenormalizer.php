@@ -29,6 +29,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
 
     /**
      * @param string|null $format
+     *
      * @return RequestInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])

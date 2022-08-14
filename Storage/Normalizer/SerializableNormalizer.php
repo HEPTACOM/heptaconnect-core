@@ -20,6 +20,7 @@ final class SerializableNormalizer implements NormalizerInterface
 
     /**
      * @param string|null $format
+     *
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])
