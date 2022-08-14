@@ -11,6 +11,9 @@ use Psr\Http\Message\ServerRequestInterface;
 
 interface HttpHandlingActorInterface
 {
+    /**
+     * Perform handling of the given HTTP request on the given stack.
+     */
     public function performHttpHandling(
         ServerRequestInterface $request,
         ResponseInterface $response,

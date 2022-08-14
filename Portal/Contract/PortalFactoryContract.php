@@ -12,9 +12,14 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 
+/**
+ * Factory service to instantiate main objects of packages like @see PortalContract, PortalExtensionContract
+ */
 abstract class PortalFactoryContract
 {
     /**
+     * Create a new instance of the given @see PortalType
+     *
      * @throws AbstractInstantiationException
      */
     public function instantiatePortal(PortalType $class): PortalContract
@@ -23,6 +28,8 @@ abstract class PortalFactoryContract
     }
 
     /**
+     * Create a new instance of the given @see PortalExtensionType
+     *
      * @throws AbstractInstantiationException
      */
     public function instantiatePortalExtension(PortalExtensionType $class): PortalExtensionContract

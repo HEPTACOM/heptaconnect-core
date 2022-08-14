@@ -10,6 +10,8 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 interface EmissionActorInterface
 {
     /**
+     * Perform an emission for the given ids on the given stack.
+     *
      * @param string[] $externalIds
      */
     public function performEmission(

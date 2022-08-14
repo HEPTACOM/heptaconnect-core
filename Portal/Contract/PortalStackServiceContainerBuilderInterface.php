@@ -13,6 +13,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 interface PortalStackServiceContainerBuilderInterface
 {
     /**
+     * Prepares a container builder to build a service container for the given scenario.
+     *
      * @throws DelegatingLoaderLoadException
      */
     public function build(

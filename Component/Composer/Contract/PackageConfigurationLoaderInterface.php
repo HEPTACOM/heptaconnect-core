@@ -8,5 +8,8 @@ use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection
 
 interface PackageConfigurationLoaderInterface
 {
+    /**
+     * Get all relevant packages and their relevant information.
+     */
     public function getPackageConfigurations(): PackageConfigurationCollection;
 }

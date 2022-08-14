@@ -10,6 +10,9 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterfac
 
 interface ExplorationActorInterface
 {
+    /**
+     * Perform an exploration for the given entity type on the given stack.
+     */
     public function performExploration(
         EntityType $entityType,
         ExplorerStackInterface $stack,

@@ -10,6 +10,9 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 
 interface ReceptionActorInterface
 {
+    /**
+     * Perform a reception for the given entities on the given stack.
+     */
     public function performReception(
         TypedDatasetEntityCollection $entities,
         ReceiverStackInterface $stack,
