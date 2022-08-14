@@ -28,6 +28,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
     }
 
     /**
+     * @param string|null $format
      * @return RequestInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])
@@ -51,6 +52,9 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
         return $request;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         if ($type !== $this->getType() || !\is_string($data)) {

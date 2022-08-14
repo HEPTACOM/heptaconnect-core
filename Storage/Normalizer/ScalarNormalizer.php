@@ -18,6 +18,7 @@ final class ScalarNormalizer implements NormalizerInterface
     }
 
     /**
+     * @param string|null $format
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])
@@ -29,6 +30,9 @@ final class ScalarNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsNormalization($data, $format = null)
     {
         return \is_bool($data) || \is_string($data) || $data === null || \is_float($data) || \is_int($data);

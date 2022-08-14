@@ -31,7 +31,7 @@ final class ConfigurationService implements ConfigurationServiceInterface
     private array $configurationProcessors;
 
     /**
-     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationFileReader
+     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors
      */
     public function __construct(
         PortalRegistryInterface $portalRegistry,

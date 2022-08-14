@@ -20,6 +20,9 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
         return $this->serializableDenormalizer->getType() . '+gzpress';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         return $this->serializableDenormalizer->denormalize(
@@ -30,6 +33,9 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
         );
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()

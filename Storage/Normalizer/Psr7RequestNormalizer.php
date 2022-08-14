@@ -10,6 +10,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 final class Psr7RequestNormalizer implements NormalizerInterface
 {
+    /**
+     * @param string|null $format
+     */
     public function supportsNormalization($data, $format = null)
     {
         return $data instanceof RequestInterface;
@@ -21,6 +24,7 @@ final class Psr7RequestNormalizer implements NormalizerInterface
     }
 
     /**
+     * @param string|null $format
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])

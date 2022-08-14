@@ -17,7 +17,7 @@ final class AllDefinitionDefaultsCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? (string) $id;
+            $class = $definition->getClass() ?? $id;
 
             if (!\array_key_exists('public', $definition->getChanges())) {
                 $definition->setPublic(true);

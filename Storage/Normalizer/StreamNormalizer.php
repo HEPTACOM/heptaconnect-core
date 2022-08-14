@@ -39,6 +39,9 @@ final class StreamNormalizer implements NormalizerInterface
         $this->logger = $logger;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsNormalization($data, $format = null)
     {
         return $data instanceof SerializableStream;
@@ -53,6 +56,7 @@ final class StreamNormalizer implements NormalizerInterface
     }
 
     /**
+     * @param string|null $format
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])
@@ -63,11 +67,13 @@ final class StreamNormalizer implements NormalizerInterface
 
         $mediaId = $context['mediaId'] ?? null;
         $filenameUuid = $mediaId === null ? Uuid::uuid4() : Uuid::uuid5(self::NS_FILENAME, $mediaId);
-        /** @var string|Hexadecimal $filename */
-        $filename = $filenameUuid->getHex();
+        /** @var string|Hexadecimal $generatedFilename */
+        $generatedFilename = $filenameUuid->getHex();
 
-        if (\class_exists(Hexadecimal::class) && $filename instanceof Hexadecimal) {
-            $filename = $filename->toString();
+        if (\class_exists(Hexadecimal::class) && $generatedFilename instanceof Hexadecimal) {
+            $filename = $generatedFilename->toString();
+        } else {
+            $filename = $generatedFilename;
         }
 
         $stream = $object->copy()->detach();

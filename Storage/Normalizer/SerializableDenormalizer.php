@@ -17,6 +17,9 @@ final class SerializableDenormalizer implements DenormalizerInterface
         return 'serializable';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!$this->supportsDenormalization($data, $type)) {
@@ -41,6 +44,9 @@ final class SerializableDenormalizer implements DenormalizerInterface
         return $result;
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()

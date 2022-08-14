@@ -12,11 +12,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 final class HttpClient extends HttpClientContract implements LoggerAwareInterface
 {
-    use LoggerAwareTrait;
+    private LoggerInterface $logger;
 
     private UriFactoryInterface $uriFactory;
 
@@ -25,6 +26,11 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         parent::__construct($client);
         $this->logger = new NullLogger();
         $this->uriFactory = $uriFactory;
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface

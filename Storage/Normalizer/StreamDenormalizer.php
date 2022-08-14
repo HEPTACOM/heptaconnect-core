@@ -35,6 +35,9 @@ final class StreamDenormalizer implements DenormalizerInterface
         return 'stream';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!\is_string($data)) {
@@ -54,6 +57,9 @@ final class StreamDenormalizer implements DenormalizerInterface
         return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         if (!\is_string($data)) {
