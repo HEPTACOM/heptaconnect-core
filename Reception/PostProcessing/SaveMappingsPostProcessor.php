@@ -124,8 +124,8 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
             return new IdentityPersistCreatePayload($mapping->getMappingNodeKey(), $externalId);
         } elseif ($externalId === null) {
             return new IdentityPersistDeletePayload($mapping->getMappingNodeKey());
-        } else {
-            return new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId);
         }
+
+        return new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId);
     }
 }

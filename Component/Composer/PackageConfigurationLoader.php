@@ -152,7 +152,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             $heptaconnectKeywords = \array_filter(
                 $packageInstance->getKeywords() ?? [],
-                static fn(string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
+                static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
             );
 
             if ($heptaconnectKeywords === []) {
@@ -178,7 +178,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $config->setTags(new StringCollection($heptaconnectKeywords));
 
         $extra = $packageInstance->getExtra() ?? [];
-        $heptaconnect = (array)($extra['heptaconnect'] ?? []);
+        $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
         if ($heptaconnect !== []) {
             /* @var array<array-key, string> $keywords */
