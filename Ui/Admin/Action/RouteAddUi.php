@@ -17,6 +17,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetA
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteCreateActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayloadCollection;
@@ -37,16 +38,20 @@ final class RouteAddUi implements RouteAddUiActionInterface
 
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     public function __construct(
         RouteCreateActionInterface $routeCreateAction,
         RouteFindActionInterface $routeFindAction,
         RouteGetActionInterface $routeGetAction,
-        PortalNodeGetActionInterface $portalNodeGetAction
+        PortalNodeGetActionInterface $portalNodeGetAction,
+        StorageKeyGeneratorContract $storageKeyGenerator
     ) {
         $this->routeCreateAction = $routeCreateAction;
         $this->routeFindAction = $routeFindAction;
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->routeGetAction = $routeGetAction;
+        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function add(RouteAddPayloadCollection $payloads): RouteAddResultCollection
@@ -62,8 +67,8 @@ final class RouteAddUi implements RouteAddUiActionInterface
                 $payload->getTargetPortalNodeKey(),
                 $payload->getEntityType(),
             ]);
-            $portalNodeKeys[\json_encode($payload->getSourcePortalNodeKey())] = $payload->getSourcePortalNodeKey();
-            $portalNodeKeys[\json_encode($payload->getTargetPortalNodeKey())] = $payload->getTargetPortalNodeKey();
+            $portalNodeKeys[$this->storageKeyGenerator->serialize($payload->getSourcePortalNodeKey())] = $payload->getSourcePortalNodeKey();
+            $portalNodeKeys[$this->storageKeyGenerator->serialize($payload->getTargetPortalNodeKey())] = $payload->getTargetPortalNodeKey();
 
             if ($checkedScenarios[$scenario] ?? false) {
                 continue;
@@ -99,7 +104,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
 
         /** @var PortalNodeGetResult $foundPortalNode */
         foreach ($foundPortalNodes as $foundPortalNode) {
-            unset($portalNodeKeys[\json_encode($foundPortalNode->getPortalNodeKey())]);
+            unset($portalNodeKeys[$this->storageKeyGenerator->serialize($foundPortalNode->getPortalNodeKey())]);
         }
 
         if ($portalNodeKeys !== []) {
