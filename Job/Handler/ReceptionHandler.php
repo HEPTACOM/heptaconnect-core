@@ -35,6 +35,12 @@ use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class ReceptionHandler implements ReceptionHandlerInterface
 {
     private LockFactory $lockFactory;
