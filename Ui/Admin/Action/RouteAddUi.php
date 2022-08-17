@@ -24,7 +24,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResultCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAlreadyExistsException;
 
 final class RouteAddUi implements RouteAddUiActionInterface
@@ -103,7 +103,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         }
 
         if ($portalNodeKeys !== []) {
-            throw new PortalNodeMissingException(\current($portalNodeKeys), 1654573096);
+            throw new PortalNodesMissingException(new PortalNodeKeyCollection(\array_values($portalNodeKeys)), 1654573096);
         }
 
         try {
