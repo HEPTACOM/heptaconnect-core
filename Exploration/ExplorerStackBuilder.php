@@ -95,7 +95,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     public function build(): ExplorerStackInterface
     {
         $explorerStack = new ExplorerStack(\array_map(
-            static fn (ExplorerContract $e) => clone $e,
+            static fn (ExplorerContract $explorer): ExplorerContract => clone $explorer,
             \array_reverse($this->explorers, false),
         ));
         $explorerStack->setLogger($this->logger);

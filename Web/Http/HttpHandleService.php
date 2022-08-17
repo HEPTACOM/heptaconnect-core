@@ -45,7 +45,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     private ResponseFactoryInterface $responseFactory;
 
-    private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
+    private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction;
 
     public function __construct(
         HttpHandlingActorInterface $actor,
@@ -54,7 +54,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ResponseFactoryInterface $responseFactory,
-        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction
+        WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction
     ) {
         $this->actor = $actor;
         $this->contextFactory = $contextFactory;
@@ -62,7 +62,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         $this->stackBuilderFactory = $stackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->responseFactory = $responseFactory;
-        $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
+        $this->httpHandlerConfigurationFindAction = $httpHandlerConfigurationFindAction;
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
@@ -73,7 +73,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
 
-        $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
         $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
 
         if (!$enabled) {

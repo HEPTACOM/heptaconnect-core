@@ -137,13 +137,13 @@ final class ConfigurationService implements ConfigurationServiceInterface
 
     private function processWriteConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
-        $write = fn (array $c) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
-            new PortalNodeConfigurationSetPayload($portalNodeKey, $c),
+        $write = fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+            new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
         ]));
 
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $writeConfiguration = $write;
-            $write = static fn (array $c) => $configurationProcessor->write($portalNodeKey, $c, $writeConfiguration);
+            $write = static fn (array $config) => $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
         }
 
         $write($configuration ?? []);

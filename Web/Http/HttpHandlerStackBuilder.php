@@ -94,7 +94,7 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function build(): HttpHandlerStackInterface
     {
         $stack = new HttpHandlerStack(\array_map(
-            static fn (HttpHandlerContract $e) => clone $e,
+            static fn (HttpHandlerContract $handler): HttpHandlerContract => clone $handler,
             \array_reverse($this->selection, false),
         ));
         $stack->setLogger($this->logger);
