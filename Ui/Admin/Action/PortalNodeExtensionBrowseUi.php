@@ -37,20 +37,10 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
     {
         $itemsLeft = $criteria->getPageSize();
         $page = $criteria->getPage();
-        $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
+        $skipFilter = $this->getSkipFilter($criteria);
 
         foreach ($this->iterateOverItems($criteria->getPortalNodeKey()) as $item) {
-            if (!$criteria->getShowActive() && $item->getActive()) {
-                continue;
-            }
-
-            if (!$criteria->getShowInactive() && !$item->getActive()) {
-                continue;
-            }
-
-            if ($itemsToSkip > 0) {
-                --$itemsToSkip;
-
+            if ($skipFilter($item)) {
                 continue;
             }
 
@@ -81,5 +71,37 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
                 yield new PortalNodeExtensionBrowseResult($portalNodeKey, $isActive, $extension::class());
             }
         }
+    }
+
+    private function getSkipFilter(PortalNodeExtensionBrowseCriteria $criteria): \Closure
+    {
+        $result = static fn (PortalNodeExtensionBrowseResult $item): bool => false;
+
+        if (!$criteria->getShowActive()) {
+            $oldResult = $result;
+            $result = static fn (PortalNodeExtensionBrowseResult $item): bool => $item->getActive() || $oldResult($item);
+        }
+
+        if (!$criteria->getShowInactive()) {
+            $oldResult = $result;
+            $result = static fn (PortalNodeExtensionBrowseResult $item): bool => !$item->getActive() || $oldResult($item);
+        }
+
+        $page = $criteria->getPage();
+        $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
+
+        return static function (PortalNodeExtensionBrowseResult $item) use (&$itemsToSkip, $result): bool {
+            if ($result($item)) {
+                return true;
+            }
+
+            if ($itemsToSkip > 0) {
+                --$itemsToSkip;
+
+                return true;
+            }
+
+            return false;
+        };
     }
 }
