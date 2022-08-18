@@ -32,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
 - Add exception code `1654573095` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when one of the requested route payloads already exists
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
-- Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create as many routes as expected
+- Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
 
 ### Changed
