@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Psr\Log\LoggerInterface;
 
 final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
@@ -94,11 +93,13 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function build(): ExplorerStackInterface
     {
-        $explorerStack = new ExplorerStack(\array_map(
-            static fn (ExplorerContract $e) => clone $e,
-            \array_reverse($this->explorers, false),
-        ));
-        $explorerStack->setLogger($this->logger);
+        $explorerStack = new ExplorerStack(
+            \array_map(
+                static fn (ExplorerContract $e) => clone $e,
+                \array_reverse($this->explorers, false),
+            ),
+            $this->logger
+        );
 
         $this->logger->debug('ExplorerStackBuilder: Built explorer stack.');
 
