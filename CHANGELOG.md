@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change `$class` parameter in `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract::instantiatePortalExtension` to be a `\Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
 - Replace `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` partially with stack processing service described in `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface`, that is implemented by `\Heptacom\HeptaConnect\Core\Emission\EmitterStackProcessor`
 - Replace `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` partially with job dispatching from emitter stacks in `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with stack processing service described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackProcessorInterface`, that is implemented by `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackProcessor`
 
 ### Deprecated
 
