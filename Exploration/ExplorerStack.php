@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
@@ -14,14 +15,17 @@ final class ExplorerStack implements ExplorerStackInterface
 {
     private ExplorerCollection $explorers;
 
+    private EntityType $entityType;
+
     private LoggerInterface $logger;
 
     /**
      * @param iterable<array-key, ExplorerContract> $explorers
      */
-    public function __construct(iterable $explorers, LoggerInterface $logger)
+    public function __construct(iterable $explorers, EntityType $entityType, LoggerInterface $logger)
     {
         $this->explorers = new ExplorerCollection($explorers);
+        $this->entityType = $entityType;
         $this->logger = $logger;
     }
 
@@ -38,5 +42,10 @@ final class ExplorerStack implements ExplorerStackInterface
         ]);
 
         return $explorer->explore($context, $this);
+    }
+
+    public function supports(): EntityType
+    {
+        return $this->entityType;
     }
 }

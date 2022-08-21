@@ -98,6 +98,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
                 static fn (ExplorerContract $e) => clone $e,
                 \array_reverse($this->explorers, false),
             ),
+            $this->entityType,
             $this->logger
         );
 

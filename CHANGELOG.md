@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move `\Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Emission\EmitterStack`
 - Move `\Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStack`
+- Add `$entityType` parameter to `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStack::__construct` to implement new `\Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface::supports`
 - Move `\Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Reception\ReceiverStack`
 - Add implementation `\Heptacom\HeptaConnect\Core\Job\Transition\EmittedEntitiesToReceiveJobsConverter` and its interface `\Heptacom\HeptaConnect\Core\Job\Transition\Contract\EmittedEntitiesToJobsConverterInterface` to convert results of an emission into receive jobs
 - Add log message code `1661091900` to `\Heptacom\HeptaConnect\Core\Job\Transition\EmittedEntitiesToReceiveJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
