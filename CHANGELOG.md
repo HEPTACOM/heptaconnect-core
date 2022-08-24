@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with stack processing service described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackProcessorInterface`, that is implemented by `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackProcessor`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with job dispatching from explorer stacks in `\Heptacom\HeptaConnect\Core\Exploration\EmissionJobDispatchingExplorer`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with triggering emission stack processing for direct emission in `\Heptacom\HeptaConnect\Core\Exploration\DirectEmittingExplorer`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring explorer in `\Heptacom\HeptaConnect\Core\Exploration\IdentityMappingExplorer`
 
 ### Deprecated
 
