@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter` to dispatch receive jobs from any emission stack, where this emitter is pushed onto
 - Add `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer` as base class for explorer, which capture stack processing and process the captured data in batches
 - Add `\Heptacom\HeptaConnect\Core\Emission\AbstractBufferedResultProcessingEmitter` as base class for emitter, which capture stack processing and process the captured data in batches
+- Add `\Heptacom\HeptaConnect\Core\Emission\EmissionEmittersFactory` described in `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionEmittersFactoryInterface` to return emitters, that provide core functionality for the emission flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
