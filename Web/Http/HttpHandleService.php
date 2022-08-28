@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
@@ -33,7 +33,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
      */
     private array $contextCache = [];
 
-    private HttpHandlingActorInterface $actor;
+    private HttpHandlerStackProcessorInterface $stackProcessor;
 
     private HttpHandleContextFactoryInterface $contextFactory;
 
@@ -48,7 +48,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
     private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
 
     public function __construct(
-        HttpHandlingActorInterface $actor,
+        HttpHandlerStackProcessorInterface $stackProcessor,
         HttpHandleContextFactoryInterface $contextFactory,
         LoggerInterface $logger,
         HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
@@ -56,7 +56,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         ResponseFactoryInterface $responseFactory,
         WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction
     ) {
-        $this->actor = $actor;
+        $this->stackProcessor = $stackProcessor;
         $this->contextFactory = $contextFactory;
         $this->logger = $logger;
         $this->stackBuilderFactory = $stackBuilderFactory;
@@ -99,7 +99,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
         } else {
-            $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
+            $response = $this->stackProcessor->processStack($request, $response, $stack, $this->getContext($portalNodeKey));
         }
 
         return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);

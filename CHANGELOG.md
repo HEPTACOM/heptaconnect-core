@@ -65,6 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with triggering emission stack processing for direct emission in `\Heptacom\HeptaConnect\Core\Exploration\DirectEmittingExplorer`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring explorer in `\Heptacom\HeptaConnect\Core\Exploration\IdentityMappingExplorer`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring emitter for direct emission in `\Heptacom\HeptaConnect\Core\Emission\IdentityMappingEmitter`
+- Rename class `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface` to match restructure of other flow components into same pattern
+- Rename class `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackProcessor` to match restructure of other flow components into same pattern
 
 ### Deprecated
 
