@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationExplorersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
@@ -23,7 +24,9 @@ final class ExploreService implements ExploreServiceInterface
 {
     private ExploreContextFactoryInterface $exploreContextFactory;
 
-    private ExplorationActorInterface $explorationActor;
+    private ExplorerStackProcessorInterface $explorerStackProcessor;
+
+    private ExplorationExplorersFactoryInterface $explorationExplorersFactory;
 
     private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory;
 
@@ -35,14 +38,16 @@ final class ExploreService implements ExploreServiceInterface
 
     public function __construct(
         ExploreContextFactoryInterface $exploreContextFactory,
-        ExplorationActorInterface $explorationActor,
+        ExplorerStackProcessorInterface $explorerStackProcessor,
+        ExplorationExplorersFactoryInterface $explorationExplorersFactory,
         ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
         PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         LoggerInterface $logger,
         JobDispatcherContract $jobDispatcher
     ) {
         $this->exploreContextFactory = $exploreContextFactory;
-        $this->explorationActor = $explorationActor;
+        $this->explorerStackProcessor = $explorerStackProcessor;
+        $this->explorationExplorersFactory = $explorationExplorersFactory;
         $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
         $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
         $this->logger = $logger;
@@ -86,7 +91,11 @@ final class ExploreService implements ExploreServiceInterface
                 continue;
             }
 
-            $this->explorationActor->performExploration($supportedType, $builder->build(), $context);
+            foreach ($this->explorationExplorersFactory->createExplorers($portalNodeKey, $supportedType) as $explorer) {
+                $builder = $builder->push($explorer);
+            }
+
+            $this->explorerStackProcessor->processStack($builder->build(), $context);
         }
     }
 
