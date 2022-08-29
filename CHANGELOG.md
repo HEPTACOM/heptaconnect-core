@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Emission\EmissionEmittersFactory` described in `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionEmittersFactoryInterface` to return emitters, that provide core functionality for the emission flow
 - Add `\Heptacom\HeptaConnect\Core\Exploration\DirectEmissionEmittersFactory` described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionEmittersFactoryInterface` to return emitters, that provide core functionality for the direct emission flow
 - Add `\Heptacom\HeptaConnect\Core\Exploration\ExplorationExplorersFactory` described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationExplorersFactoryInterface` to return explorers, that provide core functionality for the exploration flow
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleHttpHandlersFactory` described in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleHttpHandlersFactoryInterface` to return HTTP handlers, that provide core functionality for the HTTP handle flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
@@ -67,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring emitter for direct emission in `\Heptacom\HeptaConnect\Core\Emission\IdentityMappingEmitter`
 - Rename class `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface` to match restructure of other flow components into same pattern
 - Rename class `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackProcessor` to match restructure of other flow components into same pattern
+- Add parameter of `Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleHttpHandlersFactoryInterface` to `Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to extend HTTP handle flow by core HTTP handlers
 
 ### Deprecated
 
