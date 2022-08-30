@@ -7,8 +7,8 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionReceiversFactoryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
@@ -39,7 +39,7 @@ final class ReceiveService implements ReceiveServiceInterface
 
     private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
 
-    private ReceptionActorInterface $receptionActor;
+    private ReceiverStackProcessorInterface $receiverStackProcessor;
 
     private ReceptionReceiversFactoryInterface $receptionReceiversFactory;
 
@@ -48,14 +48,14 @@ final class ReceiveService implements ReceiveServiceInterface
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
-        ReceptionActorInterface $receptionActor,
+        ReceiverStackProcessorInterface $receiverStackProcessor,
         ReceptionReceiversFactoryInterface $receptionReceiversFactory
     ) {
         $this->receiveContextFactory = $receiveContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
-        $this->receptionActor = $receptionActor;
+        $this->receiverStackProcessor = $receiverStackProcessor;
         $this->receptionReceiversFactory = $receptionReceiversFactory;
     }
 
@@ -77,7 +77,7 @@ final class ReceiveService implements ReceiveServiceInterface
             return;
         }
 
-        $this->receptionActor->performReception($entities, $stack, $this->getReceiveContext($portalNodeKey));
+        $this->receiverStackProcessor->processStack($entities, $stack, $this->getReceiveContext($portalNodeKey));
     }
 
     /**

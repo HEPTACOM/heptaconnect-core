@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add log message code `1661091901` to `\Heptacom\HeptaConnect\Core\Job\Transition\ExploredPrimaryKeysToEmissionJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
 - Add log message code `1661818270` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when unlocking of a lock failed
 - Add log message code `1661818271` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when unlocking failed as no lock is found
-- Add log message code `1661818272` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when even after retrying the receptino failed
+- Add log message code `1661818272` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when even after retrying the reception failed
 - Add `\Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator` to create instances of entities with any primary key. This code is not useful for long and therefore does not receive an interface and is just an extraction refactoring of already existing code
 - Add `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter` to dispatch receive jobs from any emission stack, where this emitter is pushed onto
 - Add `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer` as base class for explorer, which capture stack processing and process the captured data in batches
@@ -70,7 +70,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with triggering emission stack processing for direct emission in `\Heptacom\HeptaConnect\Core\Exploration\DirectEmittingExplorer`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring explorer in `\Heptacom\HeptaConnect\Core\Exploration\IdentityMappingExplorer`
 - Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring emitter for direct emission in `\Heptacom\HeptaConnect\Core\Emission\IdentityMappingEmitter`
-- Rename class `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface` to match restructure of other flow components into same pattern
+- Rename interface `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface` to `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface` to match restructure of other flow components into same pattern
+- Rename class `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor` to `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackProcessor` to match restructure of other flow components into same pattern
+- Rename interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface` to match restructure of other flow components into same pattern
 - Rename class `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackProcessor` to match restructure of other flow components into same pattern
 - Add parameter of `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleHttpHandlersFactoryInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to extend HTTP handle flow by core HTTP handlers
 - Add parameter of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionReceiversFactoryInterface` to `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` to extend reception flow by core receivers
