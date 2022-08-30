@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
@@ -148,73 +149,52 @@ final class ReceptionHandler implements ReceptionHandlerInterface
             ];
         }
 
-        $lockedReceptions = [];
-        $locks = [];
+        foreach ($receptions as $dataType => $portaledEntities) {
+            foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
+                foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
+                    /** @var DatasetEntityContract $entity */
+                    foreach ($entities as $externalId => $entity) {
+                        $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
+                            $sourcePortalKey,
+                            $targetPortalKey,
+                            $dataType,
+                            $externalId,
+                        ])));
 
-        try {
-            foreach ($receptions as $dataType => $portaledEntities) {
-                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
-                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
-                        foreach ($entities as $externalId => $entity) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
-                                $sourcePortalKey,
-                                $targetPortalKey,
-                                $dataType,
-                                $externalId,
-                            ])));
-
-                            if (!$lock->acquire()) {
-                                continue;
-                            }
-
-                            $locks[] = $lock;
-                            $lockedReceptions[$dataType][$targetPortalKey][$sourcePortalKey][$externalId] = $entity;
-                        }
+                        $entity->attach(new LockAttachable($lock));
                     }
-                }
-            }
 
-            foreach ($lockedReceptions as $dataType => $portaledEntities) {
-                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
-                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
-                        $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
+                    $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
 
-                        if (!$sourcePortalNodeKey instanceof PortalNodeKeyInterface) {
-                            continue;
-                        }
-
-                        $targetPortalNodeKey = $this->storageKeyGenerator->deserialize($targetPortalKey);
-
-                        if (!$targetPortalNodeKey instanceof PortalNodeKeyInterface) {
-                            continue;
-                        }
-
-                        $entityType = new EntityType($dataType);
-
-                        /** @var DatasetEntityContract[] $rawEntities */
-                        $rawEntities = \array_column($entities, 'entity');
-                        /** @var array<DatasetEntityContract|object> $allEntities */
-                        $allEntities = $this->objectIterator->iterate($rawEntities);
-                        /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
-                        $filteredEntityObjects = new DatasetEntityCollection($allEntities);
-                        // TODO inspect memory raise - probably fixed by new storage
-                        $mappedEntities = $this->identityMapAction
-                            ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
-                            ->getMappedDatasetEntityCollection();
-                        $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
-
-                        $jobKeys = new JobKeyCollection(\array_values(\array_column($entities, 'jobKey')));
-
-                        $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                        $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
-                        $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+                    if (!$sourcePortalNodeKey instanceof PortalNodeKeyInterface) {
+                        continue;
                     }
-                }
-            }
-        } finally {
-            foreach ($locks as $lock) {
-                if ($lock->isAcquired()) {
-                    $lock->release();
+
+                    $targetPortalNodeKey = $this->storageKeyGenerator->deserialize($targetPortalKey);
+
+                    if (!$targetPortalNodeKey instanceof PortalNodeKeyInterface) {
+                        continue;
+                    }
+
+                    $entityType = new EntityType($dataType);
+
+                    /** @var DatasetEntityContract[] $rawEntities */
+                    $rawEntities = \array_column($entities, 'entity');
+                    /** @var array<DatasetEntityContract|object> $allEntities */
+                    $allEntities = $this->objectIterator->iterate($rawEntities);
+                    /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
+                    $filteredEntityObjects = new DatasetEntityCollection($allEntities);
+                    // TODO inspect memory raise - probably fixed by new storage
+                    $mappedEntities = $this->identityMapAction
+                        ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
+                        ->getMappedDatasetEntityCollection();
+                    $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
+
+                    $jobKeys = new JobKeyCollection(\array_values(\array_column($entities, 'jobKey')));
+
+                    $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
+                    $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
+                    $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                 }
             }
         }

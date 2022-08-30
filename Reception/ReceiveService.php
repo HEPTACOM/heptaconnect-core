@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionReceiversFactoryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -40,18 +41,22 @@ final class ReceiveService implements ReceiveServiceInterface
 
     private ReceptionActorInterface $receptionActor;
 
+    private ReceptionReceiversFactoryInterface $receptionReceiversFactory;
+
     public function __construct(
         ReceiveContextFactoryInterface $receiveContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
-        ReceptionActorInterface $receptionActor
+        ReceptionActorInterface $receptionActor,
+        ReceptionReceiversFactoryInterface $receptionReceiversFactory
     ) {
         $this->receiveContextFactory = $receiveContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
         $this->receptionActor = $receptionActor;
+        $this->receptionReceiversFactory = $receptionReceiversFactory;
     }
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void
@@ -87,11 +92,19 @@ final class ReceiveService implements ReceiveServiceInterface
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
                 ->createReceiverStackBuilder($portalNodeKey, $entityType)
-                ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
+                ->pushSource();
 
-            $this->receiverStackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            if ($builder->isEmpty()) {
+                $this->receiverStackCache[$cacheKey] = null;
+            } else {
+                $builder = $builder->pushDecorators();
+
+                foreach ($this->receptionReceiversFactory->createReceivers($portalNodeKey, $entityType) as $receiver) {
+                    $builder = $builder->push($receiver);
+                }
+
+                $this->receiverStackCache[$cacheKey] = $builder->build();
+            }
         }
 
         $result = $this->receiverStackCache[$cacheKey];
