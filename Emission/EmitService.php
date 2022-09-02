@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
+use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructContract;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -65,6 +66,7 @@ final class EmitService implements EmitServiceInterface
         $emittingPortalNodes = [];
         $entityType = $mappingComponents->getEntityType();
 
+        /** @var MappingComponentStructContract $mapping */
         foreach ($mappingComponents as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 
@@ -85,7 +87,7 @@ final class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            $externalIds = (new MappingComponentCollection($mappingComponents->filterByEntityType($portalNodeKey)))->getExternalIds();
+            $externalIds = (new MappingComponentCollection($mappingComponents->filterByPortalNodeKey($portalNodeKey)))->getExternalIds();
 
             $this->stackProcessor->processStack($externalIds, $stack, $this->getEmitContext($portalNodeKey));
         }
