@@ -65,6 +65,7 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
         $this->directEmitter->getEntities()->clear();
         $this->directEmitter->getEntities()->push($buffer);
         $this->emitterStackProcessor->processStack($pks, clone $this->emitterStack, $this->emitContext);
+        $this->directEmitter->getEntities()->clear();
     }
 
     protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void
