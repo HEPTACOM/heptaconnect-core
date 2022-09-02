@@ -79,29 +79,4 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
             $buffer->push([$value]);
         }
     }
-
-    protected function isAllowed(string $externalId, ?DatasetEntityContract $entity, ExploreContextInterface $context): bool
-    {
-        if (!parent::isAllowed($externalId, $entity, $context)) {
-            return false;
-        }
-
-        if (!$entity instanceof DatasetEntityContract) {
-            return true;
-        }
-
-        $primaryKey = $entity->getPrimaryKey();
-
-        if ($primaryKey === null) {
-            $this->logger->error('DirectEmittingExplorer: Empty or invalid primary key was explored', [
-                'portalNodeKey' => $context->getPortalNodeKey(),
-                'entityType' => $this->getSupportedEntityType(),
-                'primaryKey' => $primaryKey,
-            ]);
-
-            return false;
-        }
-
-        return true;
-    }
 }
