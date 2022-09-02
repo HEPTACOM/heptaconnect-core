@@ -74,6 +74,7 @@ final class LockingReceiver extends ReceiverContract
 
     /**
      * @param iterable<DatasetEntityContract> $entities
+     *
      * @return LockInterface[]
      */
     private function lockEntities(

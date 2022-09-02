@@ -34,9 +34,7 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
         try {
             yield from $this->emitNext($stack, $externalIds, $context);
         } finally {
-            while ($this->buffer->count() > 0) {
-                $this->dispatchBuffer($context);
-            }
+            $this->dispatchBuffer($context);
         }
     }
 
@@ -79,15 +77,18 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
     {
         $buffer = $this->buffer;
         $batchSize = $this->batchSize;
-        $splice = $this->createBuffer();
 
-        for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
-            /** @var DatasetEntityContract $item */
-            $item = $buffer->shift();
-            $splice->push([$item]);
+        while ($buffer->count() > 0) {
+            $slice = $this->createBuffer();
+
+            for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
+                /** @var DatasetEntityContract $item */
+                $item = $buffer->shift();
+                $slice->push([$item]);
+            }
+
+            $this->processBuffer($slice, $context);
         }
-
-        $this->processBuffer($splice, $context);
     }
 
     private function createBuffer(): TypedDatasetEntityCollection

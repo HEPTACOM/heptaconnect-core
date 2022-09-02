@@ -36,16 +36,14 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
             foreach ($this->exploreNext($context, $stack) as $key => $value) {
                 $this->pushBuffer($value, $buffer, $context);
 
-                while ($buffer->count() >= $this->batchSize) {
+                if ($buffer->count() >= $this->batchSize) {
                     $this->dispatchBuffer($buffer, $context);
                 }
 
                 yield $key => $value;
             }
         } finally {
-            while ($buffer->count() > 0) {
-                $this->dispatchBuffer($buffer, $context);
-            }
+            $this->dispatchBuffer($buffer, $context);
         }
     }
 
@@ -82,14 +80,17 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
     private function dispatchBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         $batchSize = $this->batchSize;
-        $splice = $this->createBuffer();
 
-        for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
-            /** @var T $item */
-            $item = $buffer->shift();
-            $splice->push([$item]);
+        while ($buffer->count() > 0) {
+            $slice = $this->createBuffer();
+
+            for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
+                /** @var T $item */
+                $item = $buffer->shift();
+                $slice->push([$item]);
+            }
+
+            $this->processBuffer($slice, $context);
         }
-
-        $this->processBuffer($splice, $context);
     }
 }
