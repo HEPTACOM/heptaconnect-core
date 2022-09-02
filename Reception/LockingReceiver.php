@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Lock\LockInterface;
 
 final class LockingReceiver extends ReceiverContract
 {
@@ -36,19 +37,18 @@ final class LockingReceiver extends ReceiverContract
         $todo = new TypedDatasetEntityCollection($entityType, $entities);
 
         for ($tries = 0; $tries < 3 && $todo->count() > 0; ++$tries) {
-            $lockablesAndLocked = new TypedDatasetEntityCollection($entityType);
-            $unlockables = new TypedDatasetEntityCollection($entityType);
+            // allow repetitive tries to recover from whatever blocked the locking
+            \usleep(20 * $tries);
+
+            $slice = new TypedDatasetEntityCollection($entityType);
             $newToDo = new TypedDatasetEntityCollection($entityType);
 
-            $this->lockEntities($todo, $lockablesAndLocked, $unlockables, $newToDo, $context->getPortalNodeKey());
+            $locks = $this->lockEntities($todo, $slice, $newToDo, $context->getPortalNodeKey());
 
             try {
-                $entitySlice = new TypedDatasetEntityCollection($entityType);
-                $entitySlice->push($lockablesAndLocked);
-                $entitySlice->push($unlockables);
-                $result->push($this->receiveNext(clone $stack, $entitySlice, $context));
+                $result->push($this->receiveNext(clone $stack, $slice, $context));
             } finally {
-                $this->unlockEntities($lockablesAndLocked, $context->getPortalNodeKey());
+                $this->unlockLocks($locks, $context->getPortalNodeKey());
             }
 
             $todo = $newToDo;
@@ -74,30 +74,36 @@ final class LockingReceiver extends ReceiverContract
 
     /**
      * @param iterable<DatasetEntityContract> $entities
+     * @return LockInterface[]
      */
     private function lockEntities(
         iterable $entities,
-        TypedDatasetEntityCollection $lockablesAndLocked,
-        TypedDatasetEntityCollection $unlockables,
+        TypedDatasetEntityCollection $slice,
         TypedDatasetEntityCollection $newToDo,
         PortalNodeKeyInterface $portalNodeKey
-    ): void {
-        foreach ($entities as $entity) {
+    ): array {
+        $lockedLocks = [];
+
+        foreach ($entities as $entityKey => $entity) {
             $lockAttachment = $entity->getAttachment(LockAttachable::class);
 
             if (!$lockAttachment instanceof LockAttachable) {
-                $unlockables->push([$entity]);
+                $slice->push([$entity]);
 
                 continue;
             }
 
-            if ($lockAttachment->getLock()->acquire()) {
-                $lockablesAndLocked->push([$entity]);
+            $lock = $lockAttachment->getLock();
+
+            if ($lock->acquire()) {
+                $slice->push([$entity]);
+                $lockedLocks[$entity->getPrimaryKey() ?? $entityKey] = $lock;
 
                 $this->logger->debug('Locking an entity', [
                     'portalNodeKey' => $portalNodeKey,
                     'entityType' => (string) $this->getSupportedEntityType(),
                     'primaryKey' => $entity->getPrimaryKey(),
+                    'entityLoopKey' => $entityKey,
                 ]);
 
                 continue;
@@ -105,34 +111,23 @@ final class LockingReceiver extends ReceiverContract
 
             $newToDo->push([$entity]);
         }
+
+        return $lockedLocks;
     }
 
     /**
-     * @param iterable<DatasetEntityContract> $entities
+     * @param array<array-key, LockInterface> $locks
      */
-    private function unlockEntities(iterable $entities, PortalNodeKeyInterface $portalNodeKey): void
+    private function unlockLocks(array $locks, PortalNodeKeyInterface $portalNodeKey): void
     {
-        foreach ($entities as $entity) {
-            $lockAttachment = $entity->getAttachment(LockAttachable::class);
-
-            if (!$lockAttachment instanceof LockAttachable) {
-                $this->logger->error('Unlocking of an entity failed because the lock is missing', [
-                    'portalNodeKey' => $portalNodeKey,
-                    'entityType' => (string) $this->getSupportedEntityType(),
-                    'primaryKey' => $entity->getPrimaryKey(),
-                    'code' => 1661818270,
-                ]);
-
-                continue;
-            }
-
+        foreach ($locks as $lockKey => $lock) {
             try {
-                $lockAttachment->getLock()->release();
+                $lock->release();
             } catch (\Throwable $throwable) {
                 $this->logger->error('Unlocking of an entity failed because the release of the lock failed', [
                     'portalNodeKey' => $portalNodeKey,
                     'entityType' => (string) $this->getSupportedEntityType(),
-                    'primaryKey' => $entity->getPrimaryKey(),
+                    'lockKey' => $lockKey,
                     'code' => 1661818271,
                     'exception' => $throwable,
                 ]);
