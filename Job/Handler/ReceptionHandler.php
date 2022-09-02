@@ -131,8 +131,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     throw new ReceptionJobHandlingException($job, 1636503508);
                 }
 
-                $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetPortalNodeKey());
-                $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourcePortalNodeKey());
+                $targetPortal = $this->storageKeyGenerator->serialize($route->getTargetPortalNodeKey()->withoutAlias());
+                $sourcePortal = $this->storageKeyGenerator->serialize($route->getSourcePortalNodeKey()->withoutAlias());
             } catch (ReceptionJobHandlingException|UnsupportedStorageKeyException $throwable) {
                 $this->logger->critical('Reception job preparation failed', [
                     'code' => $throwable->getCode(),
@@ -142,8 +142,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                 continue;
             }
 
-            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId] = [
-                'mapping' => $job->getMappingComponent(),
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['mapping'] = $job->getMappingComponent();
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['jobs'][] = [
                 'entity' => $entity,
                 'jobKey' => $job->getJobKey(),
             ];
@@ -151,9 +151,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
 
         foreach ($receptions as $dataType => $portaledEntities) {
             foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
-                foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
-                    /** @var DatasetEntityContract $entity */
-                    foreach ($entities as $externalId => $entity) {
+                foreach ($sourcePortaledEntities as $sourcePortalKey => $entityGroups) {
+                    foreach ($entityGroups as $externalId => $entityGroup) {
                         $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
                             $sourcePortalKey,
                             $targetPortalKey,
@@ -161,7 +160,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                             $externalId,
                         ])));
 
-                        $entity->attach(new LockAttachable($lock));
+                        $entityGroup['jobs'][0]['entity']->attach(new LockAttachable($lock));
                     }
 
                     $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
@@ -177,9 +176,18 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     }
 
                     $entityType = new EntityType($dataType);
+                    $rawEntityGroups = [];
+                    $jobKeyGroups = [];
+
+                    foreach ($entityGroups as $entityGroup) {
+                        $rawEntityGroups[] = \array_column($entityGroup['jobs'], 'entity');
+                        $jobKeyGroups[] = \array_column($entityGroup['jobs'], 'jobKey');
+                    }
 
                     /** @var DatasetEntityContract[] $rawEntities */
-                    $rawEntities = \array_column($entities, 'entity');
+                    $rawEntities = \array_merge([], ...$rawEntityGroups);
+                    $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
+
                     /** @var array<DatasetEntityContract|object> $allEntities */
                     $allEntities = $this->objectIterator->iterate($rawEntities);
                     /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
@@ -189,8 +197,6 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                         ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
                         ->getMappedDatasetEntityCollection();
                     $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
-
-                    $jobKeys = new JobKeyCollection(\array_values(\array_column($entities, 'jobKey')));
 
                     $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
                     $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
