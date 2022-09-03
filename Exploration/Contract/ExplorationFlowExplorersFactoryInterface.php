@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-interface ExplorationExplorersFactoryInterface
+interface ExplorationFlowExplorersFactoryInterface
 {
     /**
      * Returns a list of explorers, that provide core functionality for the exploration flow.

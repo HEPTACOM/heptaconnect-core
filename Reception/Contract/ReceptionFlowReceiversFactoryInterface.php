@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-interface ReceptionReceiversFactoryInterface
+interface ReceptionFlowReceiversFactoryInterface
 {
     /**
      * Returns a list of receivers, that provide core functionality for the reception flow.

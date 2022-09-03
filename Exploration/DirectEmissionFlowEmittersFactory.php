@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
-use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionEmittersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\IdentityMappingEmitter;
-use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionEmittersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 
-final class DirectEmissionEmittersFactory implements DirectEmissionEmittersFactoryInterface
+final class DirectEmissionFlowEmittersFactory implements DirectEmissionFlowEmittersFactoryInterface
 {
-    private EmissionEmittersFactoryInterface $emissionEmittersFactory;
+    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
 
     private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator;
 
@@ -24,12 +24,12 @@ final class DirectEmissionEmittersFactory implements DirectEmissionEmittersFacto
     private int $identityBatchSize;
 
     public function __construct(
-        EmissionEmittersFactoryInterface $emissionEmittersFactory,
+        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
         PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
         IdentityMapActionInterface $identityMapAction,
         int $identityBatchSize
     ) {
-        $this->emissionEmittersFactory = $emissionEmittersFactory;
+        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
         $this->primaryKeyToEntityHydrator = $primaryKeyToEntityHydrator;
         $this->identityMapAction = $identityMapAction;
         $this->identityBatchSize = $identityBatchSize;
@@ -46,7 +46,7 @@ final class DirectEmissionEmittersFactory implements DirectEmissionEmittersFacto
             ),
         ]);
 
-        $result->push($this->emissionEmittersFactory->createEmitters($portalNodeKey, $entityType));
+        $result->push($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType));
 
         return $result;
     }

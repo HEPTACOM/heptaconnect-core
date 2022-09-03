@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-interface EmissionEmittersFactoryInterface
+interface EmissionFlowEmittersFactoryInterface
 {
     /**
      * Returns a list of emitters, that provide core functionality for the emission flow.

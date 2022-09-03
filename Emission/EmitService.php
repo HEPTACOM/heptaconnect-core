@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionEmittersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
@@ -41,7 +41,7 @@ final class EmitService implements EmitServiceInterface
 
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
-    private EmissionEmittersFactoryInterface $emissionEmittersFactory;
+    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
 
     private EmitterStackProcessorInterface $stackProcessor;
 
@@ -50,14 +50,14 @@ final class EmitService implements EmitServiceInterface
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmissionEmittersFactoryInterface $emissionEmittersFactory,
+        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
         EmitterStackProcessorInterface $stackProcessor
     ) {
         $this->emitContextFactory = $emitContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emissionEmittersFactory = $emissionEmittersFactory;
+        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
         $this->stackProcessor = $stackProcessor;
     }
 
@@ -114,7 +114,7 @@ final class EmitService implements EmitServiceInterface
             if ($builder->isEmpty()) {
                 $this->emissionStackCache[$cacheKey] = null;
             } else {
-                foreach ($this->emissionEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
                     $builder = $builder->push($emitter);
                 }
 

@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
-use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionEmittersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\DirectEmitter;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
@@ -31,7 +31,7 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
 
     private EmitterStackProcessorInterface $stackProcessor;
 
-    private DirectEmissionEmittersFactoryInterface $directEmissionEmittersFactory;
+    private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory;
 
     private LoggerInterface $logger;
 
@@ -41,12 +41,12 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         EmitContextFactory $emitContextFactory,
         EmitterStackProcessorInterface $stackProcessor,
-        DirectEmissionEmittersFactoryInterface $directEmissionEmittersFactory
+        DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
     ) {
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
         $this->emitContextFactory = $emitContextFactory;
         $this->stackProcessor = $stackProcessor;
-        $this->directEmissionEmittersFactory = $directEmissionEmittersFactory;
+        $this->directEmissionFlowEmittersFactory = $directEmissionFlowEmittersFactory;
         $this->logger = new NullLogger();
         $this->profiler = new NullProfiler();
     }
@@ -85,7 +85,7 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
                     ->push($directEmitter)
                     ->pushDecorators();
 
-                foreach ($this->directEmissionEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                foreach ($this->directEmissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
                     $emissionStackBuilder = $emissionStackBuilder->push($emitter);
                 }
 

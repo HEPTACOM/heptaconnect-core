@@ -7,8 +7,8 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
-use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionEmittersFactoryInterface;
-use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationExplorersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationFlowExplorersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\Transition\Contract\ExploredPrimaryKeysToJobsConverterInterface;
 use Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator;
@@ -18,9 +18,9 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Psr\Log\LoggerInterface;
 
-final class ExplorationExplorersFactory implements ExplorationExplorersFactoryInterface
+final class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
 {
-    private DirectEmissionEmittersFactoryInterface $directEmissionEmittersFactory;
+    private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory;
 
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
@@ -45,7 +45,7 @@ final class ExplorationExplorersFactory implements ExplorationExplorersFactoryIn
     private int $emissionBatchSize;
 
     public function __construct(
-        DirectEmissionEmittersFactoryInterface $directEmissionEmittersFactory,
+        DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         EmitterStackProcessorInterface $emitterStackProcessor,
         EmitContextFactoryInterface $emitContextFactory,
@@ -58,7 +58,7 @@ final class ExplorationExplorersFactory implements ExplorationExplorersFactoryIn
         int $identityBatchSize,
         int $emissionBatchSize
     ) {
-        $this->directEmissionEmittersFactory = $directEmissionEmittersFactory;
+        $this->directEmissionFlowEmittersFactory = $directEmissionFlowEmittersFactory;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
         $this->emitterStackProcessor = $emitterStackProcessor;
         $this->emitContextFactory = $emitContextFactory;
@@ -80,7 +80,7 @@ final class ExplorationExplorersFactory implements ExplorationExplorersFactoryIn
             ->push($directEmitter)
             ->pushDecorators();
 
-        foreach ($this->directEmissionEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+        foreach ($this->directEmissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
             $emissionStackBuilder = $emissionStackBuilder->push($emitter);
         }
 

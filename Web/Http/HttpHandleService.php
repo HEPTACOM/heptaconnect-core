@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleHttpHandlersFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
@@ -48,7 +48,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
 
-    private HttpHandleHttpHandlersFactoryInterface $httpHandleHttpHandlersFactory;
+    private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory;
 
     public function __construct(
         HttpHandlerStackProcessorInterface $stackProcessor,
@@ -58,7 +58,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         StorageKeyGeneratorContract $storageKeyGenerator,
         ResponseFactoryInterface $responseFactory,
         WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
-        HttpHandleHttpHandlersFactoryInterface $httpHandleHttpHandlersFactory
+        HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory
     ) {
         $this->stackProcessor = $stackProcessor;
         $this->contextFactory = $contextFactory;
@@ -67,7 +67,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->responseFactory = $responseFactory;
         $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
-        $this->httpHandleHttpHandlersFactory = $httpHandleHttpHandlersFactory;
+        $this->httpHandleFlowHttpHandlersFactory = $httpHandleFlowHttpHandlersFactory;
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
@@ -124,7 +124,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
             } else {
                 $builder = $builder->pushDecorators();
 
-                foreach ($this->httpHandleHttpHandlersFactory->createHttpHandlers($portalNodeKey, $path) as $handler) {
+                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($portalNodeKey, $path) as $handler) {
                     $builder = $builder->push($handler);
                 }
 
