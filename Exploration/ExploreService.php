@@ -54,7 +54,7 @@ final class ExploreService implements ExploreServiceInterface
         $jobs = new JobCollection();
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
-            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
+            if ($entityTypes !== null && !$entityTypes->contains($supportedType)) {
                 continue;
             }
 
@@ -69,7 +69,7 @@ final class ExploreService implements ExploreServiceInterface
         $context = $this->exploreContextFactory->factory($portalNodeKey);
 
         foreach (self::getSupportedTypes($this->getExplorers($portalNodeKey)) as $supportedType) {
-            if ($entityTypes !== null && !$entityTypes->has($supportedType)) {
+            if ($entityTypes !== null && !$entityTypes->contains($supportedType)) {
                 continue;
             }
 
