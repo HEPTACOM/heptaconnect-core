@@ -33,7 +33,7 @@ final class ReceptionActor implements ReceptionActorInterface
         ReceiverStackInterface $stack,
         ReceiveContextInterface $context
     ): void {
-        if ($entities->count() < 1) {
+        if ($entities->isEmpty()) {
             return;
         }
 

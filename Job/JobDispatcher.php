@@ -31,7 +31,7 @@ final class JobDispatcher extends JobDispatcherContract
         ));
         $createResult = $this->jobCreateAction->create($createPayload);
 
-        if ($createResult->count() === 0) {
+        if ($createResult->isEmpty()) {
             return;
         }
 
