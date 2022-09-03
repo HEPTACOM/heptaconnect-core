@@ -32,14 +32,16 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
         try {
             $storageKey = $this->storageKeyGenerator->deserialize($query);
 
-            return new PortalNodeKeyCollection($portalNodeKeys->filter(
-                static fn (PortalNodeKeyInterface $key): bool => $key->equals($storageKey)
-            ));
+            if (!$portalNodeKeys->contains($storageKey)) {
+                return new PortalNodeKeyCollection();
+            }
+
+            return new PortalNodeKeyCollection([$storageKey]);
         } catch (UnsupportedStorageKeyException $e) {
-            return new PortalNodeKeyCollection($portalNodeKeys->filter(
+            return $portalNodeKeys->filter(
                 fn (PortalNodeKeyInterface $key): bool => $this->storageKeyGenerator->serialize($key->withAlias()) === $query
                     || $this->storageKeyGenerator->serialize($key->withoutAlias()) === $query
-            ));
+            );
         }
     }
 
@@ -49,9 +51,9 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
             return new PortalCollection();
         }
 
-        return new PortalCollection($portals->filter(
+        return $portals->filter(
             static fn (PortalContract $portal): bool => $portal instanceof $query
-        ));
+        );
     }
 
     public function matchPortalExtensions(string $query, PortalExtensionCollection $portalExtensions): PortalExtensionCollection
@@ -60,8 +62,8 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
             return new PortalExtensionCollection();
         }
 
-        return new PortalExtensionCollection($portalExtensions->filter(
+        return $portalExtensions->filter(
             static fn (PortalExtensionContract $portalExtension): bool => $portalExtension instanceof $query
-        ));
+        );
     }
 }

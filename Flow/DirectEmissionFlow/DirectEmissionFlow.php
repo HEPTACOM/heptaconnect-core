@@ -52,9 +52,9 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
         $emitContext = $this->emitContextFactory->createContext($portalNodeKey, true);
 
         /** @var DatasetEntityContract[] $unidentifiedEntities */
-        $unidentifiedEntities = \iterable_to_array($entities->filter(
+        $unidentifiedEntities = $entities->filter(
             static fn (DatasetEntityContract $entity): bool => $entity->getPrimaryKey() === null
-        ));
+        )->asArray();
 
         foreach ($unidentifiedEntities as $unidentifiedEntity) {
             $exception = new UnidentifiedEntityException($unidentifiedEntity);
