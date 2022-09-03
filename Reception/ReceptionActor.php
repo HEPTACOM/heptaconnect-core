@@ -42,7 +42,7 @@ final class ReceptionActor implements ReceptionActorInterface
                 continue;
             }
 
-            $attachable = new PrimaryKeyChangesAttachable(\get_class($object));
+            $attachable = new PrimaryKeyChangesAttachable($object::class());
             $attachable->setForeignKey($object->getPrimaryKey());
             $object->attach($attachable);
         }
@@ -53,7 +53,7 @@ final class ReceptionActor implements ReceptionActorInterface
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                'type' => $entities->getType(),
+                'type' => (string) $entities->getEntityType(),
                 'portalNodeKey' => $context->getPortalNodeKey(),
                 'stack' => $stack,
                 'exception' => $exception,

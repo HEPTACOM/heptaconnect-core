@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
@@ -13,13 +14,13 @@ use Psr\Container\ContainerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
-    private ContainerInterface $container;
+    private PortalNodeContainerFacadeContract $containerFacade;
 
     private ?array $configuration;
 
-    public function __construct(ContainerInterface $container, ?array $configuration)
+    public function __construct(PortalNodeContainerFacadeContract $container, ?array $configuration)
     {
-        $this->container = $container;
+        $this->containerFacade = $container;
         $this->configuration = $configuration;
     }
 
@@ -30,26 +31,26 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 
     public function getPortal(): PortalContract
     {
-        return $this->getContainer()->get(PortalContract::class);
+        return $this->containerFacade->getPortal();
     }
 
     public function getPortalNodeKey(): PortalNodeKeyInterface
     {
-        return $this->getContainer()->get(PortalNodeKeyInterface::class);
+        return $this->containerFacade->getPortalNodeKey();
     }
 
     public function getResourceLocker(): ResourceLockFacade
     {
-        return $this->getContainer()->get(ResourceLockFacade::class);
+        return $this->containerFacade->getResourceLocker();
     }
 
     public function getStorage(): PortalStorageInterface
     {
-        return $this->getContainer()->get(PortalStorageInterface::class);
+        return $this->containerFacade->getStorage();
     }
 
     public function getContainer(): ContainerInterface
     {
-        return $this->container;
+        return $this->containerFacade;
     }
 }

@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -119,7 +120,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     throw new ReceptionJobHandlingException($job, 1636503506);
                 }
 
-                if ($route->getEntityType() !== \get_class($entity)) {
+                if (!$route->getEntityType()->equals($entity::class())) {
                     throw new ReceptionJobHandlingException($job, 1636503507);
                 }
 
@@ -140,8 +141,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                 continue;
             }
 
-            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['mapping'] = $job->getMappingComponent();
-            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['jobs'][] = [
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['mapping'] = $job->getMappingComponent();
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['jobs'][] = [
                 'entity' => $entity,
                 'jobKey' => $job->getJobKey(),
             ];
@@ -196,6 +197,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                             $jobKeyGroups[] = \array_column($entityGroup['jobs'], 'jobKey');
                         }
 
+                        $entityType = new EntityType($dataType);
+
                         /** @var DatasetEntityContract[] $rawEntities */
                         $rawEntities = \array_merge([], ...$rawEntityGroups);
                         $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
@@ -211,7 +214,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                         $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
                         $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                        $this->receiveService->receive(new TypedDatasetEntityCollection($dataType, $rawEntities), $targetPortalNodeKey);
+                        $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
                         $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                     }
                 }

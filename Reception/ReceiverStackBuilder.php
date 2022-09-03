@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
@@ -20,22 +20,16 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     private LoggerInterface $logger;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
+    private EntityType $entityType;
 
     /**
      * @var ReceiverContract[]
      */
     private array $receivers = [];
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
     public function __construct(
         ReceiverCollection $sources,
-        string $entityType,
+        EntityType $entityType,
         LoggerInterface $logger
     ) {
         $sources = new ReceiverCollection($sources->bySupport($entityType));
@@ -47,7 +41,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function push(ReceiverContract $receiver): self
     {
-        if (\is_a($this->entityType, $receiver->supports(), true)) {
+        if ($this->entityType->equals($receiver->getSupportedEntityType())) {
             $this->logger->debug('ReceiverStackBuilder: Pushed an arbitrary receiver.', [
                 'receiver' => $receiver,
             ]);
