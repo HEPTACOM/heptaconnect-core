@@ -81,7 +81,7 @@ final class StatusReportingService implements StatusReportingServiceInterface
         StatusReporterCollection $statusReporters,
         string $topic
     ): array {
-        $topicStatusReporters = new StatusReporterCollection($statusReporters->bySupportedTopic($topic));
+        $topicStatusReporters = $statusReporters->bySupportedTopic($topic);
 
         if ($topicStatusReporters->isEmpty()) {
             $this->logger->critical(LogMessage::STATUS_REPORT_NO_STATUS_REPORTER_FOR_TYPE(), [
