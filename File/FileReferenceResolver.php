@@ -19,7 +19,6 @@ use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
 use Heptacom\HeptaConnect\Portal\Base\File\ResolvedFileReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Psr\Http\Message\RequestFactoryInterface;
 
@@ -56,10 +55,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
     {
         if ($fileReference instanceof PublicUrlFileReference) {
             $portalNodeKey = $fileReference->getPortalNodeKey();
-            $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-
-            /** @var HttpClientContract $httpClient */
-            $httpClient = $container->get(HttpClientContract::class);
+            $httpClient = $this->portalStackServiceContainerFactory->create($portalNodeKey)->getWebHttpClient();
 
             return new ResolvedPublicUrlFileReference(
                 $portalNodeKey,
@@ -69,10 +65,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
             );
         } elseif ($fileReference instanceof RequestFileReference) {
             $portalNodeKey = $fileReference->getPortalNodeKey();
-            $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-
-            /** @var HttpClientContract $httpClient */
-            $httpClient = $container->get(HttpClientContract::class);
+            $httpClient = $this->portalStackServiceContainerFactory->create($portalNodeKey)->getWebHttpClient();
 
             return new ResolvedRequestFileReference(
                 $portalNodeKey,

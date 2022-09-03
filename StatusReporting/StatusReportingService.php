@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
@@ -46,9 +45,9 @@ final class StatusReportingService implements StatusReportingServiceInterface
 
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $statusReporters = new StatusReporterCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {
@@ -96,7 +95,7 @@ final class StatusReportingService implements StatusReportingServiceInterface
         $stack = $this->getStatusReporterStack($portalNodeKey, $topicStatusReporters, $topic);
 
         try {
-            return $stack->next($context);
+            return \array_merge([$topic => false], $stack->next($context));
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::STATUS_REPORT_NO_THROW(), [
                 'topic' => $topic,

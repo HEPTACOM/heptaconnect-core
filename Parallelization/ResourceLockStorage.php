@@ -20,7 +20,7 @@ final class ResourceLockStorage extends ResourceLockStorageContract
     public function create(string $key): void
     {
         try {
-            if (!$this->lockFactory->createLock($key)->acquire()) {
+            if (!$this->lockFactory->createLock($key, 300.0, false)->acquire()) {
                 throw new ResourceIsLockedException($key, null);
             }
         } catch (\Throwable $throwable) {
@@ -30,7 +30,7 @@ final class ResourceLockStorage extends ResourceLockStorageContract
 
     public function has(string $key): bool
     {
-        return $this->lockFactory->createLock($key)->isAcquired();
+        return $this->lockFactory->createLock($key, 300.0, false)->isAcquired();
     }
 
     public function delete(string $key): void
