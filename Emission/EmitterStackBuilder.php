@@ -32,7 +32,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         EntityType $entityType,
         LoggerInterface $logger
     ) {
-        $sources = new EmitterCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
