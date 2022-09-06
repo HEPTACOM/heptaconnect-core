@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetResult;
@@ -19,7 +20,6 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteCreateActionIn
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayloadCollection;
@@ -43,22 +43,18 @@ final class RouteAddUi implements RouteAddUiActionInterface
 
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     public function __construct(
         RouteCreateActionInterface $routeCreateAction,
         RouteFindActionInterface $routeFindAction,
         RouteGetActionInterface $routeGetAction,
         RouteDeleteActionInterface $routeDeleteAction,
-        PortalNodeGetActionInterface $portalNodeGetAction,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        PortalNodeGetActionInterface $portalNodeGetAction
     ) {
         $this->routeCreateAction = $routeCreateAction;
         $this->routeFindAction = $routeFindAction;
         $this->routeGetAction = $routeGetAction;
         $this->routeDeleteAction = $routeDeleteAction;
         $this->portalNodeGetAction = $portalNodeGetAction;
-        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function add(RouteAddPayloadCollection $payloads): RouteAddResultCollection
@@ -101,7 +97,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             throw new PersistException(1654573098, $throwable);
         }
 
-        $this->revertLogicError($result, \array_values($failedScenarios));
+        $this->revertLogicError($result, new RouteAddPayloadCollection(\array_values($failedScenarios)));
     }
 
     private function getScenarioFromPayload(RouteAddPayload $payload): string
@@ -126,13 +122,15 @@ final class RouteAddUi implements RouteAddUiActionInterface
     {
         $result = new RouteCreatePayloads();
         $checkedScenarios = [];
-        $portalNodeKeys = [];
+        $portalNodeKeys = new PortalNodeKeyCollection();
 
         /** @var RouteAddPayload $payload */
         foreach ($payloads as $payload) {
             $scenario = $this->getScenarioFromPayload($payload);
-            $portalNodeKeys[$this->storageKeyGenerator->serialize($payload->getSourcePortalNodeKey())] = $payload->getSourcePortalNodeKey();
-            $portalNodeKeys[$this->storageKeyGenerator->serialize($payload->getTargetPortalNodeKey())] = $payload->getTargetPortalNodeKey();
+            $portalNodeKeys->push([
+                $payload->getSourcePortalNodeKey(),
+                $payload->getTargetPortalNodeKey(),
+            ]);
 
             if ($checkedScenarios[$scenario] ?? false) {
                 continue;
@@ -162,26 +160,24 @@ final class RouteAddUi implements RouteAddUiActionInterface
             ]);
         }
 
-        $foundPortalNodes = $this->portalNodeGetAction->get(
-            new PortalNodeGetCriteria(new PortalNodeKeyCollection(\array_values($portalNodeKeys)))
-        );
+        $portalNodeKeys = $portalNodeKeys->unique();
+        $foundPortalNodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria($portalNodeKeys));
 
         /** @var PortalNodeGetResult $foundPortalNode */
         foreach ($foundPortalNodes as $foundPortalNode) {
-            unset($portalNodeKeys[$this->storageKeyGenerator->serialize($foundPortalNode->getPortalNodeKey())]);
+            $portalNodeKeys = $portalNodeKeys->filter(
+                static fn (PortalNodeKeyInterface $pnKey): bool => !$pnKey->equals($foundPortalNode->getPortalNodeKey())
+            );
         }
 
-        if ($portalNodeKeys !== []) {
-            throw new PortalNodesMissingException(new PortalNodeKeyCollection(\array_values($portalNodeKeys)), 1654573096);
+        if (!$portalNodeKeys->isEmpty()) {
+            throw new PortalNodesMissingException($portalNodeKeys, 1654573096);
         }
 
         return $result;
     }
 
-    /**
-     * @param RouteAddPayload[] $failedScenarios
-     */
-    private function revertLogicError(RouteAddResultCollection $result, array $failedScenarios): void
+    private function revertLogicError(RouteAddResultCollection $result, RouteAddPayloadCollection $failedScenarios): void
     {
         $createdRouteKeys = new RouteKeyCollection($result->column('getRouteKey'));
         $deletedException = null;
@@ -209,7 +205,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         }
 
         throw new RouteAddFailedException(
-            new RouteAddPayloadCollection($failedScenarios),
+            $failedScenarios,
             $failedToRevert,
             $createdAndReverted,
             1654573097,
