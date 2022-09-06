@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
@@ -40,20 +41,24 @@ final class EmitService implements EmitServiceInterface
 
     private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
 
-    private EmissionActorInterface $emissionActor;
+    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
+
+    private EmitterStackProcessorInterface $stackProcessor;
 
     public function __construct(
         EmitContextFactoryInterface $emitContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmissionActorInterface $emissionActor
+        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
+        EmitterStackProcessorInterface $stackProcessor
     ) {
         $this->emitContextFactory = $emitContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emissionActor = $emissionActor;
+        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
+        $this->stackProcessor = $stackProcessor;
     }
 
     public function emit(TypedMappingComponentCollection $mappingComponents): void
@@ -61,6 +66,7 @@ final class EmitService implements EmitServiceInterface
         $emittingPortalNodes = [];
         $entityType = $mappingComponents->getEntityType();
 
+        /** @var MappingComponentStructContract $mapping */
         foreach ($mappingComponents as $mapping) {
             $portalNodeKey = $mapping->getPortalNodeKey();
 
@@ -81,14 +87,9 @@ final class EmitService implements EmitServiceInterface
                 continue;
             }
 
-            /** @var string[] $externalIds */
-            $externalIds = (new MappingComponentCollection($mappingComponents->filter(
-                static fn (MappingComponentStructContract $mapping) => $mapping->getPortalNodeKey()->equals($portalNodeKey)
-            )))->map(
-                static fn (MappingComponentStructContract $mapping) => $mapping->getExternalId()
-            );
+            $externalIds = (new MappingComponentCollection($mappingComponents->filterByPortalNodeKey($portalNodeKey)))->getExternalIds();
 
-            $this->emissionActor->performEmission($externalIds, $stack, $this->getEmitContext($portalNodeKey));
+            $this->stackProcessor->processStack($externalIds, $stack, $this->getEmitContext($portalNodeKey));
         }
     }
 
@@ -102,11 +103,23 @@ final class EmitService implements EmitServiceInterface
         if (!\array_key_exists($cacheKey, $this->emissionStackCache)) {
             $builder = $this->emitterStackBuilderFactory
                 ->createEmitterStackBuilder($portalNodeKey, $entityType)
-                ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
+                ->pushSource();
 
-            $this->emissionStackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            if ($builder->isEmpty()) {
+                return null;
+            }
+
+            $builder->pushDecorators();
+
+            if ($builder->isEmpty()) {
+                $this->emissionStackCache[$cacheKey] = null;
+            } else {
+                foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                    $builder = $builder->push($emitter);
+                }
+
+                $this->emissionStackCache[$cacheKey] = $builder->build();
+            }
         }
 
         $result = $this->emissionStackCache[$cacheKey];

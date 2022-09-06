@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
-use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsData;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
@@ -16,7 +16,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Psr\Log\LoggerInterface;
 
-final class ReceptionActor implements ReceptionActorInterface
+final class ReceiverStackProcessor implements ReceiverStackProcessorInterface
 {
     private LoggerInterface $logger;
 
@@ -28,7 +28,7 @@ final class ReceptionActor implements ReceptionActorInterface
         $this->deepObjectIterator = $deepObjectIterator;
     }
 
-    public function performReception(
+    public function processStack(
         TypedDatasetEntityCollection $entities,
         ReceiverStackInterface $stack,
         ReceiveContextInterface $context

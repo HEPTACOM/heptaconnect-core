@@ -7,8 +7,9 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -38,20 +39,24 @@ final class ReceiveService implements ReceiveServiceInterface
 
     private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
 
-    private ReceptionActorInterface $receptionActor;
+    private ReceiverStackProcessorInterface $receiverStackProcessor;
+
+    private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory;
 
     public function __construct(
         ReceiveContextFactoryInterface $receiveContextFactory,
         LoggerInterface $logger,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
-        ReceptionActorInterface $receptionActor
+        ReceiverStackProcessorInterface $receiverStackProcessor,
+        ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory
     ) {
         $this->receiveContextFactory = $receiveContextFactory;
         $this->logger = $logger;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
-        $this->receptionActor = $receptionActor;
+        $this->receiverStackProcessor = $receiverStackProcessor;
+        $this->receptionFlowReceiversFactory = $receptionFlowReceiversFactory;
     }
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void
@@ -72,7 +77,7 @@ final class ReceiveService implements ReceiveServiceInterface
             return;
         }
 
-        $this->receptionActor->performReception($entities, $stack, $this->getReceiveContext($portalNodeKey));
+        $this->receiverStackProcessor->processStack($entities, $stack, $this->getReceiveContext($portalNodeKey));
     }
 
     /**
@@ -87,11 +92,19 @@ final class ReceiveService implements ReceiveServiceInterface
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
                 ->createReceiverStackBuilder($portalNodeKey, $entityType)
-                ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
+                ->pushSource();
 
-            $this->receiverStackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            if ($builder->isEmpty()) {
+                $this->receiverStackCache[$cacheKey] = null;
+            } else {
+                $builder = $builder->pushDecorators();
+
+                foreach ($this->receptionFlowReceiversFactory->createReceivers($portalNodeKey, $entityType) as $receiver) {
+                    $builder = $builder->push($receiver);
+                }
+
+                $this->receiverStackCache[$cacheKey] = $builder->build();
+            }
         }
 
         $result = $this->receiverStackCache[$cacheKey];
