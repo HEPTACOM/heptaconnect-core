@@ -160,7 +160,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             ]);
         }
 
-        $portalNodeKeys = $portalNodeKeys->unique();
+        $portalNodeKeys = $portalNodeKeys->asUnique();
         $foundPortalNodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria($portalNodeKeys));
 
         /** @var PortalNodeGetResult $foundPortalNode */
