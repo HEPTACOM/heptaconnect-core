@@ -19,7 +19,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionAct
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalExtensionsAreAlreadyActiveOnPortalNodeException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
 final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivateUiActionInterface
 {
@@ -91,6 +91,6 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
             return;
         }
 
-        throw new PortalNodeMissingException($portalNodeKey, 1650142328);
+        throw new PortalNodesMissingException(new PortalNodeKeyCollection([$portalNodeKey]), 1650142328);
     }
 }
