@@ -31,7 +31,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         EntityType $entityType,
         LoggerInterface $logger
     ) {
-        $sources = new ReceiverCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;

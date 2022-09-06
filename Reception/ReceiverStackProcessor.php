@@ -33,7 +33,7 @@ final class ReceiverStackProcessor implements ReceiverStackProcessorInterface
         ReceiverStackInterface $stack,
         ReceiveContextInterface $context
     ): void {
-        if ($entities->count() < 1) {
+        if ($entities->isEmpty()) {
             return;
         }
 
