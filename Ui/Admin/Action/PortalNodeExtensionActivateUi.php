@@ -74,7 +74,7 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
                 foreach ($queriedPortalExtensions as $portalExtension) {
                     $portalExtensionType = $portalExtension::class();
 
-                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyActiveExtensions->has($portalExtensionType)) {
+                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyActiveExtensions->contains($portalExtensionType)) {
                         $alreadyActiveExtensions->push([$portalExtensionType]);
                     } else {
                         $portalExtensionActivePayload->addExtension($portalExtensionType);

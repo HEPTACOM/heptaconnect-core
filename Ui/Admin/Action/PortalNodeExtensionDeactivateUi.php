@@ -72,7 +72,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
                 foreach ($queriedPortalExtensions as $portalExtension) {
                     $portalExtensionType = $portalExtension::class();
 
-                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyInactiveExtensions->has($portalExtensionType)) {
+                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyInactiveExtensions->contains($portalExtensionType)) {
                         $portalExtensionDeactivatePayload->addExtension($portalExtensionType);
                     } else {
                         $alreadyInactiveExtensions->push([$portalExtensionType]);
