@@ -9,9 +9,12 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterfac
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-interface HttpHandlingActorInterface
+interface HttpHandlerStackProcessorInterface
 {
-    public function performHttpHandling(
+    /**
+     * Passes the request and a proposed response through the stack and returns the response to send.
+     */
+    public function processStack(
         ServerRequestInterface $request,
         ResponseInterface $response,
         HttpHandlerStackInterface $stack,

@@ -6,9 +6,10 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
@@ -33,7 +34,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
      */
     private array $contextCache = [];
 
-    private HttpHandlingActorInterface $actor;
+    private HttpHandlerStackProcessorInterface $stackProcessor;
 
     private HttpHandleContextFactoryInterface $contextFactory;
 
@@ -47,22 +48,26 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
 
+    private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory;
+
     public function __construct(
-        HttpHandlingActorInterface $actor,
+        HttpHandlerStackProcessorInterface $stackProcessor,
         HttpHandleContextFactoryInterface $contextFactory,
         LoggerInterface $logger,
         HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ResponseFactoryInterface $responseFactory,
-        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction
+        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
+        HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory
     ) {
-        $this->actor = $actor;
+        $this->stackProcessor = $stackProcessor;
         $this->contextFactory = $contextFactory;
         $this->logger = $logger;
         $this->stackBuilderFactory = $stackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->responseFactory = $responseFactory;
         $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
+        $this->httpHandleFlowHttpHandlersFactory = $httpHandleFlowHttpHandlersFactory;
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
@@ -99,7 +104,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
         } else {
-            $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
+            $response = $this->stackProcessor->processStack($request, $response, $stack, $this->getContext($portalNodeKey));
         }
 
         return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);
@@ -112,11 +117,19 @@ final class HttpHandleService implements HttpHandleServiceInterface
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory
                 ->createHttpHandlerStackBuilder($portalNodeKey, $path)
-                ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
+                ->pushSource();
 
-            $this->stackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            if ($builder->isEmpty()) {
+                $this->stackCache[$cacheKey] = null;
+            } else {
+                $builder = $builder->pushDecorators();
+
+                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($portalNodeKey, $path) as $handler) {
+                    $builder = $builder->push($handler);
+                }
+
+                $this->stackCache[$cacheKey] = $builder->build();
+            }
         }
 
         $result = $this->stackCache[$cacheKey];
