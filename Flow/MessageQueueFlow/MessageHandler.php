@@ -48,7 +48,7 @@ class MessageHandler implements MessageSubscriberInterface
             }
         } catch (\Throwable $throwable) {
             $this->logger->emergency('Jobs can not be loaded to be processed', [
-                'jobKeys' => \iterable_to_array($message->getJobKeys()),
+                'jobKeys' => $message->getJobKeys()->asArray(),
                 'exception' => $throwable,
                 'code' => 1647396033,
             ]);
