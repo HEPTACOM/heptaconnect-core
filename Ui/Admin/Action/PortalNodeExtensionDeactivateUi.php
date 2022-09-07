@@ -19,7 +19,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionDea
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalExtensionsAreAlreadyInactiveOnPortalNodeException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
 final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeactivateUiActionInterface
 {
@@ -74,7 +74,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
                 foreach ($queriedPortalExtensions as $portalExtension) {
                     $portalExtensionType = $portalExtension::class();
 
-                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyInactiveExtensions->has($portalExtensionType)) {
+                    if ($portalExtensionState->isActive($portalExtension) && !$alreadyInactiveExtensions->contains($portalExtensionType)) {
                         $portalExtensionDeactivatePayload->addExtension($portalExtensionType);
                     } else {
                         $alreadyInactiveExtensions->push([$portalExtensionType]);
@@ -91,6 +91,6 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
             return;
         }
 
-        throw new PortalNodeMissingException($portalNodeKey, 1650732001);
+        throw new PortalNodesMissingException(new PortalNodeKeyCollection([$portalNodeKey]), 1650732001);
     }
 }
