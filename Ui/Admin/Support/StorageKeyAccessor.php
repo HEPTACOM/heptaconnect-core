@@ -50,8 +50,10 @@ final class StorageKeyAccessor implements StorageKeyAccessorInterface
     {
         try {
             return $this->storageKeyGenerator->deserialize($keyData);
-        } catch (\Throwable $exception) {
+        } catch (UnsupportedStorageKeyException $exception) {
             throw new StorageKeyDataNotSupportedException($keyData, 1660417907, $exception);
+        } catch (\Throwable $exception) {
+            throw new ReadException(1660417913, $exception);
         }
     }
 
@@ -59,8 +61,10 @@ final class StorageKeyAccessor implements StorageKeyAccessorInterface
     {
         try {
             return $this->storageKeyGenerator->serialize($storageKey);
-        } catch (\Throwable $exception) {
+        } catch (UnsupportedStorageKeyException $exception) {
             throw new StorageKeyNotSupportedException($storageKey, 1660417908, $exception);
+        } catch (\Throwable $exception) {
+            throw new ReadException(1660417912, $exception);
         }
     }
 
