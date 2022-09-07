@@ -19,6 +19,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\ReadException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\StorageKeyDataNotSupportedException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\StorageKeyNotSupportedException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface;
@@ -77,8 +78,10 @@ final class StorageKeyAccessor implements StorageKeyAccessorInterface
             if ($storageKey instanceof JobKeyInterface) {
                 return $this->canGetJob($storageKey);
             }
-        } catch (\Throwable $exception) {
+        } catch (UnsupportedStorageKeyException $exception) {
             throw new StorageKeyNotSupportedException($storageKey, 1660417909, $exception);
+        } catch (\Throwable $exception) {
+            throw new ReadException(1660417911, $exception);
         }
 
         throw new StorageKeyNotSupportedException($storageKey, 1660417910);
