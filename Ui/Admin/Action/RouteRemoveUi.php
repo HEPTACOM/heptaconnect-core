@@ -28,8 +28,7 @@ final class RouteRemoveUi implements RouteRemoveUiActionInterface
 
     public function remove(RouteRemoveCriteria $criteria): void
     {
-        /** @var RouteKeyInterface[] $uncheckedRouteKeys */
-        $uncheckedRouteKeys = \iterable_to_array($criteria->getRouteKeys());
+        $uncheckedRouteKeys = $criteria->getRouteKeys()->asUnique();
 
         try {
             $foundRoutes = $this->routeGetAction->get(new RouteGetCriteria($criteria->getRouteKeys()));
@@ -38,8 +37,7 @@ final class RouteRemoveUi implements RouteRemoveUiActionInterface
         }
 
         foreach ($foundRoutes as $foundRoute) {
-            $uncheckedRouteKeys = \array_filter(
-                $uncheckedRouteKeys,
+            $uncheckedRouteKeys = $uncheckedRouteKeys->filter(
                 static fn (RouteKeyInterface $k): bool => !$k->equals($foundRoute->getRouteKey())
             );
         }
