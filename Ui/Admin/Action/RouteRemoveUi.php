@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteRemove\RouteRemoveCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RoutesMissingException;
 
 final class RouteRemoveUi implements RouteRemoveUiActionInterface
 {
@@ -42,8 +42,8 @@ final class RouteRemoveUi implements RouteRemoveUiActionInterface
             );
         }
 
-        foreach ($uncheckedRouteKeys as $routeKey) {
-            throw new RouteMissingException($routeKey, 1659293801);
+        if (!$uncheckedRouteKeys->isEmpty()) {
+            throw new RoutesMissingException($uncheckedRouteKeys, 1659293801);
         }
 
         try {
