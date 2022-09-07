@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetA
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeRemove\PortalNodeRemoveCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeRemoveUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
 final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 {
@@ -30,8 +30,7 @@ final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 
     public function remove(PortalNodeRemoveCriteria $criteria): void
     {
-        /** @var PortalNodeKeyInterface[] $uncheckedPortalNodeKeys */
-        $uncheckedPortalNodeKeys = \iterable_to_array($criteria->getPortalNodeKeys());
+        $uncheckedPortalNodeKeys = $criteria->getPortalNodeKeys()->asUnique();
 
         try {
             $foundPortalNodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria($criteria->getPortalNodeKeys()));
@@ -40,14 +39,13 @@ final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
         }
 
         foreach ($foundPortalNodes as $foundPortalNode) {
-            $uncheckedPortalNodeKeys = \array_filter(
-                $uncheckedPortalNodeKeys,
+            $uncheckedPortalNodeKeys = $uncheckedPortalNodeKeys->filter(
                 static fn (PortalNodeKeyInterface $k): bool => !$k->equals($foundPortalNode->getPortalNodeKey())
             );
         }
 
-        foreach ($uncheckedPortalNodeKeys as $portalNodeKey) {
-            throw new PortalNodeMissingException($portalNodeKey, 1650758001);
+        if (!$uncheckedPortalNodeKeys->isEmpty()) {
+            throw new PortalNodesMissingException($uncheckedPortalNodeKeys, 1650758001);
         }
 
         try {
