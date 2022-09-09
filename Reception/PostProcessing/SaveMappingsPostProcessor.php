@@ -43,7 +43,7 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
         $saveMappingsData = \iterable_to_array($event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class));
         $entities = \array_map(static fn (SaveMappingsData $data): DatasetEntityContract => $data->getEntity(), $saveMappingsData);
 
-        $this->saveMappings($event->getContext()->getPortalNodeKey(), \iterable_to_array($entities));
+        $this->saveMappings($event->getContext()->getPortalNodeKey(), $entities);
 
         foreach ($saveMappingsData as $saveMappingData) {
             $event->getContext()->getPostProcessingBag()->remove($saveMappingData);
