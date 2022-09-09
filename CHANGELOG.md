@@ -9,9 +9,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Move `\Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Emission\EmitterStack`
+- Move `\Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStack`
+- Add `$entityType` parameter to `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStack::__construct` to implement new `\Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface::supports`
+- Move `\Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack` out of `heptaconnect/portal-base` into this package as `\Heptacom\HeptaConnect\Core\Reception\ReceiverStack`
+- Add implementation `\Heptacom\HeptaConnect\Core\Job\Transition\EmittedEntitiesToReceiveJobsConverter` and its interface `\Heptacom\HeptaConnect\Core\Job\Transition\Contract\EmittedEntitiesToJobsConverterInterface` to convert results of an emission into receive jobs
+- Add log message code `1661091900` to `\Heptacom\HeptaConnect\Core\Job\Transition\EmittedEntitiesToReceiveJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
+- Add implementation `\Heptacom\HeptaConnect\Core\Job\Transition\ExploredPrimaryKeysToEmissionJobsConverter` and its interface `\Heptacom\HeptaConnect\Core\Job\Transition\Contract\ExploredPrimaryKeysToJobsConverterInterface` to convert results of an exploration into emission jobs
+- Add log message code `1661091901` to `\Heptacom\HeptaConnect\Core\Job\Transition\ExploredPrimaryKeysToEmissionJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
+- Add log message code `1661818271` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when unlocking of a lock failed
+- Add log message code `1661818272` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when even after retrying the reception could not be locked
+- Add `\Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator` to create instances of entities with any primary key. This code is not useful for long and therefore does not receive an interface and is just an extraction refactoring of already existing code
+- Add `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter` to dispatch receive jobs from any emission stack, where this emitter is pushed onto
+- Add `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer` as base class for explorer, which capture stack processing and process the captured data in batches
+- Add `\Heptacom\HeptaConnect\Core\Emission\AbstractBufferedResultProcessingEmitter` as base class for emitter, which capture stack processing and process the captured data in batches
+- Add `\Heptacom\HeptaConnect\Core\Emission\EmissionFlowEmittersFactory` described in `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionFlowEmittersFactoryInterface` to return emitters, that provide core functionality for the emission flow
+- Add `\Heptacom\HeptaConnect\Core\Exploration\DirectEmissionFlowEmittersFactory` described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface` to return emitters, that provide core functionality for the direct emission flow
+- Add `\Heptacom\HeptaConnect\Core\Exploration\ExplorationFlowExplorersFactory` described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationFlowExplorersFactoryInterface` to return explorers, that provide core functionality for the exploration flow
+- Add `\Heptacom\HeptaConnect\Core\Reception\ReceptionFlowReceiversFactory` described in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to return receivers, that provide core functionality for the reception flow
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleFlowHttpHandlersFactory` described in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to return HTTP handlers, that provide core functionality for the HTTP handle flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface`
@@ -19,7 +39,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface`
 - Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
+- Add exception code `1660417907` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when the given storage key data is not compatible with the storage implementation
+- Add exception code `1660417908` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when the given storage key is not compatible with the storage implementation
+- Add exception code `1660417909` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key is not compatible with the storage implementation
+- Add exception code `1660417910` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key is not supported in existence checks
+- Add exception code `1660417911` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key existence check failed in the storage implementation
+- Add exception code `1660417912` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when serialization failed in the storage implementation
+- Add exception code `1660417913` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when deserialization failed in the storage implementation
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
 - Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node
@@ -30,6 +58,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1650718861` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when the portal node alias is already taken
 - Add exception code `1650718862` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation fails due to a storage exception
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
+- Add exception code `1654573095` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when one of the requested route payloads already exists
+- Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
+- Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
+- Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
 
 ### Changed
 
@@ -41,6 +73,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update implementation `\Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable` to match changes in `\Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface`
 - Change `$class` parameter in `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract::instantiatePortal` to be a `\Heptacom\HeptaConnect\Portal\Base\Portal\PortalType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
 - Change `$class` parameter in `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract::instantiatePortalExtension` to be a `\Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType` instead of a string for better [type safe class strings](https://heptaconnect.io/reference/adr/2022-06-12-type-safe-class-strings/)
+- Change `$emissionActor` parameter in `\Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow\DirectEmissionFlow::__construct` to be a `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface` and a `\Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface` instead of a `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` to control the contents of the direct emission stack
+- Change `$emissionActor` parameter in `\Heptacom\HeptaConnect\Core\Emission\EmitService::__construct` to be a `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface` and a `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionFlowEmittersFactoryInterface` instead of a `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` to control the contents of the emission stack
+- Change `$explorationActor` parameter in `\Heptacom\HeptaConnect\Core\Exploration\ExploreService::__construct` to be a `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackProcessorInterface` and a `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationFlowExplorersFactoryInterface` instead of a `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` to control the contents of the exploration stack
+- Replace `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` partially with stack processing service described in `\Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface`, that is implemented by `\Heptacom\HeptaConnect\Core\Emission\EmitterStackProcessor`
+- Replace `\Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface` partially with job dispatching from emitter stacks in `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with stack processing service described in `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackProcessorInterface`, that is implemented by `\Heptacom\HeptaConnect\Core\Exploration\ExplorerStackProcessor`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with job dispatching from explorer stacks in `\Heptacom\HeptaConnect\Core\Exploration\EmissionJobDispatchingExplorer`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with triggering emission stack processing for direct emission in `\Heptacom\HeptaConnect\Core\Exploration\DirectEmittingExplorer`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring explorer in `\Heptacom\HeptaConnect\Core\Exploration\IdentityMappingExplorer`
+- Replace `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorationActorInterface` partially with entities' identities existence ensuring emitter for direct emission in `\Heptacom\HeptaConnect\Core\Emission\IdentityMappingEmitter`
+- Rename interface `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface` to `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface` to match restructure of other flow components into same pattern
+- Rename class `\Heptacom\HeptaConnect\Core\Reception\ReceptionActor` to `\Heptacom\HeptaConnect\Core\Reception\ReceiverStackProcessor` to match restructure of other flow components into same pattern
+- Rename interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface` to match restructure of other flow components into same pattern
+- Rename class `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackProcessor` to match restructure of other flow components into same pattern
+- Add parameter of `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to extend HTTP handle flow by core HTTP handlers
+- Add parameter of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` to extend reception flow by core receivers
+- Extract reception locking and release from `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` into `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` and `\Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable`
 
 ### Deprecated
 

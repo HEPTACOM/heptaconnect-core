@@ -31,7 +31,7 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
         string $path,
         LoggerInterface $logger
     ) {
-        $sources = new HttpHandlerCollection($sources->bySupport($path));
+        $sources = $sources->bySupport($path);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->path = $path;
