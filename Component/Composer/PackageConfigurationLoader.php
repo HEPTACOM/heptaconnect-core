@@ -41,56 +41,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $cacheItem = null;
         }
 
-        $factory = new Factory();
-        $workingDir = null;
-
-        if ($this->composerJson !== null) {
-            $workingDir = \dirname($this->composerJson);
-
-            if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
-                $workingDir = null;
-            }
-        }
-
-        $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
-        $result = new PackageConfigurationCollection();
-
-        if ($workingDir === null) {
-            $cwd = \getcwd();
-
-            if (\is_string($cwd)) {
-                $workingDir = $cwd;
-            }
-        }
-
-        foreach ($this->iteratePackages($composer) as $packageInstance) {
-            $config = new PackageConfiguration();
-            $heptaconnectKeywords = \array_filter(
-                $packageInstance->getKeywords(),
-                fn (string $k): bool => \str_starts_with($k, 'heptaconnect-')
-            );
-
-            if ($heptaconnectKeywords === []) {
-                continue;
-            }
-
-            $config->setName($packageInstance->getName());
-            $config->setTags(new StringCollection($heptaconnectKeywords));
-
-            $extra = $packageInstance->getExtra();
-            $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
-
-            if ($heptaconnect !== []) {
-                /* @var array<array-key, string> $keywords */
-                $config->setConfiguration($heptaconnect);
-            }
-
-            foreach ($this->iterateClassMaps($composer, $packageInstance, $workingDir) as $class => $file) {
-                $config->getAutoloadedFiles()->addClass($class, $file);
-            }
-
-            $result->push([$config]);
-        }
+        $result = $this->getPackageConfigurationUncached();
 
         if ($cacheItem instanceof CacheItemInterface) {
             $cacheItem->set($result);
@@ -172,5 +123,72 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
                 }
             }
         }
+    }
+
+    private function getPackageConfigurationUncached(): PackageConfigurationCollection
+    {
+        $factory = new Factory();
+        $workingDir = null;
+
+        if ($this->composerJson !== null) {
+            $workingDir = \dirname($this->composerJson);
+
+            if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
+                $workingDir = null;
+            }
+        }
+
+        $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
+        $result = new PackageConfigurationCollection();
+
+        if ($workingDir === null) {
+            $cwd = \getcwd();
+
+            if (\is_string($cwd)) {
+                $workingDir = $cwd;
+            }
+        }
+
+        foreach ($this->iteratePackages($composer) as $packageInstance) {
+            $heptaconnectKeywords = \array_filter(
+                $packageInstance->getKeywords(),
+                static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
+            );
+
+            if ($heptaconnectKeywords === []) {
+                continue;
+            }
+
+            $result->push([
+                $this->getConfigFromPackage($packageInstance, $heptaconnectKeywords, $composer, $workingDir),
+            ]);
+        }
+
+        return $result;
+    }
+
+    private function getConfigFromPackage(
+        CompletePackageInterface $packageInstance,
+        array $heptaconnectKeywords,
+        Composer $composer,
+        string $workingDir
+    ): PackageConfiguration {
+        $config = new PackageConfiguration();
+        $config->setName($packageInstance->getName());
+        $config->setTags(new StringCollection($heptaconnectKeywords));
+
+        $extra = $packageInstance->getExtra();
+        $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
+
+        if ($heptaconnect !== []) {
+            /* @var array<array-key, string> $keywords */
+            $config->setConfiguration($heptaconnect);
+        }
+
+        foreach ($this->iterateClassMaps($composer, $packageInstance, $workingDir) as $class => $file) {
+            $config->getAutoloadedFiles()->addClass($class, $file);
+        }
+
+        return $config;
     }
 }

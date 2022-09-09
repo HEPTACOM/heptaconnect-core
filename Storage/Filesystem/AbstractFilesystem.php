@@ -8,6 +8,9 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Handler;
 use League\Flysystem\PluginInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractFilesystem implements FilesystemInterface
 {
     protected FilesystemInterface $filesystem;

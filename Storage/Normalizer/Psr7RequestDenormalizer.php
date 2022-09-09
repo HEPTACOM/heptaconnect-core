@@ -34,20 +34,38 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        $requestData = \json_decode(
+        $requestData = (array) \json_decode(
             $data,
             true,
             512,
             \JSON_INVALID_UTF8_IGNORE | \JSON_THROW_ON_ERROR
         );
 
-        $request = $this->requestFactory->createRequest($requestData['method'], $requestData['uri'])
-            ->withRequestTarget($requestData['requestTarget'])
-            ->withProtocolVersion($requestData['protocolVersion'])
-            ->withBody($this->streamFactory->createStream($requestData['body']));
+        $method = $requestData['method'] ?? null;
+        $uri = $requestData['uri'] ?? null;
+        $requestTarget = $requestData['requestTarget'] ?? null;
+        $protocolVersion = $requestData['protocolVersion'] ?? null;
+        $content = $requestData['body'] ?? null;
+        $headers = $requestData['headers'] ?? null;
 
-        foreach ($requestData['headers'] as $name => $values) {
-            $request = $request->withHeader($name, $values);
+        $request = $this->requestFactory->createRequest($method, $uri);
+
+        if (\is_string($requestTarget)) {
+            $request = $request->withRequestTarget($requestTarget);
+        }
+
+        if (\is_string($protocolVersion)) {
+            $request = $request->withProtocolVersion($protocolVersion);
+        }
+
+        if (\is_string($content)) {
+            $request = $request->withBody($this->streamFactory->createStream($content));
+        }
+
+        if (\is_array($headers)) {
+            foreach ($headers as $name => $values) {
+                $request = $request->withHeader($name, $values);
+            }
         }
 
         return $request;

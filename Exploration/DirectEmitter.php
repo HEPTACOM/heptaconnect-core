@@ -56,7 +56,7 @@ final class DirectEmitter extends EmitterContract
         $externalIds = \iterable_to_array($externalIds);
         $type = $this->supports();
 
-        yield from $this->entities->filter(
+        return $this->entities->filter(
             static fn (DatasetEntityContract $entity): bool => \is_string($entity->getPrimaryKey())
                 && \in_array($entity->getPrimaryKey(), $externalIds, true)
                 && \is_a($entity, $type)

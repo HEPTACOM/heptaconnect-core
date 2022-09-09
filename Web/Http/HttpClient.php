@@ -14,6 +14,10 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class HttpClient extends HttpClientContract implements LoggerAwareInterface
 {
     private LoggerInterface $logger;

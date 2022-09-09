@@ -40,17 +40,7 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
 
         foreach ($this->iterateOverItems($criteria->getPortalNodeKey()) as $item) {
-            if (!$criteria->getShowActive() && $item->getActive()) {
-                continue;
-            }
-
-            if (!$criteria->getShowInactive() && !$item->getActive()) {
-                continue;
-            }
-
-            if ($itemsToSkip > 0) {
-                --$itemsToSkip;
-
+            if ($this->shouldSkipItem($criteria, $item, $itemsToSkip)) {
                 continue;
             }
 
@@ -64,6 +54,9 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         }
     }
 
+    /**
+     * @return iterable<int, PortalNodeExtensionBrowseResult>
+     */
     private function iterateOverItems(PortalNodeKeyInterface $portalNodeKey): iterable
     {
         $findResult = $this->portalExtensionFindAction->find($portalNodeKey);
@@ -81,5 +74,27 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
                 yield new PortalNodeExtensionBrowseResult($portalNodeKey, $isActive, $extension::class());
             }
         }
+    }
+
+    private function shouldSkipItem(
+        PortalNodeExtensionBrowseCriteria $criteria,
+        PortalNodeExtensionBrowseResult $item,
+        int &$itemsToSkip
+    ): bool {
+        if (!$criteria->getShowActive() && $item->getActive()) {
+            return true;
+        }
+
+        if (!$criteria->getShowInactive() && !$item->getActive()) {
+            return true;
+        }
+
+        if ($itemsToSkip > 0) {
+            --$itemsToSkip;
+
+            return true;
+        }
+
+        return false;
     }
 }
