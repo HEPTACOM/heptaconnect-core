@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
-use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverStack;
 use Psr\Log\LoggerInterface;
 
 final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
@@ -32,7 +31,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         EntityType $entityType,
         LoggerInterface $logger
     ) {
-        $sources = new ReceiverCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
@@ -94,11 +93,13 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 
     public function build(): ReceiverStackInterface
     {
-        $receiverStack = new ReceiverStack(\array_map(
-            static fn (ReceiverContract $e) => clone $e,
-            \array_reverse($this->receivers, false),
-        ));
-        $receiverStack->setLogger($this->logger);
+        $receiverStack = new ReceiverStack(
+            \array_map(
+                static fn (ReceiverContract $receiver): ReceiverContract => clone $receiver,
+                \array_reverse($this->receivers, false),
+            ),
+            $this->logger
+        );
 
         $this->logger->debug('ReceiverStackBuilder: Built receiver stack.');
 

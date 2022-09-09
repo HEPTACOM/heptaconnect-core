@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Psr\Log\LoggerInterface;
 
 final class EmitterStackBuilder implements EmitterStackBuilderInterface
@@ -32,7 +31,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         EntityType $entityType,
         LoggerInterface $logger
     ) {
-        $sources = new EmitterCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
@@ -94,11 +93,14 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function build(): EmitterStackInterface
     {
-        $emitterStack = new EmitterStack(\array_map(
-            static fn (EmitterContract $e) => clone $e,
-            \array_reverse($this->emitters, false),
-        ), $this->entityType);
-        $emitterStack->setLogger($this->logger);
+        $emitterStack = new EmitterStack(
+            \array_map(
+                static fn (EmitterContract $emitter): EmitterContract => clone $emitter,
+                \array_reverse($this->emitters, false),
+            ),
+            $this->entityType,
+            $this->logger
+        );
 
         $this->logger->debug('EmitterStackBuilder: Built emitter stack.');
 

@@ -4,19 +4,29 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
 
-use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachableInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\CollectionInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
 {
     private array $prototypedIds;
 
-    public function __construct(array $prototypedIds)
+    /**
+     * @var class-string[]
+     */
+    private array $excludedClasses;
+
+    /**
+     * @param class-string[] $excludedClasses
+     */
+    public function __construct(array $prototypedIds, array $excludedClasses)
     {
         $this->prototypedIds = $prototypedIds;
+        $this->excludedClasses = $excludedClasses;
     }
 
     public function process(ContainerBuilder $container): void
@@ -43,20 +53,10 @@ final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassI
             return false;
         }
 
-        if (\is_a($class, \Throwable::class, true)) {
-            return false;
-        }
-
-        if (\is_a($class, DatasetEntityContract::class, true)) {
-            return false;
-        }
-
-        if (\is_a($class, CollectionInterface::class, true)) {
-            return false;
-        }
-
-        if (\is_a($class, AttachableInterface::class, true)) {
-            return false;
+        foreach ($this->excludedClasses as $excludedClass) {
+            if (\is_a($class, $excludedClass, true)) {
+                return false;
+            }
         }
 
         $reflection = new \ReflectionClass($class);
