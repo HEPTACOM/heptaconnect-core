@@ -37,10 +37,10 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
     {
         $itemsLeft = $criteria->getPageSize();
         $page = $criteria->getPage();
-        $skipFilter = $this->getSkipFilter($criteria);
+        $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
 
         foreach ($this->iterateOverItems($criteria->getPortalNodeKey()) as $item) {
-            if ($skipFilter($item)) {
+            if ($this->shouldSkipItem($criteria, $item, $itemsToSkip)) {
                 continue;
             }
 
@@ -73,35 +73,25 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         }
     }
 
-    private function getSkipFilter(PortalNodeExtensionBrowseCriteria $criteria): \Closure
-    {
-        $result = static fn (PortalNodeExtensionBrowseResult $item): bool => false;
-
-        if (!$criteria->getShowActive()) {
-            $oldResult = $result;
-            $result = static fn (PortalNodeExtensionBrowseResult $item): bool => $item->getActive() || $oldResult($item);
+    private function shouldSkipItem(
+        PortalNodeExtensionBrowseCriteria $criteria,
+        PortalNodeExtensionBrowseResult $item,
+        int &$itemsToSkip
+    ): bool {
+        if (!$criteria->getShowActive() && $item->getActive()) {
+            return true;
         }
 
-        if (!$criteria->getShowInactive()) {
-            $oldResult = $result;
-            $result = static fn (PortalNodeExtensionBrowseResult $item): bool => !$item->getActive() || $oldResult($item);
+        if (!$criteria->getShowInactive() && !$item->getActive()) {
+            return true;
         }
 
-        $page = $criteria->getPage();
-        $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
+        if ($itemsToSkip > 0) {
+            --$itemsToSkip;
 
-        return static function (PortalNodeExtensionBrowseResult $item) use (&$itemsToSkip, $result): bool {
-            if ($result($item)) {
-                return true;
-            }
+            return true;
+        }
 
-            if ($itemsToSkip > 0) {
-                --$itemsToSkip;
-
-                return true;
-            }
-
-            return false;
-        };
+        return false;
     }
 }
