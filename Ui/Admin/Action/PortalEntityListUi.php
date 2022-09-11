@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\P
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\PortalNodeEntityListResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalEntityListUi implements PortalEntityListUiActionInterface
 {
@@ -21,7 +22,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
         $this->portalNodeEntityListUiAction = $portalNodeEntityListUiAction;
     }
 
-    public function list(PortalEntityListCriteria $criteria): iterable
+    public function list(PortalEntityListCriteria $criteria, UiActionContextInterface $context): iterable
     {
         $portalNodeKey = new PreviewPortalNodeKey($criteria->getPortal());
 
@@ -32,7 +33,7 @@ final class PortalEntityListUi implements PortalEntityListUiActionInterface
         $portalNodeCriteria->setFilterSupportedEntityType($criteria->getFilterSupportedEntityType());
 
         return \iterable_map(
-            $this->portalNodeEntityListUiAction->list($portalNodeCriteria),
+            $this->portalNodeEntityListUiAction->list($portalNodeCriteria, $context),
             static fn (PortalNodeEntityListResult $result) => new PortalEntityListResult(
                 $result->getCodeOrigin(),
                 $result->getSupportedEntityType(),

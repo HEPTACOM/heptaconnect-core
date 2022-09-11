@@ -19,6 +19,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\PortalNodeEntityListCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\PortalNodeEntityListResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterface
 {
@@ -42,7 +43,7 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
         $this->receiverCodeOriginFinder = $receiverCodeOriginFinder;
     }
 
-    public function list(PortalNodeEntityListCriteria $criteria): iterable
+    public function list(PortalNodeEntityListCriteria $criteria, UiActionContextInterface $context): iterable
     {
         $portalNodeKey = $criteria->getPortalNodeKey();
         $entityType = $criteria->getFilterSupportedEntityType();

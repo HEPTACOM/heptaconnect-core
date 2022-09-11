@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Storage\Base\Exception\ReadException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeAdd\PortalNodeAddPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeAdd\PortalNodeAddResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeAliasIsAlreadyAssignedException;
 
@@ -31,7 +32,7 @@ final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
         $this->portalNodeAliasFindAction = $portalNodeAliasFindAction;
     }
 
-    public function add(PortalNodeAddPayload $payload): PortalNodeAddResult
+    public function add(PortalNodeAddPayload $payload, UiActionContextInterface $context): PortalNodeAddResult
     {
         $alias = $payload->getPortalNodeAlias();
 

@@ -26,6 +26,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayloadCol
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResultCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAddFailedException;
@@ -57,7 +58,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         $this->portalNodeGetAction = $portalNodeGetAction;
     }
 
-    public function add(RouteAddPayloadCollection $payloads): RouteAddResultCollection
+    public function add(RouteAddPayloadCollection $payloads, UiActionContextInterface $context): RouteAddResultCollection
     {
         $createPayload = $this->validatePayloads($payloads);
 

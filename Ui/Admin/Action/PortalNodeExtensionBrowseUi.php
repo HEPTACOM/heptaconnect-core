@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetA
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionBrowse\PortalNodeExtensionBrowseCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionBrowse\PortalNodeExtensionBrowseResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiActionInterface
 {
@@ -33,7 +34,7 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
         $this->portalLoader = $portalLoader;
     }
 
-    public function browse(PortalNodeExtensionBrowseCriteria $criteria): iterable
+    public function browse(PortalNodeExtensionBrowseCriteria $criteria, UiActionContextInterface $context): iterable
     {
         $itemsLeft = $criteria->getPageSize();
         $page = $criteria->getPage();

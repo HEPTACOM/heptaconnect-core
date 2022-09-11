@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceIn
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionInterface
 {
@@ -18,7 +19,7 @@ final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionIn
         $this->statusReportingService = $statusReportingService;
     }
 
-    public function report(PortalNodeStatusReportPayload $payloads): iterable
+    public function report(PortalNodeStatusReportPayload $payloads, UiActionContextInterface $context): iterable
     {
         $portalNodeKey = $payloads->getPortalNodeKey();
 

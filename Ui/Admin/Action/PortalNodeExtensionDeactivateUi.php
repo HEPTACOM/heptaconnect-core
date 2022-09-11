@@ -16,6 +16,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExt
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionDeactivate\PortalNodeExtensionDeactivatePayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalExtensionsAreAlreadyInactiveOnPortalNodeException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
@@ -46,7 +47,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
         $this->portalLoader = $portalLoader;
     }
 
-    public function deactivate(PortalNodeExtensionDeactivatePayload $payload): void
+    public function deactivate(PortalNodeExtensionDeactivatePayload $payload, UiActionContextInterface $context): void
     {
         if ($payload->getPortalExtensionQueries() === []) {
             return;
