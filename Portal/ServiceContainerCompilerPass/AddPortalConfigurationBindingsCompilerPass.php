@@ -52,7 +52,7 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
                 $this->getConstructorArgumentNames($definition),
                 $this->getConstructorCallNames($definition),
             );
-            $related = \array_filter($argumentNames, static fn (string $k): bool => \strncmp($k, '$config', 7) === 0);
+            $related = \array_filter($argumentNames, static fn (string $key): bool => \strncmp($key, '$config', 7) === 0);
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
 
             $definition->setBindings($requiredBindings);
@@ -126,7 +126,7 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
         $parameters = $method->getParameters();
         $parameters = \array_filter($parameters, [$this, 'isParameterScalarish']);
 
-        return \array_map(static fn (\ReflectionParameter $p): string => '$' . $p->getName(), $parameters);
+        return \array_map(static fn (\ReflectionParameter $param): string => '$' . $param->getName(), $parameters);
     }
 
     private function isParameterScalarish(\ReflectionParameter $parameter): bool

@@ -51,6 +51,13 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
         return $this->get(FlowComponentRegistry::class);
     }
 
+    /**
+     * @template TGet
+     *
+     * @param class-string<TGet> $id
+     *
+     * @return TGet
+     */
     public function get($id)
     {
         return $this->container->get($id);
