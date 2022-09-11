@@ -74,7 +74,7 @@ final class PortalRegistry implements PortalRegistryInterface
         if (!isset($this->cache['portalExtensions'][$cacheKey])) {
             $extensions = $this->portalLoader->getPortalExtensions()->bySupport($portalClass);
 
-            if ($extensions->count() > 0 && !$portalNodeKey instanceof PreviewPortalNodeKey) {
+            if (!$extensions->isEmpty() && !$portalNodeKey instanceof PreviewPortalNodeKey) {
                 $portalExtensionFindResult = $this->portalExtensionFindAction->find($portalNodeKey);
 
                 $extensions = new PortalExtensionCollection($extensions->filter([$portalExtensionFindResult, 'isActive']));
