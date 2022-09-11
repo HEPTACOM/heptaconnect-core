@@ -35,14 +35,7 @@ final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderIn
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
-                            $startLine = $reflection->getStartLine();
-                            $endLine = $reflection->getEndLine();
-
-                            return new CodeOrigin(
-                                $filepath,
-                                $startLine !== false ? $startLine : -1,
-                                $endLine !== false ? $endLine : -1
-                            );
+                            return $this->createOrigin($reflection, $filepath);
                         }
                     } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
@@ -58,19 +51,27 @@ final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderIn
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
-                $startLine = $reflection->getStartLine();
-                $endLine = $reflection->getEndLine();
-
-                return new CodeOrigin(
-                    $filepath,
-                    $startLine !== false ? $startLine : -1,
-                    $endLine !== false ? $endLine : -1
-                );
+                return $this->createOrigin($reflection, $filepath);
             }
         } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($httpHandler, 1637607700, $e);
         }
 
         throw new CodeOriginNotFound($httpHandler, 1637607701);
+    }
+
+    /**
+     * @param \ReflectionClass|\ReflectionFunction $reflection
+     */
+    private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
+    {
+        $startLine = $reflection->getStartLine();
+        $endLine = $reflection->getEndLine();
+
+        return new CodeOrigin(
+            $filepath,
+            $startLine !== false ? $startLine : -1,
+            $endLine !== false ? $endLine : -1
+        );
     }
 }

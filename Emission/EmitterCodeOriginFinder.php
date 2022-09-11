@@ -31,14 +31,7 @@ final class EmitterCodeOriginFinder implements EmitterCodeOriginFinderInterface
                         $filepath = $reflection->getFileName();
 
                         if (\is_string($filepath)) {
-                            $startLine = $reflection->getStartLine();
-                            $endLine = $reflection->getEndLine();
-
-                            return new CodeOrigin(
-                                $filepath,
-                                $startLine !== false ? $startLine : -1,
-                                $endLine !== false ? $endLine : -1
-                            );
+                            return $this->createOrigin($reflection, $filepath);
                         }
                     } catch (\ReflectionException $e) {
                         $lastReflectionException = $e;
@@ -54,19 +47,27 @@ final class EmitterCodeOriginFinder implements EmitterCodeOriginFinderInterface
             $filepath = $reflection->getFileName();
 
             if (\is_string($filepath)) {
-                $startLine = $reflection->getStartLine();
-                $endLine = $reflection->getEndLine();
-
-                return new CodeOrigin(
-                    $filepath,
-                    $startLine !== false ? $startLine : -1,
-                    $endLine !== false ? $endLine : -1
-                );
+                return $this->createOrigin($reflection, $filepath);
             }
         } catch (\ReflectionException $e) {
             throw new CodeOriginNotFound($emitter, 1637607654, $e);
         }
 
         throw new CodeOriginNotFound($emitter, 1637607655);
+    }
+
+    /**
+     * @param \ReflectionClass|\ReflectionFunction $reflection
+     */
+    private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
+    {
+        $startLine = $reflection->getStartLine();
+        $endLine = $reflection->getEndLine();
+
+        return new CodeOrigin(
+            $filepath,
+            $startLine !== false ? $startLine : -1,
+            $endLine !== false ? $endLine : -1
+        );
     }
 }
