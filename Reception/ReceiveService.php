@@ -56,7 +56,7 @@ final class ReceiveService implements ReceiveServiceInterface
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void
     {
-        if ($entities->count() === 0) {
+        if ($entities->isEmpty()) {
             return;
         }
 
