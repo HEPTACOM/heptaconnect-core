@@ -45,16 +45,7 @@ final class JobRunUi implements JobRunUiActionInterface
         }
 
         foreach ($payload->getJobKeys() as $jobKey) {
-            $found = false;
-
-            foreach ($foundJobKeys as $foundJobKey) {
-                if ($foundJobKey->equals($jobKey)) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            if (!$found) {
+            if (!$foundJobKeys->contains($jobKey)) {
                 throw new JobMissingException($jobKey, 1659721163);
             }
         }
