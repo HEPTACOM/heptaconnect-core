@@ -14,19 +14,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Move decision of exclusion by class for automatically created portal node container services from `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass` into `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::getContainerExcludedClasses`
-
 ### Deprecated
 
 ### Removed
 
 ### Fixed
 
-- Fix reception of multiple entities with the same identity within a single batch in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
-- Add fallback value for the reported topic in `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService::reportSingleTopic`
 - Skip broken entries in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` instead of returning an empty list
 
 ### Security
+
+## [0.9.1.0] - 2022-08-15
+
+### Changed
+
+- Move decision of exclusion by class for automatically created portal node container services from `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass` into `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::getContainerExcludedClasses`
+
+### Fixed
+
+- Fix reception of multiple entities with the same identity within a single batch in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+- Add fallback value for the reported topic in `\Heptacom\HeptaConnect\Core\StatusReporting\StatusReportingService::reportSingleTopic`
+- Prevent parallelization lock from being released immediately after creating or checking it in `\Heptacom\HeptaConnect\Core\Parallelization\ResourceLockStorage`
 
 ## [0.9.0.2] - 2022-04-23
 
