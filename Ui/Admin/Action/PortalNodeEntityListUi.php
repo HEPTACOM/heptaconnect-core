@@ -18,6 +18,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\PortalNodeEntityListCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeEntityList\PortalNodeEntityListResult;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
@@ -41,6 +42,11 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
         $this->explorerCodeOriginFinder = $explorerCodeOriginFinder;
         $this->emitterCodeOriginFinder = $emitterCodeOriginFinder;
         $this->receiverCodeOriginFinder = $receiverCodeOriginFinder;
+    }
+
+    public static function class(): UiActionType
+    {
+        return new UiActionType(PortalNodeEntityListUiActionInterface::class);
     }
 
     public function list(PortalNodeEntityListCriteria $criteria, UiActionContextInterface $context): iterable

@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeAlias\PortalNod
 use Heptacom\HeptaConnect\Storage\Base\Exception\ReadException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeAdd\PortalNodeAddPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeAdd\PortalNodeAddResult;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
@@ -30,6 +31,11 @@ final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
     ) {
         $this->portalNodeCreateAction = $portalNodeCreateAction;
         $this->portalNodeAliasFindAction = $portalNodeAliasFindAction;
+    }
+
+    public static function class(): UiActionType
+    {
+        return new UiActionType(PortalNodeAddUiActionInterface::class);
     }
 
     public function add(PortalNodeAddPayload $payload, UiActionContextInterface $context): PortalNodeAddResult

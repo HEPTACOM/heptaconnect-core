@@ -16,6 +16,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExt
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExtensionFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionActivate\PortalNodeExtensionActivatePayload;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
@@ -46,6 +47,11 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
         $this->portalExtensionActivateAction = $portalExtensionActivateAction;
         $this->packageQueryMatcher = $packageQueryMatcher;
         $this->portalLoader = $portalLoader;
+    }
+
+    public static function class(): UiActionType
+    {
+        return new UiActionType(PortalNodeExtensionActivateUiActionInterface::class);
     }
 
     public function activate(PortalNodeExtensionActivatePayload $payload, UiActionContextInterface $context): void
