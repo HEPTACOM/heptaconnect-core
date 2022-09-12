@@ -10,6 +10,17 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract;
 interface AuditTrailInterface
 {
     /**
+     * Log and return the given throwable and mark the audit trail as ended.
+     *
+     * @template TThrowable of \Throwable
+     *
+     * @param TThrowable $throwable
+     *
+     * @return TThrowable
+     */
+    public function throwable(\Throwable $throwable): \Throwable;
+
+    /**
      * Mark the trail as ended.
      */
     public function end(): void;

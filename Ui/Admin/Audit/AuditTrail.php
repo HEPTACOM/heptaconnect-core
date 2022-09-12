@@ -17,6 +17,13 @@ final class AuditTrail implements AuditTrailInterface
         }
     }
 
+    public function throwable(\Throwable $throwable): \Throwable
+    {
+        $this->end();
+
+        return $throwable;
+    }
+
     public function end(): void
     {
         $this->hasEnded = true;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Create\PortalNodeCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Create\PortalNodeCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Create\PortalNodeCreateResult;
@@ -21,14 +22,18 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeAliasIsAlre
 
 final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private PortalNodeCreateActionInterface $portalNodeCreateAction;
 
     private PortalNodeAliasFindActionInterface $portalNodeAliasFindAction;
 
     public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
         PortalNodeCreateActionInterface $portalNodeCreateAction,
         PortalNodeAliasFindActionInterface $portalNodeAliasFindAction
     ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->portalNodeCreateAction = $portalNodeCreateAction;
         $this->portalNodeAliasFindAction = $portalNodeAliasFindAction;
     }
@@ -40,17 +45,18 @@ final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
 
     public function add(PortalNodeAddPayload $payload, UiActionContextInterface $context): PortalNodeAddResult
     {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payload, $context]);
         $alias = $payload->getPortalNodeAlias();
 
         if ($alias !== null) {
             try {
                 $foundAliases = $this->portalNodeAliasFindAction->find(new PortalNodeAliasFindCriteria([$alias]));
             } catch (ReadException $e) {
-                throw new PersistException(1650718860, $e);
+                throw $trail->throwable(new PersistException(1650718860, $e));
             }
 
             foreach ($foundAliases as $foundAlias) {
-                throw new PortalNodeAliasIsAlreadyAssignedException($foundAlias->getAlias(), $foundAlias->getPortalNodeKey(), 1650718861);
+                throw $trail->throwable(new PortalNodeAliasIsAlreadyAssignedException($foundAlias->getAlias(), $foundAlias->getPortalNodeKey(), 1650718861));
             }
         }
 
@@ -59,14 +65,16 @@ final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
                 new PortalNodeCreatePayload($payload->getPortalClass(), $payload->getPortalNodeAlias()),
             ]));
         } catch (\Throwable $throwable) {
-            throw new PersistException(1650718862, $throwable);
+            throw $trail->throwable(new PersistException(1650718862, $throwable));
         }
 
         /** @var PortalNodeCreateResult $createdPortalNode */
         foreach ($createdPortalNodes as $createdPortalNode) {
+            $trail->end();
+
             return new PortalNodeAddResult($createdPortalNode->getPortalNodeKey());
         }
 
-        throw new PersistException(1650718863);
+        throw $trail->throwable(new PersistException(1650718863));
     }
 }
