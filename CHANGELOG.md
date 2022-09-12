@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1660417911` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key existence check failed in the storage implementation
 - Add exception code `1660417912` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when serialization failed in the storage implementation
 - Add exception code `1660417913` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when deserialization failed in the storage implementation
+- Add exception code `1663051795` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi::list` when reading entity support fails
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
 - Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node

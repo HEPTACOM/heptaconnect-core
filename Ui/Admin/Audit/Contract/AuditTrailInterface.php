@@ -21,6 +21,28 @@ interface AuditTrailInterface
     public function throwable(\Throwable $throwable): \Throwable;
 
     /**
+     * Log and return the given result object and mark the audit trail as ended.
+     *
+     * @template TResult of object
+     *
+     * @param TResult $result
+     *
+     * @return TResult
+     */
+    public function return(object $result): object;
+
+    /**
+     * Log and return the given result objects and mark the audit trail as ended.
+     *
+     * @template TResult of object
+     *
+     * @param iterable<TResult> $result
+     *
+     * @return iterable<TResult>
+     */
+    public function returnIterable(iterable $result): iterable;
+
+    /**
      * Mark the trail as ended.
      */
     public function end(): void;

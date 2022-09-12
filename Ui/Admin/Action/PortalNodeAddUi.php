@@ -70,9 +70,7 @@ final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
 
         /** @var PortalNodeCreateResult $createdPortalNode */
         foreach ($createdPortalNodes as $createdPortalNode) {
-            $trail->end();
-
-            return new PortalNodeAddResult($createdPortalNode->getPortalNodeKey());
+            return $trail->return(new PortalNodeAddResult($createdPortalNode->getPortalNodeKey()));
         }
 
         throw $trail->throwable(new PersistException(1650718863));

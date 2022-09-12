@@ -110,9 +110,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $failedScenarios = \array_diff_key($requestedScenarios, $createdScenarios);
 
             if ($failedScenarios === []) {
-                $trail->end();
-
-                return $result;
+                return $trail->return($result);
             }
         } catch (\Throwable $throwable) {
             throw $trail->throwable(new PersistException(1654573098, $throwable));
