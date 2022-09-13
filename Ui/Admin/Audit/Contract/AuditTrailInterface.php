@@ -32,6 +32,18 @@ interface AuditTrailInterface
     public function return(object $result): object;
 
     /**
+     * Log and return the given result object, but does not mark the audit trail as ended
+     * as more calls of this are expected and a closing @see end
+     *
+     * @template TResult of object
+     *
+     * @param TResult $result
+     *
+     * @return TResult
+     */
+    public function yield(object $result): object;
+
+    /**
      * Log and return the given result objects and mark the audit trail as ended.
      *
      * @template TResult of object

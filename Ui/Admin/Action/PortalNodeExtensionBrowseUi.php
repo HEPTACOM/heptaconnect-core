@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -19,6 +20,8 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
     private PortalExtensionFindActionInterface $portalExtensionFindAction;
@@ -26,10 +29,12 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
     private ComposerPortalLoader $portalLoader;
 
     public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
         PortalNodeGetActionInterface $portalNodeGetAction,
         PortalExtensionFindActionInterface $portalExtensionFindAction,
         ComposerPortalLoader $portalLoader
     ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->portalExtensionFindAction = $portalExtensionFindAction;
         $this->portalLoader = $portalLoader;
@@ -42,6 +47,7 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
 
     public function browse(PortalNodeExtensionBrowseCriteria $criteria, UiActionContextInterface $context): iterable
     {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$criteria, $context]);
         $itemsLeft = $criteria->getPageSize();
         $page = $criteria->getPage();
         $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
@@ -57,8 +63,10 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
 
             --$itemsLeft;
 
-            yield $item;
+            yield $trail->yield($item);
         }
+
+        $trail->end();
     }
 
     /**

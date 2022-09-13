@@ -24,6 +24,11 @@ final class AuditTrail implements AuditTrailInterface
         return $result;
     }
 
+    public function yield(object $result): object
+    {
+        return $result;
+    }
+
     public function returnIterable(iterable $result): iterable
     {
         try {
