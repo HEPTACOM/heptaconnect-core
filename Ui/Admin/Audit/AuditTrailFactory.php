@@ -13,6 +13,13 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
 {
     public function create(UiActionInterface $uiAction, UiAuditContext $auditContext, array $ingoing): AuditTrailInterface
     {
-        return new AuditTrail();
+        return new AuditTrail(
+            function (object $output): void {
+            },
+            function (\Throwable $throwable): void {
+            },
+            function (): void {
+            },
+        );
     }
 }
