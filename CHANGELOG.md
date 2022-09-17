@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Load composer packages also from `require-dev` section of `composer.lock` file in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`
+
 ### Changed
 
 ### Deprecated
