@@ -142,6 +142,19 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
                 yield $packageInstance;
             }
+
+            $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
+            $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
+
+            foreach ($packageDevLockData as $package) {
+                $packageInstance = $locker->getLockedRepository(true)->findPackage($package['name'], $package['version']);
+
+                if (!$packageInstance instanceof CompletePackageInterface) {
+                    continue;
+                }
+
+                yield $packageInstance;
+            }
         }
 
         yield $composer->getPackage();
