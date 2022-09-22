@@ -67,6 +67,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
+- Add exception code `1663677420` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when starting an audit trail failed and a no-op trail is used instead
+- Add exception code `1663677421` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any output to an audit trail failed
+- Add exception code `1663677422` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any exception to an audit trail failed
+- Add exception code `1663677423` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when marking an audit trail as finished
 
 ### Changed
 
