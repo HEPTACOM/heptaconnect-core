@@ -36,6 +36,12 @@ use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class ReceptionHandler implements ReceptionHandlerInterface
 {
     private LockFactory $lockFactory;
@@ -87,7 +93,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
         $receptions = [];
         $routeKeys = new RouteKeyCollection(\iterable_map(
             $jobs->column('getPayload'),
-            static fn (?array $p): ?RouteKeyInterface => $p[Reception::ROUTE_KEY] ?? null
+            static fn (?array $payload): ?RouteKeyInterface => $payload[Reception::ROUTE_KEY] ?? null
         ));
         $routeDatas = $this->routeGetAction->get(new RouteGetCriteria($routeKeys));
         /** @var RouteGetResult[] $routes */

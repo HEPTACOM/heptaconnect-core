@@ -7,6 +7,10 @@ namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
 {
     private array $prototypedIds;
