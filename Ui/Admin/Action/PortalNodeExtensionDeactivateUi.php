@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionTypeCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -62,7 +63,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
     {
         $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payload, $context]);
 
-        if ($payload->getPortalExtensionQueries() === []) {
+        if ($payload->getPortalExtensionQueries()->count() < 1) {
             $trail->end();
 
             return;
@@ -77,11 +78,12 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
             $portalExtensionState = $this->portalExtensionFindAction->find($portalNodeKey);
             $alreadyInactiveExtensions = new PortalExtensionTypeCollection();
 
+            /** @var ClassStringReferenceContract $query */
             foreach ($payload->getPortalExtensionQueries() as $query) {
-                $queriedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
+                $queriedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions((string) $query, $portalExtensions);
 
                 if ($queriedPortalExtensions->count() === 0) {
-                    throw $trail->throwable(new NoMatchForPackageQueryException($query, 1650731999));
+                    throw $trail->throwable(new NoMatchForPackageQueryException((string) $query, 1650731999));
                 }
 
                 /** @var PortalExtensionContract $portalExtension */
