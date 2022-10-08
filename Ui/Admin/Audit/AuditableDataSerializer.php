@@ -7,6 +7,9 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Audit;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditableDataSerializerInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachableInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\StorageKeyInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Audit\AuditableDataAwareInterface;
 use Psr\Log\LoggerInterface;
 
@@ -14,58 +17,95 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
 {
     private LoggerInterface $logger;
 
+    private StorageKeyGeneratorContract $storageKeyGenerator;
+
     private int $jsonEncodeFlags;
 
-    public function __construct(LoggerInterface $logger, int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        StorageKeyGeneratorContract $storageKeyGenerator,
+        int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES
+    ) {
         $this->logger = $logger;
+        $this->storageKeyGenerator = $storageKeyGenerator;
         $this->jsonEncodeFlags = $jsonEncodeFlags;
     }
 
     public function serialize(AuditableDataAwareInterface $auditableDataAware): string
     {
-        $auditableData = [];
+        $result = [
+            'data' => $this->extractAuditableData($auditableDataAware),
+        ];
 
+        if ($auditableDataAware instanceof AttachmentAwareInterface) {
+            $result['attachedTypes'] = $this->extractAttachableData($auditableDataAware);
+        }
+
+        return $this->jsonEncode($result);
+    }
+
+    private function extractAuditableData(AuditableDataAwareInterface $auditableDataAware): array
+    {
         try {
-            $auditableData['data'] = $auditableDataAware->getAuditableData();
+            $result = $auditableDataAware->getAuditableData();
+
+            foreach ($result as &$item) {
+                if ($item instanceof StorageKeyInterface) {
+                    try {
+                        $item = $this->storageKeyGenerator->serialize($item);
+                    } catch (UnsupportedStorageKeyException $_) {
+                    }
+                }
+            }
+
+            return $result;
         } catch (\Throwable $throwable) {
             $this->logger->alert('Audit cannot get full payload as getAuditableData failed', [
-                'auditableData' => $auditableData,
+                'auditableData' => $auditableDataAware,
                 'throwable' => $throwable,
                 'code' => 1662200022,
             ]);
 
-            $auditableData['data'] = [];
+            return [];
         }
+    }
 
-        if ($auditableDataAware instanceof AttachmentAwareInterface) {
-            $auditableData['attachedTypes'] = \iterable_to_array($auditableDataAware->getAttachments()->map(
-                static fn (AttachableInterface $attachable) => \get_class($attachable)
-            ));
-        }
+    /**
+     * @return class-string[]
+     */
+    private function extractAttachableData(AttachmentAwareInterface $auditableDataAware): array
+    {
+        return \iterable_to_array($auditableDataAware->getAttachments()->map(
+            static fn (AttachableInterface $attachable) => \get_class($attachable)
+        ));
+    }
 
+    private function jsonEncode(array $result): string
+    {
         try {
-            $auditableDataEncoded = \json_encode($auditableData, \JSON_THROW_ON_ERROR | $this->jsonEncodeFlags);
+            $auditableDataEncoded = \json_encode($result, \JSON_THROW_ON_ERROR | $this->jsonEncodeFlags);
 
             \assert(\is_string($auditableDataEncoded));
+
+            return $auditableDataEncoded;
         } catch (\JsonException $jsonError) {
             $this->logger->alert('Audit cannot get full payload due to a json_encode error', [
-                'outputLine' => $auditableData,
+                'outputLine' => $result,
                 'throwable' => $jsonError,
                 'code' => 1662200023,
             ]);
-            $auditableDataEncoded = (string) \json_encode($auditableData, \JSON_PARTIAL_OUTPUT_ON_ERROR | $this->jsonEncodeFlags);
+
+            return (string) \json_encode($result, \JSON_PARTIAL_OUTPUT_ON_ERROR | $this->jsonEncodeFlags);
         } catch (\Throwable $throwable) {
             $this->logger->alert('Audit cannot get full payload due to an exception', [
-                'outputLine' => $auditableData,
+                'outputLine' => $result,
                 'throwable' => $throwable,
                 'code' => 1662200024,
             ]);
-            $auditableDataEncoded = (string) \json_encode([
+
+            return (string) \json_encode([
                 '$error' => 'An unrecoverable error happened during serialization',
             ], $this->jsonEncodeFlags);
         }
-
-        return $auditableDataEncoded;
     }
 }
