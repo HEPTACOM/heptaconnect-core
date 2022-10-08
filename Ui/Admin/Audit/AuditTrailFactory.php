@@ -147,8 +147,18 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
 
     private function unrollThrowable(\Throwable $throwable): iterable
     {
+        $alreadyYielded = [];
+
         do {
+            foreach ($alreadyYielded as $alreadyYield) {
+                if ($alreadyYield === $throwable) {
+                    break 2;
+                }
+            }
+
             yield $throwable;
+
+            $alreadyYielded[] = $throwable;
 
             $throwable = $throwable->getPrevious();
         } while ($throwable !== null);
