@@ -41,6 +41,7 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
         } catch (\Throwable $jsonError) {
             $this->logger->alert('Audit cannot get full payload due to a json_encode error', [
                 'outputLine' => $auditableData,
+                'throwable' => $jsonError,
                 'code' => 1662200023,
             ]);
             $auditableDataEncoded = (string) \json_encode($auditableData, \JSON_PARTIAL_OUTPUT_ON_ERROR | $this->jsonEncodeFlags);
