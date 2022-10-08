@@ -58,7 +58,7 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         $this->logger = $logger;
     }
 
-    public function create(UiActionInterface $uiAction, UiAuditContext $auditContext, array $ingoing): AuditTrailInterface
+    public function create(UiActionInterface $uiAction, UiAuditContext $auditContext, array $inbound): AuditTrailInterface
     {
         try {
             $key = $this->uiAuditTrailBeginAction->begin(new UiAuditTrailBeginPayload(
@@ -66,7 +66,7 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
                 $auditContext->getUiIdentifier(),
                 $uiAction::class(),
                 $auditContext->getUserIdentifier(),
-                $this->unpackAuditables($ingoing)
+                $this->unpackAuditables($inbound)
             ))->getUiAuditTrailKey();
         } catch (\Throwable $throwable) {
             $this->logger->critical('Starting a UI audit failed', [
