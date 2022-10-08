@@ -78,14 +78,7 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
                 'userIdentifier' => $auditContext->getUserIdentifier(),
             ]);
 
-            return new AuditTrail(
-                function (object $_): void {
-                },
-                function (\Throwable $_): void {
-                },
-                function (): void {
-                }
-            );
+            return new NullAuditTrail();
         }
 
         return new AuditTrail(
