@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add log message code `1661091901` to `\Heptacom\HeptaConnect\Core\Job\Transition\ExploredPrimaryKeysToEmissionJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
 - Add log message code `1661818271` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when unlocking of a lock failed
 - Add log message code `1661818272` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when even after retrying the reception could not be locked
+- Add log message code `1662200022` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when the auditable data object fails at exposing auditable data
+- Add log message code `1662200023` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when json_encode can not compose a JSON string
+- Add log message code `1662200024` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when auditable data throws an exception during serialization
 - Add `\Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator` to create instances of entities with any primary key. This code is not useful for long and therefore does not receive an interface and is just an extraction refactoring of already existing code
 - Add `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter` to dispatch receive jobs from any emission stack, where this emitter is pushed onto
 - Add `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer` as base class for explorer, which capture stack processing and process the captured data in batches

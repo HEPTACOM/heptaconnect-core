@@ -24,9 +24,19 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
 
     public function serialize(AuditableDataAwareInterface $auditableDataAware): string
     {
-        $auditableData = [
-            'data' => $auditableDataAware->getAuditableData(),
-        ];
+        $auditableData = [];
+
+        try {
+            $auditableData['data'] = $auditableDataAware->getAuditableData();
+        } catch (\Throwable $throwable) {
+            $this->logger->alert('Audit cannot get full payload as getAuditableData failed', [
+                'auditableData' => $auditableData,
+                'throwable' => $throwable,
+                'code' => 1662200022,
+            ]);
+
+            $auditableData['data'] = [];
+        }
 
         if ($auditableDataAware instanceof AttachmentAwareInterface) {
             $auditableData['attachedTypes'] = \iterable_to_array($auditableDataAware->getAttachments()->map(
@@ -38,13 +48,22 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
             $auditableDataEncoded = \json_encode($auditableData, \JSON_THROW_ON_ERROR | $this->jsonEncodeFlags);
 
             \assert(\is_string($auditableDataEncoded));
-        } catch (\Throwable $jsonError) {
+        } catch (\JsonException $jsonError) {
             $this->logger->alert('Audit cannot get full payload due to a json_encode error', [
                 'outputLine' => $auditableData,
                 'throwable' => $jsonError,
                 'code' => 1662200023,
             ]);
             $auditableDataEncoded = (string) \json_encode($auditableData, \JSON_PARTIAL_OUTPUT_ON_ERROR | $this->jsonEncodeFlags);
+        } catch (\Throwable $throwable) {
+            $this->logger->alert('Audit cannot get full payload due to an exception', [
+                'outputLine' => $auditableData,
+                'throwable' => $throwable,
+                'code' => 1662200024,
+            ]);
+            $auditableDataEncoded = (string) \json_encode([
+                '$error' => 'An unrecoverable error happened during serialization',
+            ], $this->jsonEncodeFlags);
         }
 
         return $auditableDataEncoded;
