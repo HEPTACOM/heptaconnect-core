@@ -76,7 +76,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
 
         try {
             $createPayload = $this->validatePayloads($payloads);
-        } catch (PortalNodesMissingException|RouteAlreadyExistsException|UnsupportedStorageKeyException $e) {
+        } catch (\Throwable $e) {
             throw $trail->throwable($e);
         }
 
