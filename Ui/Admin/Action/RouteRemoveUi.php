@@ -47,7 +47,7 @@ final class RouteRemoveUi implements RouteRemoveUiActionInterface
         $uncheckedRouteKeys = $criteria->getRouteKeys()->asUnique();
 
         try {
-            $foundRoutes = $this->routeGetAction->get(new RouteGetCriteria($criteria->getRouteKeys()));
+            $foundRoutes = $this->routeGetAction->get(new RouteGetCriteria($uncheckedRouteKeys));
         } catch (\Throwable $throwable) {
             throw $trail->throwable(new ReadException(1659293800, $throwable));
         }
