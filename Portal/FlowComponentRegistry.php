@@ -125,12 +125,12 @@ class FlowComponentRegistry
                 ...\array_keys($this->sourcedWebHttpHandlers),
                 ...\array_keys($this->flowBuilderFiles),
             ]);
-            \usort($result, static function (string $a, string $b): int {
-                $aT = (int) \is_a($a, PortalContract::class, true);
-                $bT = (int) \is_a($b, PortalContract::class, true);
+            \usort($result, static function (string $portalClassA, string $portalClassB): int {
+                $aT = (int) \is_a($portalClassA, PortalContract::class, true);
+                $bT = (int) \is_a($portalClassB, PortalContract::class, true);
 
                 if ($aT === $bT) {
-                    return \strcmp($a, $b);
+                    return \strcmp($portalClassA, $portalClassB);
                 }
 
                 return $bT <=> $aT;

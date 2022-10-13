@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionTypeCollection;
@@ -16,13 +17,17 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExt
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExtensionFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionDeactivate\PortalNodeExtensionDeactivatePayload;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalExtensionsAreAlreadyInactiveOnPortalNodeException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
 final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeactivateUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
     private PortalExtensionFindActionInterface $portalExtensionFindAction;
@@ -34,12 +39,14 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
     private ComposerPortalLoader $portalLoader;
 
     public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
         PortalNodeGetActionInterface $portalNodeGetAction,
         PortalExtensionFindActionInterface $portalExtensionFindAction,
         PortalExtensionDeactivateActionInterface $portalExtensionDeactivateAction,
         PackageQueryMatcherInterface $packageQueryMatcher,
         ComposerPortalLoader $portalLoader
     ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->portalExtensionFindAction = $portalExtensionFindAction;
         $this->portalExtensionDeactivateAction = $portalExtensionDeactivateAction;
@@ -47,9 +54,18 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
         $this->portalLoader = $portalLoader;
     }
 
-    public function deactivate(PortalNodeExtensionDeactivatePayload $payload): void
+    public static function class(): UiActionType
     {
+        return new UiActionType(PortalNodeExtensionDeactivateUiActionInterface::class);
+    }
+
+    public function deactivate(PortalNodeExtensionDeactivatePayload $payload, UiActionContextInterface $context): void
+    {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payload, $context]);
+
         if ($payload->getPortalExtensionQueries()->count() < 1) {
+            $trail->end();
+
             return;
         }
 
@@ -67,7 +83,7 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
                 $queriedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions((string) $query, $portalExtensions);
 
                 if ($queriedPortalExtensions->count() === 0) {
-                    throw new NoMatchForPackageQueryException((string) $query, 1650731999);
+                    throw $trail->throwable(new NoMatchForPackageQueryException((string) $query, 1650731999));
                 }
 
                 /** @var PortalExtensionContract $portalExtension */
@@ -83,14 +99,15 @@ final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeacti
             }
 
             if ($portalExtensionDeactivatePayload->getExtensions()->count() < 1) {
-                throw new PortalExtensionsAreAlreadyInactiveOnPortalNodeException($portalNodeKey, $alreadyInactiveExtensions, 1650732000);
+                throw $trail->throwable(new PortalExtensionsAreAlreadyInactiveOnPortalNodeException($portalNodeKey, $alreadyInactiveExtensions, 1650732000));
             }
 
             $this->portalExtensionDeactivateAction->deactivate($portalExtensionDeactivatePayload);
+            $trail->end();
 
             return;
         }
 
-        throw new PortalNodesMissingException(new PortalNodeKeyCollection([$portalNodeKey]), 1650732001);
+        throw $trail->throwable(new PortalNodesMissingException(new PortalNodeKeyCollection([$portalNodeKey]), 1650732001));
     }
 }
