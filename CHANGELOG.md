@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Only load dev-packages from `composer.lock` file when dev-mode is active in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`
+- Only check for dev-mode in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`, if the installed version of composer supports it.
 
 ### Security
 
