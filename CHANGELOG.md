@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add log message code `1661091901` to `\Heptacom\HeptaConnect\Core\Job\Transition\ExploredPrimaryKeysToEmissionJobsConverter::convert` when conversion resulted in no jobs, which can be ok, but is important to know, when looking into failing transfer
 - Add log message code `1661818271` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when unlocking of a lock failed
 - Add log message code `1661818272` to `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` when even after retrying the reception could not be locked
+- Add log message code `1662200022` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when the auditable data object fails at exposing auditable data
+- Add log message code `1662200023` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when json_encode can not compose a JSON string
+- Add log message code `1662200024` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer::serialize` when auditable data throws an exception during serialization
 - Add `\Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator` to create instances of entities with any primary key. This code is not useful for long and therefore does not receive an interface and is just an extraction refactoring of already existing code
 - Add `\Heptacom\HeptaConnect\Core\Emission\ReceiveJobDispatchingEmitter` to dispatch receive jobs from any emission stack, where this emitter is pushed onto
 - Add `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer` as base class for explorer, which capture stack processing and process the captured data in batches
@@ -30,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleFlowHttpHandlersFactory` described in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to return HTTP handlers, that provide core functionality for the HTTP handle flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
+- Add UI audit trail class to stateful log a UI actions behaviour described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface`, implemented in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrail`, `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\NullAuditTrail` and factorized by `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface`
+- Add `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditableDataSerializerInterface` to transform auditable data into a string for storing later
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\Context\UiActionContext` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\Context\UiActionContextFactory` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextFactoryInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
@@ -48,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1660417911` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key existence check failed in the storage implementation
 - Add exception code `1660417912` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when serialization failed in the storage implementation
 - Add exception code `1660417913` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when deserialization failed in the storage implementation
+- Add exception code `1663051795` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi::list` when reading entity support fails
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
 - Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node
@@ -62,6 +70,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
+- Add exception code `1663677420` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when starting an audit trail failed and a no-op trail is used instead
+- Add exception code `1663677421` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any output to an audit trail failed
+- Add exception code `1663677422` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any exception to an audit trail failed
+- Add exception code `1663677423` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when marking an audit trail as finished
 
 ### Changed
 
