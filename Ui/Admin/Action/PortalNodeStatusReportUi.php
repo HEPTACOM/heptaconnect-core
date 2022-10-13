@@ -5,21 +5,35 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeStatusReport\PortalNodeStatusReportResult;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private StatusReportingServiceInterface $statusReportingService;
 
-    public function __construct(StatusReportingServiceInterface $statusReportingService)
-    {
+    public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
+        StatusReportingServiceInterface $statusReportingService
+    ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->statusReportingService = $statusReportingService;
     }
 
-    public function report(PortalNodeStatusReportPayload $payloads): iterable
+    public static function class(): UiActionType
     {
+        return new UiActionType(PortalNodeStatusReportUiActionInterface::class);
+    }
+
+    public function report(PortalNodeStatusReportPayload $payloads, UiActionContextInterface $context): iterable
+    {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payloads, $context]);
         $portalNodeKey = $payloads->getPortalNodeKey();
 
         foreach (\array_unique($payloads->getTopics()) as $topic) {
@@ -33,7 +47,9 @@ final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionIn
 
             unset($result[$topic]);
 
-            yield $topic => new PortalNodeStatusReportResult($portalNodeKey, $topic, $success, $result);
+            yield $topic => $trail->yield(new PortalNodeStatusReportResult($portalNodeKey, $topic, $success, $result));
         }
+
+        $trail->end();
     }
 }

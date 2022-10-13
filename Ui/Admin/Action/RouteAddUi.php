@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
@@ -20,12 +21,15 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteCreateActionIn
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayloadCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResult;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddResultCollection;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAddFailedException;
@@ -33,6 +37,8 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAlreadyExistsExc
 
 final class RouteAddUi implements RouteAddUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private RouteCreateActionInterface $routeCreateAction;
 
     private RouteFindActionInterface $routeFindAction;
@@ -44,12 +50,14 @@ final class RouteAddUi implements RouteAddUiActionInterface
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
     public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
         RouteCreateActionInterface $routeCreateAction,
         RouteFindActionInterface $routeFindAction,
         RouteGetActionInterface $routeGetAction,
         RouteDeleteActionInterface $routeDeleteAction,
         PortalNodeGetActionInterface $portalNodeGetAction
     ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->routeCreateAction = $routeCreateAction;
         $this->routeFindAction = $routeFindAction;
         $this->routeGetAction = $routeGetAction;
@@ -57,9 +65,20 @@ final class RouteAddUi implements RouteAddUiActionInterface
         $this->portalNodeGetAction = $portalNodeGetAction;
     }
 
-    public function add(RouteAddPayloadCollection $payloads): RouteAddResultCollection
+    public static function class(): UiActionType
     {
-        $createPayload = $this->validatePayloads($payloads);
+        return new UiActionType(RouteAddUiActionInterface::class);
+    }
+
+    public function add(RouteAddPayloadCollection $payloads, UiActionContextInterface $context): RouteAddResultCollection
+    {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payloads, $context]);
+
+        try {
+            $createPayload = $this->validatePayloads($payloads);
+        } catch (\Throwable $e) {
+            throw $trail->throwable($e);
+        }
 
         try {
             $routeCreateResults = $this->routeCreateAction->create($createPayload);
@@ -91,13 +110,13 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $failedScenarios = \array_diff_key($requestedScenarios, $createdScenarios);
 
             if ($failedScenarios === []) {
-                return $result;
+                return $trail->return($result);
             }
         } catch (\Throwable $throwable) {
-            throw new PersistException(1654573098, $throwable);
+            throw $trail->throwable(new PersistException(1654573098, $throwable));
         }
 
-        $this->revertLogicError($result, new RouteAddPayloadCollection(\array_values($failedScenarios)));
+        throw $trail->throwable($this->revertLogicError($result, new RouteAddPayloadCollection(\array_values($failedScenarios))));
     }
 
     private function getScenarioFromPayload(RouteAddPayload $payload): string
@@ -118,6 +137,11 @@ final class RouteAddUi implements RouteAddUiActionInterface
         ]);
     }
 
+    /**
+     * @throws PortalNodesMissingException
+     * @throws RouteAlreadyExistsException
+     * @throws UnsupportedStorageKeyException
+     */
     private function validatePayloads(RouteAddPayloadCollection $payloads): RouteCreatePayloads
     {
         $result = new RouteCreatePayloads();
@@ -177,8 +201,10 @@ final class RouteAddUi implements RouteAddUiActionInterface
         return $result;
     }
 
-    private function revertLogicError(RouteAddResultCollection $result, RouteAddPayloadCollection $failedScenarios): void
-    {
+    private function revertLogicError(
+        RouteAddResultCollection $result,
+        RouteAddPayloadCollection $failedScenarios
+    ): RouteAddFailedException {
         $createdRouteKeys = new RouteKeyCollection($result->column('getRouteKey'));
         $deletedException = null;
 
@@ -204,7 +230,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             }
         }
 
-        throw new RouteAddFailedException(
+        return new RouteAddFailedException(
             $failedScenarios,
             $failedToRevert,
             $createdAndReverted,
