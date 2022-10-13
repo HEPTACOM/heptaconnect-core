@@ -106,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add parameter of `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to extend HTTP handle flow by core HTTP handlers
 - Add parameter of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` to extend reception flow by core receivers
 - Extract reception locking and release from `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` into `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` and `\Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable`
+- Change composer dependency `composer/composer:>=1.9` to `composer/composer:^2.2.6` to ensure `\Composer\Repository\InstalledRepositoryInterface::getDevMode` exists and always support loading dev-packages
 
 ### Deprecated
 
