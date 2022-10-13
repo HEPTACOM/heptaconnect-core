@@ -143,7 +143,9 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
                 yield $packageInstance;
             }
 
-            if ($composer->getRepositoryManager()->getLocalRepository()->getDevMode()) {
+            $localRepository = $composer->getRepositoryManager()->getLocalRepository();
+
+            if (\method_exists($localRepository, 'getDevMode') && $localRepository->getDevMode()) {
                 $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
                 $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
 
