@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
 
 use Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpMiddlewareInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -24,7 +24,7 @@ final class AddHttpMiddlewareClientCompilerPass implements CompilerPassInterface
         foreach ($definitions as $id => $definition) {
             $class = $definition->getClass() ?? (string) $id;
 
-            if (!\class_exists($class) || !\is_a($class, HttpMiddlewareInterface::class, true)) {
+            if (!\class_exists($class) || !\is_a($class, HttpClientMiddlewareInterface::class, true)) {
                 continue;
             }
 
