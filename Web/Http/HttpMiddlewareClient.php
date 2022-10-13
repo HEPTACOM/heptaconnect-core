@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpMiddlewareInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -14,12 +14,12 @@ final class HttpMiddlewareClient implements ClientInterface
     private ClientInterface $client;
 
     /**
-     * @var HttpMiddlewareInterface[]
+     * @var HttpClientMiddlewareInterface[]
      */
     private array $middlewares;
 
     /**
-     * @param iterable<HttpMiddlewareInterface> $middlewares
+     * @param iterable<HttpClientMiddlewareInterface> $middlewares
      */
     public function __construct(
         ClientInterface $client,
@@ -34,11 +34,11 @@ final class HttpMiddlewareClient implements ClientInterface
         return $this->next($request, ...$this->middlewares);
     }
 
-    private function next(RequestInterface $request, HttpMiddlewareInterface ...$middlewares): ResponseInterface
+    private function next(RequestInterface $request, HttpClientMiddlewareInterface ...$middlewares): ResponseInterface
     {
         $middleware = \array_shift($middlewares);
 
-        if ($middleware instanceof HttpMiddlewareInterface) {
+        if ($middleware instanceof HttpClientMiddlewareInterface) {
             $next = \Closure::fromCallable(function (RequestInterface $request) use ($middlewares) {
                 return $this->next($request, ...$middlewares);
             });
