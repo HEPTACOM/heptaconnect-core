@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface`.
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface` from a portal-node context.
 - Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.middleware`.
 
 ### Changed
