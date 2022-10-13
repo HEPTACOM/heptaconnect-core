@@ -15,6 +15,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\ReadException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RoutesMissingException;
 
 final class RouteRemoveUi implements RouteRemoveUiActionInterface
@@ -48,7 +49,7 @@ final class RouteRemoveUi implements RouteRemoveUiActionInterface
         try {
             $foundRoutes = $this->routeGetAction->get(new RouteGetCriteria($criteria->getRouteKeys()));
         } catch (\Throwable $throwable) {
-            throw $trail->throwable(new PersistException(1659293800, $throwable));
+            throw $trail->throwable(new ReadException(1659293800, $throwable));
         }
 
         foreach ($foundRoutes as $foundRoute) {
