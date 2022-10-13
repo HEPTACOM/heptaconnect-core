@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -13,10 +14,14 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExt
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionBrowse\PortalNodeExtensionBrowseCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeExtensionBrowse\PortalNodeExtensionBrowseResult;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiActionInterface
 {
+    private AuditTrailFactoryInterface $auditTrailFactory;
+
     private PortalNodeGetActionInterface $portalNodeGetAction;
 
     private PortalExtensionFindActionInterface $portalExtensionFindAction;
@@ -24,33 +29,31 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
     private ComposerPortalLoader $portalLoader;
 
     public function __construct(
+        AuditTrailFactoryInterface $auditTrailFactory,
         PortalNodeGetActionInterface $portalNodeGetAction,
         PortalExtensionFindActionInterface $portalExtensionFindAction,
         ComposerPortalLoader $portalLoader
     ) {
+        $this->auditTrailFactory = $auditTrailFactory;
         $this->portalNodeGetAction = $portalNodeGetAction;
         $this->portalExtensionFindAction = $portalExtensionFindAction;
         $this->portalLoader = $portalLoader;
     }
 
-    public function browse(PortalNodeExtensionBrowseCriteria $criteria): iterable
+    public static function class(): UiActionType
     {
+        return new UiActionType(PortalNodeExtensionBrowseUiActionInterface::class);
+    }
+
+    public function browse(PortalNodeExtensionBrowseCriteria $criteria, UiActionContextInterface $context): iterable
+    {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$criteria, $context]);
         $itemsLeft = $criteria->getPageSize();
         $page = $criteria->getPage();
         $itemsToSkip = $page !== null ? (($page - 1) * $criteria->getPageSize()) : 0;
 
         foreach ($this->iterateOverItems($criteria->getPortalNodeKey()) as $item) {
-            if (!$criteria->getShowActive() && $item->getActive()) {
-                continue;
-            }
-
-            if (!$criteria->getShowInactive() && !$item->getActive()) {
-                continue;
-            }
-
-            if ($itemsToSkip > 0) {
-                --$itemsToSkip;
-
+            if ($this->shouldSkipItem($criteria, $item, $itemsToSkip)) {
                 continue;
             }
 
@@ -60,10 +63,15 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
 
             --$itemsLeft;
 
-            yield $item;
+            yield $trail->yield($item);
         }
+
+        $trail->end();
     }
 
+    /**
+     * @return iterable<int, PortalNodeExtensionBrowseResult>
+     */
     private function iterateOverItems(PortalNodeKeyInterface $portalNodeKey): iterable
     {
         $findResult = $this->portalExtensionFindAction->find($portalNodeKey);
@@ -81,5 +89,27 @@ final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiAc
                 yield new PortalNodeExtensionBrowseResult($portalNodeKey, $isActive, $extension::class());
             }
         }
+    }
+
+    private function shouldSkipItem(
+        PortalNodeExtensionBrowseCriteria $criteria,
+        PortalNodeExtensionBrowseResult $item,
+        int &$itemsToSkip
+    ): bool {
+        if (!$criteria->getShowActive() && $item->getActive()) {
+            return true;
+        }
+
+        if (!$criteria->getShowInactive() && !$item->getActive()) {
+            return true;
+        }
+
+        if ($itemsToSkip > 0) {
+            --$itemsToSkip;
+
+            return true;
+        }
+
+        return false;
     }
 }

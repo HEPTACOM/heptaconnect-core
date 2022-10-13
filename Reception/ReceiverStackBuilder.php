@@ -95,7 +95,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     {
         $receiverStack = new ReceiverStack(
             \array_map(
-                static fn (ReceiverContract $e) => clone $e,
+                static fn (ReceiverContract $receiver): ReceiverContract => clone $receiver,
                 \array_reverse($this->receivers, false),
             ),
             $this->logger

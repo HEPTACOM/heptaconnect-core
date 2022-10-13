@@ -95,7 +95,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
     {
         $emitterStack = new EmitterStack(
             \array_map(
-                static fn (EmitterContract $e) => clone $e,
+                static fn (EmitterContract $emitter): EmitterContract => clone $emitter,
                 \array_reverse($this->emitters, false),
             ),
             $this->entityType,

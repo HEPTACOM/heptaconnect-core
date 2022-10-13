@@ -46,7 +46,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     private ResponseFactoryInterface $responseFactory;
 
-    private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
+    private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction;
 
     private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory;
 
@@ -57,7 +57,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
         ResponseFactoryInterface $responseFactory,
-        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
+        WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
         HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory
     ) {
         $this->stackProcessor = $stackProcessor;
@@ -66,7 +66,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         $this->stackBuilderFactory = $stackBuilderFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->responseFactory = $responseFactory;
-        $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
+        $this->httpHandlerConfigurationFindAction = $httpHandlerConfigurationFindAction;
         $this->httpHandleFlowHttpHandlersFactory = $httpHandleFlowHttpHandlersFactory;
     }
 
@@ -78,7 +78,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
 
-        $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
         $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
 
         if (!$enabled) {
