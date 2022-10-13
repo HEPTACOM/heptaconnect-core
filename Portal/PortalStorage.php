@@ -142,6 +142,7 @@ final class PortalStorage implements PortalStorageInterface
                         'exception' => $throwable,
                         'portalNodeKey' => $this->portalNodeKey,
                     ]);
+
                     continue;
                 }
 
