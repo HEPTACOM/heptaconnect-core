@@ -99,12 +99,12 @@ final class ExploreService implements ExploreServiceInterface
         }
     }
 
-    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
+    private static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
     {
         return new EntityTypeCollection($explorers->column('getSupportedEntityType'));
     }
 
-    protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
+    private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
         $flowComponentRegistry = $this->portalStackServiceContainerFactory
             ->create($portalNodeKey)

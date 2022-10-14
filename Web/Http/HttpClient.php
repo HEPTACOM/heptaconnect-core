@@ -114,7 +114,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return $response;
     }
 
-    protected function getRetryAfterHeader(ResponseInterface $response): ?string
+    private function getRetryAfterHeader(ResponseInterface $response): ?string
     {
         $retryAfterHeaders = $response->getHeader('Retry-After');
         $retryAfterHeader = \array_shift($retryAfterHeaders);
@@ -127,7 +127,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
      */
-    protected function getSleepInterval(string $retryAfter, \DateTime $now): ?int
+    private function getSleepInterval(string $retryAfter, \DateTime $now): ?int
     {
         $retryAfterDate = \DateTime::createFromFormat('D, d M Y H:i:s e', $retryAfter);
 
@@ -140,19 +140,19 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return null;
     }
 
-    protected function isRedirect(ResponseInterface $response): bool
+    private function isRedirect(ResponseInterface $response): bool
     {
         $statusCode = $response->getStatusCode();
 
         return $statusCode >= 300 && $statusCode < 400 && $response->hasHeader('Location');
     }
 
-    protected function isAbsolute(string $location): bool
+    private function isAbsolute(string $location): bool
     {
         return \is_string(\parse_url($location, \PHP_URL_HOST));
     }
 
-    protected function getLocationHeader(ResponseInterface $response): ?string
+    private function getLocationHeader(ResponseInterface $response): ?string
     {
         $locationHeaders = $response->getHeader('Location');
         $locationHeader = \array_shift($locationHeaders);
@@ -160,7 +160,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return \is_string($locationHeader) ? $locationHeader : null;
     }
 
-    protected function isError(ResponseInterface $response): bool
+    private function isError(ResponseInterface $response): bool
     {
         $statusCode = $response->getStatusCode();
 

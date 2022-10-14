@@ -47,7 +47,7 @@ final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassI
         }
     }
 
-    protected function isPrototypable(string $class): bool
+    private function isPrototypable(string $class): bool
     {
         if (!\class_exists($class)) {
             return false;
