@@ -18,9 +18,12 @@ final class HttpMiddlewareCollector implements \IteratorAggregate
      */
     public function __construct(iterable $middlewares)
     {
-        $this->middlewares = \iterable_to_array($middlewares);
+        $this->middlewares = \array_values(\iterable_to_array($middlewares));
     }
 
+    /**
+     * @return \Traversable<int, MiddlewareInterface>
+     */
     public function getIterator(): \Traversable
     {
         return new \ArrayObject($this->middlewares);
