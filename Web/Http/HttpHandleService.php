@@ -104,6 +104,8 @@ final class HttpHandleService implements HttpHandleServiceInterface
             ]);
         } else {
             $context = $this->getContext($portalNodeKey);
+
+            // TODO: Use PortalNodeContainerFacade
             $middlewares = $context->getContainer()->get(HttpMiddlewareCollector::class);
 
             $executeHttpHandlerStack = \Closure::fromCallable(
