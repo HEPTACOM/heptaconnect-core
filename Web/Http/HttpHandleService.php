@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
+use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
@@ -100,9 +101,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
             ]);
         } else {
             $context = $this->getContext($portalNodeKey);
-
-            // TODO collect middlewares
-            $middlewares = [];
+            $middlewares = $context->getContainer()->get(HttpMiddlewareCollector::class);
 
             $executeHttpHandlerStack = \Closure::fromCallable(
                 fn (ServerRequestInterface $request) => $this->actor->performHttpHandling(
