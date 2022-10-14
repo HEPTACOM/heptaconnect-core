@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass` to automatically tag services implementing `\Psr\Http\Server\MiddlewareInterface` with `heptaconnect.http.handler.middleware`.
 - Add `\Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector` as a service in the portal-node container. It is used to retrieve tagged middleware services from the container.
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler` to wrap execution of middleware chain
-- Add composer dependency `psr/http-server-handler: ^1.0` and `psr/http-server-middleware: ^1.0` to support PSR-15 middlewares for http handlers
+- Add composer dependency `psr/http-server-handler: ^1.0` and `psr/http-server-middleware: ^1.0` to support PSR-15 middlewares for HTTP handlers
 - Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
 - Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
 
