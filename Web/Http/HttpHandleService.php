@@ -99,7 +99,23 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
         } else {
-            $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
+            $context = $this->getContext($portalNodeKey);
+
+            // TODO collect middlewares
+            $middlewares = [];
+
+            $executeHttpHandlerStack = \Closure::fromCallable(
+                fn (ServerRequestInterface $request) => $this->actor->performHttpHandling(
+                    $request,
+                    $response,
+                    $stack,
+                    $context
+                )
+            );
+
+            $middlewareHandler = new HttpMiddlewareHandler($executeHttpHandlerStack, ...$middlewares);
+
+            $response = $middlewareHandler->handle($request);
         }
 
         return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);
