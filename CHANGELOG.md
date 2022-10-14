@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface` from a portal-node context.
-- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.middleware`.
+- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.client.middleware`.
 - Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
 - Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
 
