@@ -106,20 +106,18 @@ final class EmitService implements EmitServiceInterface
                 ->pushSource();
 
             if ($builder->isEmpty()) {
+                $this->emissionStackCache[$cacheKey] = null;
+
                 return null;
             }
 
             $builder->pushDecorators();
 
-            if ($builder->isEmpty()) {
-                $this->emissionStackCache[$cacheKey] = null;
-            } else {
-                foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
-                    $builder = $builder->push($emitter);
-                }
-
-                $this->emissionStackCache[$cacheKey] = $builder->build();
+            foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                $builder = $builder->push($emitter);
             }
+
+            $this->emissionStackCache[$cacheKey] = $builder->build();
         }
 
         $result = $this->emissionStackCache[$cacheKey];
