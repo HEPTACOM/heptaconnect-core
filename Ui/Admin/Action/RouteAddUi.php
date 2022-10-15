@@ -125,7 +125,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $payload->getSourcePortalNodeKey(),
             $payload->getTargetPortalNodeKey(),
             $payload->getEntityType(),
-        ]);
+        ], \JSON_THROW_ON_ERROR);
     }
 
     private function getScenarioFromResult(RouteAddResult $result): string
@@ -134,7 +134,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $result->getSourcePortalNodeKey(),
             $result->getTargetPortalNodeKey(),
             $result->getEntityType(),
-        ]);
+        ], \JSON_THROW_ON_ERROR);
     }
 
     /**
