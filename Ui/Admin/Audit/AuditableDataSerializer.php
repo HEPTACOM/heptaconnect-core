@@ -83,9 +83,8 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
     private function jsonEncode(array $result): string
     {
         try {
+            /** @var string $auditableDataEncoded */
             $auditableDataEncoded = \json_encode($result, \JSON_THROW_ON_ERROR | $this->jsonEncodeFlags);
-
-            \assert(\is_string($auditableDataEncoded));
 
             return $auditableDataEncoded;
         } catch (\JsonException $jsonError) {

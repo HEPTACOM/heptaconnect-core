@@ -57,7 +57,7 @@ final class EmitterCodeOriginFinder implements EmitterCodeOriginFinderInterface
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionFunction $reflection
+     * @param \ReflectionClass<EmitterContract>|\ReflectionFunction $reflection
      */
     private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
     {

@@ -38,7 +38,7 @@ abstract class PortalFactoryContract
     }
 
     /**
-     * @template T
+     * @template T of object
      *
      * @param class-string<T> $class
      *

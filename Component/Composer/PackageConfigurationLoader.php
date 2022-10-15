@@ -149,6 +149,8 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             }
         }
 
+        \assert(\is_string($workingDir));
+
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             /** @var array|null $keywords */
             $keywords = $packageInstance->getKeywords();

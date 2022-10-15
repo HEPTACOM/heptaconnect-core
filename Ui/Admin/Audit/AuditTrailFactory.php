@@ -145,6 +145,9 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         }
     }
 
+    /**
+     * @return iterable<int, \Throwable>
+     */
     private function unrollThrowable(\Throwable $throwable): iterable
     {
         $alreadyYielded = [];

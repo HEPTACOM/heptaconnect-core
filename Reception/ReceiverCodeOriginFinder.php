@@ -56,7 +56,7 @@ final class ReceiverCodeOriginFinder implements ReceiverCodeOriginFinderInterfac
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionFunction $reflection
+     * @param \ReflectionClass<ReceiverContract>|\ReflectionFunction $reflection
      */
     private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
     {

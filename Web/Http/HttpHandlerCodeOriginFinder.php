@@ -61,7 +61,7 @@ final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderIn
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionFunction $reflection
+     * @param \ReflectionClass<HttpHandlerContract>|\ReflectionFunction $reflection
      */
     private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
     {

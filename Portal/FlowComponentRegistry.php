@@ -70,6 +70,9 @@ class FlowComponentRegistry
         $this->flowBuilderFiles = $flowBuilderFiles;
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getExplorers(string $source): ExplorerCollection
     {
         $this->loadSource($source);
@@ -77,6 +80,9 @@ class FlowComponentRegistry
         return new ExplorerCollection($this->sourcedExplorers[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getEmitters(string $source): EmitterCollection
     {
         $this->loadSource($source);
@@ -84,6 +90,9 @@ class FlowComponentRegistry
         return new EmitterCollection($this->sourcedEmitters[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getReceivers(string $source): ReceiverCollection
     {
         $this->loadSource($source);
@@ -91,6 +100,9 @@ class FlowComponentRegistry
         return new ReceiverCollection($this->sourcedReceivers[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getStatusReporters(string $source): StatusReporterCollection
     {
         $this->loadSource($source);
@@ -98,6 +110,9 @@ class FlowComponentRegistry
         return new StatusReporterCollection($this->sourcedStatusReporters[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getWebHttpHandlers(string $source): HttpHandlerCollection
     {
         $this->loadSource($source);
@@ -142,6 +157,9 @@ class FlowComponentRegistry
         return $result;
     }
 
+    /**
+     * @param class-string $source
+     */
     private function loadSource(string $source): void
     {
         $files = $this->flowBuilderFiles[$source] ?? [];

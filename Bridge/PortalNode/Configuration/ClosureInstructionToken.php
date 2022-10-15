@@ -16,7 +16,7 @@ final class ClosureInstructionToken extends InstructionTokenContract
     private \Closure $closure;
 
     /**
-     * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $type
+     * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      * @param \Closure(\Closure(): array)                                                            $closure
      */
     public function __construct(string $query, \Closure $closure)

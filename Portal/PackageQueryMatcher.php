@@ -32,6 +32,10 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
         try {
             $storageKey = $this->storageKeyGenerator->deserialize($query);
 
+            if (!$storageKey instanceof PortalNodeKeyInterface) {
+                return new PortalNodeKeyCollection();
+            }
+
             if (!$portalNodeKeys->contains($storageKey)) {
                 return new PortalNodeKeyCollection();
             }

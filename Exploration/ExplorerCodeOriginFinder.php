@@ -56,7 +56,7 @@ final class ExplorerCodeOriginFinder implements ExplorerCodeOriginFinderInterfac
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionFunction $reflection
+     * @param \ReflectionClass<ExplorerContract>|\ReflectionFunction $reflection
      */
     private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
     {

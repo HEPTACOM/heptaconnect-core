@@ -55,7 +55,7 @@ final class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFi
     }
 
     /**
-     * @param \ReflectionClass|\ReflectionFunction $reflection
+     * @param \ReflectionClass<StatusReporterContract>|\ReflectionFunction $reflection
      */
     private function createOrigin(\Reflector $reflection, string $filepath): CodeOrigin
     {

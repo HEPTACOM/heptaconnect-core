@@ -33,29 +33,34 @@ final class MarkAsFailedPostProcessor extends PostProcessorContract
             $event->getContext()->getPostProcessingBag()->of(MarkAsFailedData::class),
             static fn (MarkAsFailedData $data) => $data
         );
+        $logger = $event->getContext()->getContainer()->get(LoggerInterface::class) ?? $this->logger;
 
         /** @var MarkAsFailedData $data */
         foreach ($markAsFailedData as $data) {
             $mapping = $data->getEntity()->getAttachment(PrimaryKeySharingMappingStruct::class);
 
             if ($mapping instanceof MappingInterface) {
-                $mappingComponent = new MappingComponentStruct(
-                    $mapping->getPortalNodeKey(),
-                    $mapping->getEntityType(),
-                    $mapping->getExternalId()
-                );
-                $payload = new IdentityErrorCreatePayload($mappingComponent, $data->getThrowable());
+                $externalId = $mapping->getExternalId();
 
-                $this->identityErrorCreateAction->create(new IdentityErrorCreatePayloads([$payload]));
-            } else {
-                $logger = $event->getContext()->getContainer()->get(LoggerInterface::class) ?? $this->logger;
+                if ($externalId !== null) {
+                    $mappingComponent = new MappingComponentStruct(
+                        $mapping->getPortalNodeKey(),
+                        $mapping->getEntityType(),
+                        $externalId
+                    );
+                    $payload = new IdentityErrorCreatePayload($mappingComponent, $data->getThrowable());
 
-                $logger->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
-                    'throwable' => $data->getThrowable(),
-                    'data' => $data,
-                    'code' => 1637456198,
-                ]);
+                    $this->identityErrorCreateAction->create(new IdentityErrorCreatePayloads([$payload]));
+
+                    continue;
+                }
             }
+
+            $logger->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
+                'throwable' => $data->getThrowable(),
+                'data' => $data,
+                'code' => 1637456198,
+            ]);
         }
     }
 }

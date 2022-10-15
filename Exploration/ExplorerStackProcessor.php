@@ -22,7 +22,15 @@ final class ExplorerStackProcessor implements ExplorerStackProcessorInterface
     public function processStack(ExplorerStackInterface $stack, ExploreContextInterface $context): iterable
     {
         try {
-            yield from $stack->next($context);
+            foreach ($stack->next($context) as $key => $value) {
+                if (\is_int($value)) {
+                    yield $key => (string) $value;
+
+                    continue;
+                }
+
+                yield $key => $value;
+            }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::EXPLORE_NO_THROW(), [
                 'type' => $stack->supports(),
