@@ -73,9 +73,8 @@ final class StreamNormalizer implements NormalizerInterface
 
         if (\class_exists(Hexadecimal::class) && $generatedFilename instanceof Hexadecimal) {
             $filename = $generatedFilename->toString();
-            /** @var string $generatedFilename */
+        /* @var string $generatedFilename */
         } else {
-            /** @var string $generatedFilename */
             $filename = $generatedFilename;
         }
 

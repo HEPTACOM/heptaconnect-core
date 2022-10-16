@@ -57,7 +57,6 @@ class PortalNodeConfigurationHelper
                 throw new \RuntimeException('Can not read JSON file', 1647801830);
             }
 
-
             $config = \json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
 
             if (!\is_array($config)) {
