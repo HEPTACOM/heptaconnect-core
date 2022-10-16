@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 
-class PackageConfiguration
+final class PackageConfiguration
 {
     private string $name = '';
 
