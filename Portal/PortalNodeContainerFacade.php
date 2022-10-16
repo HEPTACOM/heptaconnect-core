@@ -52,11 +52,11 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
     }
 
     /**
-     * @template TGet
+     * @template TGet of object
      *
-     * @param class-string<TGet> $id
+     * @param class-string<TGet>|string $id
      *
-     * @return TGet
+     * @return ($id is class-string<TGet> ? TGet : string)
      */
     public function get($id)
     {
