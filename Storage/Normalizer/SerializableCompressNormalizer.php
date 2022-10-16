@@ -24,9 +24,15 @@ final class SerializableCompressNormalizer implements NormalizerInterface
     /**
      * @param string|null $format
      */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize($object, $format = null, array $context = []): string
     {
-        $result = \gzcompress($this->serializableNormalizer->normalize($object, $format, $context));
+        $compressedValue = $this->serializableNormalizer->normalize($object, $format, $context);
+
+        if (!\is_string($compressedValue)) {
+            throw new GzipCompressException(1637432096);
+        }
+
+        $result = \gzcompress($compressedValue);
 
         if (!\is_string($result)) {
             throw new GzipCompressException(1637432095);
