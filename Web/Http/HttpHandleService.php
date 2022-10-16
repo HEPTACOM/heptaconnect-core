@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
@@ -103,23 +102,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
         } else {
-            $context = $this->getContext($portalNodeKey);
-
-            // TODO: Use PortalNodeContainerFacade
-            $middlewares = $context->getContainer()->get(HttpMiddlewareCollector::class);
-
-            $executeHttpHandlerStack = \Closure::fromCallable(
-                fn (ServerRequestInterface $request) => $this->actor->performHttpHandling(
-                    $request,
-                    $response,
-                    $stack,
-                    $context
-                )
-            );
-
-            $middlewareHandler = new HttpMiddlewareHandler($executeHttpHandlerStack, ...$middlewares);
-
-            $response = $middlewareHandler->handle($request);
+            $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
         }
 
         return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);
@@ -135,6 +118,10 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 ->pushSource()
                 // TODO break when source is already empty
                 ->pushDecorators();
+
+            if (!$builder->isEmpty()) {
+                $builder->push(new HttpMiddlewareChainHandler($path));
+            }
 
             $this->stackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
         }
