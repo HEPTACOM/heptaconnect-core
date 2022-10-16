@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Heptacom\HeptaConnect\Core\Web\Http;
+namespace Heptacom\HeptaConnect\Core\Web\Http\Handler;
 
 use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
+use Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
