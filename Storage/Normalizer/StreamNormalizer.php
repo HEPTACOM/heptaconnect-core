@@ -13,6 +13,7 @@ use League\Flysystem\FilesystemInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 
 final class StreamNormalizer implements NormalizerInterface
 {
@@ -67,16 +68,9 @@ final class StreamNormalizer implements NormalizerInterface
         }
 
         $mediaId = $context['mediaId'] ?? null;
-        $filenameUuid = $mediaId === null ? Uuid::uuid4() : Uuid::uuid5(self::NS_FILENAME, $mediaId);
-        /** @var string|Hexadecimal $generatedFilename */
-        $generatedFilename = $filenameUuid->getHex();
-
-        if (\class_exists(Hexadecimal::class) && $generatedFilename instanceof Hexadecimal) {
-            $filename = $generatedFilename->toString();
-        /* @var string $generatedFilename */
-        } else {
-            $filename = $generatedFilename;
-        }
+        $filename = $this->generateFilename(
+            $mediaId === null ? Uuid::uuid4() : Uuid::uuid5(self::NS_FILENAME, $mediaId)
+        );
 
         $stream = $object->copy()->detach();
 
@@ -98,5 +92,17 @@ final class StreamNormalizer implements NormalizerInterface
         \fclose($stream);
 
         return $filename;
+    }
+
+    private function generateFilename(UuidInterface $filenameUuid): string
+    {
+        /** @var string|Hexadecimal $generatedFilename */
+        $generatedFilename = $filenameUuid->getHex();
+
+        if (\class_exists(Hexadecimal::class) && $generatedFilename instanceof Hexadecimal) {
+            return $generatedFilename->toString();
+        }
+
+        return (string) $generatedFilename;
     }
 }
