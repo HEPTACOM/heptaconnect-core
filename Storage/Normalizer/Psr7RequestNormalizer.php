@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 final class Psr7RequestNormalizer implements NormalizerInterface
 {
+    private RequestSerializerInterface $serializer;
+
+    public function __construct(RequestSerializerInterface $serializer)
+    {
+        $this->serializer = $serializer;
+    }
+
     /**
      * @param string|null $format
      */
@@ -37,13 +45,6 @@ final class Psr7RequestNormalizer implements NormalizerInterface
             );
         }
 
-        return \json_encode([
-            'method' => $object->getMethod(),
-            'uri' => (string) $object->getUri(),
-            'requestTarget' => $object->getRequestTarget(),
-            'protocolVersion' => $object->getProtocolVersion(),
-            'headers' => $object->getHeaders(),
-            'body' => (string) $object->getBody(),
-        ], \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
+        return $this->serializer->serialize($object);
     }
 }

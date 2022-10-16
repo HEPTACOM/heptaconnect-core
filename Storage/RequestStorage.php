@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Storage;
 
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
-use Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer;
-use Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\FileReference\RequestGet\FileReferenceGetRequestCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\FileReference\RequestPersist\FileReferencePersistRequestPayload;
@@ -21,9 +21,9 @@ final class RequestStorage extends RequestStorageContract
 {
     private const DEFAULT_KEY = 'default';
 
-    private Psr7RequestNormalizer $normalizer;
+    private RequestSerializerInterface $serializer;
 
-    private Psr7RequestDenormalizer $denormalizer;
+    private RequestDeserializerInterface $deserializer;
 
     private FileReferenceGetRequestActionInterface $getRequestAction;
 
@@ -32,14 +32,14 @@ final class RequestStorage extends RequestStorageContract
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     public function __construct(
-        Psr7RequestNormalizer $normalizer,
-        Psr7RequestDenormalizer $denormalizer,
+        RequestSerializerInterface $serializer,
+        RequestDeserializerInterface $deserializer,
         FileReferenceGetRequestActionInterface $getRequestAction,
         FileReferencePersistRequestActionInterface $persistRequestAction,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->normalizer = $normalizer;
-        $this->denormalizer = $denormalizer;
+        $this->serializer = $serializer;
+        $this->deserializer = $deserializer;
         $this->getRequestAction = $getRequestAction;
         $this->persistRequestAction = $persistRequestAction;
         $this->storageKeyGenerator = $storageKeyGenerator;
@@ -55,19 +55,15 @@ final class RequestStorage extends RequestStorageContract
         ));
 
         foreach ($requestResults as $requestResult) {
-            $request = $this->denormalizer->denormalize(
-                $requestResult->getSerializedRequest(),
-                'psr7-request'
-            );
-
-            if (!$request instanceof RequestInterface) {
+            try {
+                return $this->deserializer->deserialize($requestResult->getSerializedRequest());
+            } catch (\Throwable $throwable) {
                 throw new \UnexpectedValueException(
                     'Denormalizing a serialized request failed: ' . $requestResult->getSerializedRequest(),
-                    1647790094
+                    1647790094,
+                    $throwable
                 );
             }
-
-            return $request;
         }
 
         throw new \RuntimeException(\sprintf(
@@ -82,7 +78,7 @@ final class RequestStorage extends RequestStorageContract
         PortalNodeKeyInterface $portalNodeKey,
         RequestInterface $request
     ): FileReferenceRequestKeyInterface {
-        $serializedRequest = $this->normalizer->normalize($request);
+        $serializedRequest = $this->serializer->serialize($request);
 
         $payload = new FileReferencePersistRequestPayload($portalNodeKey);
         $payload->addSerializedRequest(self::DEFAULT_KEY, $serializedRequest);
