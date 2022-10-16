@@ -10,6 +10,8 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFacto
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
@@ -78,7 +80,9 @@ final class HttpHandleService implements HttpHandleServiceInterface
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
 
-        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(
+            new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled')
+        );
         $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
 
         if (!$enabled) {
