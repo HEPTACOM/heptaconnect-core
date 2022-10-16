@@ -10,8 +10,6 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFacto
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;

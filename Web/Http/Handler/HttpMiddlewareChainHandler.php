@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http\Handler;
 
+use Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade;
 use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
@@ -28,9 +29,9 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
         HttpHandleContextInterface $context,
         HttpHandlerStackInterface $stack
     ): ResponseInterface {
-        // TODO: Use PortalNodeContainerFacade
+        $container = new PortalNodeContainerFacade($context->getContainer());
         /** @var MiddlewareInterface[] $middlewares */
-        $middlewares = $context->getContainer()->get(HttpMiddlewareCollector::class);
+        $middlewares = $container->get(HttpMiddlewareCollector::class);
 
         $executeHttpHandlerStack = \Closure::fromCallable(
             fn (ServerRequestInterface $request) => $this->handleNext(

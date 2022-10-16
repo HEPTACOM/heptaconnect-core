@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 
 use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
+use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
@@ -46,4 +47,9 @@ abstract class PortalNodeContainerFacadeContract implements ContainerInterface
      * Gets the flow component registry.
      */
     abstract public function getFlowComponentRegistry(): FlowComponentRegistry;
+
+    /**
+     * Gets the HTTP handler middleware collector.
+     */
+    abstract public function getHttpHandlerMiddlewareCollector(): HttpMiddlewareCollector;
 }
