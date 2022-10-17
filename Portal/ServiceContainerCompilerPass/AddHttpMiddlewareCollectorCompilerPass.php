@@ -20,7 +20,7 @@ final class AddHttpMiddlewareCollectorCompilerPass implements CompilerPassInterf
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            $class = $definition->getClass() ?? (string) $id;
+            $class = $definition->getClass() ?? $id;
 
             if (!\class_exists($class) || !\is_a($class, MiddlewareInterface::class, true)) {
                 continue;

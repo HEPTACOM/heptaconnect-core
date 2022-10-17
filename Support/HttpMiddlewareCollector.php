@@ -6,6 +6,9 @@ namespace Heptacom\HeptaConnect\Core\Support;
 
 use Psr\Http\Server\MiddlewareInterface;
 
+/**
+ * @implements \IteratorAggregate<int, MiddlewareInterface>
+ */
 final class HttpMiddlewareCollector implements \IteratorAggregate
 {
     /**
