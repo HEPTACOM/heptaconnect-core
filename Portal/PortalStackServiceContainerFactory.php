@@ -17,8 +17,11 @@ class PortalStackServiceContainerFactory
      */
     private array $portalContainers = [];
 
-    public function __construct(private PortalRegistryInterface $portalRegistry, private PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder, private StorageKeyGeneratorContract $storageKeyGenerator)
-    {
+    public function __construct(
+        private PortalRegistryInterface $portalRegistry,
+        private PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder,
+        private StorageKeyGeneratorContract $storageKeyGenerator
+    ) {
     }
 
     public function create(PortalNodeKeyInterface $portalNodeKey): PortalNodeContainerFacadeContract

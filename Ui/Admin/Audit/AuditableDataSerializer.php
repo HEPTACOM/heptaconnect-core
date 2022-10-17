@@ -15,8 +15,11 @@ use Psr\Log\LoggerInterface;
 
 final class AuditableDataSerializer implements AuditableDataSerializerInterface
 {
-    public function __construct(private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES
+    ) {
     }
 
     public function serialize(AuditableDataAwareInterface $auditableDataAware): string

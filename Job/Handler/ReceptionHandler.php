@@ -44,8 +44,18 @@ use Symfony\Component\Lock\LockFactory;
  */
 final class ReceptionHandler implements ReceptionHandlerInterface
 {
-    public function __construct(private LockFactory $lockFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private ReceiveServiceInterface $receiveService, private DeepObjectIteratorContract $objectIterator, private RouteGetActionInterface $routeGetAction, private LoggerInterface $logger, private JobStartActionInterface $jobStartAction, private JobFinishActionInterface $jobFinishAction, private IdentityMapActionInterface $identityMapAction, private IdentityReflectActionInterface $identityReflectAction)
-    {
+    public function __construct(
+        private LockFactory $lockFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ReceiveServiceInterface $receiveService,
+        private DeepObjectIteratorContract $objectIterator,
+        private RouteGetActionInterface $routeGetAction,
+        private LoggerInterface $logger,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction,
+        private IdentityMapActionInterface $identityMapAction,
+        private IdentityReflectActionInterface $identityReflectAction
+    ) {
     }
 
     public function triggerReception(JobDataCollection $jobs): void

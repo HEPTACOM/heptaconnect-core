@@ -18,8 +18,9 @@ final class DirectEmitter extends EmitterContract
      */
     private DatasetEntityCollection $entities;
 
-    public function __construct(private EntityType $supports)
-    {
+    public function __construct(
+        private EntityType $supports
+    ) {
         $this->entities = new DatasetEntityCollection();
     }
 

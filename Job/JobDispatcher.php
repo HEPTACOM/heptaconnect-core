@@ -14,8 +14,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final class JobDispatcher extends JobDispatcherContract
 {
-    public function __construct(private MessageBusInterface $bus, private JobCreateActionInterface $jobCreateAction)
-    {
+    public function __construct(
+        private MessageBusInterface $bus,
+        private JobCreateActionInterface $jobCreateAction
+    ) {
     }
 
     public function dispatch(JobCollection $jobs): void

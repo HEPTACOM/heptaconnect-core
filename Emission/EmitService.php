@@ -33,8 +33,14 @@ final class EmitService implements EmitServiceInterface
      */
     private array $emitContextCache = [];
 
-    public function __construct(private EmitContextFactoryInterface $emitContextFactory, private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory, private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory, private EmitterStackProcessorInterface $stackProcessor)
-    {
+    public function __construct(
+        private EmitContextFactoryInterface $emitContextFactory,
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
+        private EmitterStackProcessorInterface $stackProcessor
+    ) {
     }
 
     public function emit(TypedMappingComponentCollection $mappingComponents): void

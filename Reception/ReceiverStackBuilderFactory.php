@@ -14,8 +14,10 @@ use Psr\Log\LoggerInterface;
 
 final class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
 {
-    public function __construct(private PortalStackServiceContainerFactory $portalContainerFactory, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private PortalStackServiceContainerFactory $portalContainerFactory,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function createReceiverStackBuilder(

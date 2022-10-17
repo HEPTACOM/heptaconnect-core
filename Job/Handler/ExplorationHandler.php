@@ -18,8 +18,12 @@ use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 final class ExplorationHandler implements ExplorationHandlerInterface
 {
-    public function __construct(private ExploreServiceInterface $exploreService, private StorageKeyGeneratorContract $storageKeyGenerator, private JobStartActionInterface $jobStartAction, private JobFinishActionInterface $jobFinishAction)
-    {
+    public function __construct(
+        private ExploreServiceInterface $exploreService,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction
+    ) {
     }
 
     public function triggerExplorations(JobDataCollection $jobs): void

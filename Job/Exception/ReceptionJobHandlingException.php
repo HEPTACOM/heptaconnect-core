@@ -8,8 +8,11 @@ use Heptacom\HeptaConnect\Core\Job\JobData;
 
 class ReceptionJobHandlingException extends \RuntimeException
 {
-    public function __construct(private JobData $jobData, int $code, ?\Throwable $throwable = null)
-    {
+    public function __construct(
+        private JobData $jobData,
+        int $code,
+        ?\Throwable $throwable = null
+    ) {
         parent::__construct('Reception job could not be processed', $code, $throwable);
     }
 

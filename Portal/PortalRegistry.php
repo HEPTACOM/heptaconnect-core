@@ -32,8 +32,13 @@ final class PortalRegistry implements PortalRegistryInterface
         'portalExtensions' => [],
     ];
 
-    public function __construct(private PortalFactoryContract $portalFactory, private ComposerPortalLoader $portalLoader, private StorageKeyGeneratorContract $storageKeyGenerator, private PortalNodeGetActionInterface $portalNodeGetAction, private PortalExtensionFindActionInterface $portalExtensionFindAction)
-    {
+    public function __construct(
+        private PortalFactoryContract $portalFactory,
+        private ComposerPortalLoader $portalLoader,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private PortalExtensionFindActionInterface $portalExtensionFindAction
+    ) {
     }
 
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract

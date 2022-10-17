@@ -18,8 +18,9 @@ use Psr\Log\LoggerInterface;
  */
 final class ExploredPrimaryKeysToEmissionJobsConverter implements ExploredPrimaryKeysToJobsConverterInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
     public function convert(

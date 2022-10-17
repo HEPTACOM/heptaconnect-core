@@ -16,8 +16,10 @@ final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassI
     /**
      * @param class-string[] $excludedClasses
      */
-    public function __construct(private array $prototypedIds, private array $excludedClasses)
-    {
+    public function __construct(
+        private array $prototypedIds,
+        private array $excludedClasses
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

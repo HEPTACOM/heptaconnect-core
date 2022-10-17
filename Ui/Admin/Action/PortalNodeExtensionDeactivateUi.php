@@ -26,8 +26,14 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingExc
 
 final class PortalNodeExtensionDeactivateUi implements PortalNodeExtensionDeactivateUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalNodeGetActionInterface $portalNodeGetAction, private PortalExtensionFindActionInterface $portalExtensionFindAction, private PortalExtensionDeactivateActionInterface $portalExtensionDeactivateAction, private PackageQueryMatcherInterface $packageQueryMatcher, private ComposerPortalLoader $portalLoader)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private PortalExtensionFindActionInterface $portalExtensionFindAction,
+        private PortalExtensionDeactivateActionInterface $portalExtensionDeactivateAction,
+        private PackageQueryMatcherInterface $packageQueryMatcher,
+        private ComposerPortalLoader $portalLoader
+    ) {
     }
 
     public static function class(): UiActionType

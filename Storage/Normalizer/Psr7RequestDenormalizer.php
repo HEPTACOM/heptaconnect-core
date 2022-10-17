@@ -10,8 +10,9 @@ use Psr\Http\Message\RequestInterface;
 
 final class Psr7RequestDenormalizer implements DenormalizerInterface
 {
-    public function __construct(private RequestDeserializerInterface $deserializer)
-    {
+    public function __construct(
+        private RequestDeserializerInterface $deserializer
+    ) {
     }
 
     public function getType(): string

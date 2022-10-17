@@ -15,8 +15,9 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
 {
     public const CONFIG_KEY_SEPARATORS = '_.-';
 
-    public function __construct(private ConfigurationContract $configuration)
-    {
+    public function __construct(
+        private ConfigurationContract $configuration
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

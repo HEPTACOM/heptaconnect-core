@@ -9,8 +9,9 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class PostReceptionEvent extends Event
 {
-    public function __construct(private ReceiveContextInterface $context)
-    {
+    public function __construct(
+        private ReceiveContextInterface $context
+    ) {
     }
 
     public function getContext(): ReceiveContextInterface

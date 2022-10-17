@@ -9,8 +9,9 @@ use Symfony\Component\Lock\LockInterface;
 
 final class LockAttachable implements AttachableInterface
 {
-    public function __construct(private LockInterface $lock)
-    {
+    public function __construct(
+        private LockInterface $lock
+    ) {
     }
 
     public function getLock(): LockInterface

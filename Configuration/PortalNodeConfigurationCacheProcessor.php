@@ -11,8 +11,10 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigurationProcessorInterface
 {
-    public function __construct(private CacheItemPoolInterface $cache, private StorageKeyGeneratorContract $storageKeyGenerator)
-    {
+    public function __construct(
+        private CacheItemPoolInterface $cache,
+        private StorageKeyGeneratorContract $storageKeyGenerator
+    ) {
     }
 
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array

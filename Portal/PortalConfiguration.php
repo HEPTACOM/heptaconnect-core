@@ -10,8 +10,9 @@ final class PortalConfiguration extends ConfigurationContract
 {
     private ?array $flat = null;
 
-    public function __construct(private array $configuration)
-    {
+    public function __construct(
+        private array $configuration
+    ) {
     }
 
     public function get(string $name)

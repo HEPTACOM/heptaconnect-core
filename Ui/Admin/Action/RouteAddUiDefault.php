@@ -13,8 +13,9 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class RouteAddUiDefault implements RouteAddUiDefaultProviderInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory
+    ) {
     }
 
     public static function class(): UiActionType

@@ -20,8 +20,11 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RoutesMissingExceptio
 
 final class RouteRemoveUi implements RouteRemoveUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private RouteGetActionInterface $routeGetAction, private RouteDeleteActionInterface $routeDeleteAction)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private RouteGetActionInterface $routeGetAction,
+        private RouteDeleteActionInterface $routeDeleteAction
+    ) {
     }
 
     public static function class(): UiActionType

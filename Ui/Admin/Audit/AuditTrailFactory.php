@@ -26,8 +26,15 @@ use Psr\Log\LoggerInterface;
 
 final class AuditTrailFactory implements AuditTrailFactoryInterface
 {
-    public function __construct(private DeepObjectIteratorContract $deepObjectIterator, private AuditableDataSerializerInterface $auditableDataSerializer, private UiAuditTrailBeginActionInterface $uiAuditTrailBeginAction, private UiAuditTrailLogOutputActionInterface $uiAuditTrailLogOutputAction, private UiAuditTrailLogErrorActionInterface $uiAuditTrailLogErrorAction, private UiAuditTrailEndActionInterface $uiAuditTrailEndAction, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private DeepObjectIteratorContract $deepObjectIterator,
+        private AuditableDataSerializerInterface $auditableDataSerializer,
+        private UiAuditTrailBeginActionInterface $uiAuditTrailBeginAction,
+        private UiAuditTrailLogOutputActionInterface $uiAuditTrailLogOutputAction,
+        private UiAuditTrailLogErrorActionInterface $uiAuditTrailLogErrorAction,
+        private UiAuditTrailEndActionInterface $uiAuditTrailEndAction,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function create(UiActionInterface $uiAction, UiAuditContext $auditContext, array $inbound): AuditTrailInterface

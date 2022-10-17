@@ -10,8 +10,9 @@ use Symfony\Component\Lock\LockFactory;
 
 final class ResourceLockStorage extends ResourceLockStorageContract
 {
-    public function __construct(private LockFactory $lockFactory)
-    {
+    public function __construct(
+        private LockFactory $lockFactory
+    ) {
     }
 
     public function create(string $key): void

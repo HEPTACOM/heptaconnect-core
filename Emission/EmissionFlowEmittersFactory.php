@@ -13,8 +13,11 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 final class EmissionFlowEmittersFactory implements EmissionFlowEmittersFactoryInterface
 {
-    public function __construct(private EmittedEntitiesToJobsConverterInterface $emittedEntitiesToJobsConverter, private JobDispatcherContract $jobDispatcher, private int $jobBatchSize)
-    {
+    public function __construct(
+        private EmittedEntitiesToJobsConverterInterface $emittedEntitiesToJobsConverter,
+        private JobDispatcherContract $jobDispatcher,
+        private int $jobBatchSize
+    ) {
     }
 
     public function createEmitters(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): EmitterCollection

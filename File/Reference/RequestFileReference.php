@@ -10,8 +10,10 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface
 
 final class RequestFileReference extends FileReferenceContract
 {
-    public function __construct(PortalNodeKeyInterface $portalNodeKey, private FileReferenceRequestKeyInterface $requestId)
-    {
+    public function __construct(
+        PortalNodeKeyInterface $portalNodeKey,
+        private FileReferenceRequestKeyInterface $requestId
+    ) {
         parent::__construct($portalNodeKey);
     }
 

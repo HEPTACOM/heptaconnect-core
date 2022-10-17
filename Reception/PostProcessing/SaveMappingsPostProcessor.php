@@ -22,8 +22,11 @@ use Psr\Log\LoggerInterface;
 
 final class SaveMappingsPostProcessor extends PostProcessorContract
 {
-    public function __construct(private DeepObjectIteratorContract $deepObjectIterator, private IdentityPersistActionInterface $identityPersistAction, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private DeepObjectIteratorContract $deepObjectIterator,
+        private IdentityPersistActionInterface $identityPersistAction,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function handle(PostReceptionEvent $event): void

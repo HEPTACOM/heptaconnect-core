@@ -20,8 +20,14 @@ use Psr\Log\LogLevel;
 
 class FlowComponentCodeOriginFinderLogger extends AbstractLogger
 {
-    public function __construct(private LoggerInterface $decorated, private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder, private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder, private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder, private StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder, private HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder)
-    {
+    public function __construct(
+        private LoggerInterface $decorated,
+        private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
+        private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
+        private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder,
+        private StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder,
+        private HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder
+    ) {
     }
 
     public function log($level, $message, array $context = []): void

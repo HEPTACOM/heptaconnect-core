@@ -17,8 +17,10 @@ use Psr\Log\LoggerInterface;
 
 final class MarkAsFailedPostProcessor extends PostProcessorContract
 {
-    public function __construct(private IdentityErrorCreateActionInterface $identityErrorCreateAction, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private IdentityErrorCreateActionInterface $identityErrorCreateAction,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function handle(PostReceptionEvent $event): void

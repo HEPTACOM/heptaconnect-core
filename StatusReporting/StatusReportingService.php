@@ -23,8 +23,12 @@ final class StatusReportingService implements StatusReportingServiceInterface
      */
     private array $statusReporterStackCache = [];
 
-    public function __construct(private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private PortalStackServiceContainerFactory $portalStackServiceContainerFactory, private StatusReportingContextFactoryInterface $statusReportingContextFactory)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private StatusReportingContextFactoryInterface $statusReportingContextFactory
+    ) {
     }
 
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array

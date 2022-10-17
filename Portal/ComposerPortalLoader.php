@@ -24,8 +24,11 @@ class ComposerPortalLoader
 {
     private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
 
-    public function __construct(private PackageConfigurationLoaderInterface $packageConfigLoader, private PortalFactoryContract $portalFactory, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private PackageConfigurationLoaderInterface $packageConfigLoader,
+        private PortalFactoryContract $portalFactory,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function getPortals(): PortalCollection

@@ -21,8 +21,9 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
     /**
      * @param array<string, string[]> $flowBuilderFiles
      */
-    public function __construct(private array $flowBuilderFiles)
-    {
+    public function __construct(
+        private array $flowBuilderFiles
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

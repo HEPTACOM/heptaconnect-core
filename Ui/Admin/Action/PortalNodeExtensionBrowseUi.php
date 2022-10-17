@@ -20,8 +20,12 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class PortalNodeExtensionBrowseUi implements PortalNodeExtensionBrowseUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalNodeGetActionInterface $portalNodeGetAction, private PortalExtensionFindActionInterface $portalExtensionFindAction, private ComposerPortalLoader $portalLoader)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private PortalExtensionFindActionInterface $portalExtensionFindAction,
+        private ComposerPortalLoader $portalLoader
+    ) {
     }
 
     public static function class(): UiActionType

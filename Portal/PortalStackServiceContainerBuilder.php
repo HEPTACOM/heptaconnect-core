@@ -89,8 +89,19 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
-    public function __construct(private LoggerInterface $logger, private NormalizationRegistryContract $normalizationRegistry, private PortalStorageFactory $portalStorageFactory, private ResourceLockingContract $resourceLocking, private ProfilerFactoryContract $profilerFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private FilesystemFactory $filesystemFactory, private ConfigurationServiceInterface $configurationService, private PublisherInterface $publisher, private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory, private RequestStorageContract $requestStorage)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalStorageFactory $portalStorageFactory,
+        private ResourceLockingContract $resourceLocking,
+        private ProfilerFactoryContract $profilerFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private FilesystemFactory $filesystemFactory,
+        private ConfigurationServiceInterface $configurationService,
+        private PublisherInterface $publisher,
+        private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        private RequestStorageContract $requestStorage
+    ) {
     }
 
     /**
@@ -274,6 +285,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     /**
      * @param Definition[] $definitions
+     *
      * @psalm-param class-string $interface
      * @psalm-param class-string $packageClass
      */

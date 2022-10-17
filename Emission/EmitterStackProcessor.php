@@ -14,8 +14,9 @@ use Psr\Log\LoggerInterface;
 
 final class EmitterStackProcessor implements EmitterStackProcessorInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
     public function processStack(

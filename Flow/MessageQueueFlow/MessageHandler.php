@@ -15,8 +15,11 @@ use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
 final class MessageHandler implements MessageSubscriberInterface
 {
-    public function __construct(private JobGetActionInterface $jobGetAction, private DelegatingJobActorContract $jobActor, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private JobGetActionInterface $jobGetAction,
+        private DelegatingJobActorContract $jobActor,
+        private LoggerInterface $logger
+    ) {
     }
 
     public static function getHandledMessages(): iterable

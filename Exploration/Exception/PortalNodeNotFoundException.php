@@ -12,7 +12,7 @@ class PortalNodeNotFoundException extends \RuntimeException
 
     public function __construct(PortalNodeKeyInterface $portalNodeKey, int $code = 0, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('Portal by key \'%s\' not found', \json_encode($portalNodeKey, JSON_THROW_ON_ERROR)), $code, $previous);
+        parent::__construct(\sprintf('Portal by key \'%s\' not found', \json_encode($portalNodeKey, \JSON_THROW_ON_ERROR)), $code, $previous);
         $this->portalNodeKey = $portalNodeKey;
     }
 

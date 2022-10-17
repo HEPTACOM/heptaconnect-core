@@ -15,8 +15,9 @@ use Psr\Container\ContainerInterface;
 
 final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
 {
-    public function __construct(private ContainerInterface $container)
-    {
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     public function getPortal(): PortalContract

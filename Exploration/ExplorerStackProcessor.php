@@ -12,8 +12,9 @@ use Psr\Log\LoggerInterface;
 
 final class ExplorerStackProcessor implements ExplorerStackProcessorInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
     public function processStack(ExplorerStackInterface $stack, ExploreContextInterface $context): iterable

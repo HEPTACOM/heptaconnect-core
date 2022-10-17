@@ -24,8 +24,14 @@ class FlowComponentRegistry
      * @param array<class-string, HttpHandlerCollection>    $sourcedWebHttpHandlers
      * @param array<class-string, string[]>                 $flowBuilderFiles
      */
-    public function __construct(private array $sourcedExplorers, private array $sourcedEmitters, private array $sourcedReceivers, private array $sourcedStatusReporters, private array $sourcedWebHttpHandlers, private array $flowBuilderFiles)
-    {
+    public function __construct(
+        private array $sourcedExplorers,
+        private array $sourcedEmitters,
+        private array $sourcedReceivers,
+        private array $sourcedStatusReporters,
+        private array $sourcedWebHttpHandlers,
+        private array $flowBuilderFiles
+    ) {
     }
 
     /**

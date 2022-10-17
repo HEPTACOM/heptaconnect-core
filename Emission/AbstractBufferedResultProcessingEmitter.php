@@ -18,8 +18,10 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
 {
     private TypedDatasetEntityCollection $buffer;
 
-    public function __construct(private EntityType $entityType, private int $batchSize)
-    {
+    public function __construct(
+        private EntityType $entityType,
+        private int $batchSize
+    ) {
         $this->buffer = $this->createBuffer();
     }
 

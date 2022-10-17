@@ -14,8 +14,10 @@ use Psr\Log\LoggerInterface;
 
 final class ExplorerStackBuilderFactory implements ExplorerStackBuilderFactoryInterface
 {
-    public function __construct(private PortalStackServiceContainerFactory $portalContainerFactory, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private PortalStackServiceContainerFactory $portalContainerFactory,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function createExplorerStackBuilder(

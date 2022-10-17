@@ -34,8 +34,16 @@ final class HttpHandleService implements HttpHandleServiceInterface
      */
     private array $contextCache = [];
 
-    public function __construct(private HttpHandlerStackProcessorInterface $stackProcessor, private HttpHandleContextFactoryInterface $contextFactory, private LoggerInterface $logger, private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private ResponseFactoryInterface $responseFactory, private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction, private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory)
-    {
+    public function __construct(
+        private HttpHandlerStackProcessorInterface $stackProcessor,
+        private HttpHandleContextFactoryInterface $contextFactory,
+        private LoggerInterface $logger,
+        private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ResponseFactoryInterface $responseFactory,
+        private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
+        private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory
+    ) {
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface

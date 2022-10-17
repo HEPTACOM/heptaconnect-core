@@ -9,8 +9,9 @@ use Psr\Log\LoggerInterface;
 
 class ExceptionCodeLogger extends AbstractLogger
 {
-    public function __construct(private LoggerInterface $decorated)
-    {
+    public function __construct(
+        private LoggerInterface $decorated
+    ) {
     }
 
     public function log($level, $message, array $context = []): void

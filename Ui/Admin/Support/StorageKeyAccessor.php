@@ -26,8 +26,12 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInter
 
 final class StorageKeyAccessor implements StorageKeyAccessorInterface
 {
-    public function __construct(private StorageKeyGeneratorContract $storageKeyGenerator, private PortalNodeGetActionInterface $portalNodeGetAction, private RouteGetActionInterface $routeGetAction, private JobGetActionInterface $jobGetAction)
-    {
+    public function __construct(
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private RouteGetActionInterface $routeGetAction,
+        private JobGetActionInterface $jobGetAction
+    ) {
     }
 
     public function deserialize(string $keyData): StorageKeyInterface

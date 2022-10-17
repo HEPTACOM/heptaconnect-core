@@ -31,8 +31,14 @@ final class ReceiveService implements ReceiveServiceInterface
      */
     private array $receiveContextCache = [];
 
-    public function __construct(private ReceiveContextFactoryInterface $receiveContextFactory, private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory, private ReceiverStackProcessorInterface $receiverStackProcessor, private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory)
-    {
+    public function __construct(
+        private ReceiveContextFactoryInterface $receiveContextFactory,
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
+        private ReceiverStackProcessorInterface $receiverStackProcessor,
+        private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory
+    ) {
     }
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void

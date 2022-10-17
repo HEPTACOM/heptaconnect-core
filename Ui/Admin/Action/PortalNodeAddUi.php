@@ -22,8 +22,11 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodeAliasIsAlre
 
 final class PortalNodeAddUi implements PortalNodeAddUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalNodeCreateActionInterface $portalNodeCreateAction, private PortalNodeAliasFindActionInterface $portalNodeAliasFindAction)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalNodeCreateActionInterface $portalNodeCreateAction,
+        private PortalNodeAliasFindActionInterface $portalNodeAliasFindAction
+    ) {
     }
 
     public static function class(): UiActionType

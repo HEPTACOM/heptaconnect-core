@@ -18,8 +18,11 @@ final class ExplorerStack implements ExplorerStackInterface
     /**
      * @param iterable<array-key, ExplorerContract> $explorers
      */
-    public function __construct(iterable $explorers, private EntityType $entityType, private LoggerInterface $logger)
-    {
+    public function __construct(
+        iterable $explorers,
+        private EntityType $entityType,
+        private LoggerInterface $logger
+    ) {
         $this->explorers = new ExplorerCollection($explorers);
     }
 

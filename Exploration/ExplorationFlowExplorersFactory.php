@@ -23,8 +23,20 @@ use Psr\Log\LoggerInterface;
  */
 final class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
 {
-    public function __construct(private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory, private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory, private EmitterStackProcessorInterface $emitterStackProcessor, private EmitContextFactoryInterface $emitContextFactory, private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter, private JobDispatcherContract $jobDispatcher, private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator, private IdentityMapActionInterface $identityMapAction, private LoggerInterface $logger, private int $jobBatchSize, private int $identityBatchSize, private int $emissionBatchSize)
-    {
+    public function __construct(
+        private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory,
+        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private EmitterStackProcessorInterface $emitterStackProcessor,
+        private EmitContextFactoryInterface $emitContextFactory,
+        private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
+        private JobDispatcherContract $jobDispatcher,
+        private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
+        private IdentityMapActionInterface $identityMapAction,
+        private LoggerInterface $logger,
+        private int $jobBatchSize,
+        private int $identityBatchSize,
+        private int $emissionBatchSize
+    ) {
     }
 
     public function createExplorers(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ExplorerCollection

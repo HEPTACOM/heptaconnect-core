@@ -22,8 +22,15 @@ use Psr\Log\LoggerInterface;
 
 final class ExploreService implements ExploreServiceInterface
 {
-    public function __construct(private ExploreContextFactoryInterface $exploreContextFactory, private ExplorerStackProcessorInterface $explorerStackProcessor, private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory, private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory, private PortalStackServiceContainerFactory $portalStackServiceContainerFactory, private LoggerInterface $logger, private JobDispatcherContract $jobDispatcher)
-    {
+    public function __construct(
+        private ExploreContextFactoryInterface $exploreContextFactory,
+        private ExplorerStackProcessorInterface $explorerStackProcessor,
+        private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory,
+        private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private LoggerInterface $logger,
+        private JobDispatcherContract $jobDispatcher
+    ) {
     }
 
     public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void

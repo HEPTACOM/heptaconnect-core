@@ -14,8 +14,10 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class PortalNodeStatusReportUi implements PortalNodeStatusReportUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private StatusReportingServiceInterface $statusReportingService)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private StatusReportingServiceInterface $statusReportingService
+    ) {
     }
 
     public static function class(): UiActionType

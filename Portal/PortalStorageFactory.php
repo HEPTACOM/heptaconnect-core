@@ -17,8 +17,15 @@ use Psr\Log\LoggerInterface;
 
 class PortalStorageFactory
 {
-    public function __construct(private NormalizationRegistryContract $normalizationRegistry, private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction, private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction, private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction, private PortalNodeStorageListActionInterface $portalNodeStorageListAction, private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction, private LoggerInterface $logger)
-    {
+    public function __construct(
+        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
+        private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
+        private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
+        private PortalNodeStorageListActionInterface $portalNodeStorageListAction,
+        private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function createPortalStorage(PortalNodeKeyInterface $portalNodeKey): PortalStorageInterface

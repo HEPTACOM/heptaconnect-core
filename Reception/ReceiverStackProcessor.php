@@ -18,8 +18,10 @@ use Psr\Log\LoggerInterface;
 
 final class ReceiverStackProcessor implements ReceiverStackProcessorInterface
 {
-    public function __construct(private LoggerInterface $logger, private DeepObjectIteratorContract $deepObjectIterator)
-    {
+    public function __construct(
+        private LoggerInterface $logger,
+        private DeepObjectIteratorContract $deepObjectIterator
+    ) {
     }
 
     public function processStack(

@@ -25,8 +25,13 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterface
 {
-    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalStackServiceContainerFactory $portalStackServiceContainerFactory, private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder, private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder, private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder)
-    {
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
+        private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
+        private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder
+    ) {
     }
 
     public static function class(): UiActionType

@@ -11,8 +11,9 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 final class Psr7RequestNormalizer implements NormalizerInterface
 {
-    public function __construct(private RequestSerializerInterface $serializer)
-    {
+    public function __construct(
+        private RequestSerializerInterface $serializer
+    ) {
     }
 
     /**

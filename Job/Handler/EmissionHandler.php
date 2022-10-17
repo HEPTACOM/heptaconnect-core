@@ -19,8 +19,11 @@ use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 final class EmissionHandler implements EmissionHandlerInterface
 {
-    public function __construct(private EmitServiceInterface $emitService, private JobStartActionInterface $jobStartAction, private JobFinishActionInterface $jobFinishAction)
-    {
+    public function __construct(
+        private EmitServiceInterface $emitService,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction
+    ) {
     }
 
     public function triggerEmission(JobDataCollection $jobs): void

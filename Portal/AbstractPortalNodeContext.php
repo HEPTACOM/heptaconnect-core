@@ -14,8 +14,10 @@ use Psr\Container\ContainerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
-    public function __construct(private PortalNodeContainerFacadeContract $containerFacade, private ?array $configuration)
-    {
+    public function __construct(
+        private PortalNodeContainerFacadeContract $containerFacade,
+        private ?array $configuration
+    ) {
     }
 
     public function getConfig(): ?array

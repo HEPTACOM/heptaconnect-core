@@ -16,8 +16,9 @@ use Psr\Http\Server\MiddlewareInterface;
 
 final class HttpMiddlewareChainHandler extends HttpHandlerContract
 {
-    public function __construct(private string $path)
-    {
+    public function __construct(
+        private string $path
+    ) {
     }
 
     public function handle(

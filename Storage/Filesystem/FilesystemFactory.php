@@ -10,8 +10,10 @@ use League\Flysystem\FilesystemInterface;
 
 class FilesystemFactory
 {
-    public function __construct(private StorageKeyGeneratorContract $storageKeyGenerator, private FilesystemInterface $filesystem)
-    {
+    public function __construct(
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private FilesystemInterface $filesystem
+    ) {
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): FilesystemInterface

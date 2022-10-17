@@ -12,8 +12,9 @@ use Psr\Log\LoggerInterface;
 
 final class ReceptionFlowReceiversFactory implements ReceptionFlowReceiversFactoryInterface
 {
-    public function __construct(private LoggerInterface $logger)
-    {
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
     public function createReceivers(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ReceiverCollection

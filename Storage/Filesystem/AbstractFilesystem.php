@@ -13,8 +13,9 @@ use League\Flysystem\PluginInterface;
  */
 abstract class AbstractFilesystem implements FilesystemInterface
 {
-    public function __construct(protected FilesystemInterface $filesystem)
-    {
+    public function __construct(
+        protected FilesystemInterface $filesystem
+    ) {
     }
 
     /**

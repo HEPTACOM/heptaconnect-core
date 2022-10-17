@@ -14,8 +14,11 @@ use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 
 final class DelegatingJobActor extends DelegatingJobActorContract
 {
-    public function __construct(private EmissionHandlerInterface $emissionHandler, private ReceptionHandlerInterface $receptionHandler, private ExplorationHandlerInterface $explorationHandler)
-    {
+    public function __construct(
+        private EmissionHandlerInterface $emissionHandler,
+        private ReceptionHandlerInterface $receptionHandler,
+        private ExplorationHandlerInterface $explorationHandler
+    ) {
     }
 
     public function performJobs(string $type, JobDataCollection $jobs): void

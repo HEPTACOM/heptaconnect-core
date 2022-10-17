@@ -9,8 +9,9 @@ use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\Instruct
 
 final class InstructionFileLoader implements InstructionLoaderInterface
 {
-    public function __construct(private string $path)
-    {
+    public function __construct(
+        private string $path
+    ) {
     }
 
     /**

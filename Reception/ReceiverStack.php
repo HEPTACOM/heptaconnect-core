@@ -18,8 +18,10 @@ final class ReceiverStack implements ReceiverStackInterface
     /**
      * @param iterable<array-key, ReceiverContract> $receivers
      */
-    public function __construct(iterable $receivers, private LoggerInterface $logger)
-    {
+    public function __construct(
+        iterable $receivers,
+        private LoggerInterface $logger
+    ) {
         $this->receivers = new ReceiverCollection($receivers);
     }
 
