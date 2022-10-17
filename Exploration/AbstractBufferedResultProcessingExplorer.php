@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\CollectionInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
@@ -66,7 +67,7 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
      *
      * @param CollectionInterface<T> $buffer
      */
-    abstract protected function pushBuffer(\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract|int|string $value, CollectionInterface $buffer, ExploreContextInterface $context): void;
+    abstract protected function pushBuffer(DatasetEntityContract|int|string $value, CollectionInterface $buffer, ExploreContextInterface $context): void;
 
     /**
      * @param CollectionInterface<T> $buffer

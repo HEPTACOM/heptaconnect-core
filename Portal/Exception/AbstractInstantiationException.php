@@ -7,12 +7,9 @@ namespace Heptacom\HeptaConnect\Core\Portal\Exception;
 abstract class AbstractInstantiationException extends \RuntimeException
 {
     /**
-     * @psalm-param class-string $class
+     * @param class-string $class
      */
     public function __construct(
-        /**
-         * @psalm-var class-string
-         */
         private string $class,
         ?\Throwable $previous = null
     ) {

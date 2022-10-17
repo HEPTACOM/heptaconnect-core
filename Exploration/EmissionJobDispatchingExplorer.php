@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\Transition\Contract\ExploredPrimaryKeysToJobsConverterInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\CollectionInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
@@ -48,7 +49,7 @@ final class EmissionJobDispatchingExplorer extends AbstractBufferedResultProcess
         $this->jobDispatcher->dispatch($jobs);
     }
 
-    protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void
+    protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if (\is_int($value) || \is_string($value)) {
             $this->logger->debug('EmissionJobDispatchingExplorer: Entity was explored and job dispatch is prepared', [

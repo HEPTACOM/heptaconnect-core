@@ -52,7 +52,7 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
         $this->directEmitter->getEntities()->clear();
     }
 
-    protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void
+    protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if ($value instanceof DatasetEntityContract) {
             $this->logger->debug('DirectEmittingExplorer: Entity was explored and job dispatch is prepared', [
