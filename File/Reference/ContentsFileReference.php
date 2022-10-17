@@ -9,22 +9,13 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 final class ContentsFileReference extends FileReferenceContract
 {
-    private string $normalizedStream;
-
-    private string $normalizationType;
-
-    private string $mimeType;
-
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        string $normalizedStream,
-        string $normalizationType,
-        string $mimeType
+        private string $normalizedStream,
+        private string $normalizationType,
+        private string $mimeType
     ) {
         parent::__construct($portalNodeKey);
-        $this->normalizedStream = $normalizedStream;
-        $this->normalizationType = $normalizationType;
-        $this->mimeType = $mimeType;
     }
 
     public function getNormalizedStream(): string

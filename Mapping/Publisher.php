@@ -13,11 +13,8 @@ use Heptacom\HeptaConnect\Portal\Base\Publication\Contract\PublisherInterface;
 
 final class Publisher implements PublisherInterface
 {
-    private JobDispatcherContract $jobDispatcher;
-
-    public function __construct(JobDispatcherContract $jobDispatcher)
+    public function __construct(private JobDispatcherContract $jobDispatcher)
     {
-        $this->jobDispatcher = $jobDispatcher;
     }
 
     public function publishBatch(MappingComponentCollection $mappings): void

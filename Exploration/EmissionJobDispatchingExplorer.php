@@ -17,24 +17,14 @@ use Psr\Log\LoggerInterface;
  */
 final class EmissionJobDispatchingExplorer extends AbstractBufferedResultProcessingExplorer
 {
-    private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter;
-
-    private JobDispatcherContract $jobDispatcher;
-
-    private LoggerInterface $logger;
-
     public function __construct(
         EntityType $entityType,
-        ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
-        JobDispatcherContract $jobDispatcher,
-        LoggerInterface $logger,
+        private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
+        private JobDispatcherContract $jobDispatcher,
+        private LoggerInterface $logger,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);
-
-        $this->exploredPksToJobsConverter = $exploredPksToJobsConverter;
-        $this->jobDispatcher = $jobDispatcher;
-        $this->logger = $logger;
     }
 
     protected function createBuffer(): CollectionInterface

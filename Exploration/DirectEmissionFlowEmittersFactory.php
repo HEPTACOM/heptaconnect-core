@@ -15,24 +15,8 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActio
 
 final class DirectEmissionFlowEmittersFactory implements DirectEmissionFlowEmittersFactoryInterface
 {
-    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
-
-    private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator;
-
-    private IdentityMapActionInterface $identityMapAction;
-
-    private int $identityBatchSize;
-
-    public function __construct(
-        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
-        PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
-        IdentityMapActionInterface $identityMapAction,
-        int $identityBatchSize
-    ) {
-        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
-        $this->primaryKeyToEntityHydrator = $primaryKeyToEntityHydrator;
-        $this->identityMapAction = $identityMapAction;
-        $this->identityBatchSize = $identityBatchSize;
+    public function __construct(private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory, private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator, private IdentityMapActionInterface $identityMapAction, private int $identityBatchSize)
+    {
     }
 
     public function createEmitters(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): EmitterCollection

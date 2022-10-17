@@ -17,19 +17,13 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActio
  */
 final class IdentityMappingExplorer extends AbstractBufferedResultProcessingExplorer
 {
-    private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator;
-
-    private IdentityMapActionInterface $identityMapAction;
-
     public function __construct(
         EntityType $entityType,
-        PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
-        IdentityMapActionInterface $identityMapAction,
+        private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
+        private IdentityMapActionInterface $identityMapAction,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);
-        $this->primaryKeyToEntityHydrator = $primaryKeyToEntityHydrator;
-        $this->identityMapAction = $identityMapAction;
     }
 
     protected function createBuffer(): CollectionInterface

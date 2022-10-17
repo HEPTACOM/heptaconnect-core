@@ -22,22 +22,10 @@ use Psr\Log\LoggerInterface;
 
 class ComposerPortalLoader
 {
-    private PackageConfigurationLoaderInterface $packageConfigLoader;
-
-    private PortalFactoryContract $portalFactory;
-
-    private LoggerInterface $logger;
-
     private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
 
-    public function __construct(
-        PackageConfigurationLoaderInterface $packageConfigLoader,
-        PortalFactoryContract $portalFactory,
-        LoggerInterface $logger
-    ) {
-        $this->packageConfigLoader = $packageConfigLoader;
-        $this->portalFactory = $portalFactory;
-        $this->logger = $logger;
+    public function __construct(private PackageConfigurationLoaderInterface $packageConfigLoader, private PortalFactoryContract $portalFactory, private LoggerInterface $logger)
+    {
     }
 
     public function getPortals(): PortalCollection

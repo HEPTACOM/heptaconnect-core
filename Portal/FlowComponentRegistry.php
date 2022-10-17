@@ -17,36 +17,6 @@ class FlowComponentRegistry
     private ?array $orderedSources = null;
 
     /**
-     * @var array<class-string, ExplorerCollection>
-     */
-    private array $sourcedExplorers;
-
-    /**
-     * @var array<class-string, EmitterCollection>
-     */
-    private array $sourcedEmitters;
-
-    /**
-     * @var array<class-string, ReceiverCollection>
-     */
-    private array $sourcedReceivers;
-
-    /**
-     * @var array<class-string, StatusReporterCollection>
-     */
-    private array $sourcedStatusReporters;
-
-    /**
-     * @var array<class-string, HttpHandlerCollection>
-     */
-    private array $sourcedWebHttpHandlers;
-
-    /**
-     * @var array<class-string, string[]>
-     */
-    private array $flowBuilderFiles;
-
-    /**
      * @param array<class-string, ExplorerCollection>       $sourcedExplorers
      * @param array<class-string, EmitterCollection>        $sourcedEmitters
      * @param array<class-string, ReceiverCollection>       $sourcedReceivers
@@ -54,20 +24,8 @@ class FlowComponentRegistry
      * @param array<class-string, HttpHandlerCollection>    $sourcedWebHttpHandlers
      * @param array<class-string, string[]>                 $flowBuilderFiles
      */
-    public function __construct(
-        array $sourcedExplorers,
-        array $sourcedEmitters,
-        array $sourcedReceivers,
-        array $sourcedStatusReporters,
-        array $sourcedWebHttpHandlers,
-        array $flowBuilderFiles
-    ) {
-        $this->sourcedExplorers = $sourcedExplorers;
-        $this->sourcedEmitters = $sourcedEmitters;
-        $this->sourcedReceivers = $sourcedReceivers;
-        $this->sourcedStatusReporters = $sourcedStatusReporters;
-        $this->sourcedWebHttpHandlers = $sourcedWebHttpHandlers;
-        $this->flowBuilderFiles = $flowBuilderFiles;
+    public function __construct(private array $sourcedExplorers, private array $sourcedEmitters, private array $sourcedReceivers, private array $sourcedStatusReporters, private array $sourcedWebHttpHandlers, private array $flowBuilderFiles)
+    {
     }
 
     /**

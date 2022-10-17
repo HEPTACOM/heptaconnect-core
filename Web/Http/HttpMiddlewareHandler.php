@@ -34,9 +34,7 @@ final class HttpMiddlewareHandler implements RequestHandlerInterface
         $middleware = \array_shift($middlewares);
 
         if ($middleware instanceof MiddlewareInterface) {
-            $next = \Closure::fromCallable(function (ServerRequestInterface $request) use ($middlewares) {
-                return $this->next($request, ...$middlewares);
-            });
+            $next = \Closure::fromCallable(fn(ServerRequestInterface $request) => $this->next($request, ...$middlewares));
 
             $handler = new class($next) implements RequestHandlerInterface {
                 private \Closure $next;

@@ -21,12 +21,6 @@ use Psr\Log\LoggerInterface;
 
 final class ReceiveService implements ReceiveServiceInterface
 {
-    private ReceiveContextFactoryInterface $receiveContextFactory;
-
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @var array<array-key, ReceiverStackInterface|null>
      */
@@ -37,26 +31,8 @@ final class ReceiveService implements ReceiveServiceInterface
      */
     private array $receiveContextCache = [];
 
-    private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
-
-    private ReceiverStackProcessorInterface $receiverStackProcessor;
-
-    private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory;
-
-    public function __construct(
-        ReceiveContextFactoryInterface $receiveContextFactory,
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
-        ReceiverStackProcessorInterface $receiverStackProcessor,
-        ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory
-    ) {
-        $this->receiveContextFactory = $receiveContextFactory;
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
-        $this->receiverStackProcessor = $receiverStackProcessor;
-        $this->receptionFlowReceiversFactory = $receptionFlowReceiversFactory;
+    public function __construct(private ReceiveContextFactoryInterface $receiveContextFactory, private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory, private ReceiverStackProcessorInterface $receiverStackProcessor, private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory)
+    {
     }
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void

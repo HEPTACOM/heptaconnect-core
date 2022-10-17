@@ -28,40 +28,8 @@ use Psr\Log\LoggerInterface;
 
 final class PortalStorage implements PortalStorageInterface
 {
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction;
-
-    private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction;
-
-    private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction;
-
-    private PortalNodeStorageListActionInterface $portalNodeStorageListAction;
-
-    private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction;
-
-    private LoggerInterface $logger;
-
-    private PortalNodeKeyInterface $portalNodeKey;
-
-    public function __construct(
-        NormalizationRegistryContract $normalizationRegistry,
-        PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
-        PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
-        PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
-        PortalNodeStorageListActionInterface $portalNodeStorageListAction,
-        PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
-        LoggerInterface $logger,
-        PortalNodeKeyInterface $portalNodeKey
-    ) {
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
-        $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
-        $this->portalNodeStorageGetAction = $portalNodeStorageGetAction;
-        $this->portalNodeStorageListAction = $portalNodeStorageListAction;
-        $this->portalNodeStorageSetAction = $portalNodeStorageSetAction;
-        $this->logger = $logger;
-        $this->portalNodeKey = $portalNodeKey;
+    public function __construct(private NormalizationRegistryContract $normalizationRegistry, private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction, private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction, private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction, private PortalNodeStorageListActionInterface $portalNodeStorageListAction, private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction, private LoggerInterface $logger, private PortalNodeKeyInterface $portalNodeKey)
+    {
     }
 
     public function get($key, $default = null)
@@ -321,7 +289,7 @@ final class PortalStorage implements PortalStorageInterface
 
         try {
             return new \DateInterval(\sprintf('PT%dS', $ttl));
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             return null;
         }
     }

@@ -10,16 +10,10 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 abstract class InstructionTokenContract
 {
     /**
-     * @var class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string
-     */
-    private string $query;
-
-    /**
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      */
-    public function __construct(string $query)
+    public function __construct(private string $query)
     {
-        $this->query = $query;
     }
 
     /**

@@ -45,7 +45,7 @@ final class SerializableNormalizer implements NormalizerInterface
             \serialize($data);
 
             return true;
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             return false;
         }
     }

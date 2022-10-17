@@ -18,16 +18,8 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\ReadException;
 
 final class PortalEntityListUi implements PortalEntityListUiActionInterface
 {
-    private AuditTrailFactoryInterface $auditTrailFactory;
-
-    private PortalNodeEntityListUiActionInterface $portalNodeEntityListUiAction;
-
-    public function __construct(
-        AuditTrailFactoryInterface $auditTrailFactory,
-        PortalNodeEntityListUiActionInterface $portalNodeEntityListUiAction
-    ) {
-        $this->auditTrailFactory = $auditTrailFactory;
-        $this->portalNodeEntityListUiAction = $portalNodeEntityListUiAction;
+    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalNodeEntityListUiActionInterface $portalNodeEntityListUiAction)
+    {
     }
 
     public static function class(): UiActionType

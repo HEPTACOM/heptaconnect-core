@@ -33,7 +33,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
             \ini_set('unserialize_callback_func', self::class . '::handleUnserializeClass');
 
             $result = \unserialize($data);
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             return null;
         } finally {
             if (\is_string($unserialize_callback_func)) {

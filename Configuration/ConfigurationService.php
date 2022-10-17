@@ -19,12 +19,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ConfigurationService implements ConfigurationServiceInterface
 {
-    private PortalRegistryInterface $portalRegistry;
-
-    private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
-
-    private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
-
     /**
      * @var PortalNodeConfigurationProcessorInterface[]
      */
@@ -34,14 +28,11 @@ final class ConfigurationService implements ConfigurationServiceInterface
      * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors
      */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
+        private PortalRegistryInterface $portalRegistry,
+        private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
+        private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
         iterable $configurationProcessors
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
-        $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
         $this->configurationProcessors = \iterable_to_array($configurationProcessors);
     }
 

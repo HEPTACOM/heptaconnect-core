@@ -23,12 +23,6 @@ use Psr\Log\LoggerInterface;
 
 final class EmitService implements EmitServiceInterface
 {
-    private EmitContextFactoryInterface $emitContextFactory;
-
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @var array<array-key, EmitterStackInterface|null>
      */
@@ -39,26 +33,8 @@ final class EmitService implements EmitServiceInterface
      */
     private array $emitContextCache = [];
 
-    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
-
-    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
-
-    private EmitterStackProcessorInterface $stackProcessor;
-
-    public function __construct(
-        EmitContextFactoryInterface $emitContextFactory,
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
-        EmitterStackProcessorInterface $stackProcessor
-    ) {
-        $this->emitContextFactory = $emitContextFactory;
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
-        $this->stackProcessor = $stackProcessor;
+    public function __construct(private EmitContextFactoryInterface $emitContextFactory, private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory, private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory, private EmitterStackProcessorInterface $stackProcessor)
+    {
     }
 
     public function emit(TypedMappingComponentCollection $mappingComponents): void

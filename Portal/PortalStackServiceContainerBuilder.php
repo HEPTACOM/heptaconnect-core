@@ -85,56 +85,12 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
-    private LoggerInterface $logger;
-
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private PortalStorageFactory $portalStorageFactory;
-
-    private ResourceLockingContract $resourceLocking;
-
-    private ProfilerFactoryContract $profilerFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private FilesystemFactory $filesystemFactory;
-
-    private ConfigurationServiceInterface $configurationService;
-
-    private PublisherInterface $publisher;
-
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
-
-    private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
-
-    private RequestStorageContract $requestStorage;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
-    public function __construct(
-        LoggerInterface $logger,
-        NormalizationRegistryContract $normalizationRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        ProfilerFactoryContract $profilerFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService,
-        PublisherInterface $publisher,
-        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        RequestStorageContract $requestStorage
-    ) {
-        $this->logger = $logger;
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalStorageFactory = $portalStorageFactory;
-        $this->resourceLocking = $resourceLocking;
-        $this->profilerFactory = $profilerFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->filesystemFactory = $filesystemFactory;
-        $this->configurationService = $configurationService;
-        $this->publisher = $publisher;
-        $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
-        $this->requestStorage = $requestStorage;
+    public function __construct(private LoggerInterface $logger, private NormalizationRegistryContract $normalizationRegistry, private PortalStorageFactory $portalStorageFactory, private ResourceLockingContract $resourceLocking, private ProfilerFactoryContract $profilerFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private FilesystemFactory $filesystemFactory, private ConfigurationServiceInterface $configurationService, private PublisherInterface $publisher, private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory, private RequestStorageContract $requestStorage)
+    {
     }
 
     /**
@@ -174,7 +130,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
             $seenDefinitions = $containerBuilder->getDefinitions();
-            $packageClass = \get_class($package);
+            $packageClass = $package::class;
 
             $this->tagDefinitionSource($newDefinitions, ExplorerContract::class, self::EXPLORER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, EmitterContract::class, self::EMITTER_SOURCE_TAG, $packageClass);
@@ -232,7 +188,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
         ]);
-        $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+        $containerBuilder->setAlias($portal::class, PortalContract::class);
 
         if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
             $this->setSyntheticServices($containerBuilder, [
@@ -418,7 +374,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $containerBuilder->set($id, $service);
             $definition = (new Definition())
                 ->setSynthetic(true)
-                ->setClass(\get_class($service));
+                ->setClass($service::class);
             $containerBuilder->setDefinition($id, $definition);
         }
     }

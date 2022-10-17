@@ -22,20 +22,8 @@ use Psr\Log\LoggerInterface;
 
 final class SaveMappingsPostProcessor extends PostProcessorContract
 {
-    private DeepObjectIteratorContract $deepObjectIterator;
-
-    private IdentityPersistActionInterface $identityPersistAction;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        DeepObjectIteratorContract $deepObjectIterator,
-        IdentityPersistActionInterface $identityPersistAction,
-        LoggerInterface $logger
-    ) {
-        $this->deepObjectIterator = $deepObjectIterator;
-        $this->identityPersistAction = $identityPersistAction;
-        $this->logger = $logger;
+    public function __construct(private DeepObjectIteratorContract $deepObjectIterator, private IdentityPersistActionInterface $identityPersistAction, private LoggerInterface $logger)
+    {
     }
 
     public function handle(PostReceptionEvent $event): void
@@ -103,7 +91,7 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
                 'code' => 1637527920,
                 'firstForeignKey' => $firstForeignKey,
                 'externalId' => $externalId,
-                'entityType' => \get_class($entity),
+                'entityType' => $entity::class,
             ]);
 
             return null;
@@ -114,7 +102,7 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
                 'code' => 1637527921,
                 'firstForeignKey' => $firstForeignKey,
                 'externalId' => $externalId,
-                'entityType' => \get_class($entity),
+                'entityType' => $entity::class,
             ]);
 
             return null;

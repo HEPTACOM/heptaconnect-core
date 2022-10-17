@@ -34,40 +34,8 @@ final class HttpHandleService implements HttpHandleServiceInterface
      */
     private array $contextCache = [];
 
-    private HttpHandlerStackProcessorInterface $stackProcessor;
-
-    private HttpHandleContextFactoryInterface $contextFactory;
-
-    private LoggerInterface $logger;
-
-    private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private ResponseFactoryInterface $responseFactory;
-
-    private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction;
-
-    private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory;
-
-    public function __construct(
-        HttpHandlerStackProcessorInterface $stackProcessor,
-        HttpHandleContextFactoryInterface $contextFactory,
-        LoggerInterface $logger,
-        HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ResponseFactoryInterface $responseFactory,
-        WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
-        HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory
-    ) {
-        $this->stackProcessor = $stackProcessor;
-        $this->contextFactory = $contextFactory;
-        $this->logger = $logger;
-        $this->stackBuilderFactory = $stackBuilderFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->responseFactory = $responseFactory;
-        $this->httpHandlerConfigurationFindAction = $httpHandlerConfigurationFindAction;
-        $this->httpHandleFlowHttpHandlersFactory = $httpHandleFlowHttpHandlersFactory;
+    public function __construct(private HttpHandlerStackProcessorInterface $stackProcessor, private HttpHandleContextFactoryInterface $contextFactory, private LoggerInterface $logger, private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private ResponseFactoryInterface $responseFactory, private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction, private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory)
+    {
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface

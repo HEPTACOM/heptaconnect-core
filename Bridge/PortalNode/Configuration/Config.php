@@ -49,7 +49,7 @@ class Config
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      * @param array|\Closure():array                                                                 $payload
      */
-    public static function replace(string $query, $payload, bool $recursive = true): void
+    public static function replace(string $query, array|\Closure $payload, bool $recursive = true): void
     {
         if (\is_array($payload)) {
             $array = $payload;
@@ -75,7 +75,7 @@ class Config
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      * @param array|\Closure():array                                                                 $payload
      */
-    public static function merge(string $query, $payload, bool $recursive = true): void
+    public static function merge(string $query, array|\Closure $payload, bool $recursive = true): void
     {
         if (\is_array($payload)) {
             $array = $payload;
@@ -101,7 +101,7 @@ class Config
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      * @param array|\Closure():array                                                                 $payload
      */
-    public static function reset(string $query, $payload): void
+    public static function reset(string $query, array|\Closure $payload): void
     {
         if (\is_array($payload)) {
             $array = $payload;

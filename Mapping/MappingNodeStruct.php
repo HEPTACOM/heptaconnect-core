@@ -10,14 +10,8 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\MappingNodeStructInterface;
 
 final class MappingNodeStruct implements MappingNodeStructInterface
 {
-    private MappingNodeKeyInterface $id;
-
-    private EntityType $entityType;
-
-    public function __construct(MappingNodeKeyInterface $id, EntityType $entityType)
+    public function __construct(private MappingNodeKeyInterface $id, private EntityType $entityType)
     {
-        $this->id = $id;
-        $this->entityType = $entityType;
     }
 
     public function getKey(): MappingNodeKeyInterface

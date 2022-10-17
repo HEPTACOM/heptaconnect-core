@@ -15,11 +15,8 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
 {
     public const CONFIG_KEY_SEPARATORS = '_.-';
 
-    private ConfigurationContract $configuration;
-
-    public function __construct(ConfigurationContract $configuration)
+    public function __construct(private ConfigurationContract $configuration)
     {
-        $this->configuration = $configuration;
     }
 
     public function process(ContainerBuilder $container): void
@@ -52,7 +49,7 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
                 $this->getConstructorArgumentNames($definition),
                 $this->getConstructorCallNames($definition),
             );
-            $related = \array_filter($argumentNames, static fn (string $key): bool => \strncmp($key, '$config', 7) === 0);
+            $related = \array_filter($argumentNames, static fn (string $key): bool => str_starts_with($key, '$config'));
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
 
             $definition->setBindings($requiredBindings);

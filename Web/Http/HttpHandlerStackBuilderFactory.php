@@ -13,14 +13,8 @@ use Psr\Log\LoggerInterface;
 
 final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
 {
-    private PortalStackServiceContainerFactory $portalContainerFactory;
-
-    private LoggerInterface $logger;
-
-    public function __construct(PortalStackServiceContainerFactory $portalContainerFactory, LoggerInterface $logger)
+    public function __construct(private PortalStackServiceContainerFactory $portalContainerFactory, private LoggerInterface $logger)
     {
-        $this->portalContainerFactory = $portalContainerFactory;
-        $this->logger = $logger;
     }
 
     public function createHttpHandlerStackBuilder(

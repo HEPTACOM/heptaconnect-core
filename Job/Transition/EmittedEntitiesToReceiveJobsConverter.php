@@ -19,14 +19,8 @@ use Psr\Log\LoggerInterface;
 
 final class EmittedEntitiesToReceiveJobsConverter implements EmittedEntitiesToJobsConverterInterface
 {
-    private ReceptionRouteListActionInterface $receptionRouteListAction;
-
-    private LoggerInterface $logger;
-
-    public function __construct(ReceptionRouteListActionInterface $receptionRouteListAction, LoggerInterface $logger)
+    public function __construct(private ReceptionRouteListActionInterface $receptionRouteListAction, private LoggerInterface $logger)
     {
-        $this->receptionRouteListAction = $receptionRouteListAction;
-        $this->logger = $logger;
     }
 
     public function convert(PortalNodeKeyInterface $portalNodeKey, DatasetEntityCollection $entities): JobCollection

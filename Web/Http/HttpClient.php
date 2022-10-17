@@ -22,13 +22,10 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
 {
     private LoggerInterface $logger;
 
-    private UriFactoryInterface $uriFactory;
-
-    public function __construct(ClientInterface $client, UriFactoryInterface $uriFactory)
+    public function __construct(ClientInterface $client, private UriFactoryInterface $uriFactory)
     {
         parent::__construct($client);
         $this->logger = new NullLogger();
-        $this->uriFactory = $uriFactory;
     }
 
     public function setLogger(LoggerInterface $logger): void

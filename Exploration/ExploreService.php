@@ -22,36 +22,8 @@ use Psr\Log\LoggerInterface;
 
 final class ExploreService implements ExploreServiceInterface
 {
-    private ExploreContextFactoryInterface $exploreContextFactory;
-
-    private ExplorerStackProcessorInterface $explorerStackProcessor;
-
-    private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory;
-
-    private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private LoggerInterface $logger;
-
-    private JobDispatcherContract $jobDispatcher;
-
-    public function __construct(
-        ExploreContextFactoryInterface $exploreContextFactory,
-        ExplorerStackProcessorInterface $explorerStackProcessor,
-        ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory,
-        ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        LoggerInterface $logger,
-        JobDispatcherContract $jobDispatcher
-    ) {
-        $this->exploreContextFactory = $exploreContextFactory;
-        $this->explorerStackProcessor = $explorerStackProcessor;
-        $this->explorationFlowExplorersFactory = $explorationFlowExplorersFactory;
-        $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->logger = $logger;
-        $this->jobDispatcher = $jobDispatcher;
+    public function __construct(private ExploreContextFactoryInterface $exploreContextFactory, private ExplorerStackProcessorInterface $explorerStackProcessor, private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory, private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory, private PortalStackServiceContainerFactory $portalStackServiceContainerFactory, private LoggerInterface $logger, private JobDispatcherContract $jobDispatcher)
+    {
     }
 
     public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void

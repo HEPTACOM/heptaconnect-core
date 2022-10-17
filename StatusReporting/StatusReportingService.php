@@ -18,29 +18,13 @@ use Psr\Log\LoggerInterface;
 
 final class StatusReportingService implements StatusReportingServiceInterface
 {
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @return array<array-key, StatusReporterStackInterface>
      */
     private array $statusReporterStackCache = [];
 
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private StatusReportingContextFactoryInterface $statusReportingContextFactory;
-
-    public function __construct(
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        StatusReportingContextFactoryInterface $statusReportingContextFactory
-    ) {
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->statusReportingContextFactory = $statusReportingContextFactory;
+    public function __construct(private LoggerInterface $logger, private StorageKeyGeneratorContract $storageKeyGenerator, private PortalStackServiceContainerFactory $portalStackServiceContainerFactory, private StatusReportingContextFactoryInterface $statusReportingContextFactory)
+    {
     }
 
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array

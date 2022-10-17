@@ -18,14 +18,8 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterfac
  */
 abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
 {
-    private EntityType $entityType;
-
-    private int $batchSize;
-
-    public function __construct(EntityType $entityType, int $batchSize)
+    public function __construct(private EntityType $entityType, private int $batchSize)
     {
-        $this->entityType = $entityType;
-        $this->batchSize = $batchSize;
     }
 
     public function explore(ExploreContextInterface $context, ExplorerStackInterface $stack): iterable
@@ -69,10 +63,9 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
     /**
      * Any data that is returned by the stack is running through this. Here can be filtered what will be buffered.
      *
-     * @param DatasetEntityContract|int|string $value
      * @param CollectionInterface<T>           $buffer
      */
-    abstract protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void;
+    abstract protected function pushBuffer(\Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract|int|string $value, CollectionInterface $buffer, ExploreContextInterface $context): void;
 
     /**
      * @param CollectionInterface<T> $buffer

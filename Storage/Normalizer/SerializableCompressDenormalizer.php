@@ -8,11 +8,8 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterfa
 
 final class SerializableCompressDenormalizer implements DenormalizerInterface
 {
-    private DenormalizerInterface $serializableDenormalizer;
-
-    public function __construct(DenormalizerInterface $serializableDenormalizer)
+    public function __construct(private DenormalizerInterface $serializableDenormalizer)
     {
-        $this->serializableDenormalizer = $serializableDenormalizer;
     }
 
     public function getType(): string

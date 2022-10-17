@@ -21,28 +21,8 @@ final class RequestStorage extends RequestStorageContract
 {
     private const DEFAULT_KEY = 'default';
 
-    private RequestSerializerInterface $serializer;
-
-    private RequestDeserializerInterface $deserializer;
-
-    private FileReferenceGetRequestActionInterface $getRequestAction;
-
-    private FileReferencePersistRequestActionInterface $persistRequestAction;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    public function __construct(
-        RequestSerializerInterface $serializer,
-        RequestDeserializerInterface $deserializer,
-        FileReferenceGetRequestActionInterface $getRequestAction,
-        FileReferencePersistRequestActionInterface $persistRequestAction,
-        StorageKeyGeneratorContract $storageKeyGenerator
-    ) {
-        $this->serializer = $serializer;
-        $this->deserializer = $deserializer;
-        $this->getRequestAction = $getRequestAction;
-        $this->persistRequestAction = $persistRequestAction;
-        $this->storageKeyGenerator = $storageKeyGenerator;
+    public function __construct(private RequestSerializerInterface $serializer, private RequestDeserializerInterface $deserializer, private FileReferenceGetRequestActionInterface $getRequestAction, private FileReferencePersistRequestActionInterface $persistRequestAction, private StorageKeyGeneratorContract $storageKeyGenerator)
+    {
     }
 
     public function load(

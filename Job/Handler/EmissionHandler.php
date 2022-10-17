@@ -19,20 +19,8 @@ use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 final class EmissionHandler implements EmissionHandlerInterface
 {
-    private EmitServiceInterface $emitService;
-
-    private JobStartActionInterface $jobStartAction;
-
-    private JobFinishActionInterface $jobFinishAction;
-
-    public function __construct(
-        EmitServiceInterface $emitService,
-        JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction
-    ) {
-        $this->emitService = $emitService;
-        $this->jobStartAction = $jobStartAction;
-        $this->jobFinishAction = $jobFinishAction;
+    public function __construct(private EmitServiceInterface $emitService, private JobStartActionInterface $jobStartAction, private JobFinishActionInterface $jobFinishAction)
+    {
     }
 
     public function triggerEmission(JobDataCollection $jobs): void

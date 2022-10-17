@@ -8,13 +8,10 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 
 final class PortalConfiguration extends ConfigurationContract
 {
-    private array $configuration;
-
     private ?array $flat = null;
 
-    public function __construct(array $configuration)
+    public function __construct(private array $configuration)
     {
-        $this->configuration = $configuration;
     }
 
     public function get(string $name)

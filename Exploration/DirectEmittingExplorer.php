@@ -19,32 +19,16 @@ use Psr\Log\LoggerInterface;
  */
 final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplorer
 {
-    private DirectEmitter $directEmitter;
-
-    private EmitterStackProcessorInterface $emitterStackProcessor;
-
-    private EmitterStackInterface $emitterStack;
-
-    private EmitContextInterface $emitContext;
-
-    private LoggerInterface $logger;
-
     public function __construct(
         EntityType $entityType,
-        DirectEmitter $directEmitter,
-        EmitterStackProcessorInterface $emitterStackProcessor,
-        EmitterStackInterface $emitterStack,
-        EmitContextInterface $emitContext,
-        LoggerInterface $logger,
+        private DirectEmitter $directEmitter,
+        private EmitterStackProcessorInterface $emitterStackProcessor,
+        private EmitterStackInterface $emitterStack,
+        private EmitContextInterface $emitContext,
+        private LoggerInterface $logger,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);
-
-        $this->directEmitter = $directEmitter;
-        $this->emitterStackProcessor = $emitterStackProcessor;
-        $this->emitterStack = $emitterStack;
-        $this->emitContext = $emitContext;
-        $this->logger = $logger;
     }
 
     protected function createBuffer(): CollectionInterface

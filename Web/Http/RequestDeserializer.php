@@ -11,14 +11,8 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class RequestDeserializer implements RequestDeserializerInterface
 {
-    private RequestFactoryInterface $requestFactory;
-
-    private StreamFactoryInterface $streamFactory;
-
-    public function __construct(RequestFactoryInterface $requestFactory, StreamFactoryInterface $streamFactory)
+    public function __construct(private RequestFactoryInterface $requestFactory, private StreamFactoryInterface $streamFactory)
     {
-        $this->requestFactory = $requestFactory;
-        $this->streamFactory = $streamFactory;
     }
 
     public function deserialize(string $requestData): RequestInterface

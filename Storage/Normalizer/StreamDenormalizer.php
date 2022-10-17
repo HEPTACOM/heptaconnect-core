@@ -14,16 +14,10 @@ use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
 final class StreamDenormalizer implements DenormalizerInterface
 {
-    private FilesystemInterface $filesystem;
-
     private StreamFactoryInterface $streamFactory;
 
-    private StreamPathContract $streamPath;
-
-    public function __construct(FilesystemInterface $filesystem, StreamPathContract $streamPath)
+    public function __construct(private FilesystemInterface $filesystem, private StreamPathContract $streamPath)
     {
-        $this->filesystem = $filesystem;
-        $this->streamPath = $streamPath;
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
     }
 

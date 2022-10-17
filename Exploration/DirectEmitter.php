@@ -13,16 +13,13 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 
 final class DirectEmitter extends EmitterContract
 {
-    private EntityType $supports;
-
     /**
      * @psalm-var DatasetEntityCollection<DatasetEntityContract>
      */
     private DatasetEntityCollection $entities;
 
-    public function __construct(EntityType $supports)
+    public function __construct(private EntityType $supports)
     {
-        $this->supports = $supports;
         $this->entities = new DatasetEntityCollection();
     }
 

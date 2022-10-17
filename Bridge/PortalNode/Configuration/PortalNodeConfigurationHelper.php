@@ -16,9 +16,7 @@ class PortalNodeConfigurationHelper
      */
     public function env(array $mappings): \Closure
     {
-        return function () use ($mappings): array {
-            return $this->resolveMapping($mappings, static fn (string $i) => \getenv($i));
-        };
+        return fn(): array => $this->resolveMapping($mappings, static fn (string $i) => \getenv($i));
     }
 
     /**
@@ -78,9 +76,7 @@ class PortalNodeConfigurationHelper
      */
     public function array(array $array, array $mappings): \Closure
     {
-        return function () use ($mappings, $array): array {
-            return $this->resolveMapping($mappings, fn (string $i) => $this->resolveDotPath($i, $array));
-        };
+        return fn(): array => $this->resolveMapping($mappings, fn (string $i) => $this->resolveDotPath($i, $array));
     }
 
     /**

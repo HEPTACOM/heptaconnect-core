@@ -9,11 +9,8 @@ use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\Instruct
 
 final class InstructionFileLoader implements InstructionLoaderInterface
 {
-    private string $path;
-
-    public function __construct(string $path)
+    public function __construct(private string $path)
     {
-        $this->path = $path;
     }
 
     /**
@@ -26,7 +23,7 @@ final class InstructionFileLoader implements InstructionLoaderInterface
             require $this->path;
 
             return $config->buildInstructions();
-        } catch (\Throwable $throwable) {
+        } catch (\Throwable) {
             throw new \RuntimeException('Can not load configuration file ' . $this->path, 1645611612);
         }
     }

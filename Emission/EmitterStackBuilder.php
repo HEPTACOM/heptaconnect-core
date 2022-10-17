@@ -19,8 +19,6 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     private EntityType $entityType;
 
-    private LoggerInterface $logger;
-
     /**
      * @var EmitterContract[]
      */
@@ -29,13 +27,12 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
     public function __construct(
         EmitterCollection $sources,
         EntityType $entityType,
-        LoggerInterface $logger
+        private LoggerInterface $logger
     ) {
         $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
-        $this->logger = $logger;
     }
 
     public function push(EmitterContract $emitter): self

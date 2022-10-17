@@ -44,48 +44,8 @@ use Symfony\Component\Lock\LockFactory;
  */
 final class ReceptionHandler implements ReceptionHandlerInterface
 {
-    private LockFactory $lockFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private ReceiveServiceInterface $receiveService;
-
-    private DeepObjectIteratorContract $objectIterator;
-
-    private RouteGetActionInterface $routeGetAction;
-
-    private LoggerInterface $logger;
-
-    private JobStartActionInterface $jobStartAction;
-
-    private JobFinishActionInterface $jobFinishAction;
-
-    private IdentityMapActionInterface $identityMapAction;
-
-    private IdentityReflectActionInterface $identityReflectAction;
-
-    public function __construct(
-        LockFactory $lockFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ReceiveServiceInterface $receiveService,
-        DeepObjectIteratorContract $objectIterator,
-        RouteGetActionInterface $routeGetAction,
-        LoggerInterface $logger,
-        JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction,
-        IdentityMapActionInterface $identityMapAction,
-        IdentityReflectActionInterface $identityReflectAction
-    ) {
-        $this->lockFactory = $lockFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->receiveService = $receiveService;
-        $this->objectIterator = $objectIterator;
-        $this->routeGetAction = $routeGetAction;
-        $this->logger = $logger;
-        $this->jobStartAction = $jobStartAction;
-        $this->jobFinishAction = $jobFinishAction;
-        $this->identityMapAction = $identityMapAction;
-        $this->identityReflectAction = $identityReflectAction;
+    public function __construct(private LockFactory $lockFactory, private StorageKeyGeneratorContract $storageKeyGenerator, private ReceiveServiceInterface $receiveService, private DeepObjectIteratorContract $objectIterator, private RouteGetActionInterface $routeGetAction, private LoggerInterface $logger, private JobStartActionInterface $jobStartAction, private JobFinishActionInterface $jobFinishAction, private IdentityMapActionInterface $identityMapAction, private IdentityReflectActionInterface $identityReflectAction)
+    {
     }
 
     public function triggerReception(JobDataCollection $jobs): void

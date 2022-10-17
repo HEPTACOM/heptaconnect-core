@@ -23,56 +23,8 @@ use Psr\Log\LoggerInterface;
  */
 final class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
 {
-    private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory;
-
-    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
-
-    private EmitterStackProcessorInterface $emitterStackProcessor;
-
-    private EmitContextFactoryInterface $emitContextFactory;
-
-    private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter;
-
-    private JobDispatcherContract $jobDispatcher;
-
-    private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator;
-
-    private IdentityMapActionInterface $identityMapAction;
-
-    private LoggerInterface $logger;
-
-    private int $jobBatchSize;
-
-    private int $identityBatchSize;
-
-    private int $emissionBatchSize;
-
-    public function __construct(
-        DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory,
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmitterStackProcessorInterface $emitterStackProcessor,
-        EmitContextFactoryInterface $emitContextFactory,
-        ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
-        JobDispatcherContract $jobDispatcher,
-        PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
-        IdentityMapActionInterface $identityMapAction,
-        LoggerInterface $logger,
-        int $jobBatchSize,
-        int $identityBatchSize,
-        int $emissionBatchSize
-    ) {
-        $this->directEmissionFlowEmittersFactory = $directEmissionFlowEmittersFactory;
-        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emitterStackProcessor = $emitterStackProcessor;
-        $this->emitContextFactory = $emitContextFactory;
-        $this->exploredPksToJobsConverter = $exploredPksToJobsConverter;
-        $this->jobDispatcher = $jobDispatcher;
-        $this->primaryKeyToEntityHydrator = $primaryKeyToEntityHydrator;
-        $this->identityMapAction = $identityMapAction;
-        $this->logger = $logger;
-        $this->jobBatchSize = $jobBatchSize;
-        $this->identityBatchSize = $identityBatchSize;
-        $this->emissionBatchSize = $emissionBatchSize;
+    public function __construct(private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory, private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory, private EmitterStackProcessorInterface $emitterStackProcessor, private EmitContextFactoryInterface $emitContextFactory, private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter, private JobDispatcherContract $jobDispatcher, private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator, private IdentityMapActionInterface $identityMapAction, private LoggerInterface $logger, private int $jobBatchSize, private int $identityBatchSize, private int $emissionBatchSize)
+    {
     }
 
     public function createExplorers(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ExplorerCollection

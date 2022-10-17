@@ -9,12 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 final class PublicUrlFileReference extends FileReferenceContract
 {
-    private string $publicUrl;
-
-    public function __construct(PortalNodeKeyInterface $portalNodeKey, string $publicUrl)
+    public function __construct(PortalNodeKeyInterface $portalNodeKey, private string $publicUrl)
     {
         parent::__construct($portalNodeKey);
-        $this->publicUrl = $publicUrl;
     }
 
     public function getPublicUrl(): string

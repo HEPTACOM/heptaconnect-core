@@ -37,32 +37,8 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAlreadyExistsExc
 
 final class RouteAddUi implements RouteAddUiActionInterface
 {
-    private AuditTrailFactoryInterface $auditTrailFactory;
-
-    private RouteCreateActionInterface $routeCreateAction;
-
-    private RouteFindActionInterface $routeFindAction;
-
-    private RouteGetActionInterface $routeGetAction;
-
-    private RouteDeleteActionInterface $routeDeleteAction;
-
-    private PortalNodeGetActionInterface $portalNodeGetAction;
-
-    public function __construct(
-        AuditTrailFactoryInterface $auditTrailFactory,
-        RouteCreateActionInterface $routeCreateAction,
-        RouteFindActionInterface $routeFindAction,
-        RouteGetActionInterface $routeGetAction,
-        RouteDeleteActionInterface $routeDeleteAction,
-        PortalNodeGetActionInterface $portalNodeGetAction
-    ) {
-        $this->auditTrailFactory = $auditTrailFactory;
-        $this->routeCreateAction = $routeCreateAction;
-        $this->routeFindAction = $routeFindAction;
-        $this->routeGetAction = $routeGetAction;
-        $this->routeDeleteAction = $routeDeleteAction;
-        $this->portalNodeGetAction = $portalNodeGetAction;
+    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private RouteCreateActionInterface $routeCreateAction, private RouteFindActionInterface $routeFindAction, private RouteGetActionInterface $routeGetAction, private RouteDeleteActionInterface $routeDeleteAction, private PortalNodeGetActionInterface $portalNodeGetAction)
+    {
     }
 
     public static function class(): UiActionType

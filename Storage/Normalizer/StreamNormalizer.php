@@ -24,20 +24,8 @@ final class StreamNormalizer implements NormalizerInterface
 
     public const NS_FILENAME = '048a23d3ac504a67a477da1d098090b0';
 
-    private FilesystemInterface $filesystem;
-
-    private StreamPathContract $streamPath;
-
-    private LoggerInterface $logger;
-
-    public function __construct(
-        FilesystemInterface $filesystem,
-        StreamPathContract $streamPath,
-        LoggerInterface $logger
-    ) {
-        $this->filesystem = $filesystem;
-        $this->streamPath = $streamPath;
-        $this->logger = $logger;
+    public function __construct(private FilesystemInterface $filesystem, private StreamPathContract $streamPath, private LoggerInterface $logger)
+    {
     }
 
     /**

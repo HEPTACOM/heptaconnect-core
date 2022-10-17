@@ -26,32 +26,8 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingExc
 
 final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivateUiActionInterface
 {
-    private AuditTrailFactoryInterface $auditTrailFactory;
-
-    private PortalNodeGetActionInterface $portalNodeGetAction;
-
-    private PortalExtensionFindActionInterface $portalExtensionFindAction;
-
-    private PortalExtensionActivateActionInterface $portalExtensionActivateAction;
-
-    private PackageQueryMatcherInterface $packageQueryMatcher;
-
-    private ComposerPortalLoader $portalLoader;
-
-    public function __construct(
-        AuditTrailFactoryInterface $auditTrailFactory,
-        PortalNodeGetActionInterface $portalNodeGetAction,
-        PortalExtensionFindActionInterface $portalExtensionFindAction,
-        PortalExtensionActivateActionInterface $portalExtensionActivateAction,
-        PackageQueryMatcherInterface $packageQueryMatcher,
-        ComposerPortalLoader $portalLoader
-    ) {
-        $this->auditTrailFactory = $auditTrailFactory;
-        $this->portalNodeGetAction = $portalNodeGetAction;
-        $this->portalExtensionFindAction = $portalExtensionFindAction;
-        $this->portalExtensionActivateAction = $portalExtensionActivateAction;
-        $this->packageQueryMatcher = $packageQueryMatcher;
-        $this->portalLoader = $portalLoader;
+    public function __construct(private AuditTrailFactoryInterface $auditTrailFactory, private PortalNodeGetActionInterface $portalNodeGetAction, private PortalExtensionFindActionInterface $portalExtensionFindAction, private PortalExtensionActivateActionInterface $portalExtensionActivateAction, private PackageQueryMatcherInterface $packageQueryMatcher, private ComposerPortalLoader $portalLoader)
+    {
     }
 
     public static function class(): UiActionType
