@@ -78,7 +78,9 @@ final class HttpHandleService implements HttpHandleServiceInterface
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
 
-        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled'));
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(
+            new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled')
+        );
         $enabled = (bool) ($enabledCheck->getValue()['value'] ?? true);
 
         if (!$enabled) {

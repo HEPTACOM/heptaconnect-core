@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
+use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
@@ -49,6 +50,11 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
     public function getFlowComponentRegistry(): FlowComponentRegistry
     {
         return $this->get(FlowComponentRegistry::class);
+    }
+
+    public function getHttpHandlerMiddlewareCollector(): HttpMiddlewareCollector
+    {
+        return $this->get(HttpMiddlewareCollector::class);
     }
 
     /**
