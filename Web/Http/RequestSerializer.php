@@ -15,11 +15,11 @@ final class RequestSerializer implements RequestSerializerInterface
         try {
             return \json_encode([
                 'method' => $request->getMethod(),
-                'uri' => (string)$request->getUri(),
+                'uri' => (string) $request->getUri(),
                 'requestTarget' => $request->getRequestTarget(),
                 'protocolVersion' => $request->getProtocolVersion(),
                 'headers' => $request->getHeaders(),
-                'body' => (string)$request->getBody(),
+                'body' => (string) $request->getBody(),
             ], \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
         } catch (\Throwable $jsonError) {
             throw new RequestSerializationException($request, 1666451010, $jsonError);
