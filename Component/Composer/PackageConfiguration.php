@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
+use Heptacom\HeptaConnect\Dataset\Base\AttachmentCollection;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
+use Heptacom\HeptaConnect\Dataset\Base\Support\AttachmentAwareTrait;
 
-final class PackageConfiguration
+final class PackageConfiguration implements AttachmentAwareInterface
 {
+    use AttachmentAwareTrait;
+
     private string $name = '';
 
     private StringCollection $tags;
@@ -18,6 +23,7 @@ final class PackageConfiguration
 
     public function __construct()
     {
+        $this->attachments = new AttachmentCollection();
         $this->tags = new StringCollection();
         $this->autoloadedFiles = new PackageConfigurationClassMap();
     }
