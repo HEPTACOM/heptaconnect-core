@@ -13,18 +13,14 @@ use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityError
 use Heptacom\HeptaConnect\Storage\Base\Action\IdentityError\Create\IdentityErrorCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErrorCreateActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
-use Psr\Log\LoggerInterface;
 
 final class MarkAsFailedPostProcessor extends PostProcessorContract
 {
     private IdentityErrorCreateActionInterface $identityErrorCreateAction;
 
-    private LoggerInterface $logger;
-
-    public function __construct(IdentityErrorCreateActionInterface $identityErrorCreateAction, LoggerInterface $logger)
+    public function __construct(IdentityErrorCreateActionInterface $identityErrorCreateAction)
     {
         $this->identityErrorCreateAction = $identityErrorCreateAction;
-        $this->logger = $logger;
     }
 
     public function handle(PostReceptionEvent $event): void
@@ -33,7 +29,6 @@ final class MarkAsFailedPostProcessor extends PostProcessorContract
             $event->getContext()->getPostProcessingBag()->of(MarkAsFailedData::class),
             static fn (MarkAsFailedData $data) => $data
         );
-        $logger = $event->getContext()->getContainer()->get(LoggerInterface::class) ?? $this->logger;
 
         /** @var MarkAsFailedData $data */
         foreach ($markAsFailedData as $data) {
@@ -56,7 +51,7 @@ final class MarkAsFailedPostProcessor extends PostProcessorContract
                 }
             }
 
-            $logger->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
+            $event->getContext()->getLogger()->error(LogMessage::MARK_AS_FAILED_ENTITY_IS_UNMAPPED(), [
                 'throwable' => $data->getThrowable(),
                 'data' => $data,
                 'code' => 1637456198,
