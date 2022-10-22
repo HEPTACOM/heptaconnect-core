@@ -115,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1647801830` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be read from the filesystem
 - Add exception code `1637432096` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize` when original normalized value is not a string
 - Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration` and `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler`
+- Implement `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface::getLogger` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::getLogger` by looking up the service in the container
 
 ### Deprecated
 

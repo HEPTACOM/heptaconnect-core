@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Facade around a portal node container to normalize accessing inner services.
@@ -37,6 +38,11 @@ abstract class PortalNodeContainerFacadeContract implements ContainerInterface
      * Gets the storage/cache implementation.
      */
     abstract public function getStorage(): PortalStorageInterface;
+
+    /**
+     * Gets the logger.
+     */
+    abstract public function getLogger(): LoggerInterface;
 
     /**
      * Gets the HTTP client
