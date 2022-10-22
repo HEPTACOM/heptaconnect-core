@@ -13,8 +13,6 @@ interface EmittedEntitiesToJobsConverterInterface
 {
     /**
      * Converts freshly emitted entities into jobs like receive jobs.
-     *
-     * @param DatasetEntityCollection<DatasetEntityContract> $entities
      */
     public function convert(PortalNodeKeyInterface $portalNodeKey, DatasetEntityCollection $entities): JobCollection;
 }

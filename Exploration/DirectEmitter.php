@@ -15,9 +15,6 @@ final class DirectEmitter extends EmitterContract
 {
     private EntityType $supports;
 
-    /**
-     * @psalm-var DatasetEntityCollection<DatasetEntityContract>
-     */
     private DatasetEntityCollection $entities;
 
     public function __construct(EntityType $supports)
@@ -38,9 +35,6 @@ final class DirectEmitter extends EmitterContract
         yield from $this->emitNext($stack, $externalIds, $context);
     }
 
-    /**
-     * @psalm-return DatasetEntityCollection<DatasetEntityContract>
-     */
     public function getEntities(): DatasetEntityCollection
     {
         return $this->entities;
