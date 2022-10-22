@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
+use Heptacom\HeptaConnect\Core\Portal\Exception\ServiceNotFoundException;
 use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
@@ -12,14 +13,36 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
 {
     private ContainerInterface $container;
 
+    /**
+     * @throws ServiceNotFoundException
+     */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+
+        foreach ((new \ReflectionClass($this))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->getName() === 'get' || !\str_starts_with($method->getName(), 'get')) {
+                continue;
+            }
+
+            $returnType = $method->getReturnType();
+
+            if (!$returnType instanceof \ReflectionNamedType) {
+                continue;
+            }
+
+            try {
+                $method->invoke($this);
+            } catch (\Throwable $callException) {
+                throw new ServiceNotFoundException($returnType->getName(), 1666461305, $callException);
+            }
+        }
     }
 
     public function getPortal(): PortalContract
@@ -42,6 +65,11 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
         return $this->get(PortalStorageInterface::class);
     }
 
+    public function getLogger(): LoggerInterface
+    {
+        return $this->get(LoggerInterface::class);
+    }
+
     public function getWebHttpClient(): HttpClientContract
     {
         return $this->get(HttpClientContract::class);
@@ -62,7 +90,7 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
      *
      * @param class-string<TGet>|string $id
      *
-     * @phpstan-return ($id is class-string<TGet> ? TGet : object)|null
+     * @return ($id is class-string<TGet> ? TGet : object|null)
      */
     public function get($id)
     {

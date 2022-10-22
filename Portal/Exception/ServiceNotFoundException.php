@@ -10,9 +10,9 @@ class ServiceNotFoundException extends \Exception implements NotFoundExceptionIn
 {
     private string $id;
 
-    public function __construct(string $id, ?\Throwable $previous = null)
+    public function __construct(string $id, int $code, ?\Throwable $previous = null)
     {
-        parent::__construct(\sprintf('Service by id %s not found', $id), 0, $previous);
+        parent::__construct(\sprintf('Service by id %s not found', $id), $code, $previous);
         $this->id = $id;
     }
 

@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Web\Http\Handler;
 
 use Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade;
-use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 
 final class HttpMiddlewareChainHandler extends HttpHandlerContract
 {
@@ -30,8 +28,7 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
         HttpHandlerStackInterface $stack
     ): ResponseInterface {
         $container = new PortalNodeContainerFacade($context->getContainer());
-        /** @var MiddlewareInterface[] $middlewares */
-        $middlewares = $container->get(HttpMiddlewareCollector::class);
+        $middlewares = $container->getHttpHandlerMiddlewareCollector();
 
         $executeHttpHandlerStack = \Closure::fromCallable(
             fn (ServerRequestInterface $request) => $this->handleNext(
