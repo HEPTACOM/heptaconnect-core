@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestDeserializationException;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -19,12 +20,16 @@ final class RequestDeserializer implements RequestDeserializerInterface
 
     public function deserialize(string $requestData): RequestInterface
     {
-        $requestData = (array) \json_decode(
-            $requestData,
-            true,
-            512,
-            \JSON_INVALID_UTF8_IGNORE | \JSON_THROW_ON_ERROR
-        );
+        try {
+            $requestData = (array) \json_decode(
+                $requestData,
+                true,
+                512,
+                \JSON_INVALID_UTF8_IGNORE | \JSON_THROW_ON_ERROR
+            );
+        } catch (\Throwable $jsonError) {
+            throw new RequestDeserializationException($requestData, 1666451009, $jsonError);
+        }
 
         $method = $requestData['method'] ?? null;
         $uri = $requestData['uri'] ?? null;

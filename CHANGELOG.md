@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Reception\ReceptionFlowReceiversFactory` described in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to return receivers, that provide core functionality for the reception flow
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleFlowHttpHandlersFactory` described in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to return HTTP handlers, that provide core functionality for the HTTP handle flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
+- Add exception code `1666461305` to `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade::__construct` when the given container does not contain all necessary services, that explicitly are exposed by the facade
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add UI audit trail class to stateful log a UI actions behaviour described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface`, implemented in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrail`, `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\NullAuditTrail` and factorized by `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface`
 - Add `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditableDataSerializerInterface` to transform auditable data into a string for storing later
@@ -78,8 +79,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1663677421` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any output to an audit trail failed
 - Add exception code `1663677422` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any exception to an audit trail failed
 - Add exception code `1663677423` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when marking an audit trail as finished
-- Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` to be explicitly used independently `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
-- Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` to be explicitly used independently `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
+- Extract deserialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestDeserializationException` to be explicitly used independently `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
+- Add exception code `1666451009` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer::deserialize` when the given request data is not valid JSON
+- Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestSerializationException` to be explicitly used independently `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
+- Add exception code `1666451010` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer::serialize` when the given request cannot be serialized into JSON
 
 ### Changed
 
@@ -111,8 +114,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Change composer dependency `composer/composer:>=1.9` to `composer/composer:^2.2.6` to ensure `\Composer\Repository\InstalledRepositoryInterface::getDevMode` exists and always support loading dev-packages
 - Use `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` instead of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` and `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` to allow for implementation change
 - Add exception code `1647801830` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be read from the filesystem
-- Add exception code `1637432096` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize` when original normalized value is not a string to compress
+- Add exception code `1637432096` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize` when original normalized value is not a string
 - Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration` and `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler`
+- Implement `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface::getLogger` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::getLogger` by looking up the service in the container
+- Implement `\Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface` in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration`
+- Removed logger dependency from `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor`
 
 ### Deprecated
 

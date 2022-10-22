@@ -92,8 +92,7 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
     private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
         $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $container->getFlowComponentRegistry();
         $components = new ExplorerCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {

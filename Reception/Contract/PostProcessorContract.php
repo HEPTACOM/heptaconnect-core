@@ -12,7 +12,7 @@ abstract class PostProcessorContract implements EventSubscriberInterface
 {
     /**
      * Process the given event.
-     * Altering the given @see PostProcessorDataBag is allowed and expected to affect behaviour reception stack processing.
+     * Altering the given @see PostProcessorDataBag is allowed and expected to affect behaviour of reception stack processing.
      */
     abstract public function handle(PostReceptionEvent $event): void;
 
