@@ -62,7 +62,7 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
      *
      * @param class-string<TGet>|string $id
      *
-     * @return ($id is class-string<TGet> ? TGet : string)
+     * @phpstan-return ($id is class-string<TGet> ? TGet : object)|null
      */
     public function get($id)
     {
