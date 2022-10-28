@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Filesystem` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` to provide a path conversion for portals
+
 ### Changed
 
 ### Deprecated
