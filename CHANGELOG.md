@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter` described as `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface` to convert between URIs and paths when using paths as contextualized URIs
+- Add `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter` described by `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface` to convert between URIs and paths when using paths as contextualized URIs
 - Add exception code `1666942800` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path is not a compatible URI
 - Add exception code `1666942801` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path already has a protocol
 - Add exception code `1666942802` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has a port
@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1667052400` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamWrapperRegistry` when the decorated stream wrapper could not be identified by a path
 - Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\UriToPathConvertingStreamWrapper` that converts input to path and output to URI using `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface`
 - Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\PathToUriConvertingStreamWrapper` that converts input to URI and output to path using `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface`
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamWrapperFactoryInterface`, that needs to be implemented by bridges and integrations, to create portal node specific integrations
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface`
 
 ### Changed
 
