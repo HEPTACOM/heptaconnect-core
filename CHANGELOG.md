@@ -24,6 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add interface `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface` to describe, what the PHP documentation describes as signatures for a class to use as a stream wrapper 
 - Add singleton `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamWrapperRegistry` around `stream_wrapper_register` to allow decoration of stream wrapper using `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface`
 - Add exception code `1667052400` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamWrapperRegistry` when the decorated stream wrapper could not be identified by a path
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\UriToPathConvertingStreamWrapper` that converts input to path and output to URI using `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface`
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\PathToUriConvertingStreamWrapper` that converts input to URI and output to path using `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface`
 
 ### Changed
 
