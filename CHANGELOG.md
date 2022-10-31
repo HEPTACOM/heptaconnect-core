@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Add `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getConfig` to forward the decorated filesystem config
+- Wrap result of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixFilesystem::getAdapter` into an adaptor decorator of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixAdapter` to ensure that adapter usage will apply same path rewrites like the filesystem itself
 
 ### Deprecated
 
