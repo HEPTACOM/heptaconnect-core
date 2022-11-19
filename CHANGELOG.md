@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamWrapperFactoryInterface`, that needs to be implemented by bridges and integrations, to create portal node specific integrations
 - Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamProtocolProviderInterface`, that needs to be implemented by bridges and integrations, to create portal node specific stream protocols
 - Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface`
+- Add stream wrapper implementation `\Heptacom\HeptaConnect\Core\File\Filesystem\RewritePathStreamWrapper` to rewrite requested paths to a new protocol while changing the protocol and the path itself  
 
 ### Changed
 
