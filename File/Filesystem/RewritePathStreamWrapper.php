@@ -334,8 +334,9 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             $newPath = $this->toNewPath($path);
+            $isRecursive = ($options & \STREAM_MKDIR_RECURSIVE) === \STREAM_MKDIR_RECURSIVE;
 
-            if (!@\mkdir($newPath, $mode, ($options & \STREAM_MKDIR_RECURSIVE) === \STREAM_MKDIR_RECURSIVE) && !\is_dir($newPath)) {
+            if (!@\mkdir($newPath, $mode, $isRecursive) && !\is_dir($newPath)) {
                 throw new \RuntimeException('Unable to create directory: ' . $path);
             }
 
