@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\File\Filesystem;
 
-use Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamWrapperFactoryInterface;
+use Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamProtocolProviderInterface;
+use Heptacom\HeptaConnect\Core\File\Filesystem\RewritePathStreamWrapper;
 use Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter;
-use Heptacom\HeptaConnect\Core\File\Filesystem\StreamWrapperRegistry;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -15,36 +15,40 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class FilesystemFactory implements FilesystemFactoryInterface
 {
-    private PortalNodeFilesystemStreamWrapperFactoryInterface $streamWrapperFactory;
+    private PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider;
 
     private UriFactoryInterface $uriFactory;
 
     private StorageKeyGeneratorContract $storageKeyGenerator;
 
     public function __construct(
-        PortalNodeFilesystemStreamWrapperFactoryInterface $streamWrapperFactory,
+        PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider,
         UriFactoryInterface $uriFactory,
         StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->streamWrapperFactory = $streamWrapperFactory;
         $this->uriFactory = $uriFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
+        $this->streamProtocolProvider = $streamProtocolProvider;
     }
 
     public function create(PortalNodeKeyInterface $portalNodeKey): FilesystemInterface
     {
         $key = $this->storageKeyGenerator->serialize($portalNodeKey);
         $streamScheme = \strtolower(\preg_replace('/[^a-zA-Z0-9]/', '-', 'heptaconnect-' . $key));
-        $pathConverter = new StreamUriSchemePathConverter($this->uriFactory, $streamScheme);
 
         if (!\in_array($streamScheme, \stream_get_wrappers(), true)) {
-            $streamWrapper = new UriToPathConvertingStreamWrapper();
-            $streamWrapper->setDecorated($this->streamWrapperFactory->create($portalNodeKey));
-            $streamWrapper->setConverter($pathConverter);
+            $trueProtocol = $this->streamProtocolProvider->provide($portalNodeKey);
 
-            StreamWrapperRegistry::register($streamScheme, $streamWrapper);
+            \stream_wrapper_register($streamScheme, RewritePathStreamWrapper::class);
+            \stream_context_set_default([
+                $streamScheme => [
+                    'protocol' => [
+                        'set' => $trueProtocol,
+                    ],
+                ],
+            ]);
         }
 
-        return new Filesystem($pathConverter);
+        return new Filesystem(new StreamUriSchemePathConverter($this->uriFactory, $streamScheme));
     }
 }
