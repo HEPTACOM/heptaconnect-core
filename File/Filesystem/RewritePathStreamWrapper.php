@@ -135,8 +135,6 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     public function stream_set_option(int $option, int $arg1, int $arg2): bool
     {
-        \xdebug_break();
-
         return false;
     }
 
