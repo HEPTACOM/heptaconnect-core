@@ -68,11 +68,5 @@
             "infection/extension-installer": true
         }
     },
-    "extra": {
-        "unused": [
-            "bentools/iterable-functions",
-            "symfony/polyfill-php80"
-        ]
-    },
     "website": "https://heptaconnect.io"
 }
