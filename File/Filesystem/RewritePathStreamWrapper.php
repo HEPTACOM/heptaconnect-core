@@ -264,7 +264,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
                     return \chown($path, $value);
                 case \STREAM_META_OWNER:
                     if (!\is_int($value)) {
-                        throw new \InvalidArgumentException('Parameter is expected to be string');
+                        throw new \InvalidArgumentException('Parameter is expected to be int');
                     }
 
                     return \chown($path, $value);
@@ -276,7 +276,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
                     return \chgrp($path, $value);
                 case \STREAM_META_GROUP:
                     if (!\is_int($value)) {
-                        throw new \InvalidArgumentException('Parameter is expected to be string');
+                        throw new \InvalidArgumentException('Parameter is expected to be int');
                     }
 
                     return \chgrp($path, $value);
