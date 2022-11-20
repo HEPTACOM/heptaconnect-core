@@ -24,8 +24,8 @@ final class InstructionFileLoader implements InstructionLoaderInterface
             require $this->path;
 
             return $config->buildInstructions();
-        } catch (\Throwable) {
-            throw new \RuntimeException('Can not load configuration file ' . $this->path, 1645611612);
+        } catch (\Throwable $throwable) {
+            throw new \RuntimeException('Can not load configuration file ' . $this->path, 1645611612, $throwable);
         }
     }
 }

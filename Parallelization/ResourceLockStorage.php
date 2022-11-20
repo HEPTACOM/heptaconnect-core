@@ -21,8 +21,8 @@ final class ResourceLockStorage extends ResourceLockStorageContract
             if (!$this->lockFactory->createLock($key, 300.0, false)->acquire()) {
                 throw new ResourceIsLockedException($key, null);
             }
-        } catch (\Throwable) {
-            throw new ResourceIsLockedException($key, null);
+        } catch (\Throwable $throwable) {
+            throw new ResourceIsLockedException($key, null, $throwable);
         }
     }
 
