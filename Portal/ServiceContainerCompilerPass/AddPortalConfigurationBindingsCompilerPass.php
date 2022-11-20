@@ -46,7 +46,7 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
                 $this->getConstructorArgumentNames($definition),
                 $this->getConstructorCallNames($definition),
             );
-            $related = \array_filter($argumentNames, static fn (string $key): bool => str_starts_with($key, '$config'));
+            $related = \array_filter($argumentNames, static fn (string $key): bool => \str_starts_with($key, '$config'));
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
 
             $definition->setBindings($requiredBindings);
