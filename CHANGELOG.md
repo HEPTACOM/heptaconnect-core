@@ -126,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Remove support for `php: 7.4` as it will not receive any updates anymore, it is unlikely to be used. By raising the minimum PHP version we also make use of features introduced by PHP 8.0, which mainly have no effect on public API
+- Remove composer dependency `symfony/polyfill-php80` as minimum PHP version is raised to PHP 8.0
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException` and `\Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException` as their condition origin will occur earlier related to either `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException`, `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException` or `\Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException` will be thrown instead
 
 ### Fixed
