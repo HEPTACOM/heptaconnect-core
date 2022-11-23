@@ -33,7 +33,7 @@ final class StreamUriSchemePathConverter implements StreamUriSchemePathConverter
         }
 
         if ($uri->getHost() === '') {
-            $urlParts = \explode('/', $uri->getPath(), 2);
+            $urlParts = \explode('/', \ltrim($uri->getPath(), '/'), 2);
             $uri = $uri->withPath($urlParts[1] ?? '')->withHost($urlParts[0]);
         }
 
