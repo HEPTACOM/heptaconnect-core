@@ -386,7 +386,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
                 $path = \readlink($this->toNewPath($path));
             }
 
-            return \stat($this->toNewPath($path));
+            return @\stat($this->toNewPath($path));
         } catch (\Throwable $throwable) {
             if (($flags & \STREAM_URL_STAT_QUIET) !== \STREAM_URL_STAT_QUIET) {
                 \trigger_error($throwable->getMessage(), \E_USER_WARNING);
