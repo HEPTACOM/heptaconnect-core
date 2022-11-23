@@ -23,13 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Filesystem` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` to provide a path conversion for portals
 - Add interface `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface` to describe, what the PHP documentation describes as signatures for a class to use as a stream wrapper 
 - Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamProtocolProviderInterface`, that needs to be implemented by bridges and integrations, to create portal node specific stream protocols
-- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface`
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` to create portal node specific instances of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface`
 - Add stream wrapper implementation `\Heptacom\HeptaConnect\Core\File\Filesystem\RewritePathStreamWrapper` to rewrite requested paths to a new protocol while changing the protocol and the path itself  
 
 ### Changed
 
 - Add `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getConfig` to forward the decorated filesystem config
 - Wrap result of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixFilesystem::getAdapter` into an adaptor decorator of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixAdapter` to ensure that adapter usage will apply same path rewrites like the filesystem itself
+- Add dependency on `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide a `Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` service for portal nodes
 
 ### Deprecated
 
