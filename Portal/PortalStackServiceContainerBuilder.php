@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
@@ -23,6 +24,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
+use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface as HeptaConnectFilesystemInterface;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -100,7 +102,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         private ConfigurationServiceInterface $configurationService,
         private PublisherInterface $publisher,
         private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        private RequestStorageContract $requestStorage
+        private RequestStorageContract $requestStorage,
+        private FilesystemFactoryInterface $filesystemFactory2
     ) {
     }
 
@@ -198,6 +201,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
+            HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
         ]);
         $containerBuilder->setAlias($portal::class, PortalContract::class);
 
