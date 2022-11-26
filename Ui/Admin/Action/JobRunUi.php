@@ -49,7 +49,7 @@ final class JobRunUi implements JobRunUiActionInterface
         $alreadyRunJobKeys = new JobKeyCollection();
 
         while ($jobDatasByType !== []) {
-            $jobType = (string) \key($jobDatasByType);
+            $jobType = \key($jobDatasByType);
             $jobs = $jobDatasByType[$jobType];
             unset($jobDatasByType[$jobType]);
 
