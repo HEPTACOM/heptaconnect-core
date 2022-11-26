@@ -55,7 +55,7 @@ final class JobRunUi implements JobRunUiActionInterface
 
             try {
                 $this->jobActor->performJobs($jobType, $jobs);
-            } catch (\Throwable $exception) {
+            } catch (\Throwable) {
                 $notYetPerformedJobs = new JobKeyCollection();
 
                 foreach ($jobDatasByType as $missingJobs) {
