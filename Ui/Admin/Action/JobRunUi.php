@@ -18,14 +18,10 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\JobProcessingExceptio
 
 final class JobRunUi implements JobRunUiActionInterface
 {
-    private DelegatingJobActorContract $jobActor;
-
-    private JobGetActionInterface $jobGetAction;
-
-    public function __construct(DelegatingJobActorContract $jobActor, JobGetActionInterface $jobGetAction)
-    {
-        $this->jobActor = $jobActor;
-        $this->jobGetAction = $jobGetAction;
+    public function __construct(
+        private DelegatingJobActorContract $jobActor,
+        private JobGetActionInterface $jobGetAction
+    ) {
     }
 
     public function run(JobRunPayload $payload): void
