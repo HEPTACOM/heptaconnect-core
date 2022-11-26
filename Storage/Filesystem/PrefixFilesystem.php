@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Plugin\PluggableTrait;
 
@@ -37,6 +38,11 @@ class PrefixFilesystem extends AbstractFilesystem
     public function preparePath(string $path): string
     {
         return $this->prefix . $path;
+    }
+
+    public function getAdapter(): AdapterInterface
+    {
+        return new PrefixAdapter($this->filesystem->getAdapter(), $this->prefix);
     }
 
     private function normalizePrefix(string $prefix): string

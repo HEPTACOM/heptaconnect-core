@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
+use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Handler;
 use League\Flysystem\PluginInterface;
@@ -280,9 +281,17 @@ abstract class AbstractFilesystem implements FilesystemInterface
         throw new \RuntimeException('Filesystem plugins are not allowed in abstract filesystems.');
     }
 
-    public function getAdapter(): FilesystemInterface
+    /**
+     * Get the Adapter.
+     */
+    public function getAdapter(): AdapterInterface
     {
-        return $this->filesystem;
+        return $this->filesystem->getAdapter();
+    }
+
+    public function getConfig()
+    {
+        return $this->filesystem->getConfig();
     }
 
     /**
