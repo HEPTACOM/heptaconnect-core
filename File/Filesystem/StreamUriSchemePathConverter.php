@@ -10,14 +10,10 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class StreamUriSchemePathConverter implements StreamUriSchemePathConverterInterface
 {
-    private UriFactoryInterface $uriFactory;
-
-    private string $scheme;
-
-    public function __construct(UriFactoryInterface $uriFactory, string $scheme)
-    {
-        $this->uriFactory = $uriFactory;
-        $this->scheme = $scheme;
+    public function __construct(
+        private UriFactoryInterface $uriFactory,
+        private string $scheme
+    ) {
     }
 
     public function convertToUri(string $path): string

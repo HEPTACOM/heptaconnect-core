@@ -15,20 +15,11 @@ use Psr\Http\Message\UriFactoryInterface;
 
 final class FilesystemFactory implements FilesystemFactoryInterface
 {
-    private PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider;
-
-    private UriFactoryInterface $uriFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     public function __construct(
-        PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider,
-        UriFactoryInterface $uriFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        private PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider,
+        private UriFactoryInterface $uriFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->uriFactory = $uriFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->streamProtocolProvider = $streamProtocolProvider;
     }
 
     public function create(PortalNodeKeyInterface $portalNodeKey): FilesystemInterface
