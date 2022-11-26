@@ -9,6 +9,7 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
@@ -23,6 +24,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
+use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface as HeptaConnectFilesystemInterface;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -103,6 +105,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private RequestStorageContract $requestStorage;
 
+    private FilesystemFactoryInterface $filesystemFactory2;
+
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     public function __construct(
@@ -116,7 +120,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         ConfigurationServiceInterface $configurationService,
         PublisherInterface $publisher,
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        RequestStorageContract $requestStorage
+        RequestStorageContract $requestStorage,
+        FilesystemFactoryInterface $filesystemFactory2
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -129,6 +134,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $this->publisher = $publisher;
         $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
         $this->requestStorage = $requestStorage;
+        $this->filesystemFactory2 = $filesystemFactory2;
     }
 
     /**
@@ -226,6 +232,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
             FileReferenceResolverContract::class => $this->fileReferenceResolver,
+            HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
 
