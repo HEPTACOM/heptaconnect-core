@@ -9,17 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface` from a portal-node context.
-- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.client.middleware`.
-- Execute a chain of `\Psr\Http\Server\MiddlewareInterface` services for inbound HTTP request via `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract`
-- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass` to automatically tag services implementing `\Psr\Http\Server\MiddlewareInterface` with `heptaconnect.http.handler.middleware`.
-- Add `\Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector` as a service in the portal-node container. It is used to retrieve tagged middleware services from the container.
-- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler` to wrap execution of middleware chain
-- Add composer dependency `psr/http-server-handler: ^1.0` and `psr/http-server-middleware: ^1.0` to support PSR-15 middlewares for HTTP handlers
-- Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
-- Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
+- Add `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter` described by `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface` to convert between URIs and paths when using paths as contextualized URIs
+- Add exception code `1666942800` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path is not a compatible URI
+- Add exception code `1666942801` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path already has a protocol
+- Add exception code `1666942802` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has a port
+- Add exception code `1666942803` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has query parameters
+- Add exception code `1666942804` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has a URI fragment
+- Add exception code `1666942810` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI is not a URI
+- Add exception code `1666942811` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has no host
+- Add exception code `1666942812` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has a port
+- Add exception code `1666942813` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has query parameters
+- Add exception code `1666942814` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has a URI fragment
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Filesystem` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` to provide a path conversion for portals
+- Add interface `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface` to describe, what the PHP documentation describes as signatures for a class to use as a stream wrapper 
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamProtocolProviderInterface`, that needs to be implemented by bridges and integrations, to create portal node specific stream protocols
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` to create portal node specific instances of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface`
+- Add stream wrapper implementation `\Heptacom\HeptaConnect\Core\File\Filesystem\RewritePathStreamWrapper` to rewrite requested paths to a new protocol while changing the protocol and the path itself  
 
 ### Changed
+
+- Add `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getConfig` to forward the decorated filesystem config
+- Wrap result of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixFilesystem::getAdapter` into an adaptor decorator of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixAdapter` to ensure that adapter usage will apply same path rewrites like the filesystem itself
+- Add dependency on `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide a `Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` service for portal nodes
 
 ### Deprecated
 
@@ -27,11 +38,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Changed return type of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getAdapter` from `\League\Flysystem\FilesystemInterface` to `\League\Flysystem\AdapterInterface` by returning the decorated filesystem adapter instead of the filesystem itself
+
+### Security
+
+## [0.9.2.0] - 2022-10-16
+
+### Added
+
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface` from a portal-node context.
+- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.client.middleware`.
+- Execute a chain of `\Psr\Http\Server\MiddlewareInterface` services for inbound HTTP request via `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract`
+- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass` to automatically tag services implementing `\Psr\Http\Server\MiddlewareInterface` with `heptaconnect.http.handler.middleware`.
+- Add `\Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector` as a service in the portal-node container. It is used to retrieve tagged middleware services from the container.
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler` to wrap execution of middleware chain
+- Add composer dependency `psr/http-server-handler: ^1.0` and `psr/http-server-middleware: ^1.0` to support PSR-15 middlewares for HTTP handlers
+- Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
+- Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
+
+### Fixed
+
 - Only load dev-packages from `composer.lock` file when dev-mode is active in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`
 - Only check for dev-mode in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`, if the installed version of composer supports it.
 - Skip broken entries in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` instead of returning an empty list
-
-### Security
 
 ## [0.9.1.1] - 2022-09-28
 
