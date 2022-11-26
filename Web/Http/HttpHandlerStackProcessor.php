@@ -14,11 +14,9 @@ use Psr\Log\LoggerInterface;
 
 final class HttpHandlerStackProcessor implements HttpHandlerStackProcessorInterface
 {
-    private LoggerInterface $logger;
-
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        private LoggerInterface $logger
+    ) {
     }
 
     public function processStack(

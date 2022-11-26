@@ -19,8 +19,6 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     private EntityType $entityType;
 
-    private LoggerInterface $logger;
-
     /**
      * @var ExplorerContract[]
      */
@@ -29,13 +27,12 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     public function __construct(
         ExplorerCollection $sources,
         EntityType $entityType,
-        LoggerInterface $logger
+        private LoggerInterface $logger
     ) {
         $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
-        $this->logger = $logger;
     }
 
     public function push(ExplorerContract $explorer): self

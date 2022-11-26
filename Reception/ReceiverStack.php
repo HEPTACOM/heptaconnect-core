@@ -15,15 +15,14 @@ final class ReceiverStack implements ReceiverStackInterface
 {
     private ReceiverCollection $receivers;
 
-    private LoggerInterface $logger;
-
     /**
      * @param iterable<array-key, ReceiverContract> $receivers
      */
-    public function __construct(iterable $receivers, LoggerInterface $logger)
-    {
+    public function __construct(
+        iterable $receivers,
+        private LoggerInterface $logger
+    ) {
         $this->receivers = new ReceiverCollection($receivers);
-        $this->logger = $logger;
     }
 
     public function next(TypedDatasetEntityCollection $entities, ReceiveContextInterface $context): iterable

@@ -9,11 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructCon
 
 abstract class AbstractJobType extends JobContract
 {
-    protected MappingComponentStructContract $mapping;
-
-    public function __construct(MappingComponentStructContract $mapping)
-    {
-        $this->mapping = $mapping;
+    public function __construct(
+        protected MappingComponentStructContract $mapping
+    ) {
     }
 
     public function getMappingComponent(): MappingComponentStructContract

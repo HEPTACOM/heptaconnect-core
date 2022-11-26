@@ -11,7 +11,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
@@ -20,15 +20,19 @@ use Psr\Log\NullLogger;
  */
 final class HttpClient extends HttpClientContract implements LoggerAwareInterface
 {
-    use LoggerAwareTrait;
+    private LoggerInterface $logger;
 
-    private UriFactoryInterface $uriFactory;
-
-    public function __construct(ClientInterface $client, UriFactoryInterface $uriFactory)
-    {
+    public function __construct(
+        ClientInterface $client,
+        private UriFactoryInterface $uriFactory
+    ) {
         parent::__construct($client);
         $this->logger = new NullLogger();
-        $this->uriFactory = $uriFactory;
+    }
+
+    public function setLogger(LoggerInterface $logger): void
+    {
+        $this->logger = $logger;
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface
@@ -42,7 +46,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         $remainingRetries = $this->getMaxRetry();
         $remainingRedirect = $this->getMaxRedirect();
 
-        do {
+        while (true) {
             $response = $this->getClient()->sendRequest($request);
             $now = new \DateTime();
             $code = $response->getStatusCode();
@@ -100,7 +104,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
             }
 
             break;
-        } while (true);
+        }
 
         if (\in_array($code, $this->getExceptionTriggers(), true)) {
             throw new HttpException($request, $response);
@@ -109,7 +113,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return $response;
     }
 
-    protected function getRetryAfterHeader(ResponseInterface $response): ?string
+    private function getRetryAfterHeader(ResponseInterface $response): ?string
     {
         $retryAfterHeaders = $response->getHeader('Retry-After');
         $retryAfterHeader = \array_shift($retryAfterHeaders);
@@ -122,7 +126,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
      *
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
      */
-    protected function getSleepInterval(string $retryAfter, \DateTime $now): ?int
+    private function getSleepInterval(string $retryAfter, \DateTime $now): ?int
     {
         $retryAfterDate = \DateTime::createFromFormat('D, d M Y H:i:s e', $retryAfter);
 
@@ -135,19 +139,19 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return null;
     }
 
-    protected function isRedirect(ResponseInterface $response): bool
+    private function isRedirect(ResponseInterface $response): bool
     {
         $statusCode = $response->getStatusCode();
 
         return $statusCode >= 300 && $statusCode < 400 && $response->hasHeader('Location');
     }
 
-    protected function isAbsolute(string $location): bool
+    private function isAbsolute(string $location): bool
     {
         return \is_string(\parse_url($location, \PHP_URL_HOST));
     }
 
-    protected function getLocationHeader(ResponseInterface $response): ?string
+    private function getLocationHeader(ResponseInterface $response): ?string
     {
         $locationHeaders = $response->getHeader('Location');
         $locationHeader = \array_shift($locationHeaders);
@@ -155,7 +159,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         return \is_string($locationHeader) ? $locationHeader : null;
     }
 
-    protected function isError(ResponseInterface $response): bool
+    private function isError(ResponseInterface $response): bool
     {
         $statusCode = $response->getStatusCode();
 

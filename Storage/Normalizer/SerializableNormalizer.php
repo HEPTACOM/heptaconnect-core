@@ -19,6 +19,8 @@ final class SerializableNormalizer implements NormalizerInterface
     }
 
     /**
+     * @param string|null $format
+     *
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])
@@ -30,6 +32,9 @@ final class SerializableNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsNormalization($data, $format = null)
     {
         if ($data instanceof StreamInterface) {
@@ -40,7 +45,7 @@ final class SerializableNormalizer implements NormalizerInterface
             \serialize($data);
 
             return true;
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             return false;
         }
     }

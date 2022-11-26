@@ -19,32 +19,16 @@ use Psr\Log\LoggerInterface;
  */
 final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplorer
 {
-    private DirectEmitter $directEmitter;
-
-    private EmitterStackProcessorInterface $emitterStackProcessor;
-
-    private EmitterStackInterface $emitterStack;
-
-    private EmitContextInterface $emitContext;
-
-    private LoggerInterface $logger;
-
     public function __construct(
         EntityType $entityType,
-        DirectEmitter $directEmitter,
-        EmitterStackProcessorInterface $emitterStackProcessor,
-        EmitterStackInterface $emitterStack,
-        EmitContextInterface $emitContext,
-        LoggerInterface $logger,
+        private DirectEmitter $directEmitter,
+        private EmitterStackProcessorInterface $emitterStackProcessor,
+        private EmitterStackInterface $emitterStack,
+        private EmitContextInterface $emitContext,
+        private LoggerInterface $logger,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);
-
-        $this->directEmitter = $directEmitter;
-        $this->emitterStackProcessor = $emitterStackProcessor;
-        $this->emitterStack = $emitterStack;
-        $this->emitContext = $emitContext;
-        $this->logger = $logger;
     }
 
     protected function createBuffer(): CollectionInterface
@@ -68,7 +52,7 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
         $this->directEmitter->getEntities()->clear();
     }
 
-    protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void
+    protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if ($value instanceof DatasetEntityContract) {
             $this->logger->debug('DirectEmittingExplorer: Entity was explored and job dispatch is prepared', [

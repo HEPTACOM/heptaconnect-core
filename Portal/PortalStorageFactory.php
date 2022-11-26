@@ -17,36 +17,15 @@ use Psr\Log\LoggerInterface;
 
 class PortalStorageFactory
 {
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction;
-
-    private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction;
-
-    private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction;
-
-    private PortalNodeStorageListActionInterface $portalNodeStorageListAction;
-
-    private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        NormalizationRegistryContract $normalizationRegistry,
-        PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
-        PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
-        PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
-        PortalNodeStorageListActionInterface $portalNodeStorageListAction,
-        PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
-        LoggerInterface $logger
+        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
+        private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
+        private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
+        private PortalNodeStorageListActionInterface $portalNodeStorageListAction,
+        private PortalNodeStorageSetActionInterface $portalNodeStorageSetAction,
+        private LoggerInterface $logger
     ) {
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalNodeStorageClearAction = $portalNodeStorageClearAction;
-        $this->portalNodeStorageDeleteAction = $portalNodeStorageDeleteAction;
-        $this->portalNodeStorageGetAction = $portalNodeStorageGetAction;
-        $this->portalNodeStorageListAction = $portalNodeStorageListAction;
-        $this->portalNodeStorageSetAction = $portalNodeStorageSetAction;
-        $this->logger = $logger;
     }
 
     public function createPortalStorage(PortalNodeKeyInterface $portalNodeKey): PortalStorageInterface

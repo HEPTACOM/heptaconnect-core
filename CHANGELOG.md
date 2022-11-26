@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Reception\ReceptionFlowReceiversFactory` described in `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to return receivers, that provide core functionality for the reception flow
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleFlowHttpHandlersFactory` described in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to return HTTP handlers, that provide core functionality for the HTTP handle flow
 - Add implementation `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade` and its contract `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract` to have a typed interface onto `\Psr\Container\ContainerInterface`
+- Add exception code `1666461305` to `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade::__construct` when the given container does not contain all necessary services, that explicitly are exposed by the facade
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add UI audit trail class to stateful log a UI actions behaviour described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface`, implemented in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrail`, `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\NullAuditTrail` and factorized by `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface`
 - Add `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditableDataSerializerInterface` to transform auditable data into a string for storing later
@@ -48,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface`
 - Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
 - Add exception code `1660417907` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when the given storage key data is not compatible with the storage implementation
 - Add exception code `1660417908` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when the given storage key is not compatible with the storage implementation
@@ -73,10 +75,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
+- Add exception code `1659293800` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when reading known routes from storage fails
+- Add exception code `1659293801` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when route that does not exist is tried to be deleted
+- Add exception code `1659293802` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when deleting routes fails in storage
 - Add exception code `1663677420` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when starting an audit trail failed and a no-op trail is used instead
 - Add exception code `1663677421` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any output to an audit trail failed
 - Add exception code `1663677422` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when logging any exception to an audit trail failed
 - Add exception code `1663677423` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory::create` when marking an audit trail as finished
+- Extract deserialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestDeserializationException` to be explicitly used independent from `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
+- Add exception code `1666451009` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer::deserialize` when the given request data is not valid JSON
+- Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestSerializationException` to be explicitly used independent from `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
+- Add exception code `1666451010` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer::serialize` when the given request cannot be serialized into JSON
 
 ### Changed
 
@@ -105,16 +114,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add parameter of `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface` to `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to extend HTTP handle flow by core HTTP handlers
 - Add parameter of `\Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface` to `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` to extend reception flow by core receivers
 - Extract reception locking and release from `\Heptacom\HeptaConnect\Core\Reception\ReceiveService` into `\Heptacom\HeptaConnect\Core\Reception\LockingReceiver` and `\Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable`
+- Change composer dependency `composer/composer:>=1.9` to `composer/composer:^2.2.6` to ensure `\Composer\Repository\InstalledRepositoryInterface::getDevMode` exists and always support loading dev-packages
+- Use `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` instead of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` and `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` to allow for implementation change
+- Add exception code `1647801830` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be read from the filesystem
+- Add exception code `1637432096` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize` when original normalized value is not a string
+- Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration` and `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler`
+- Implement `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface::getLogger` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::getLogger` by looking up the service in the container
+- Implement `\Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface` in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration`
+- Removed logger dependency from `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor`
+- Replace union type hints to real union types in `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::replace`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::merge`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::set` and `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer::pushBuffer`
 
 ### Deprecated
 
 ### Removed
 
+- Remove support for `php: 7.4` as it will not receive any updates anymore, it is unlikely to be used. By raising the minimum PHP version we also make use of features introduced by PHP 8.0, which mainly have no effect on public API
+- Remove composer dependency `symfony/polyfill-php80` as minimum PHP version is raised to PHP 8.0
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException` and `\Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException` as their condition origin will occur earlier related to either `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException`, `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException` or `\Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException` will be thrown instead
 
 ### Fixed
 
 ### Security
+
+## [0.9.2.0] - 2022-10-16
+
+### Added
+
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareClient` to execute a chain of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services for outbound HTTP requests via `\Psr\Http\Client\ClientInterface` from a portal-node context.
+- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` to automatically tag services implementing `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` with `heptaconnect.http.client.middleware`.
+- Execute a chain of `\Psr\Http\Server\MiddlewareInterface` services for inbound HTTP request via `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract`
+- Add `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass` to automatically tag services implementing `\Psr\Http\Server\MiddlewareInterface` with `heptaconnect.http.handler.middleware`.
+- Add `\Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector` as a service in the portal-node container. It is used to retrieve tagged middleware services from the container.
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpMiddlewareHandler` to wrap execution of middleware chain
+- Add composer dependency `psr/http-server-handler: ^1.0` and `psr/http-server-middleware: ^1.0` to support PSR-15 middlewares for HTTP handlers
+- Add exception code `1651338559` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` when unpacking a single entry fails
+- Add exception code `1651338621` in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` when denormalizing any stored value fails
+
+### Fixed
+
+- Only load dev-packages from `composer.lock` file when dev-mode is active in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`
+- Only check for dev-mode in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`, if the installed version of composer supports it.
+- Skip broken entries in `\Heptacom\HeptaConnect\Core\Portal\PortalStorage::list` instead of returning an empty list
+
+## [0.9.1.1] - 2022-09-28
+
+### Added
+
+- Load composer packages also from `require-dev` section of `composer.lock` file in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader`
 
 ## [0.9.1.0] - 2022-08-15
 

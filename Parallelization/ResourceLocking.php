@@ -13,16 +13,10 @@ use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
 final class ResourceLocking extends ResourceLockingContract
 {
-    private ResourceLockStorageContract $resourceLockStorage;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     public function __construct(
-        ResourceLockStorageContract $resourceLockStorage,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        private ResourceLockStorageContract $resourceLockStorage,
+        private StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->resourceLockStorage = $resourceLockStorage;
-        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function isLocked(string $resourceKey, ?StorageKeyInterface $owner): bool
@@ -57,7 +51,7 @@ final class ResourceLocking extends ResourceLockingContract
         if ($owner instanceof StorageKeyInterface) {
             try {
                 $prefix = $this->storageKeyGenerator->serialize($owner);
-            } catch (UnsupportedStorageKeyException $e) {
+            } catch (UnsupportedStorageKeyException) {
             }
         }
 

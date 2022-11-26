@@ -25,28 +25,13 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface
 
 final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterface
 {
-    private AuditTrailFactoryInterface $auditTrailFactory;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder;
-
-    private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder;
-
-    private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder;
-
     public function __construct(
-        AuditTrailFactoryInterface $auditTrailFactory,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
-        EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
-        ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
+        private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
+        private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder
     ) {
-        $this->auditTrailFactory = $auditTrailFactory;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->explorerCodeOriginFinder = $explorerCodeOriginFinder;
-        $this->emitterCodeOriginFinder = $emitterCodeOriginFinder;
-        $this->receiverCodeOriginFinder = $receiverCodeOriginFinder;
     }
 
     public static function class(): UiActionType
@@ -107,8 +92,7 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
     private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
         $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $container->getFlowComponentRegistry();
         $components = new ExplorerCollection();
 
         foreach ($flowComponentRegistry->getOrderedSources() as $source) {

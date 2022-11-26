@@ -9,5 +9,8 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 
 interface ReceiveContextFactoryInterface
 {
+    /**
+     * Create a context for a reception on the given portal node.
+     */
     public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface;
 }

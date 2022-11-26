@@ -16,23 +16,17 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
-    private EntityStatusContract $entityStatus;
-
     private EventDispatcherInterface $eventDispatcher;
 
     private PostProcessorDataBag $postProcessingBag;
 
-    private array $postProcessors;
-
     public function __construct(
         PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,
-        EntityStatusContract $entityStatus,
-        array $postProcessors
+        private EntityStatusContract $entityStatus,
+        private array $postProcessors
     ) {
         parent::__construct($containerFacade, $configuration);
-        $this->entityStatus = $entityStatus;
-        $this->postProcessors = $postProcessors;
         $this->postProcessingBag = new PostProcessorDataBag();
         $this->initializeEventDispatcher();
     }

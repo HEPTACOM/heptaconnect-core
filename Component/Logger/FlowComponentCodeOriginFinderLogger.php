@@ -20,32 +20,14 @@ use Psr\Log\LogLevel;
 
 class FlowComponentCodeOriginFinderLogger extends AbstractLogger
 {
-    private LoggerInterface $decorated;
-
-    private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder;
-
-    private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder;
-
-    private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder;
-
-    private StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder;
-
-    private HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder;
-
     public function __construct(
-        LoggerInterface $decorated,
-        EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
-        ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
-        ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder,
-        StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder,
-        HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder
+        private LoggerInterface $decorated,
+        private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
+        private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
+        private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder,
+        private StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder,
+        private HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder
     ) {
-        $this->decorated = $decorated;
-        $this->emitterCodeOriginFinder = $emitterCodeOriginFinder;
-        $this->explorerCodeOriginFinder = $explorerCodeOriginFinder;
-        $this->receiverCodeOriginFinder = $receiverCodeOriginFinder;
-        $this->statusReporterCodeOriginFinder = $statusReporterCodeOriginFinder;
-        $this->httpHandlerCodeOriginFinder = $httpHandlerCodeOriginFinder;
     }
 
     public function log($level, $message, array $context = []): void
@@ -66,7 +48,7 @@ class FlowComponentCodeOriginFinderLogger extends AbstractLogger
             } catch (\Throwable $throwable) {
                 $this->decorated->log(LogLevel::DEBUG, 'Could not evaluate code origin in for log message', [
                     'code' => $throwable->getCode(),
-                    'flow_component_class' => \get_class($value),
+                    'flow_component_class' => $value::class,
                     'context_key' => $key,
                 ]);
             }

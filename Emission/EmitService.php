@@ -23,12 +23,6 @@ use Psr\Log\LoggerInterface;
 
 final class EmitService implements EmitServiceInterface
 {
-    private EmitContextFactoryInterface $emitContextFactory;
-
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @var array<array-key, EmitterStackInterface|null>
      */
@@ -39,26 +33,14 @@ final class EmitService implements EmitServiceInterface
      */
     private array $emitContextCache = [];
 
-    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
-
-    private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory;
-
-    private EmitterStackProcessorInterface $stackProcessor;
-
     public function __construct(
-        EmitContextFactoryInterface $emitContextFactory,
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
-        EmitterStackProcessorInterface $stackProcessor
+        private EmitContextFactoryInterface $emitContextFactory,
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
+        private EmitterStackProcessorInterface $stackProcessor
     ) {
-        $this->emitContextFactory = $emitContextFactory;
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emissionFlowEmittersFactory = $emissionFlowEmittersFactory;
-        $this->stackProcessor = $stackProcessor;
     }
 
     public function emit(TypedMappingComponentCollection $mappingComponents): void
@@ -106,20 +88,18 @@ final class EmitService implements EmitServiceInterface
                 ->pushSource();
 
             if ($builder->isEmpty()) {
+                $this->emissionStackCache[$cacheKey] = null;
+
                 return null;
             }
 
             $builder->pushDecorators();
 
-            if ($builder->isEmpty()) {
-                $this->emissionStackCache[$cacheKey] = null;
-            } else {
-                foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
-                    $builder = $builder->push($emitter);
-                }
-
-                $this->emissionStackCache[$cacheKey] = $builder->build();
+            foreach ($this->emissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                $builder = $builder->push($emitter);
             }
+
+            $this->emissionStackCache[$cacheKey] = $builder->build();
         }
 
         $result = $this->emissionStackCache[$cacheKey];

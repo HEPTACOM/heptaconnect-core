@@ -4,12 +4,21 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
 final class Psr7RequestNormalizer implements NormalizerInterface
 {
+    public function __construct(
+        private RequestSerializerInterface $serializer
+    ) {
+    }
+
+    /**
+     * @param string|null $format
+     */
     public function supportsNormalization($data, $format = null)
     {
         return $data instanceof RequestInterface;
@@ -21,24 +30,19 @@ final class Psr7RequestNormalizer implements NormalizerInterface
     }
 
     /**
+     * @param string|null $format
+     *
      * @return string
      */
     public function normalize($object, $format = null, array $context = [])
     {
         if (!$object instanceof RequestInterface) {
             throw new InvalidArgumentException(
-                'Psr7RequestNormalizer can only normalize request objects. Got: ' . \get_class($object),
+                'Psr7RequestNormalizer can only normalize request objects. Got: ' . $object::class,
                 1647789809
             );
         }
 
-        return \json_encode([
-            'method' => $object->getMethod(),
-            'uri' => (string) $object->getUri(),
-            'requestTarget' => $object->getRequestTarget(),
-            'protocolVersion' => $object->getProtocolVersion(),
-            'headers' => $object->getHeaders(),
-            'body' => (string) $object->getBody(),
-        ], \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
+        return $this->serializer->serialize($object);
     }
 }

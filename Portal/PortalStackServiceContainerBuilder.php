@@ -9,6 +9,8 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterf
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
@@ -83,56 +85,23 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
-    private LoggerInterface $logger;
-
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private PortalStorageFactory $portalStorageFactory;
-
-    private ResourceLockingContract $resourceLocking;
-
-    private ProfilerFactoryContract $profilerFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private FilesystemFactory $filesystemFactory;
-
-    private ConfigurationServiceInterface $configurationService;
-
-    private PublisherInterface $publisher;
-
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
-
-    private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
-
-    private RequestStorageContract $requestStorage;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     public function __construct(
-        LoggerInterface $logger,
-        NormalizationRegistryContract $normalizationRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        ProfilerFactoryContract $profilerFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService,
-        PublisherInterface $publisher,
-        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        RequestStorageContract $requestStorage
+        private LoggerInterface $logger,
+        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalStorageFactory $portalStorageFactory,
+        private ResourceLockingContract $resourceLocking,
+        private ProfilerFactoryContract $profilerFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private FilesystemFactory $filesystemFactory,
+        private ConfigurationServiceInterface $configurationService,
+        private PublisherInterface $publisher,
+        private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        private RequestStorageContract $requestStorage
     ) {
-        $this->logger = $logger;
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalStorageFactory = $portalStorageFactory;
-        $this->resourceLocking = $resourceLocking;
-        $this->profilerFactory = $profilerFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->filesystemFactory = $filesystemFactory;
-        $this->configurationService = $configurationService;
-        $this->publisher = $publisher;
-        $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
-        $this->requestStorage = $requestStorage;
     }
 
     /**
@@ -172,14 +141,16 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
             $seenDefinitions = $containerBuilder->getDefinitions();
-            $packageClass = \get_class($package);
+            $packageClass = $package::class;
 
             $this->tagDefinitionSource($newDefinitions, ExplorerContract::class, self::EXPLORER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, EmitterContract::class, self::EMITTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, ReceiverContract::class, self::RECEIVER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, HttpHandlerContract::class, self::WEB_HTTP_HANDLER_SOURCE_TAG, $packageClass);
-            $flowBuilderFiles[$packageClass] = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php') ?: [];
+
+            $globMatches = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php');
+            $flowBuilderFiles[$packageClass] = $globMatches !== false ? $globMatches : [];
         }
 
         foreach ($containerBuilder->getDefinitions() as $definition) {
@@ -227,13 +198,18 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
-            FileReferenceResolverContract::class => $this->fileReferenceResolver,
         ]);
-        $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+        $containerBuilder->setAlias($portal::class, PortalContract::class);
 
         if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
             $this->setSyntheticServices($containerBuilder, [
                 DirectEmissionFlowContract::class => $this->directEmissionFlow,
+            ]);
+        }
+
+        if ($this->fileReferenceResolver instanceof FileReferenceResolverContract) {
+            $this->setSyntheticServices($containerBuilder, [
+                FileReferenceResolverContract::class => $this->fileReferenceResolver,
             ]);
         }
 
@@ -259,6 +235,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
+        $containerBuilder->addCompilerPass(new AddHttpMiddlewareClientCompilerPass());
+        $containerBuilder->addCompilerPass(new AddHttpMiddlewareCollectorCompilerPass());
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
@@ -307,6 +285,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     /**
      * @param Definition[] $definitions
+     *
      * @psalm-param class-string $interface
      * @psalm-param class-string $packageClass
      */
@@ -399,17 +378,16 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     }
 
     /**
-     * @param object[] $services
+     * @param array<class-string, object> $services
      */
     private function setSyntheticServices(ContainerBuilder $containerBuilder, array $services): void
     {
         foreach ($services as $id => $service) {
-            $definitionId = (string) $id;
-            $containerBuilder->set($definitionId, $service);
+            $containerBuilder->set($id, $service);
             $definition = (new Definition())
                 ->setSynthetic(true)
-                ->setClass(\get_class($service));
-            $containerBuilder->setDefinition($definitionId, $definition);
+                ->setClass($service::class);
+            $containerBuilder->setDefinition($id, $definition);
         }
     }
 }
