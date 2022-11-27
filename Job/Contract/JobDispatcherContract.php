@@ -8,5 +8,8 @@ use Heptacom\HeptaConnect\Core\Job\JobCollection;
 
 abstract class JobDispatcherContract
 {
+    /**
+     * Dispatch all given jobs to be run deferred.
+     */
     abstract public function dispatch(JobCollection $jobs): void;
 }

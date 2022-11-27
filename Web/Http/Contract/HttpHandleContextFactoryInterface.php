@@ -9,5 +9,8 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterfa
 
 interface HttpHandleContextFactoryInterface
 {
+    /**
+     * Create a context for handling an HTTP request on the given portal node.
+     */
     public function createContext(PortalNodeKeyInterface $portalNodeKey): HttpHandleContextInterface;
 }

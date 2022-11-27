@@ -15,20 +15,13 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErr
 
 final class EmitContext extends AbstractPortalNodeContext implements EmitContextInterface
 {
-    private IdentityErrorCreateActionInterface $identityErrorCreateAction;
-
-    private bool $directEmission;
-
     public function __construct(
         PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,
-        IdentityErrorCreateActionInterface $identityErrorCreateAction,
-        bool $directEmission
+        private IdentityErrorCreateActionInterface $identityErrorCreateAction,
+        private bool $directEmission
     ) {
         parent::__construct($containerFacade, $configuration);
-
-        $this->identityErrorCreateAction = $identityErrorCreateAction;
-        $this->directEmission = $directEmission;
     }
 
     public function isDirectEmission(): bool

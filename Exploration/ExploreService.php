@@ -22,36 +22,15 @@ use Psr\Log\LoggerInterface;
 
 final class ExploreService implements ExploreServiceInterface
 {
-    private ExploreContextFactoryInterface $exploreContextFactory;
-
-    private ExplorerStackProcessorInterface $explorerStackProcessor;
-
-    private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory;
-
-    private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private LoggerInterface $logger;
-
-    private JobDispatcherContract $jobDispatcher;
-
     public function __construct(
-        ExploreContextFactoryInterface $exploreContextFactory,
-        ExplorerStackProcessorInterface $explorerStackProcessor,
-        ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory,
-        ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        LoggerInterface $logger,
-        JobDispatcherContract $jobDispatcher
+        private ExploreContextFactoryInterface $exploreContextFactory,
+        private ExplorerStackProcessorInterface $explorerStackProcessor,
+        private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory,
+        private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private LoggerInterface $logger,
+        private JobDispatcherContract $jobDispatcher
     ) {
-        $this->exploreContextFactory = $exploreContextFactory;
-        $this->explorerStackProcessor = $explorerStackProcessor;
-        $this->explorationFlowExplorersFactory = $explorationFlowExplorersFactory;
-        $this->explorerStackBuilderFactory = $explorerStackBuilderFactory;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->logger = $logger;
-        $this->jobDispatcher = $jobDispatcher;
     }
 
     public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
@@ -99,12 +78,12 @@ final class ExploreService implements ExploreServiceInterface
         }
     }
 
-    protected static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
+    private static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
     {
         return new EntityTypeCollection($explorers->column('getSupportedEntityType'));
     }
 
-    protected function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
+    private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
         $flowComponentRegistry = $this->portalStackServiceContainerFactory
             ->create($portalNodeKey)

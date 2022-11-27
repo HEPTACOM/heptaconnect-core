@@ -13,22 +13,13 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
-class MessageHandler implements MessageSubscriberInterface
+final class MessageHandler implements MessageSubscriberInterface
 {
-    private JobGetActionInterface $jobGetAction;
-
-    private DelegatingJobActorContract $jobActor;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        JobGetActionInterface $jobGetAction,
-        DelegatingJobActorContract $jobActor,
-        LoggerInterface $logger
+        private JobGetActionInterface $jobGetAction,
+        private DelegatingJobActorContract $jobActor,
+        private LoggerInterface $logger
     ) {
-        $this->jobGetAction = $jobGetAction;
-        $this->jobActor = $jobActor;
-        $this->logger = $logger;
     }
 
     public static function getHandledMessages(): iterable

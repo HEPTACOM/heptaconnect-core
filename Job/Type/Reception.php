@@ -14,19 +14,12 @@ class Reception extends AbstractJobType
 
     public const ENTITY = 'entity';
 
-    protected RouteKeyInterface $routeKey;
-
-    protected DatasetEntityContract $entity;
-
     public function __construct(
         MappingComponentStructContract $mapping,
-        RouteKeyInterface $routeKey,
-        DatasetEntityContract $entity
+        protected RouteKeyInterface $routeKey,
+        protected DatasetEntityContract $entity
     ) {
         parent::__construct($mapping);
-
-        $this->routeKey = $routeKey;
-        $this->entity = $entity;
     }
 
     public function getPayload(): ?array

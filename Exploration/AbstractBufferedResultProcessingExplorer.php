@@ -18,14 +18,10 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterfac
  */
 abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
 {
-    private EntityType $entityType;
-
-    private int $batchSize;
-
-    public function __construct(EntityType $entityType, int $batchSize)
-    {
-        $this->entityType = $entityType;
-        $this->batchSize = $batchSize;
+    public function __construct(
+        private EntityType $entityType,
+        private int $batchSize
+    ) {
     }
 
     public function explore(ExploreContextInterface $context, ExplorerStackInterface $stack): iterable
@@ -69,28 +65,19 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
     /**
      * Any data that is returned by the stack is running through this. Here can be filtered what will be buffered.
      *
-     * @param DatasetEntityContract|int|string $value
-     * @param CollectionInterface<T>           $buffer
+     * @param CollectionInterface<T> $buffer
      */
-    abstract protected function pushBuffer($value, CollectionInterface $buffer, ExploreContextInterface $context): void;
+    abstract protected function pushBuffer(DatasetEntityContract|int|string $value, CollectionInterface $buffer, ExploreContextInterface $context): void;
 
     /**
      * @param CollectionInterface<T> $buffer
      */
     private function dispatchBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
-        $batchSize = $this->batchSize;
-
-        while ($buffer->count() > 0) {
-            $slice = $this->createBuffer();
-
-            for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
-                /** @var T $item */
-                $item = $buffer->shift();
-                $slice->push([$item]);
-            }
-
+        foreach ($buffer->chunk(\max(1, $this->batchSize)) as $slice) {
             $this->processBuffer($slice, $context);
         }
+
+        $buffer->clear();
     }
 }

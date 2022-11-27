@@ -14,16 +14,10 @@ final class MappingStruct implements MappingInterface
 {
     private ?string $externalId = null;
 
-    private PortalNodeKeyInterface $portalNodeId;
-
-    private MappingNodeStructInterface $mappingNodeStruct;
-
     public function __construct(
-        PortalNodeKeyInterface $portalNodeId,
-        MappingNodeStructInterface $mappingNodeStruct
+        private PortalNodeKeyInterface $portalNodeId,
+        private MappingNodeStructInterface $mappingNodeStruct
     ) {
-        $this->portalNodeId = $portalNodeId;
-        $this->mappingNodeStruct = $mappingNodeStruct;
     }
 
     public function getExternalId(): ?string

@@ -19,16 +19,11 @@ use Symfony\Component\DependencyInjection\Reference;
 final class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var array<string, string[]>
-     */
-    private array $flowBuilderFiles;
-
-    /**
      * @param array<string, string[]> $flowBuilderFiles
      */
-    public function __construct(array $flowBuilderFiles)
-    {
-        $this->flowBuilderFiles = $flowBuilderFiles;
+    public function __construct(
+        private array $flowBuilderFiles
+    ) {
     }
 
     public function process(ContainerBuilder $container): void

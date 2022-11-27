@@ -15,18 +15,15 @@ final class EmitterStack implements EmitterStackInterface
 {
     private EmitterCollection $emitters;
 
-    private EntityType $entityType;
-
-    private LoggerInterface $logger;
-
     /**
      * @param iterable<EmitterContract> $emitters
      */
-    public function __construct(iterable $emitters, EntityType $entityType, LoggerInterface $logger)
-    {
+    public function __construct(
+        iterable $emitters,
+        private EntityType $entityType,
+        private LoggerInterface $logger
+    ) {
         $this->emitters = new EmitterCollection($emitters);
-        $this->entityType = $entityType;
-        $this->logger = $logger;
     }
 
     public function next(iterable $externalIds, EmitContextInterface $context): iterable

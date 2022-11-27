@@ -16,16 +16,12 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
  */
 abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
 {
-    private EntityType $entityType;
-
-    private int $batchSize;
-
     private TypedDatasetEntityCollection $buffer;
 
-    public function __construct(EntityType $entityType, int $batchSize)
-    {
-        $this->entityType = $entityType;
-        $this->batchSize = $batchSize;
+    public function __construct(
+        private EntityType $entityType,
+        private int $batchSize
+    ) {
         $this->buffer = $this->createBuffer();
     }
 
@@ -75,20 +71,11 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
 
     private function dispatchBuffer(EmitContextInterface $context): void
     {
-        $buffer = $this->buffer;
-        $batchSize = $this->batchSize;
-
-        while ($buffer->count() > 0) {
-            $slice = $this->createBuffer();
-
-            for ($step = 0; $step < \max(1, $batchSize) && $buffer->count() > 0; ++$step) {
-                /** @var DatasetEntityContract $item */
-                $item = $buffer->shift();
-                $slice->push([$item]);
-            }
-
+        foreach ($this->buffer->chunk(\max(1, $this->batchSize)) as $slice) {
             $this->processBuffer($slice, $context);
         }
+
+        $this->buffer->clear();
     }
 
     private function createBuffer(): TypedDatasetEntityCollection

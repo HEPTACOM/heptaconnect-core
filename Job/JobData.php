@@ -9,17 +9,11 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 
 class JobData
 {
-    protected MappingComponentStructContract $mappingComponent;
-
-    protected ?array $payload;
-
-    private JobKeyInterface $jobKey;
-
-    public function __construct(MappingComponentStructContract $mappingComponent, ?array $payload, JobKeyInterface $jobKey)
-    {
-        $this->mappingComponent = $mappingComponent;
-        $this->payload = $payload;
-        $this->jobKey = $jobKey;
+    public function __construct(
+        protected MappingComponentStructContract $mappingComponent,
+        protected ?array $payload,
+        private JobKeyInterface $jobKey
+    ) {
     }
 
     public function getMappingComponent(): MappingComponentStructContract

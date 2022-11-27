@@ -37,32 +37,14 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\RouteAlreadyExistsExc
 
 final class RouteAddUi implements RouteAddUiActionInterface
 {
-    private AuditTrailFactoryInterface $auditTrailFactory;
-
-    private RouteCreateActionInterface $routeCreateAction;
-
-    private RouteFindActionInterface $routeFindAction;
-
-    private RouteGetActionInterface $routeGetAction;
-
-    private RouteDeleteActionInterface $routeDeleteAction;
-
-    private PortalNodeGetActionInterface $portalNodeGetAction;
-
     public function __construct(
-        AuditTrailFactoryInterface $auditTrailFactory,
-        RouteCreateActionInterface $routeCreateAction,
-        RouteFindActionInterface $routeFindAction,
-        RouteGetActionInterface $routeGetAction,
-        RouteDeleteActionInterface $routeDeleteAction,
-        PortalNodeGetActionInterface $portalNodeGetAction
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private RouteCreateActionInterface $routeCreateAction,
+        private RouteFindActionInterface $routeFindAction,
+        private RouteGetActionInterface $routeGetAction,
+        private RouteDeleteActionInterface $routeDeleteAction,
+        private PortalNodeGetActionInterface $portalNodeGetAction
     ) {
-        $this->auditTrailFactory = $auditTrailFactory;
-        $this->routeCreateAction = $routeCreateAction;
-        $this->routeFindAction = $routeFindAction;
-        $this->routeGetAction = $routeGetAction;
-        $this->routeDeleteAction = $routeDeleteAction;
-        $this->portalNodeGetAction = $portalNodeGetAction;
     }
 
     public static function class(): UiActionType
@@ -125,7 +107,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $payload->getSourcePortalNodeKey(),
             $payload->getTargetPortalNodeKey(),
             $payload->getEntityType(),
-        ]);
+        ], \JSON_THROW_ON_ERROR);
     }
 
     private function getScenarioFromResult(RouteAddResult $result): string
@@ -134,7 +116,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
             $result->getSourcePortalNodeKey(),
             $result->getTargetPortalNodeKey(),
             $result->getEntityType(),
-        ]);
+        ], \JSON_THROW_ON_ERROR);
     }
 
     /**

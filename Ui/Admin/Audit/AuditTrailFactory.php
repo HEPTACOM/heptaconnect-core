@@ -26,36 +26,15 @@ use Psr\Log\LoggerInterface;
 
 final class AuditTrailFactory implements AuditTrailFactoryInterface
 {
-    private DeepObjectIteratorContract $deepObjectIterator;
-
-    private AuditableDataSerializerInterface $auditableDataSerializer;
-
-    private UiAuditTrailBeginActionInterface $uiAuditTrailBeginAction;
-
-    private UiAuditTrailLogOutputActionInterface $uiAuditTrailLogOutputAction;
-
-    private UiAuditTrailLogErrorActionInterface $uiAuditTrailLogErrorAction;
-
-    private UiAuditTrailEndActionInterface $uiAuditTrailEndAction;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        DeepObjectIteratorContract $deepObjectIterator,
-        AuditableDataSerializerInterface $auditableDataSerializer,
-        UiAuditTrailBeginActionInterface $uiAuditTrailBeginAction,
-        UiAuditTrailLogOutputActionInterface $uiAuditTrailLogOutputAction,
-        UiAuditTrailLogErrorActionInterface $uiAuditTrailLogErrorAction,
-        UiAuditTrailEndActionInterface $uiAuditTrailEndAction,
-        LoggerInterface $logger
+        private DeepObjectIteratorContract $deepObjectIterator,
+        private AuditableDataSerializerInterface $auditableDataSerializer,
+        private UiAuditTrailBeginActionInterface $uiAuditTrailBeginAction,
+        private UiAuditTrailLogOutputActionInterface $uiAuditTrailLogOutputAction,
+        private UiAuditTrailLogErrorActionInterface $uiAuditTrailLogErrorAction,
+        private UiAuditTrailEndActionInterface $uiAuditTrailEndAction,
+        private LoggerInterface $logger
     ) {
-        $this->deepObjectIterator = $deepObjectIterator;
-        $this->auditableDataSerializer = $auditableDataSerializer;
-        $this->uiAuditTrailBeginAction = $uiAuditTrailBeginAction;
-        $this->uiAuditTrailLogOutputAction = $uiAuditTrailLogOutputAction;
-        $this->uiAuditTrailLogErrorAction = $uiAuditTrailLogErrorAction;
-        $this->uiAuditTrailEndAction = $uiAuditTrailEndAction;
-        $this->logger = $logger;
     }
 
     public function create(UiActionInterface $uiAction, UiAuditContext $auditContext, array $inbound): AuditTrailInterface
@@ -111,7 +90,7 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         foreach ($this->unrollThrowable($auditException) as $depth => $exception) {
             $payloads->push([new UiAuditTrailLogErrorPayload(
                 $auditTrailKey,
-                \get_class($exception),
+                $exception::class,
                 $depth,
                 $exception->getMessage(),
                 (string) $exception->getCode()
@@ -145,6 +124,9 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         }
     }
 
+    /**
+     * @return iterable<int, \Throwable>
+     */
     private function unrollThrowable(\Throwable $throwable): iterable
     {
         $alreadyYielded = [];

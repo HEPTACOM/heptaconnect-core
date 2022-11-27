@@ -12,20 +12,13 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 
 final class ReceiveJobDispatchingEmitter extends AbstractBufferedResultProcessingEmitter
 {
-    private EmittedEntitiesToJobsConverterInterface $emissionResultToJobConverter;
-
-    private JobDispatcherContract $jobDispatcher;
-
     public function __construct(
         EntityType $entityType,
-        EmittedEntitiesToJobsConverterInterface $emissionResultToJobConverter,
-        JobDispatcherContract $jobDispatcher,
+        private EmittedEntitiesToJobsConverterInterface $emissionResultToJobConverter,
+        private JobDispatcherContract $jobDispatcher,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);
-
-        $this->emissionResultToJobConverter = $emissionResultToJobConverter;
-        $this->jobDispatcher = $jobDispatcher;
     }
 
     protected function processBuffer(TypedDatasetEntityCollection $buffer, EmitContextInterface $context): void

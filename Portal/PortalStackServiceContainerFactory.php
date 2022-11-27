@@ -12,25 +12,16 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 
 class PortalStackServiceContainerFactory
 {
-    private PortalRegistryInterface $portalRegistry;
-
-    private PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @var PortalNodeContainerFacadeContract[]
      */
     private array $portalContainers = [];
 
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder,
-        StorageKeyGeneratorContract $storageKeyGenerator
+        private PortalRegistryInterface $portalRegistry,
+        private PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder,
+        private StorageKeyGeneratorContract $storageKeyGenerator
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->portalStackServiceContainerBuilder = $portalStackServiceContainerBuilder;
-        $this->storageKeyGenerator = $storageKeyGenerator;
     }
 
     public function create(PortalNodeKeyInterface $portalNodeKey): PortalNodeContainerFacadeContract

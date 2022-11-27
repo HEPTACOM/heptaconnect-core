@@ -12,16 +12,10 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterfa
 
 final class HttpHandleContextFactory implements HttpHandleContextFactoryInterface
 {
-    private ConfigurationServiceInterface $configurationService;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
     public function __construct(
-        ConfigurationServiceInterface $configurationService,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private ConfigurationServiceInterface $configurationService,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
-        $this->configurationService = $configurationService;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey): HttpHandleContextInterface

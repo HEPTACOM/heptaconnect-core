@@ -12,11 +12,9 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolver
 
 final class PortalNodeAliasResolver implements PortalNodeAliasResolverInterface
 {
-    private PortalNodeAliasFindActionInterface $findAction;
-
-    public function __construct(PortalNodeAliasFindActionInterface $findAction)
-    {
-        $this->findAction = $findAction;
+    public function __construct(
+        private PortalNodeAliasFindActionInterface $findAction
+    ) {
     }
 
     public function resolve(string $portalNodeAlias): PortalNodeKeyInterface

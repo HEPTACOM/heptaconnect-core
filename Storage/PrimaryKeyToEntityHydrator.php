@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 class PrimaryKeyToEntityHydrator
 {
     /**
-     * @var array<class-string, \ReflectionClass>
+     * @var array<class-string, \ReflectionClass<DatasetEntityContract>>
      */
     private array $factoryCache = [];
 
