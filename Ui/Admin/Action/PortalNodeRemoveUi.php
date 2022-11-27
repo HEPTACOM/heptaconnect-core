@@ -34,7 +34,7 @@ final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 
         foreach ($foundPortalNodes as $foundPortalNode) {
             $uncheckedPortalNodeKeys = $uncheckedPortalNodeKeys->filter(
-                static fn (PortalNodeKeyInterface $k): bool => !$k->equals($foundPortalNode->getPortalNodeKey())
+                static fn (PortalNodeKeyInterface $key): bool => !$key->equals($foundPortalNode->getPortalNodeKey())
             );
         }
 
