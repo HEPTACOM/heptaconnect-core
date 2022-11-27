@@ -16,16 +16,10 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingExc
 
 final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 {
-    private PortalNodeGetActionInterface $portalNodeGetAction;
-
-    private PortalNodeDeleteActionInterface $portalNodeDeleteAction;
-
     public function __construct(
-        PortalNodeGetActionInterface $portalNodeGetAction,
-        PortalNodeDeleteActionInterface $portalNodeDeleteAction
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private PortalNodeDeleteActionInterface $portalNodeDeleteAction
     ) {
-        $this->portalNodeGetAction = $portalNodeGetAction;
-        $this->portalNodeDeleteAction = $portalNodeDeleteAction;
     }
 
     public function remove(PortalNodeRemoveCriteria $criteria): void
