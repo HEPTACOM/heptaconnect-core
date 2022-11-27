@@ -16,6 +16,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeRem
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PersistException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\ReadException;
 
 final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 {
@@ -39,7 +40,7 @@ final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
         try {
             $foundPortalNodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria($criteria->getPortalNodeKeys()));
         } catch (\Throwable $throwable) {
-            throw $trail->throwable(new PersistException(1650758000, $throwable));
+            throw $trail->throwable(new ReadException(1650758000, $throwable));
         }
 
         foreach ($foundPortalNodes as $foundPortalNode) {
