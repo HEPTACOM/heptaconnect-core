@@ -4,23 +4,31 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Overview\RouteOverviewCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteOverviewActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteBrowse\RouteBrowseCriteria;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteBrowse\RouteBrowseResult;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteBrowseUiActionInterface;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 
 final class RouteBrowseUi implements RouteBrowseUiActionInterface
 {
-    private RouteOverviewActionInterface $routeOverviewAction;
-
-    public function __construct(RouteOverviewActionInterface $routeOverviewAction)
-    {
-        $this->routeOverviewAction = $routeOverviewAction;
+    public function __construct(
+        private AuditTrailFactoryInterface $auditTrailFactory,
+        private RouteOverviewActionInterface $routeOverviewAction
+    ) {
     }
 
-    public function browse(RouteBrowseCriteria $criteria): iterable
+    public static function class(): UiActionType
     {
+        return new UiActionType(RouteBrowseUiActionInterface::class);
+    }
+
+    public function browse(RouteBrowseCriteria $criteria, UiActionContextInterface $context): iterable
+    {
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$criteria, $context]);
         $storageCriteria = new RouteOverviewCriteria();
 
         $storageCriteria->setPage($criteria->getPage() ?? 0);
@@ -34,13 +42,15 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
         $storageCriteria->setEntityTypeFilter($criteria->getEntityTypeFilter());
 
         foreach ($this->routeOverviewAction->overview($storageCriteria) as $storageResult) {
-            yield new RouteBrowseResult(
+            yield $trail->yield(new RouteBrowseResult(
                 $storageResult->getRouteKey(),
                 $storageResult->getSourcePortalNodeKey(),
                 $storageResult->getTargetPortalNodeKey(),
                 $storageResult->getEntityType(),
                 $storageResult->getCapabilities()
-            );
+            ));
         }
+
+        $trail->end();
     }
 }
