@@ -19,29 +19,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ConfigurationService implements ConfigurationServiceInterface
 {
-    private PortalRegistryInterface $portalRegistry;
-
-    private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
-
-    private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
-
     /**
      * @var PortalNodeConfigurationProcessorInterface[]
      */
     private array $configurationProcessors;
 
     /**
-     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationFileReader
+     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors
      */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
+        private PortalRegistryInterface $portalRegistry,
+        private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
+        private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
         iterable $configurationProcessors
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
-        $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
         $this->configurationProcessors = \iterable_to_array($configurationProcessors);
     }
 
@@ -64,8 +55,8 @@ final class ConfigurationService implements ConfigurationServiceInterface
             $data = null;
         } else {
             $data = $this->getPortalNodeConfigurationInternal($portalNodeKey);
-            $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration ?? []);
-            $configuration = $this->removeStorageKeysWhenValueIsNull($configuration, $configuration ?? []);
+            $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration);
+            $configuration = $this->removeStorageKeysWhenValueIsNull($configuration, $configuration);
             $data = \array_replace_recursive($data, $configuration);
 
             $template->resolve($data);

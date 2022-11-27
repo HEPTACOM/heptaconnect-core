@@ -22,12 +22,12 @@
         "rss": "https://heptaconnect.io/news/rss2.xml"
     },
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "ext-hash": "*",
         "ext-json": "*",
         "ext-zlib": "*",
         "bentools/iterable-functions": ">=1.4 <2",
-        "composer/composer": ">=1.9",
+        "composer/composer": "^2.2.6",
         "heptacom/heptaconnect-dataset-base": "self.version",
         "heptacom/heptaconnect-portal-base": "self.version",
         "heptacom/heptaconnect-storage-base": "self.version",
@@ -39,6 +39,8 @@
         "psr/http-client": "^1.0",
         "psr/http-factory": "^1.0",
         "psr/http-message": "^1.0",
+        "psr/http-server-handler": "^1.0",
+        "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1",
         "ramsey/uuid": "^3.5 || ^4",
         "symfony/config": "^4.4 || ^5.0",
@@ -47,7 +49,6 @@
         "symfony/event-dispatcher-contracts": ">=1.1",
         "symfony/lock": "^4.0 || ^5.0",
         "symfony/messenger": "^4.0 || ^5.0",
-        "symfony/polyfill-php80": ">=1.16",
         "symfony/yaml": "^4.4 || ^5.0"
     },
     "repositories": {
@@ -65,12 +66,6 @@
         "allow-plugins": {
             "infection/extension-installer": true
         }
-    },
-    "extra": {
-        "unused": [
-            "bentools/iterable-functions",
-            "symfony/polyfill-php80"
-        ]
     },
     "website": "https://heptaconnect.io"
 }

@@ -14,12 +14,10 @@ final class UiActionContext implements AttachmentAwareInterface, UiActionContext
 {
     use AttachmentAwareTrait;
 
-    private UiAuditContext $auditContext;
-
-    public function __construct(UiAuditContext $auditContext)
-    {
+    public function __construct(
+        private UiAuditContext $auditContext
+    ) {
         $this->attachments = new AttachmentCollection();
-        $this->auditContext = $auditContext;
     }
 
     public function getAuditContext(): UiAuditContext

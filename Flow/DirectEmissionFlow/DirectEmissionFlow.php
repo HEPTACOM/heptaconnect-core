@@ -25,28 +25,16 @@ use Psr\Log\NullLogger;
 
 final class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwareInterface, ProfilerAwareInterface
 {
-    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
-
-    private EmitContextFactory $emitContextFactory;
-
-    private EmitterStackProcessorInterface $stackProcessor;
-
-    private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory;
-
     private LoggerInterface $logger;
 
     private ProfilerContract $profiler;
 
     public function __construct(
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmitContextFactory $emitContextFactory,
-        EmitterStackProcessorInterface $stackProcessor,
-        DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
+        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private EmitContextFactory $emitContextFactory,
+        private EmitterStackProcessorInterface $stackProcessor,
+        private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
     ) {
-        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emitContextFactory = $emitContextFactory;
-        $this->stackProcessor = $stackProcessor;
-        $this->directEmissionFlowEmittersFactory = $directEmissionFlowEmittersFactory;
         $this->logger = new NullLogger();
         $this->profiler = new NullProfiler();
     }

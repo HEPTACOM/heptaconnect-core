@@ -17,14 +17,10 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
 {
-    private ?string $composerJson;
-
-    private CacheItemPoolInterface $cache;
-
-    public function __construct(?string $composerJson, CacheItemPoolInterface $cache)
-    {
-        $this->composerJson = $composerJson;
-        $this->cache = $cache;
+    public function __construct(
+        private ?string $composerJson,
+        private CacheItemPoolInterface $cache
+    ) {
     }
 
     public function getPackageConfigurations(): PackageConfigurationCollection
@@ -93,6 +89,23 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
                 yield $packageInstance;
             }
+
+            $localRepository = $composer->getRepositoryManager()->getLocalRepository();
+
+            if ($localRepository->getDevMode() ?? false) {
+                $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
+                $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
+
+                foreach ($packageDevLockData as $package) {
+                    $packageInstance = $locker->getLockedRepository(true)->findPackage($package['name'], $package['version']);
+
+                    if (!$packageInstance instanceof CompletePackageInterface) {
+                        continue;
+                    }
+
+                    yield $packageInstance;
+                }
+            }
         }
 
         yield $composer->getPackage();
@@ -106,7 +119,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         CompletePackageInterface $package,
         ?string $workingDir
     ): iterable {
-        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload() ?? []);
+        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload());
         $installPath = $composer->getInstallationManager()->getInstallPath($package);
 
         foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
@@ -149,9 +162,13 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             }
         }
 
+        \assert(\is_string($workingDir));
+
         foreach ($this->iteratePackages($composer) as $packageInstance) {
+            /** @var array|null $keywords */
+            $keywords = $packageInstance->getKeywords();
             $heptaconnectKeywords = \array_filter(
-                $packageInstance->getKeywords() ?? [],
+                $keywords ?? [],
                 static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
             );
 
@@ -177,7 +194,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $config->setName($packageInstance->getName());
         $config->setTags(new StringCollection($heptaconnectKeywords));
 
-        $extra = $packageInstance->getExtra() ?? [];
+        $extra = $packageInstance->getExtra();
         $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
 
         if ($heptaconnect !== []) {

@@ -26,29 +26,14 @@ final class FileReferenceResolver extends FileReferenceResolverContract
 {
     private RequestFactoryInterface $requestFactory;
 
-    private FileContentsUrlProviderInterface $fileContentsUrlProvider;
-
-    private FileRequestUrlProviderInterface $fileRequestUrlProvider;
-
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private RequestStorageContract $requestStorage;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
     public function __construct(
-        FileContentsUrlProviderInterface $fileContentsUrlProvider,
-        FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        NormalizationRegistryContract $normalizationRegistry,
-        RequestStorageContract $requestStorage,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private FileContentsUrlProviderInterface $fileContentsUrlProvider,
+        private FileRequestUrlProviderInterface $fileRequestUrlProvider,
+        private NormalizationRegistryContract $normalizationRegistry,
+        private RequestStorageContract $requestStorage,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
-        $this->fileContentsUrlProvider = $fileContentsUrlProvider;
-        $this->fileRequestUrlProvider = $fileRequestUrlProvider;
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->requestStorage = $requestStorage;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
     }
 
     public function resolve(FileReferenceContract $fileReference): ResolvedFileReferenceContract
@@ -94,7 +79,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
         }
 
         throw new \InvalidArgumentException(
-            'FileReference of unsupported source: ' . \get_class($fileReference),
+            'FileReference of unsupported source: ' . $fileReference::class,
             1647789133
         );
     }

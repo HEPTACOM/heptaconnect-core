@@ -13,23 +13,14 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 
 final class ReceiveContextFactory implements ReceiveContextFactoryInterface
 {
-    private ConfigurationServiceInterface $configurationService;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private EntityStatusContract $entityStatus;
-
     private array $postProcessors;
 
     public function __construct(
-        ConfigurationServiceInterface $configurationService,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        EntityStatusContract $entityStatus,
+        private ConfigurationServiceInterface $configurationService,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private EntityStatusContract $entityStatus,
         iterable $postProcessors
     ) {
-        $this->configurationService = $configurationService;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->entityStatus = $entityStatus;
         $this->postProcessors = $postProcessors instanceof \Traversable ? \iterator_to_array($postProcessors) : $postProcessors;
     }
 

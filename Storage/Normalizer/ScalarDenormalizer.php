@@ -17,6 +17,9 @@ final class ScalarDenormalizer implements DenormalizerInterface
         return 'scalar';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
         if (!$this->supportsDenormalization($data, $type)) {
@@ -26,6 +29,9 @@ final class ScalarDenormalizer implements DenormalizerInterface
         return \unserialize($data, ['allowed_classes' => false]);
     }
 
+    /**
+     * @param string|null $format
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()

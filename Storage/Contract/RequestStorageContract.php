@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
 use Psr\Http\Message\RequestInterface;
 
+/**
+ * Describes a storage for file references.
+ */
 abstract class RequestStorageContract
 {
     /**

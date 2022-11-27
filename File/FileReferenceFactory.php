@@ -19,24 +19,12 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 final class FileReferenceFactory extends FileReferenceFactoryContract
 {
-    private PortalNodeKeyInterface $portalNodeKey;
-
-    private StreamFactoryInterface $streamFactory;
-
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private RequestStorageContract $requestStorage;
-
     public function __construct(
-        PortalNodeKeyInterface $portalNodeKey,
-        StreamFactoryInterface $streamFactory,
-        NormalizationRegistryContract $normalizationRegistry,
-        RequestStorageContract $requestStorage
+        private PortalNodeKeyInterface $portalNodeKey,
+        private StreamFactoryInterface $streamFactory,
+        private NormalizationRegistryContract $normalizationRegistry,
+        private RequestStorageContract $requestStorage
     ) {
-        $this->portalNodeKey = $portalNodeKey;
-        $this->streamFactory = $streamFactory;
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->requestStorage = $requestStorage;
     }
 
     public function fromPublicUrl(string $publicUrl): FileReferenceContract

@@ -19,16 +19,6 @@ use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 
 final class PortalRegistry implements PortalRegistryInterface
 {
-    private PortalFactoryContract $portalFactory;
-
-    private ComposerPortalLoader $portalLoader;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private PortalNodeGetActionInterface $portalNodeGetAction;
-
-    private PortalExtensionFindActionInterface $portalExtensionFindAction;
-
     /**
      * @var array{
      *             classes: array<string, PortalType|null>,
@@ -43,17 +33,12 @@ final class PortalRegistry implements PortalRegistryInterface
     ];
 
     public function __construct(
-        PortalFactoryContract $portalFactory,
-        ComposerPortalLoader $portalLoader,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        PortalNodeGetActionInterface $portalNodeGetAction,
-        PortalExtensionFindActionInterface $portalExtensionFindAction
+        private PortalFactoryContract $portalFactory,
+        private ComposerPortalLoader $portalLoader,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private PortalNodeGetActionInterface $portalNodeGetAction,
+        private PortalExtensionFindActionInterface $portalExtensionFindAction
     ) {
-        $this->portalFactory = $portalFactory;
-        $this->portalLoader = $portalLoader;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->portalNodeGetAction = $portalNodeGetAction;
-        $this->portalExtensionFindAction = $portalExtensionFindAction;
     }
 
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract

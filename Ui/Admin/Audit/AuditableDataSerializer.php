@@ -15,20 +15,11 @@ use Psr\Log\LoggerInterface;
 
 final class AuditableDataSerializer implements AuditableDataSerializerInterface
 {
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private int $jsonEncodeFlags;
-
     public function __construct(
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private int $jsonEncodeFlags = \JSON_UNESCAPED_SLASHES
     ) {
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->jsonEncodeFlags = $jsonEncodeFlags;
     }
 
     public function serialize(AuditableDataAwareInterface $auditableDataAware): string
@@ -53,7 +44,7 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
                 if ($item instanceof StorageKeyInterface) {
                     try {
                         $item = $this->storageKeyGenerator->serialize($item);
-                    } catch (UnsupportedStorageKeyException $_) {
+                    } catch (UnsupportedStorageKeyException) {
                     }
                 }
             }
@@ -76,16 +67,15 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
     private function extractAttachableData(AttachmentAwareInterface $auditableDataAware): array
     {
         return \iterable_to_array($auditableDataAware->getAttachments()->map(
-            static fn (AttachableInterface $attachable) => \get_class($attachable)
+            static fn (AttachableInterface $attachable) => $attachable::class
         ));
     }
 
     private function jsonEncode(array $result): string
     {
         try {
+            /** @var string $auditableDataEncoded */
             $auditableDataEncoded = \json_encode($result, \JSON_THROW_ON_ERROR | $this->jsonEncodeFlags);
-
-            \assert(\is_string($auditableDataEncoded));
 
             return $auditableDataEncoded;
         } catch (\JsonException $jsonError) {

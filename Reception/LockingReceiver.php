@@ -17,14 +17,10 @@ use Symfony\Component\Lock\LockInterface;
 
 final class LockingReceiver extends ReceiverContract
 {
-    private EntityType $entityType;
-
-    private LoggerInterface $logger;
-
-    public function __construct(EntityType $entityType, LoggerInterface $logger)
-    {
-        $this->entityType = $entityType;
-        $this->logger = $logger;
+    public function __construct(
+        private EntityType $entityType,
+        private LoggerInterface $logger
+    ) {
     }
 
     public function receive(

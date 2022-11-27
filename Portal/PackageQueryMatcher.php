@@ -16,11 +16,9 @@ use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
 final class PackageQueryMatcher implements PackageQueryMatcherInterface
 {
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    public function __construct(StorageKeyGeneratorContract $storageKeyGenerator)
-    {
-        $this->storageKeyGenerator = $storageKeyGenerator;
+    public function __construct(
+        private StorageKeyGeneratorContract $storageKeyGenerator
+    ) {
     }
 
     public function matchPortalNodeKeys(string $query, PortalNodeKeyCollection $portalNodeKeys): PortalNodeKeyCollection
@@ -32,12 +30,16 @@ final class PackageQueryMatcher implements PackageQueryMatcherInterface
         try {
             $storageKey = $this->storageKeyGenerator->deserialize($query);
 
+            if (!$storageKey instanceof PortalNodeKeyInterface) {
+                return new PortalNodeKeyCollection();
+            }
+
             if (!$portalNodeKeys->contains($storageKey)) {
                 return new PortalNodeKeyCollection();
             }
 
             return new PortalNodeKeyCollection([$storageKey]);
-        } catch (UnsupportedStorageKeyException $e) {
+        } catch (UnsupportedStorageKeyException) {
             return $portalNodeKeys->filter(
                 fn (PortalNodeKeyInterface $key): bool => $this->storageKeyGenerator->serialize($key->withAlias()) === $query
                     || $this->storageKeyGenerator->serialize($key->withoutAlias()) === $query

@@ -17,36 +17,6 @@ class FlowComponentRegistry
     private ?array $orderedSources = null;
 
     /**
-     * @var array<class-string, ExplorerCollection>
-     */
-    private array $sourcedExplorers;
-
-    /**
-     * @var array<class-string, EmitterCollection>
-     */
-    private array $sourcedEmitters;
-
-    /**
-     * @var array<class-string, ReceiverCollection>
-     */
-    private array $sourcedReceivers;
-
-    /**
-     * @var array<class-string, StatusReporterCollection>
-     */
-    private array $sourcedStatusReporters;
-
-    /**
-     * @var array<class-string, HttpHandlerCollection>
-     */
-    private array $sourcedWebHttpHandlers;
-
-    /**
-     * @var array<class-string, string[]>
-     */
-    private array $flowBuilderFiles;
-
-    /**
      * @param array<class-string, ExplorerCollection>       $sourcedExplorers
      * @param array<class-string, EmitterCollection>        $sourcedEmitters
      * @param array<class-string, ReceiverCollection>       $sourcedReceivers
@@ -55,21 +25,18 @@ class FlowComponentRegistry
      * @param array<class-string, string[]>                 $flowBuilderFiles
      */
     public function __construct(
-        array $sourcedExplorers,
-        array $sourcedEmitters,
-        array $sourcedReceivers,
-        array $sourcedStatusReporters,
-        array $sourcedWebHttpHandlers,
-        array $flowBuilderFiles
+        private array $sourcedExplorers,
+        private array $sourcedEmitters,
+        private array $sourcedReceivers,
+        private array $sourcedStatusReporters,
+        private array $sourcedWebHttpHandlers,
+        private array $flowBuilderFiles
     ) {
-        $this->sourcedExplorers = $sourcedExplorers;
-        $this->sourcedEmitters = $sourcedEmitters;
-        $this->sourcedReceivers = $sourcedReceivers;
-        $this->sourcedStatusReporters = $sourcedStatusReporters;
-        $this->sourcedWebHttpHandlers = $sourcedWebHttpHandlers;
-        $this->flowBuilderFiles = $flowBuilderFiles;
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getExplorers(string $source): ExplorerCollection
     {
         $this->loadSource($source);
@@ -77,6 +44,9 @@ class FlowComponentRegistry
         return new ExplorerCollection($this->sourcedExplorers[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getEmitters(string $source): EmitterCollection
     {
         $this->loadSource($source);
@@ -84,6 +54,9 @@ class FlowComponentRegistry
         return new EmitterCollection($this->sourcedEmitters[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getReceivers(string $source): ReceiverCollection
     {
         $this->loadSource($source);
@@ -91,6 +64,9 @@ class FlowComponentRegistry
         return new ReceiverCollection($this->sourcedReceivers[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getStatusReporters(string $source): StatusReporterCollection
     {
         $this->loadSource($source);
@@ -98,6 +74,9 @@ class FlowComponentRegistry
         return new StatusReporterCollection($this->sourcedStatusReporters[$source] ?? []);
     }
 
+    /**
+     * @param class-string $source
+     */
     public function getWebHttpHandlers(string $source): HttpHandlerCollection
     {
         $this->loadSource($source);
@@ -142,6 +121,9 @@ class FlowComponentRegistry
         return $result;
     }
 
+    /**
+     * @param class-string $source
+     */
     private function loadSource(string $source): void
     {
         $files = $this->flowBuilderFiles[$source] ?? [];

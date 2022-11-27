@@ -13,20 +13,11 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\IdentityError\IdentityErr
 
 final class EmitContextFactory implements EmitContextFactoryInterface
 {
-    private ConfigurationServiceInterface $configurationService;
-
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private IdentityErrorCreateActionInterface $identityErrorCreateAction;
-
     public function __construct(
-        ConfigurationServiceInterface $configurationService,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        IdentityErrorCreateActionInterface $identityErrorCreateAction
+        private ConfigurationServiceInterface $configurationService,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private IdentityErrorCreateActionInterface $identityErrorCreateAction
     ) {
-        $this->configurationService = $configurationService;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->identityErrorCreateAction = $identityErrorCreateAction;
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey, bool $directEmission = false): EmitContextInterface

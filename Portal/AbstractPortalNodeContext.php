@@ -11,17 +11,14 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
-    private PortalNodeContainerFacadeContract $containerFacade;
-
-    private ?array $configuration;
-
-    public function __construct(PortalNodeContainerFacadeContract $container, ?array $configuration)
-    {
-        $this->containerFacade = $container;
-        $this->configuration = $configuration;
+    public function __construct(
+        private PortalNodeContainerFacadeContract $containerFacade,
+        private ?array $configuration
+    ) {
     }
 
     public function getConfig(): ?array
@@ -47,6 +44,11 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
     public function getStorage(): PortalStorageInterface
     {
         return $this->containerFacade->getStorage();
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->containerFacade->getLogger();
     }
 
     public function getContainer(): ContainerInterface

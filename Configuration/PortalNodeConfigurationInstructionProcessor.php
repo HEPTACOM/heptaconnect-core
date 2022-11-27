@@ -22,12 +22,6 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
 {
     private ?array $instructions = null;
 
-    private LoggerInterface $logger;
-
-    private PortalRegistryInterface $portalRegistry;
-
-    private PackageQueryMatcherInterface $packageQueryMatcher;
-
     /**
      * @var InstructionLoaderInterface[]
      */
@@ -37,14 +31,11 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
      * @param iterable<InstructionLoaderInterface> $instructionLoaders
      */
     public function __construct(
-        LoggerInterface $logger,
-        PortalRegistryInterface $portalRegistry,
-        PackageQueryMatcherInterface $packageQueryMatcher,
+        private LoggerInterface $logger,
+        private PortalRegistryInterface $portalRegistry,
+        private PackageQueryMatcherInterface $packageQueryMatcher,
         iterable $instructionLoaders
     ) {
-        $this->logger = $logger;
-        $this->portalRegistry = $portalRegistry;
-        $this->packageQueryMatcher = $packageQueryMatcher;
         $this->instructionLoaders = \iterable_to_array($instructionLoaders);
     }
 
@@ -130,7 +121,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
                 $result[] = $instructionLoader->loadInstructions();
             } catch (\Throwable $throwable) {
                 $this->logger->critical('Failed loading instructions', [
-                    'class' => \get_class($instructionLoader),
+                    'class' => $instructionLoader::class,
                     'exception' => $throwable,
                     'code' => 1647826121,
                 ]);
