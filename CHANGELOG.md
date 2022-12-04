@@ -86,6 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1666451009` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestDeserializer::deserialize` when the given request data is not valid JSON
 - Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestSerializationException` to be explicitly used independent from `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
 - Add exception code `1666451010` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer::serialize` when the given request cannot be serialized into JSON
+- Add constant `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX`, that is preceding a portal node configuration binding aliases
 
 ### Changed
 
@@ -123,6 +124,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implement `\Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface` in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration`
 - Removed logger dependency from `\Heptacom\HeptaConnect\Core\Reception\PostProcessing\MarkAsFailedPostProcessor`
 - Replace union type hints to real union types in `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::replace`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::merge`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::set` and `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer::pushBuffer`
+- Split `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass` into `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass` and `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationAsParameterCompilerPass` to separate parameter assignment and generating name bindings
 
 ### Deprecated
 

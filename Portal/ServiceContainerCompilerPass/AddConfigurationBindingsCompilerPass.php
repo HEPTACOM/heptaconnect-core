@@ -5,31 +5,22 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
 
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
-final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassInterface
+final class AddConfigurationBindingsCompilerPass implements CompilerPassInterface
 {
     public const CONFIG_KEY_SEPARATORS = '_.-';
 
-    public function __construct(
-        private ConfigurationContract $configuration
-    ) {
-    }
-
     public function process(ContainerBuilder $container): void
     {
-        $keys = $this->configuration->keys();
+        $keys = [];
 
-        if ($keys === []) {
-            return;
-        }
-
-        foreach ($keys as $key) {
-            $container->setParameter($this->getParameterKey($key), $this->configuration->get($key));
+        foreach (\array_keys($container->getParameterBag()->all()) as $key) {
+            if (\str_starts_with($key, 'portal_config.')) {
+                $keys[] = \mb_substr($key, 14);
+            }
         }
 
         $bindings = \array_combine(
@@ -42,9 +33,19 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
                 continue;
             }
 
+            $class = $definition->getClass();
+
+            if ($class === null) {
+                continue;
+            }
+
+            if (!\class_exists($class)) {
+                continue;
+            }
+
             $argumentNames = \array_merge(
-                $this->getConstructorArgumentNames($definition),
-                $this->getConstructorCallNames($definition),
+                $this->getConstructorArgumentNames($class),
+                $this->getConstructorCallNames($class, $definition->getMethodCalls()),
             );
             $related = \array_filter($argumentNames, static fn (string $key): bool => \str_starts_with($key, '$config'));
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
@@ -55,7 +56,7 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
 
     private function getParameterKey(string $configurationName): string
     {
-        return 'portal_config.' . $configurationName;
+        return PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX . $configurationName;
     }
 
     private function getBindingKey(string $configurationName): string
@@ -68,34 +69,23 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
         return new BoundArgument('%' . $this->getParameterKey($configurationName) . '%');
     }
 
-    private function getConstructorArgumentNames(Definition $definition): array
+    /**
+     * @param class-string $class
+     */
+    private function getConstructorArgumentNames(string $class): array
     {
-        $class = $definition->getClass();
-
-        if ($class === null || !\class_exists($class)) {
-            return [];
-        }
-
         return $this->extractParameterParameterNames((new \ReflectionClass($class))->getConstructor());
     }
 
-    private function getConstructorCallNames(Definition $definition): array
+    /**
+     * @param class-string $class
+     * @param array{string, array}[] $methodCalls
+     */
+    private function getConstructorCallNames(string $class, array $methodCalls): array
     {
-        $class = $definition->getClass();
-
-        if ($class === null || !\class_exists($class)) {
-            return [];
-        }
-
-        $calls = $definition->getMethodCalls();
-
-        if ($calls === []) {
-            return [];
-        }
-
         $result = [];
 
-        foreach ($calls as [$method, $arguments]) {
+        foreach ($methodCalls as [$method, $arguments]) {
             if (!\method_exists($class, $method)) {
                 continue;
             }
