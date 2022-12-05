@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
-use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
+use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -19,27 +19,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ConfigurationService implements ConfigurationServiceInterface
 {
-    /**
-     * @var PortalNodeConfigurationProcessorInterface[]
-     */
-    private array $configurationProcessors;
-
-    /**
-     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors
-     */
     public function __construct(
         private PortalRegistryInterface $portalRegistry,
         private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
         private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
-        iterable $configurationProcessors
+        private PortalNodeConfigurationProcessorServiceInterface $configurationProcessorService
     ) {
-        $this->configurationProcessors = \iterable_to_array($configurationProcessors);
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-        $configuration = $this->processReadConfiguration(
+        $configuration = $this->configurationProcessorService->applyRead(
             $portalNodeKey,
             fn () => $this->getPortalNodeConfigurationInternal($portalNodeKey)
         );
@@ -62,7 +53,13 @@ final class ConfigurationService implements ConfigurationServiceInterface
             $template->resolve($data);
         }
 
-        $this->processWriteConfiguration($portalNodeKey, $data);
+        $this->configurationProcessorService->applyWrite(
+            $portalNodeKey,
+            $data ?? [],
+            fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+                new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
+            ]))
+        );
     }
 
     /**
@@ -114,29 +111,5 @@ final class ConfigurationService implements ConfigurationServiceInterface
         }
 
         return [];
-    }
-
-    private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
-    {
-        foreach ($this->configurationProcessors as $configurationProcessor) {
-            $readConfiguration = $read;
-            $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
-        }
-
-        return $read();
-    }
-
-    private function processWriteConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
-    {
-        $write = fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
-            new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
-        ]));
-
-        foreach ($this->configurationProcessors as $configurationProcessor) {
-            $writeConfiguration = $write;
-            $write = static fn (array $config) => $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
-        }
-
-        $write($configuration ?? []);
     }
 }
