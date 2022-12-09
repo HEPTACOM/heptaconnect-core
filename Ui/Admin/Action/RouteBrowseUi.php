@@ -37,9 +37,6 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
 
         $storageCriteria->setPage($criteria->getPage() ?? 0);
         $storageCriteria->setPageSize($criteria->getPageSize());
-        $storageCriteria->setSort([
-            RouteOverviewCriteria::FIELD_CREATED => RouteOverviewCriteria::SORT_DESC,
-        ]);
         $storageCriteria->setCapabilityFilter($criteria->getCapabilityFilter());
         $storageCriteria->setSourcePortalNodeKeyFilter($criteria->getSourcePortalNodeKeyFilter());
         $storageCriteria->setTargetPortalNodeKeyFilter($criteria->getTargetPortalNodeKeyFilter());
@@ -84,6 +81,10 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
             }
 
             $storageSorting[$parsedField] = $parsedDirection;
+        }
+
+        if ($storageSorting === []) {
+            $storageSorting[RouteOverviewCriteria::FIELD_CREATED] = OverviewCriteriaContract::SORT_DESC;
         }
 
         $storageCriteria->setSort($storageSorting);
