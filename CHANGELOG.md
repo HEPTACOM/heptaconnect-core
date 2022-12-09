@@ -73,6 +73,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
+- Add exception code `1670625000` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi::browse` when the given sorting direction is not supported
+- Add exception code `1670625001` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi::browse` when the given field to sort by is not supported
 - Add exception code `1659293800` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when reading known routes from storage fails
 - Add exception code `1659293801` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when route that does not exist is tried to be deleted
 - Add exception code `1659293802` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when deleting routes fails in storage
