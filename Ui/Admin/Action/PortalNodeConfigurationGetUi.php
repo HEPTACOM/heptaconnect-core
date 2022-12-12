@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterfac
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
+use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeConfiguration\Get\PortalNodeConfigurationGetCriteria as StoragePortalNodeConfigurationGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\PortalNodeConfigurationGetActionInterface;
@@ -34,54 +35,65 @@ final class PortalNodeConfigurationGetUi implements PortalNodeConfigurationGetUi
         return new UiActionType(PortalNodeConfigurationGetUiActionInterface::class);
     }
 
-    public function get(
-        PortalNodeConfigurationGetCriteria $criteria,
-        UiActionContextInterface $context
-    ): PortalNodeConfigurationGetResult {
-        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$criteria, $context]);
-        $portalNodeKey = $criteria->getPortalNodeKey();
-
-        if ($portalNodeKey instanceof PreviewPortalNodeKey) {
-            return $trail->return(new PortalNodeConfigurationGetResult($portalNodeKey, []));
-        }
-
-        $portalNodeGetCriteria = new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
-
-        try {
-            $portalNodes = \iterable_to_array($this->portalNodeGetAction->get($portalNodeGetCriteria));
-        } catch (\Throwable $throwable) {
-            throw $trail->throwable(new ReadException(1670832600, $throwable));
-        }
-
-        $portalNode = \array_shift($portalNodes);
-
-        if ($portalNode === null) {
-            throw $trail->throwable(
-                new PortalNodesMissingException($portalNodeGetCriteria->getPortalNodeKeys(), 1670832601)
-            );
-        }
-
-        try {
-            return $trail->return(new PortalNodeConfigurationGetResult(
-                $portalNodeKey,
-                $this->getPortalNodeConfigurationInternal($portalNodeKey)
-            ));
-        } catch (\Throwable $throwable) {
-            throw $trail->throwable(new ReadException(1670832602, $throwable));
-        }
-    }
-
-    /**
-     * @throws \Throwable
-     */
-    private function getPortalNodeConfigurationInternal(PortalNodeKeyInterface $portalNodeKey): array
+    public function get(PortalNodeConfigurationGetCriteria $criteria, UiActionContextInterface $context): iterable
     {
-        $criteria = new StoragePortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
+        $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$criteria, $context]);
+        $pnKeysToLoad = new PortalNodeKeyCollection();
 
-        foreach ($this->configurationGetAction->get($criteria) as $configuration) {
-            return $configuration->getValue();
+        foreach ($criteria->getPortalNodeKeys() as $portalNodeKey) {
+            if ($portalNodeKey instanceof PreviewPortalNodeKey) {
+                yield $trail->yield(new PortalNodeConfigurationGetResult($portalNodeKey, []));
+            } else {
+                $pnKeysToLoad->push([$portalNodeKey]);
+            }
         }
 
-        return [];
+        if (!$pnKeysToLoad->isEmpty()) {
+            $portalNodeGetCriteria = new PortalNodeGetCriteria($pnKeysToLoad);
+
+            try {
+                $gotPortalNodeKeys = new PortalNodeKeyCollection(\iterable_map(
+                    $this->portalNodeGetAction->get($portalNodeGetCriteria),
+                    static fn (PortalNodeGetResult $result): PortalNodeKeyInterface => $result->getPortalNodeKey()
+                ));
+            } catch (\Throwable $throwable) {
+                throw $trail->throwable(new ReadException(1670832600, $throwable));
+            }
+
+            $missingPortalNodes = new PortalNodeKeyCollection($pnKeysToLoad->filter(
+                static fn (PortalNodeKeyInterface $pnKey): bool => !$gotPortalNodeKeys->contains($pnKey)
+            ));
+
+            if (!$missingPortalNodes->isEmpty()) {
+                throw $trail->throwable(new PortalNodesMissingException($missingPortalNodes, 1670832601));
+            }
+
+            $fetchedPortalNodeKeys = new PortalNodeKeyCollection();
+
+            try {
+                $criteria = new StoragePortalNodeConfigurationGetCriteria($pnKeysToLoad);
+
+                foreach ($this->configurationGetAction->get($criteria) as $configuration) {
+                    $fetchedPortalNodeKeys->push([$configuration->getPortalNodeKey()]);
+
+                    yield $trail->yield(new PortalNodeConfigurationGetResult(
+                        $configuration->getPortalNodeKey(),
+                        $configuration->getValue()
+                    ));
+                }
+            } catch (\Throwable $throwable) {
+                throw $trail->throwable(new ReadException(1670832602, $throwable));
+            }
+
+            $notFetchedPortalNodeKeys = $pnKeysToLoad->filter(
+                static fn (PortalNodeKeyInterface $pnKey): bool => !$fetchedPortalNodeKeys->contains($pnKey)
+            );
+
+            foreach ($notFetchedPortalNodeKeys as $notFetchedPortalNodeKey) {
+                yield $trail->yield(new PortalNodeConfigurationGetResult($notFetchedPortalNodeKey, []));
+            }
+        }
+
+        $trail->end();
     }
 }
