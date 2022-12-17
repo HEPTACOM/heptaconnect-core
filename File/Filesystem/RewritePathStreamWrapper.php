@@ -23,6 +23,11 @@ use Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface;
  *         "prepend_safe_separator": true // if "prepend" is handled as directory and shall be merged with the path using a directory separator
  *     ]
  * ]
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class RewritePathStreamWrapper implements StreamWrapperInterface
 {
