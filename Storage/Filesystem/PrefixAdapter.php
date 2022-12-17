@@ -8,6 +8,9 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 final class PrefixAdapter extends AbstractAdapter
 {
     private AdapterInterface $decorated;
