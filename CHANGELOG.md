@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteBrowseUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface`
 - Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
 - Add exception code `1660417907` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when the given storage key data is not compatible with the storage implementation
@@ -75,6 +76,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
+- Add exception code `1670625000` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi::browse` when the given sorting direction is not supported
+- Add exception code `1670625001` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi::browse` when the given field to sort by is not supported
 - Add exception code `1659293800` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when reading known routes from storage fails
 - Add exception code `1659293801` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when route that does not exist is tried to be deleted
 - Add exception code `1659293802` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi::remove` when deleting routes fails in storage
@@ -135,6 +138,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 ### Security
+
+## [0.9.3.0] - 2022-11-26
+
+### Added
+
+- Add `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter` described by `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface` to convert between URIs and paths when using paths as contextualized URIs
+- Add exception code `1666942800` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path is not a compatible URI
+- Add exception code `1666942801` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path already has a protocol
+- Add exception code `1666942802` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has a port
+- Add exception code `1666942803` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has query parameters
+- Add exception code `1666942804` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToUri` when the path has a URI fragment
+- Add exception code `1666942810` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI is not a URI
+- Add exception code `1666942811` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has no host
+- Add exception code `1666942812` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has a port
+- Add exception code `1666942813` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has query parameters
+- Add exception code `1666942814` in `\Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter::convertToPath` when the URI has a URI fragment
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Filesystem` as implementation of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` to provide a path conversion for portals
+- Add interface `\Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface` to describe, what the PHP documentation describes as signatures for a class to use as a stream wrapper 
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\PortalNodeFilesystemStreamProtocolProviderInterface`, that needs to be implemented by bridges and integrations, to create portal node specific stream protocols
+- Add `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\FilesystemFactory` described by `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` to create portal node specific instances of `\Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface`
+- Add stream wrapper implementation `\Heptacom\HeptaConnect\Core\File\Filesystem\RewritePathStreamWrapper` to rewrite requested paths to a new protocol while changing the protocol and the path itself  
+
+### Changed
+
+- Add `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getConfig` to forward the decorated filesystem config
+- Wrap result of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixFilesystem::getAdapter` into an adaptor decorator of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixAdapter` to ensure that adapter usage will apply same path rewrites like the filesystem itself
+- Add dependency on `\Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide a `Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface` service for portal nodes
+
+### Fixed
+
+- Changed return type of `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem::getAdapter` from `\League\Flysystem\FilesystemInterface` to `\League\Flysystem\AdapterInterface` by returning the decorated filesystem adapter instead of the filesystem itself
 
 ## [0.9.2.0] - 2022-10-16
 
