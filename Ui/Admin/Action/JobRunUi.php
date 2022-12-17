@@ -11,12 +11,13 @@ use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterfac
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Job\JobRun\JobRunPayload;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\UiActionType;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobRunUiActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\JobMissingException;
+use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\JobsMissingException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\JobProcessingException;
 
 final class JobRunUi implements JobRunUiActionInterface
@@ -51,10 +52,12 @@ final class JobRunUi implements JobRunUiActionInterface
             $jobs->push([$jobData]);
         }
 
-        foreach ($payload->getJobKeys() as $jobKey) {
-            if (!$foundJobKeys->contains($jobKey)) {
-                throw $trail->throwable(new JobMissingException($jobKey, 1659721163));
-            }
+        $jobsNotFound = $payload->getJobKeys()->filter(
+            static fn (JobKeyInterface $jobKey): bool => !$foundJobKeys->contains($jobKey)
+        );
+
+        if (!$jobsNotFound->isEmpty()) {
+            throw $trail->throwable(new JobsMissingException($jobsNotFound, 1659721163));
         }
 
         $alreadyRunJobKeys = new JobKeyCollection();
