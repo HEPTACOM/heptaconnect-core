@@ -45,10 +45,12 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
         $storageSorting = [];
 
         foreach ($criteria->getSort() as $field => $direction) {
+            /** @var string|null $parsedDirection */
             $parsedDirection = [
                 BrowseCriteriaContract::SORT_ASC => OverviewCriteriaContract::SORT_ASC,
                 BrowseCriteriaContract::SORT_DESC => OverviewCriteriaContract::SORT_DESC,
             ][$direction] ?? null;
+            /** @var string|null $parsedField */
             $parsedField = [
                 RouteBrowseCriteria::FIELD_CREATED => RouteOverviewCriteria::FIELD_CREATED,
                 RouteBrowseCriteria::FIELD_ENTITY_TYPE => RouteOverviewCriteria::FIELD_ENTITY_TYPE,
