@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
 use League\Flysystem\AdapterInterface;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Handler;
 use League\Flysystem\PluginInterface;
@@ -17,6 +18,13 @@ abstract class AbstractFilesystem implements FilesystemInterface
     public function __construct(
         protected FilesystemInterface $filesystem
     ) {
+        if (!\method_exists($this->filesystem, 'getConfig')) {
+            throw new \UnexpectedValueException('Filesystem does not expose config');
+        }
+
+        if (!\method_exists($this->filesystem, 'getAdapter')) {
+            throw new \UnexpectedValueException('Filesystem does not expose adapter');
+        }
     }
 
     public function has($path): bool
@@ -218,7 +226,7 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getAdapter();
     }
 
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->filesystem->getConfig();
     }
