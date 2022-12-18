@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\File\Filesystem\Contract;
 
 /**
+ * Allows you to implement your own protocol handlers and streams for use with all the other filesystem functions.
+ *
  * @property resource $context
  *
  * @see https://www.php.net/manual/en/class.streamwrapper.php
