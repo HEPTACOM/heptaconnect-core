@@ -57,18 +57,18 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
             ][$field] ?? null;
 
             if (!\is_string($parsedDirection)) {
-                throw new UnsupportedSortingException(
+                throw $trail->throwable(new UnsupportedSortingException(
                     $direction,
                     new StringCollection([
                         BrowseCriteriaContract::SORT_ASC,
                         BrowseCriteriaContract::SORT_DESC,
                     ]),
                     1670625000
-                );
+                ));
             }
 
             if (!\is_string($parsedField)) {
-                throw new UnsupportedSortingException(
+                throw $trail->throwable(throw new UnsupportedSortingException(
                     $field,
                     new StringCollection([
                         RouteBrowseCriteria::FIELD_CREATED,
@@ -77,7 +77,7 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
                         RouteBrowseCriteria::FIELD_TARGET,
                     ]),
                     1670625001
-                );
+                ));
             }
 
             $storageSorting[$parsedField] = $parsedDirection;
