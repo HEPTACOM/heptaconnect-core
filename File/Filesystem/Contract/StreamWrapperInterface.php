@@ -38,7 +38,7 @@ interface StreamWrapperInterface
      *
      * @returns string|false
      */
-    public function dir_readdir();
+    public function dir_readdir(): mixed;
 
     /**
      * Rewind directory handle
@@ -63,7 +63,7 @@ interface StreamWrapperInterface
     /**
      * Retrieve the underlaying resource
      *
-     * @return resource
+     * @return resource|false
      */
     public function stream_cast(int $cast_as);
 
@@ -90,7 +90,7 @@ interface StreamWrapperInterface
     /**
      * Change stream metadata
      */
-    public function stream_metadata(string $path, int $option, $value): bool;
+    public function stream_metadata(string $path, int $option, mixed $value): bool;
 
     /**
      * Opens file or URL
@@ -104,6 +104,8 @@ interface StreamWrapperInterface
 
     /**
      * Read from stream
+     *
+     * @param int<0, max> $count
      *
      * @return string|false
      */
@@ -133,6 +135,8 @@ interface StreamWrapperInterface
 
     /**
      * Truncate stream
+     *
+     * @param int<0, max> $new_size
      */
     public function stream_truncate(int $new_size): bool;
 

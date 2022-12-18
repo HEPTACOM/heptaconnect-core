@@ -67,7 +67,13 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     public function stream_cast(int $cast_as)
     {
-        return $this->file;
+        $result = $this->file;
+
+        if (\is_resource($result)) {
+            return $result;
+        }
+
+        return false;
     }
 
     public function stream_close(): void
@@ -160,7 +166,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (\is_resource($this->file)) {
-                return \ftell($this->file);
+                $result = \ftell($this->file);
+
+                if ($result !== false) {
+                    return $result;
+                }
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
@@ -184,7 +194,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (\is_resource($this->file)) {
-                return \fwrite($this->file, $data);
+                $result = \fwrite($this->file, $data);
+
+                if ($result !== false) {
+                    return $result;
+                }
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
@@ -213,7 +227,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
-    public function dir_readdir()
+    public function dir_readdir(): mixed
     {
         try {
             if (\is_resource($this->directory)) {
@@ -235,7 +249,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     public function dir_rewinddir(): bool
     {
         try {
-            return \is_resource($this->directory) && (\rewinddir($this->directory) ?? false);
+            if (\is_resource($this->directory)) {
+                \rewinddir($this->directory);
+
+                return true;
+            }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
         }
@@ -247,7 +265,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     // START NODE OPERATIONS
 
-    public function stream_metadata(string $path, int $option, $value): bool
+    public function stream_metadata(string $path, int $option, mixed $value): bool
     {
         try {
             $path = $this->toNewPath($path);
@@ -388,7 +406,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (($flags & \STREAM_URL_STAT_LINK) === \STREAM_URL_STAT_LINK) {
-                $path = \readlink($this->toNewPath($path));
+                $linkedPath = \readlink($this->toNewPath($path));
+
+                if ($linkedPath !== false) {
+                    $path = $linkedPath;
+                }
             }
 
             return @\stat($this->toNewPath($path));
