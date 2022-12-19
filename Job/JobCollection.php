@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Support\AbstractCollection;
  */
 class JobCollection extends AbstractCollection
 {
-    protected function isValidItem($item): bool
+    protected function isValidItem(mixed $item): bool
     {
         /* @phpstan-ignore-next-line */
         return $item instanceof JobContract;
