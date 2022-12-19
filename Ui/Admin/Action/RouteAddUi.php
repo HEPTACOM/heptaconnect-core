@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriter
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayloads;
+use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreateResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Delete\RouteDeleteCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Find\RouteFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Find\RouteFindResult;
@@ -21,6 +22,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteCreateActionIn
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\RouteKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\Route\RouteAdd\RouteAddPayload;
@@ -64,7 +66,9 @@ final class RouteAddUi implements RouteAddUiActionInterface
 
         try {
             $routeCreateResults = $this->routeCreateAction->create($createPayload);
-            $routeGetCriteria = new RouteGetCriteria(new RouteKeyCollection($routeCreateResults->column('getRouteKey')));
+            $routeGetCriteria = new RouteGetCriteria(new RouteKeyCollection($routeCreateResults->map(
+                static fn (RouteCreateResult $createResult): RouteKeyInterface => $createResult->getRouteKey()
+            )));
             $routeGetResults = $this->routeGetAction->get($routeGetCriteria);
             $result = new RouteAddResultCollection(\iterable_map(
                 $routeGetResults,
@@ -187,7 +191,9 @@ final class RouteAddUi implements RouteAddUiActionInterface
         RouteAddResultCollection $result,
         RouteAddPayloadCollection $failedScenarios
     ): RouteAddFailedException {
-        $createdRouteKeys = new RouteKeyCollection($result->column('getRouteKey'));
+        $createdRouteKeys = new RouteKeyCollection($result->map(
+            static fn (RouteAddResult $result): RouteKeyInterface => $result->getRouteKey()
+        ));
         $deletedException = null;
 
         try {

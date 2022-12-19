@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
@@ -61,9 +62,16 @@ final class ReceptionHandler implements ReceptionHandlerInterface
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];
-        $routeKeys = new RouteKeyCollection(\iterable_map(
-            $jobs->column('getPayload'),
-            static fn (?array $payload): ?RouteKeyInterface => $payload[Reception::ROUTE_KEY] ?? null
+        $routeKeys = new RouteKeyCollection($jobs->map(
+            static function (JobData $jobData): ?RouteKeyInterface {
+                $result = $jobData->getPayload()[Reception::ROUTE_KEY] ?? null;
+
+                if ($result instanceof RouteKeyInterface) {
+                    return $result;
+                }
+
+                return null;
+            }
         ));
 
         $uniqueRouteKeys = new RouteKeyCollection();

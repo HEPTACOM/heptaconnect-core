@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Storage\PrimaryKeyToEntityHydrator;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\PrimaryKeyAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
@@ -29,7 +30,9 @@ final class IdentityMappingEmitter extends AbstractBufferedResultProcessingEmitt
             $context->getPortalNodeKey(),
             $this->primaryKeyToEntityHydrator->hydrate(
                 $this->getSupportedEntityType(),
-                new StringCollection($buffer->column('getPrimaryKey'))
+                new StringCollection($buffer->map(
+                    static fn (PrimaryKeyAwareInterface $entity): ?string => $entity->getPrimaryKey()
+                ))
             )
         ));
     }

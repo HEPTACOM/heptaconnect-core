@@ -73,15 +73,21 @@ final class JobRunUi implements JobRunUiActionInterface
                 $notYetPerformedJobs = new JobKeyCollection();
 
                 foreach ($jobDatasByType as $missingJobs) {
-                    $notYetPerformedJobs->push($missingJobs->column('getJobKey'));
+                    $notYetPerformedJobs->push($missingJobs->map(
+                        static fn (JobData $jobData): JobKeyInterface => $jobData->getJobKey()
+                    ));
                 }
 
-                $justTriedJobKeys = new JobKeyCollection($jobs->column('getJobKey'));
+                $justTriedJobKeys = new JobKeyCollection($jobs->map(
+                    static fn (JobData $jobData): JobKeyInterface => $jobData->getJobKey()
+                ));
 
                 throw $trail->throwable(new JobProcessingException($alreadyRunJobKeys, $justTriedJobKeys, $notYetPerformedJobs, 1659721164));
             }
 
-            $alreadyRunJobKeys->push($jobs->column('getJobKey'));
+            $alreadyRunJobKeys->push($jobs->map(
+                static fn (JobData $jobData): JobKeyInterface => $jobData->getJobKey()
+            ));
         }
 
         $trail->end();

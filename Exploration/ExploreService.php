@@ -14,7 +14,9 @@ use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Exploration;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -80,7 +82,9 @@ final class ExploreService implements ExploreServiceInterface
 
     private static function getSupportedTypes(ExplorerCollection $explorers): EntityTypeCollection
     {
-        return new EntityTypeCollection($explorers->column('getSupportedEntityType'));
+        return new EntityTypeCollection($explorers->map(
+            static fn (ExplorerContract $explorer): EntityType => $explorer->getSupportedEntityType()
+        ));
     }
 
     private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
