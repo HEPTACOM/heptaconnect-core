@@ -49,7 +49,9 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
         if ($entityType !== null) {
             $entityFilter = static fn (iterable $fcs): iterable => \iterable_filter(
                 $fcs,
-                static fn ($fc): bool => $fc->getSupportedEntityType()->equals($entityType)
+                static function (ExplorerContract|EmitterContract|ReceiverContract $fc) use ($entityType): bool {
+                    return $fc->getSupportedEntityType()->equals($entityType);
+                }
             );
         }
 

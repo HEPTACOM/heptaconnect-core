@@ -335,7 +335,7 @@ final class PortalStorage implements PortalStorageInterface
         return null;
     }
 
-    private function packSetItem(string $key, $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
+    private function packSetItem(string $key, mixed $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
     {
         $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
