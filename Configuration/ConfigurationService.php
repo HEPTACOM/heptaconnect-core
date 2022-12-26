@@ -116,6 +116,9 @@ final class ConfigurationService implements ConfigurationServiceInterface
         return [];
     }
 
+    /**
+     * @param \Closure(): array $read
+     */
     private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         foreach ($this->configurationProcessors as $configurationProcessor) {

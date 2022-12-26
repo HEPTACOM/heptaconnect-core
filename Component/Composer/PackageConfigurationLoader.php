@@ -167,6 +167,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             /** @var array|null $keywords */
             $keywords = $packageInstance->getKeywords();
+            /** @var string[] $heptaconnectKeywords */
             $heptaconnectKeywords = \array_filter(
                 $keywords ?? [],
                 static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
@@ -184,6 +185,9 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         return $result;
     }
 
+    /**
+     * @param string[] $heptaconnectKeywords
+     */
     private function getConfigFromPackage(
         CompletePackageInterface $packageInstance,
         array $heptaconnectKeywords,
