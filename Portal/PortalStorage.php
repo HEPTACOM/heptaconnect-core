@@ -302,7 +302,7 @@ final class PortalStorage implements PortalStorageInterface
         }
     }
 
-    private function unpackGetResult(PortalNodeStorageItemContract $getResult)
+    private function unpackGetResult(PortalNodeStorageItemContract $getResult): mixed
     {
         $denormalizer = $this->normalizationRegistry->getDenormalizer($getResult->getType());
 
