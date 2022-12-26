@@ -11,12 +11,12 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface
 final class NormalizationRegistry extends NormalizationRegistryContract
 {
     /**
-     * @var array|NormalizerInterface[]
+     * @var NormalizerInterface[]
      */
     private array $normalizer;
 
     /**
-     * @var array|DenormalizerInterface[]
+     * @var DenormalizerInterface[]
      */
     private array $denormalizer;
 

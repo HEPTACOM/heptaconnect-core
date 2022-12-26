@@ -20,6 +20,9 @@ use Psr\Log\LoggerInterface;
  */
 final class PortalNodeConfigurationInstructionProcessor implements PortalNodeConfigurationProcessorInterface
 {
+    /**
+     * @var InstructionTokenContract[]|null
+     */
     private ?array $instructions = null;
 
     /**
