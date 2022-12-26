@@ -31,7 +31,6 @@ class PrimaryKeyToEntityHydrator
                 $entity = $factory->newInstanceWithoutConstructor();
 
                 \Closure::bind(function (DatasetEntityContract $entity): void {
-                    $entity->attachments = new AttachmentCollection();
                     $entity->dependencies = new DependencyCollection();
                 }, null, $entity)($entity);
 
