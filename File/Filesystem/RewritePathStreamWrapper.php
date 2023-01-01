@@ -272,11 +272,19 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
             switch ($option) {
                 case \STREAM_META_TOUCH:
-                    return \touch(
-                        $path,
-                        \is_array($value) && \array_key_exists(0, $value) ? $value[0] : \time(),
-                        \is_array($value) && \array_key_exists(1, $value) ? $value[1] : \time()
-                    );
+                    if (\is_array($value) && \array_key_exists(0, $value) && \is_numeric($value[0])) {
+                        $mtime = (int) $value[0];
+                    } else {
+                        $mtime = \time();
+                    }
+
+                    if (\is_array($value) && \array_key_exists(1, $value) && \is_numeric($value[1])) {
+                        $atime = (int) $value[1];
+                    } else {
+                        $atime = \time();
+                    }
+
+                    return \touch($path, $mtime, $atime);
                 case \STREAM_META_OWNER_NAME:
                     if (!\is_string($value)) {
                         throw new \InvalidArgumentException('Parameter is expected to be string');
@@ -302,6 +310,10 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
                     return \chgrp($path, $value);
                 case \STREAM_META_ACCESS:
+                    if (!\is_int($value)) {
+                        throw new \InvalidArgumentException('Parameter is expected to be int');
+                    }
+
                     return \chmod($path, $value);
             }
         } catch (\Throwable $throwable) {

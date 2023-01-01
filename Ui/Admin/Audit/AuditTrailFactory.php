@@ -146,6 +146,9 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         } while ($throwable !== null);
     }
 
+    /**
+     * @param array<object|iterable> $unpackables
+     */
     private function unpackAuditables(array $unpackables): TaggedStringCollection
     {
         $result = new TaggedStringCollection();

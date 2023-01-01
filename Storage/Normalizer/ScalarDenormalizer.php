@@ -18,6 +18,7 @@ final class ScalarDenormalizer implements DenormalizerInterface
     }
 
     /**
+     * @param string $data - type verified by supportsDenormalization
      * @param string|null $format
      */
     public function denormalize($data, $type, $format = null, array $context = [])
@@ -31,6 +32,7 @@ final class ScalarDenormalizer implements DenormalizerInterface
 
     /**
      * @param string|null $format
+     * @psalm-assert string $data
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

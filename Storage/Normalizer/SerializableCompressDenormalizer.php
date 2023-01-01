@@ -19,6 +19,7 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
     }
 
     /**
+     * @param string $data - type verified by supportsDenormalization
      * @param string|null $format
      */
     public function denormalize($data, $type, $format = null, array $context = [])
@@ -37,6 +38,7 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()
+            && \is_string($data)
             && $this->serializableDenormalizer->supportsDenormalization(
                 \gzuncompress($data),
                 $this->serializableDenormalizer->getType(),

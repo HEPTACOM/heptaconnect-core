@@ -21,7 +21,7 @@ final class RequestDeserializer implements RequestDeserializerInterface
     public function deserialize(string $requestData): RequestInterface
     {
         try {
-            $requestData = (array) \json_decode(
+            $requestPayload = (array) \json_decode(
                 $requestData,
                 true,
                 512,
@@ -31,12 +31,22 @@ final class RequestDeserializer implements RequestDeserializerInterface
             throw new RequestDeserializationException($requestData, 1666451009, $jsonError);
         }
 
-        $method = $requestData['method'] ?? null;
-        $uri = $requestData['uri'] ?? null;
-        $requestTarget = $requestData['requestTarget'] ?? null;
-        $protocolVersion = $requestData['protocolVersion'] ?? null;
-        $content = $requestData['body'] ?? null;
-        $headers = $requestData['headers'] ?? null;
+        $method = $requestPayload['method'] ?? null;
+
+        if (!\is_string($method)) {
+            throw new RequestDeserializationException($requestData, 1666451010, new \InvalidArgumentException('$.method is not a string'));
+        }
+
+        $uri = $requestPayload['uri'] ?? null;
+
+        if (!\is_string($uri)) {
+            throw new RequestDeserializationException($requestData, 1666451011, new \InvalidArgumentException('$.uri is not a string'));
+        }
+
+        $requestTarget = $requestPayload['requestTarget'] ?? null;
+        $protocolVersion = $requestPayload['protocolVersion'] ?? null;
+        $content = $requestPayload['body'] ?? null;
+        $headers = $requestPayload['headers'] ?? null;
 
         $request = $this->requestFactory->createRequest($method, $uri);
 
@@ -54,10 +64,40 @@ final class RequestDeserializer implements RequestDeserializerInterface
 
         if (\is_array($headers)) {
             foreach ($headers as $name => $values) {
-                $request = $request->withHeader($name, $values);
+                try {
+                    $request = $request->withHeader((string) $name, $this->castToScalarArray((string) $name, $values));
+                } catch (\Throwable $throwable) {
+                    throw new RequestDeserializationException($requestData, 1666451012, $throwable);
+                }
             }
         }
 
         return $request;
+    }
+
+    /**
+     * @return string[]|string
+     */
+    private function castToScalarArray(string $headerName, mixed $value): array|string
+    {
+        if (\is_scalar($value)) {
+            return (string) $value;
+        }
+
+        if (!\is_array($value)) {
+            $result = [];
+
+            foreach ($value as $index => $item) {
+                if (!\is_scalar($item)) {
+                    throw new \InvalidArgumentException(\sprintf('$.headers[%s][%s] is neither a string nor a list', $headerName, $index));
+                }
+
+                $result[$index] = (string) $item;
+            }
+
+            return $result;
+        }
+
+        throw new \InvalidArgumentException(\sprintf('$.headers[%s] is neither a string nor a list', $headerName));
     }
 }

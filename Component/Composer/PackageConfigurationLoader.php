@@ -77,6 +77,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $locker = $composer->getLocker();
 
         if ($locker instanceof Locker && $locker->isLocked()) {
+            /** @var array{name: string, version: string}[] $packageLockData */
             $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
@@ -93,6 +94,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $localRepository = $composer->getRepositoryManager()->getLocalRepository();
 
             if ($localRepository->getDevMode() ?? false) {
+                /** @var array{name: string, version: string}[] $packageDevLockData */
                 $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
                 $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
 

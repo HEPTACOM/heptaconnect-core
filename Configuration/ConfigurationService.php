@@ -71,7 +71,7 @@ final class ConfigurationService implements ConfigurationServiceInterface
     private function removeStorageKeysWhenValueIsNull(array $editable, array $nullArray): array
     {
         foreach ($nullArray as $key => $value) {
-            if (\is_array($value) && \array_key_exists($key, $editable)) {
+            if (\is_array($value) && \array_key_exists($key, $editable) && \is_array($editable[$key])) {
                 $editable[$key] = $this->removeStorageKeysWhenValueIsNull($editable[$key], $value);
 
                 continue;

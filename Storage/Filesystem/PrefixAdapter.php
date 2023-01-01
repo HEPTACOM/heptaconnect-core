@@ -93,6 +93,7 @@ final class PrefixAdapter extends AbstractAdapter
 
     public function listContents($directory = '', $recursive = false)
     {
+        /** @var array{path: string}[] $original */
         $original = $this->decorated->listContents($this->applyPathPrefix($directory), $recursive);
         $result = [];
 

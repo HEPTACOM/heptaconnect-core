@@ -21,6 +21,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
     }
 
     /**
+     * @param string $data - type verified by supportsDenormalization
      * @param string|null $format
      *
      * @return RequestInterface

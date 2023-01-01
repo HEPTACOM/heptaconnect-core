@@ -95,7 +95,17 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
 
         $result = [];
 
-        foreach ($calls as [$method, $arguments]) {
+        foreach ($calls as $call) {
+            if (!\is_array($call)) {
+                continue;
+            }
+
+            $method = $call[0];
+
+            if (!\is_string($method)) {
+                continue;
+            }
+
             if (!\method_exists($class, $method)) {
                 continue;
             }
@@ -138,6 +148,9 @@ final class AddPortalConfigurationBindingsCompilerPass implements CompilerPassIn
         return false;
     }
 
+    /**
+     * @return list<string>
+     */
     private function getParameterTypes(?\ReflectionType $type): array
     {
         if ($type instanceof \ReflectionNamedType) {

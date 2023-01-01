@@ -18,6 +18,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
     }
 
     /**
+     * @param string $data - type verified by supportsDenormalization
      * @param string|null $format
      */
     public function denormalize($data, $type, $format = null, array $context = [])

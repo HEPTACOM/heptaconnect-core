@@ -86,9 +86,19 @@ class Config
             $closure = $payload;
 
             if ($recursive) {
-                $payload = static fn (\Closure $loadConfig): array => \array_merge_recursive($loadConfig(), $closure());
+                $payload = static function (\Closure $loadConfig) use ($closure): array {
+                    /** @var array $config */
+                    $config = $loadConfig();
+
+                    return \array_merge_recursive($config, $closure());
+                };
             } else {
-                $payload = static fn (\Closure $loadConfig): array => \array_merge($loadConfig(), $closure());
+                $payload = static function (\Closure $loadConfig) use ($closure): array {
+                    /** @var array $config */
+                    $config = $loadConfig();
+
+                    return \array_merge($config, $closure());
+                };
             }
 
             self::$instructions[] = new ClosureInstructionToken($query, $payload);
@@ -110,6 +120,7 @@ class Config
 
         if ($payload instanceof \Closure) {
             self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($payload): array {
+                /** @var array $config */
                 $config = $loadConfig();
 
                 self::unsetArrayByKeys($config, $payload());
@@ -144,7 +155,7 @@ class Config
     {
         foreach ($unsetInstructions as $parent => $key) {
             if (\is_array($key)) {
-                if (isset($array[$parent])) {
+                if (isset($array[$parent]) && \is_array($array[$parent])) {
                     self::unsetArrayByKeys($array[$parent], $key);
                 }
             } else {

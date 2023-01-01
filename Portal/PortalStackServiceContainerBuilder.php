@@ -307,6 +307,10 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         }
     }
 
+    /**
+     * @param array<string, string> $psr4
+     * @param string[] $exclude
+     */
     private function registerPsr4Prototype(
         ContainerBuilder $containerBuilder,
         array $psr4,
