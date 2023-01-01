@@ -23,7 +23,7 @@ final class PortalRegistry implements PortalRegistryInterface
      * @var array{
      *             classes: array<string, PortalType|null>,
      *             portals: array<string, PortalContract>,
-     *             portalExtensions: array
+     *             portalExtensions: array<string, PortalExtensionCollection>
      *             }
      */
     private array $cache = [

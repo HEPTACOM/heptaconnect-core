@@ -21,13 +21,17 @@ final class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigura
     {
         $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
 
-        if (!$cachedConfig->isHit()) {
-            $configuration = $read();
-
-            $this->cache->save($cachedConfig->set($configuration));
-        } else {
+        if ($cachedConfig->isHit()) {
             $configuration = $cachedConfig->get();
+
+            if (\is_array($configuration)) {
+                return $configuration;
+            }
         }
+
+        $configuration = $read();
+
+        $this->cache->save($cachedConfig->set($configuration));
 
         return $configuration;
     }

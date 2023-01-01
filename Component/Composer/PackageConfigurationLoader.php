@@ -31,7 +31,11 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class) . '-' . $cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                $result = $cacheItem->get();
+
+                if ($result instanceof PackageConfigurationCollection) {
+                    return $result;
+                }
             }
         } else {
             $cacheItem = null;

@@ -513,7 +513,13 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
             $this->lastProtocol = $protocol;
         }
 
-        return \stream_context_get_options($this->getContext())[$protocol];
+        $options = \stream_context_get_options($this->getContext())[$protocol] ?? [];
+
+        if (!\is_array($options)) {
+            return [];
+        }
+
+        return $options;
     }
 
     /**
