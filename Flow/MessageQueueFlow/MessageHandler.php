@@ -30,7 +30,7 @@ final class MessageHandler implements MessageSubscriberInterface
 
     public function handleJob(JobMessage $message): void
     {
-        /** @var JobDataCollection[] $jobs */
+        /** @var array<string, JobDataCollection> $jobs */
         $jobs = [];
 
         try {
