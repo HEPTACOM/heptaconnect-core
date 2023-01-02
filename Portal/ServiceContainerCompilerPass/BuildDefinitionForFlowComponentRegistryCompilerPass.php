@@ -62,8 +62,8 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
         foreach ($serviceIds as $serviceId => $tagData) {
             $groupKey = $tagData[0]['source'] ?? null;
 
-            if ($groupKey !== null) {
-                $grouped[$groupKey][] = new Reference($serviceId);
+            if (\is_scalar($groupKey)) {
+                $grouped[(string) $groupKey][] = new Reference($serviceId);
             }
         }
 

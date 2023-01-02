@@ -97,7 +97,7 @@ final class LockingReceiver extends ReceiverContract
 
             if ($lock->acquire()) {
                 $slice->push([$entity]);
-                $lockedLocks[$entity->getPrimaryKey() ?? $entityKey] = $lock;
+                $lockedLocks[$entity->getPrimaryKey() ?? (string) $entityKey] = $lock;
 
                 $this->logger->debug('Locking an entity', [
                     'portalNodeKey' => $portalNodeKey,
