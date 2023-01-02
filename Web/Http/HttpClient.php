@@ -77,6 +77,7 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
                 (($maxWaitTimeout = $this->getMaxWaitTimeout()[$code] ?? 0) > 0)
                 && \is_string($retryAfter = $this->getRetryAfterHeader($response))
                 && \is_int($sleepInterval = $this->getSleepInterval($retryAfter, $now))
+                && 0 < $sleepInterval
                 && $sleepInterval <= $maxWaitTimeout
                 && $remainingRetries-- > 0
             ) {

@@ -187,10 +187,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     $rawEntities = \array_merge([], ...$rawEntityGroups);
                     $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
 
-                    /** @var iterable<DatasetEntityContract|object> $allEntities */
-                    $allEntities = $this->objectIterator->iterate($rawEntities);
-                    /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
-                    $filteredEntityObjects = new DatasetEntityCollection($allEntities);
+                    $filteredEntityObjects = new DatasetEntityCollection();
+                    $filteredEntityObjects->pushIgnoreInvalidItems($this->objectIterator->iterate($rawEntities));
                     // TODO inspect memory raise - probably fixed by new storage
                     $mappedEntities = $this->identityMapAction
                         ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
