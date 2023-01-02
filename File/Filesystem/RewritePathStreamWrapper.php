@@ -437,7 +437,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     private function toNewPath(string $path): string
     {
-        $protocolOptions = $this->getOptions($path)['protocol'];
+        $protocolOptions = $this->getOptions($path)['protocol'] ?? [];
         $pathOptions = $this->getOptions($path)['path'] ?? [];
         [
             'protocol' => $oldProtocol,
@@ -504,6 +504,21 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return $path;
     }
 
+    /**
+     * @return array{
+     *     path?: array{
+     *          set?: string,
+     *          prepend?: string,
+     *          append?: string,
+     *          prepend_safe_separator?: bool
+     *     },
+     *     protocol?: array{
+     *          set?: string,
+     *          prepend?: string,
+     *          append?: string
+     *     }
+     * }
+     */
     private function getOptions(?string $path): array
     {
         $protocol = $this->lastProtocol;
@@ -517,6 +532,55 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
         if (!\is_array($options)) {
             return [];
+        }
+
+        if (isset($options['path'])) {
+            if (!\is_array($options['path'])) {
+                \trigger_error(\sprintf('Option "path" is not a valid array/object for protocol: "%s"', $protocol), \E_USER_WARNING);
+                unset($options['path']);
+            } else {
+                if (!\is_string($options['path']['set'] ?? null)) {
+                    \trigger_error(\sprintf('Option "path.set" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['set']);
+                }
+
+                if (!\is_string($options['path']['prepend'] ?? null)) {
+                    \trigger_error(\sprintf('Option "path.prepend" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['prepend']);
+                }
+
+                if (!\is_string($options['path']['append'] ?? null)) {
+                    \trigger_error(\sprintf('Option "path.append" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['append']);
+                }
+
+                if (!\is_bool($options['path']['prepend_safe_separator'] ?? null)) {
+                    \trigger_error(\sprintf('Option "path.prepend_safe_separator" is not a valid bool for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['prepend_safe_separator']);
+                }
+            }
+        }
+
+        if (isset($options['protocol'])) {
+            if (!\is_array($options['protocol'])) {
+                \trigger_error(\sprintf('Option "protocol" is not a valid array/object for protocol: "%s"', $protocol), \E_USER_WARNING);
+                unset($options['protocol']);
+            } else {
+                if (!\is_string($options['protocol']['set'] ?? null)) {
+                    \trigger_error(\sprintf('Option "protocol.set" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['set']);
+                }
+
+                if (!\is_string($options['protocol']['prepend'] ?? null)) {
+                    \trigger_error(\sprintf('Option "protocol.prepend" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['prepend']);
+                }
+
+                if (!\is_string($options['protocol']['append'] ?? null)) {
+                    \trigger_error(\sprintf('Option "protocol.append" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['append']);
+                }
+            }
         }
 
         return $options;
