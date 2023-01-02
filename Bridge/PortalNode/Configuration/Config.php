@@ -29,18 +29,16 @@ class Config
      * Uses the given configuration array as complete configuration.
      *
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
-     * @param array|\Closure(\Closure(): array)                                                      $payload
+     * @param array|\Closure(\Closure(): array): array                                               $payload
      */
-    public static function set(string $query, $payload): void
+    public static function set(string $query, array|\Closure $payload): void
     {
         if (\is_array($payload)) {
             $array = $payload;
             $payload = static fn () => $array;
         }
 
-        if ($payload instanceof \Closure) {
-            self::$instructions[] = new ClosureInstructionToken($query, $payload);
-        }
+        self::$instructions[] = new ClosureInstructionToken($query, $payload);
     }
 
     /**
@@ -56,17 +54,15 @@ class Config
             $payload = static fn () => $array;
         }
 
-        if ($payload instanceof \Closure) {
-            $closure = $payload;
+        $closure = $payload;
 
-            if ($recursive) {
-                $payload = static fn (\Closure $loadConfig): array => \array_replace_recursive($loadConfig(), $closure());
-            } else {
-                $payload = static fn (\Closure $loadConfig): array => \array_replace($loadConfig(), $closure());
-            }
-
-            self::$instructions[] = new ClosureInstructionToken($query, $payload);
+        if ($recursive) {
+            $payload = static fn (\Closure $loadConfig): array => \array_replace_recursive($loadConfig(), $closure());
+        } else {
+            $payload = static fn (\Closure $loadConfig): array => \array_replace($loadConfig(), $closure());
         }
+
+        self::$instructions[] = new ClosureInstructionToken($query, $payload);
     }
 
     /**
@@ -82,27 +78,25 @@ class Config
             $payload = static fn () => $array;
         }
 
-        if ($payload instanceof \Closure) {
-            $closure = $payload;
+        $closure = $payload;
 
-            if ($recursive) {
-                $payload = static function (\Closure $loadConfig) use ($closure): array {
-                    /** @var array $config */
-                    $config = $loadConfig();
+        if ($recursive) {
+            $payload = static function (\Closure $loadConfig) use ($closure): array {
+                /** @var array $config */
+                $config = $loadConfig();
 
-                    return \array_merge_recursive($config, $closure());
-                };
-            } else {
-                $payload = static function (\Closure $loadConfig) use ($closure): array {
-                    /** @var array $config */
-                    $config = $loadConfig();
+                return \array_merge_recursive($config, $closure());
+            };
+        } else {
+            $payload = static function (\Closure $loadConfig) use ($closure): array {
+                /** @var array $config */
+                $config = $loadConfig();
 
-                    return \array_merge($config, $closure());
-                };
-            }
-
-            self::$instructions[] = new ClosureInstructionToken($query, $payload);
+                return \array_merge($config, $closure());
+            };
         }
+
+        self::$instructions[] = new ClosureInstructionToken($query, $payload);
     }
 
     /**
@@ -118,16 +112,14 @@ class Config
             $payload = static fn () => $array;
         }
 
-        if ($payload instanceof \Closure) {
-            self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($payload): array {
-                /** @var array $config */
-                $config = $loadConfig();
+        self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($payload): array {
+            /** @var array $config */
+            $config = $loadConfig();
 
-                self::unsetArrayByKeys($config, $payload());
+            self::unsetArrayByKeys($config, $payload());
 
-                return $config;
-            });
-        }
+            return $config;
+        });
     }
 
     /**
