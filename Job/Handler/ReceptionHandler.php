@@ -62,16 +62,9 @@ final class ReceptionHandler implements ReceptionHandlerInterface
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];
-        $routeKeys = new RouteKeyCollection($jobs->map(
-            static function (JobData $jobData): ?RouteKeyInterface {
-                $result = $jobData->getPayload()[Reception::ROUTE_KEY] ?? null;
-
-                if ($result instanceof RouteKeyInterface) {
-                    return $result;
-                }
-
-                return null;
-            }
+        $routeKeys = new RouteKeyCollection();
+        $routeKeys->pushIgnoreInvalidItems($jobs->map(
+            static fn (JobData $jobData): mixed => $jobData->getPayload()[Reception::ROUTE_KEY] ?? null
         ));
 
         $uniqueRouteKeys = new RouteKeyCollection();
@@ -185,7 +178,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
 
                     /** @var DatasetEntityContract[] $rawEntities */
                     $rawEntities = \array_merge([], ...$rawEntityGroups);
-                    $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
+                    $jobKeys = new JobKeyCollection(\array_merge(...$jobKeyGroups));
 
                     $filteredEntityObjects = new DatasetEntityCollection();
                     $filteredEntityObjects->pushIgnoreInvalidItems($this->objectIterator->iterate($rawEntities));

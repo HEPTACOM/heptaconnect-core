@@ -26,14 +26,14 @@ final class IdentityMappingEmitter extends AbstractBufferedResultProcessingEmitt
 
     protected function processBuffer(TypedDatasetEntityCollection $buffer, EmitContextInterface $context): void
     {
+        $primaryKeys = new StringCollection();
+        $primaryKeys->pushIgnoreInvalidItems($buffer->map(
+            static fn (PrimaryKeyAwareInterface $entity): ?string => $entity->getPrimaryKey()
+        ));
+
         $this->identityMapAction->map(new IdentityMapPayload(
             $context->getPortalNodeKey(),
-            $this->primaryKeyToEntityHydrator->hydrate(
-                $this->getSupportedEntityType(),
-                new StringCollection($buffer->map(
-                    static fn (PrimaryKeyAwareInterface $entity): ?string => $entity->getPrimaryKey()
-                ))
-            )
+            $this->primaryKeyToEntityHydrator->hydrate($this->getSupportedEntityType(), $primaryKeys)
         ));
     }
 }
