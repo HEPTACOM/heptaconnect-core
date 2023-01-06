@@ -106,11 +106,13 @@ final class StatusReportingService implements StatusReportingServiceInterface
         string $topic
     ): StatusReporterStackInterface {
         $cacheKey = \md5(\implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
+        $result = $this->statusReporterStackCache[$cacheKey] ?? null;
 
-        if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters, $this->logger);
+        if (!$result instanceof StatusReporterStackInterface) {
+            $result = new StatusReporterStack($statusReporters, $this->logger);
+            $this->statusReporterStackCache[$cacheKey] = $result;
         }
 
-        return clone $this->statusReporterStackCache[$cacheKey];
+        return clone $result;
     }
 }
