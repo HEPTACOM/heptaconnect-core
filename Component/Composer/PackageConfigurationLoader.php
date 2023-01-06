@@ -128,7 +128,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload());
         $installPath = $composer->getInstallationManager()->getInstallPath($package);
 
-        foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
+        foreach ($classLoader->getPrefixesPsr4() as $dirs) {
             foreach ($dirs as $dir) {
                 if (\is_dir($absolute = $installPath . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
