@@ -16,7 +16,7 @@ class PortalNodeConfigurationHelper
      */
     public function env(array $mappings): \Closure
     {
-        return fn (): array => $this->resolveMapping($mappings, static fn (string $i): array|false|string => \getenv($i));
+        return fn (): array => $this->resolveMapping($mappings, static fn (string $i): false|string => \getenv($i));
     }
 
     /**
