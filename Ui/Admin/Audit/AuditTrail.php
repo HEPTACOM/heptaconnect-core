@@ -26,9 +26,9 @@ final class AuditTrail implements AuditTrailInterface
     private \Closure $logEnd;
 
     /**
-     * @param \Closure(object     $output):    void $logResult
-     * @param \Closure(\Throwable $throwable): void $logThrowable
-     * @param \Closure(): void    $logEnd
+     * @param \Closure(object): void     $logResult
+     * @param \Closure(\Throwable): void $logThrowable
+     * @param \Closure(): void           $logEnd
      */
     public function __construct(\Closure $logResult, \Closure $logThrowable, \Closure $logEnd)
     {

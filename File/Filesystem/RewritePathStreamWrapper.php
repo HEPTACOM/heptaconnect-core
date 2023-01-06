@@ -80,7 +80,9 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (\is_resource($this->file)) {
-                \fclose($this->file);
+                $stream = $this->file;
+                $this->file = null;
+                \fclose($stream);
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
