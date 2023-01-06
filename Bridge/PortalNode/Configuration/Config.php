@@ -35,7 +35,7 @@ class Config
     {
         if (\is_array($payload)) {
             $array = $payload;
-            $payload = static fn () => $array;
+            $payload = static fn (): array => $array;
         }
 
         self::$instructions[] = new ClosureInstructionToken($query, $payload);
@@ -51,7 +51,7 @@ class Config
     {
         if (\is_array($payload)) {
             $array = $payload;
-            $payload = static fn () => $array;
+            $payload = static fn (): array => $array;
         }
 
         $closure = $payload;
@@ -75,7 +75,7 @@ class Config
     {
         if (\is_array($payload)) {
             $array = $payload;
-            $payload = static fn () => $array;
+            $payload = static fn (): array => $array;
         }
 
         $closure = $payload;
@@ -109,7 +109,7 @@ class Config
     {
         if (\is_array($payload)) {
             $array = $payload;
-            $payload = static fn () => $array;
+            $payload = static fn (): array => $array;
         }
 
         self::$instructions[] = new ClosureInstructionToken($query, static function (\Closure $loadConfig) use ($payload): array {

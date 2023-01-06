@@ -123,7 +123,7 @@ final class ConfigurationService implements ConfigurationServiceInterface
     {
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $readConfiguration = $read;
-            $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
+            $read = static fn (): array => $configurationProcessor->read($portalNodeKey, $readConfiguration);
         }
 
         return $read();
@@ -131,13 +131,17 @@ final class ConfigurationService implements ConfigurationServiceInterface
 
     private function processWriteConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
-        $write = fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
-            new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
-        ]));
+        $write = function (array $config) use ($portalNodeKey): void {
+            $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+                new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
+            ]));
+        };
 
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $writeConfiguration = $write;
-            $write = static fn (array $config) => $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
+            $write = static function (array $config) use ($configurationProcessor, $portalNodeKey, $writeConfiguration): void {
+                $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
+            };
         }
 
         $write($configuration ?? []);
