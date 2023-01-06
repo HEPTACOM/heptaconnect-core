@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\InaccessableConstructorOnInstantionException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
@@ -38,15 +39,15 @@ abstract class PortalFactoryContract
     }
 
     /**
-     * @template T of object
+     * @template T of PortalExtensionContract
      *
-     * @param class-string<T> $class
+     * @param class-string<PackageContract> $class
      *
      * @throws AbstractInstantiationException
      *
      * @return T
      */
-    private function instantiateObject(string $class): object
+    private function instantiateObject(string $class): PortalContract|PortalExtensionContract
     {
         $reflection = new \ReflectionClass($class);
 
