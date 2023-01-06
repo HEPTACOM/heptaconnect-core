@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 final class PortalConfiguration extends ConfigurationContract
 {
     /**
-     * @var array<string, scalar|array>|null
+     * @var array<string, mixed>|null
      */
     private ?array $flat = null;
 
@@ -34,7 +34,7 @@ final class PortalConfiguration extends ConfigurationContract
     }
 
     /**
-     * @return array<string, array|scalar>
+     * @return array<string, mixed>
      */
     private function &flattened(): array
     {
