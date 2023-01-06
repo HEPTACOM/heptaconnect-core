@@ -150,7 +150,7 @@ class Config
                 if (isset($array[$parent]) && \is_array($array[$parent])) {
                     self::unsetArrayByKeys($array[$parent], $key);
                 }
-            } else if (\is_scalar($key)) {
+            } elseif (\is_scalar($key)) {
                 unset($array[(string) $key]);
             }
         }

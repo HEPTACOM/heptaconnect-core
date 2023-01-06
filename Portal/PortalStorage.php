@@ -377,6 +377,7 @@ final class PortalStorage implements PortalStorageInterface
 
     /**
      * @return array<int, string>
+     *
      * @throw InvalidArgumentException
      */
     private function validateKeys(iterable $keys): array

@@ -238,6 +238,7 @@ abstract class AbstractFilesystem implements FilesystemInterface
 
     /**
      * @param array{dirname: string, path: string} $info
+     *
      * @return array{dirname: string, path: string}
      */
     private function stripPathFromContent(array $info)

@@ -38,6 +38,7 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
 
     /**
      * @param string|null $format
+     *
      * @psalm-assert string $data
      */
     public function supportsDenormalization($data, $type, $format = null)

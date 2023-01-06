@@ -24,8 +24,10 @@ final class HttpMiddlewareHandler implements RequestHandlerInterface
     /**
      * @param \Closure(ServerRequestInterface): ResponseInterface $next
      */
-    public function __construct(\Closure $next, MiddlewareInterface ...$middlewares)
-    {
+    public function __construct(
+        \Closure $next,
+        MiddlewareInterface ...$middlewares
+    ) {
         $this->handleStack = $next;
         $this->middlewares = $middlewares;
     }
