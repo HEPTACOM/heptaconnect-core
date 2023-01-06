@@ -84,7 +84,7 @@ final class RequestDeserializer implements RequestDeserializerInterface
             return (string) $value;
         }
 
-        if (!\is_array($value)) {
+        if (\is_array($value)) {
             $result = [];
 
             foreach ($value as $index => $item) {
