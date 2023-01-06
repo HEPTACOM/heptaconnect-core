@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 
 final class SerializableCompressDenormalizer implements DenormalizerInterface
 {
@@ -19,11 +20,14 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param string $data - type verified by supportsDenormalization
      * @param string|null $format
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
+        if (!$this->supportsDenormalization($data, $type, $format)) {
+            throw new InvalidArgumentException();
+        }
+
         return $this->serializableDenormalizer->denormalize(
             \gzuncompress($data),
             $this->serializableDenormalizer->getType(),
@@ -34,6 +38,7 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
 
     /**
      * @param string|null $format
+     * @psalm-assert string $data
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

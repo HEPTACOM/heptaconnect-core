@@ -7,7 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\InaccessableConstructorOnInstantionException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
@@ -25,7 +24,20 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortal(PortalType $class): PortalContract
     {
-        return $this->instantiateObject((string) $class);
+        $classString = (string) $class;
+        $reflection = new \ReflectionClass($classString);
+
+        if (!$reflection->isInstantiable()) {
+            throw new InaccessableConstructorOnInstantionException($classString);
+        }
+
+        $ctor = $reflection->getConstructor();
+
+        if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
+            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
+        }
+
+        return new $classString();
     }
 
     /**
@@ -35,32 +47,19 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortalExtension(PortalExtensionType $class): PortalExtensionContract
     {
-        return $this->instantiateObject((string) $class);
-    }
-
-    /**
-     * @template T of PortalExtensionContract
-     *
-     * @param class-string<PackageContract> $class
-     *
-     * @throws AbstractInstantiationException
-     *
-     * @return T
-     */
-    private function instantiateObject(string $class): PortalContract|PortalExtensionContract
-    {
-        $reflection = new \ReflectionClass($class);
+        $classString = (string) $class;
+        $reflection = new \ReflectionClass($classString);
 
         if (!$reflection->isInstantiable()) {
-            throw new InaccessableConstructorOnInstantionException($class);
+            throw new InaccessableConstructorOnInstantionException($classString);
         }
 
         $ctor = $reflection->getConstructor();
 
         if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
-            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($class);
+            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
         }
 
-        return new $class();
+        return new $classString();
     }
 }
