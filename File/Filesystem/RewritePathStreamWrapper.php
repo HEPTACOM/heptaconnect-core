@@ -446,6 +446,10 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
             'remaining' => $remaining,
         ] = $this->trimProtocol($path);
 
+        if ($oldProtocol === null) {
+            \trigger_error('Option resolution failed due to missing protocol', \E_USER_ERROR);
+        }
+
         $protocol = $oldProtocol;
 
         if (\is_string($set = ($protocolOptions['set'] ?? null))) {
@@ -531,8 +535,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
 
         if ($protocol === null) {
-            \trigger_error('Option resolution failed due to missing protocol', \E_USER_WARNING);
-            return [];
+            \trigger_error('Option resolution failed due to missing protocol', \E_USER_ERROR);
         }
 
         $options = \stream_context_get_options($this->getContext())[$protocol] ?? [];
