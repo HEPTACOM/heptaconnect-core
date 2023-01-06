@@ -14,7 +14,6 @@ class JobCollection extends AbstractCollection
 {
     protected function isValidItem(mixed $item): bool
     {
-        /* @phpstan-ignore-next-line */
         return $item instanceof JobContract;
     }
 }
