@@ -137,6 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Replace union type hints to real union types in `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::replace`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::merge`, `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Config::set` and `\Heptacom\HeptaConnect\Core\Exploration\AbstractBufferedResultProcessingExplorer::pushBuffer`
 - Split `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass` into `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass` and `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\SetConfigurationAsParameterCompilerPass` to separate parameter assignment and generating name bindings
 - Extract processing of portal node configuration processors from `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService` into `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationProcessorService` described by `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorServiceInterface`
+- Change composer dependency `symfony/dependency-injection: ^4.4 || ^5.0` to `symfony/dependency-injection: ^4.4.11 || ^5.0` to ensure auto wiring works with PHP 8 union types
 
 ### Deprecated
 
