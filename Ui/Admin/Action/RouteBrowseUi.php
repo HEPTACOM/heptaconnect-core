@@ -45,10 +45,12 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
         $storageSorting = [];
 
         foreach ($criteria->getSort() as $field => $direction) {
+            /** @var string|null $parsedDirection */
             $parsedDirection = [
                 BrowseCriteriaContract::SORT_ASC => OverviewCriteriaContract::SORT_ASC,
                 BrowseCriteriaContract::SORT_DESC => OverviewCriteriaContract::SORT_DESC,
             ][$direction] ?? null;
+            /** @var string|null $parsedField */
             $parsedField = [
                 RouteBrowseCriteria::FIELD_CREATED => RouteOverviewCriteria::FIELD_CREATED,
                 RouteBrowseCriteria::FIELD_ENTITY_TYPE => RouteOverviewCriteria::FIELD_ENTITY_TYPE,
@@ -57,18 +59,18 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
             ][$field] ?? null;
 
             if (!\is_string($parsedDirection)) {
-                throw new UnsupportedSortingException(
+                throw $trail->throwable(new UnsupportedSortingException(
                     $direction,
                     new StringCollection([
                         BrowseCriteriaContract::SORT_ASC,
                         BrowseCriteriaContract::SORT_DESC,
                     ]),
                     1670625000
-                );
+                ));
             }
 
             if (!\is_string($parsedField)) {
-                throw new UnsupportedSortingException(
+                throw $trail->throwable(throw new UnsupportedSortingException(
                     $field,
                     new StringCollection([
                         RouteBrowseCriteria::FIELD_CREATED,
@@ -77,7 +79,7 @@ final class RouteBrowseUi implements RouteBrowseUiActionInterface
                         RouteBrowseCriteria::FIELD_TARGET,
                     ]),
                     1670625001
-                );
+                ));
             }
 
             $storageSorting[$parsedField] = $parsedDirection;

@@ -25,7 +25,7 @@ final class FilesystemFactory implements FilesystemFactoryInterface
     public function create(PortalNodeKeyInterface $portalNodeKey): FilesystemInterface
     {
         $key = $this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias());
-        $streamScheme = \strtolower(\preg_replace('/[^a-zA-Z0-9]/', '-', 'heptaconnect-' . $key));
+        $streamScheme = \strtolower((string) \preg_replace('/[^a-zA-Z0-9]/', '-', 'heptaconnect-' . $key));
 
         if (!\in_array($streamScheme, \stream_get_wrappers(), true)) {
             $trueProtocol = $this->streamProtocolProvider->provide($portalNodeKey);
