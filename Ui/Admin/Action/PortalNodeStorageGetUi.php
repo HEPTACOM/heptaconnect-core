@@ -63,7 +63,7 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
      * @throws InvalidPortalNodeStorageValueException
      * @throws ReadException
      *
-     * @return iterable<PortalNodeStorageGetResult>
+     * @return iterable<array-key, PortalNodeStorageGetResult>
      */
     private function collectValues(PortalNodeKeyInterface $portalNodeKey, StringCollection $keys): iterable
     {
@@ -75,7 +75,7 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
                     throw new InvalidPortalNodeStorageValueException($portalNodeKey, (string) $key, 1673129102);
                 }
 
-                yield new PortalNodeStorageGetResult($portalNodeKey, $key, $value);
+                yield new PortalNodeStorageGetResult($portalNodeKey, (string) $key, $value);
             }
         } catch (InvalidPortalNodeStorageValueException $throwable) {
             throw $throwable;
@@ -104,7 +104,7 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
 
         $missingPortalNodes = new PortalNodeKeyCollection($pnKeysToLoad->filter(
             static fn (PortalNodeKeyInterface $pnKey): bool => !$gotPortalNodeKeys->contains($pnKey)
-        ));
+        )->getIterator());
 
         if (!$missingPortalNodes->isEmpty()) {
             throw new PortalNodesMissingException($missingPortalNodes, 1673129101);
