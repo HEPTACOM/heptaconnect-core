@@ -22,13 +22,19 @@ final class SetConfigurationAsParameterCompilerPass implements CompilerPassInter
         $keys = $config->keys();
 
         foreach (\array_keys($container->getParameterBag()->all()) as $parameterName) {
-            if (\str_starts_with($parameterName, PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX)) {
+            if (\is_string($parameterName) && \str_starts_with($parameterName, PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX)) {
                 $container->getParameterBag()->remove($parameterName);
             }
         }
 
         foreach ($keys as $key) {
-            $container->setParameter($this->getParameterKey($key), $config->get($key));
+            $value = $config->get($key);
+
+            if (!\is_scalar($value) && !\is_array($value) && $value !== null) {
+                continue;
+            }
+
+            $container->setParameter($this->getParameterKey($key), $value);
         }
     }
 

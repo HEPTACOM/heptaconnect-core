@@ -62,7 +62,7 @@ final class PortalNodeConfigurationGetUi implements PortalNodeConfigurationGetUi
 
             $missingPortalNodes = new PortalNodeKeyCollection($pnKeysToLoad->filter(
                 static fn (PortalNodeKeyInterface $pnKey): bool => !$gotPortalNodeKeys->contains($pnKey)
-            ));
+            )->getIterator());
 
             if (!$missingPortalNodes->isEmpty()) {
                 throw $trail->throwable(new PortalNodesMissingException($missingPortalNodes, 1670832601));

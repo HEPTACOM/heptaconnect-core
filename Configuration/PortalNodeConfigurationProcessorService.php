@@ -30,7 +30,7 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
     {
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $readConfiguration = $read;
-            $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
+            $read = static fn (): array => $configurationProcessor->read($portalNodeKey, $readConfiguration);
         }
 
         return $read();
@@ -43,7 +43,9 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
     ): void {
         foreach ($this->configurationProcessors as $configurationProcessor) {
             $writeConfiguration = $write;
-            $write = static fn (array $config) => $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
+            $write = static function (array $config) use ($configurationProcessor, $portalNodeKey, $writeConfiguration): void {
+                $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
+            };
         }
 
         $write($configuration);

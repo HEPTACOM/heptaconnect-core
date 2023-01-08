@@ -18,7 +18,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
         $keys = [];
 
         foreach (\array_keys($container->getParameterBag()->all()) as $key) {
-            if (\str_starts_with($key, PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX)) {
+            if (\is_string($key) && \str_starts_with($key, PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX)) {
                 $keys[] = \mb_substr($key, \mb_strlen(PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX));
             }
         }
@@ -43,9 +43,11 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
                 continue;
             }
 
+            /** @var array{string, array}[] $methodCalls */
+            $methodCalls = $definition->getMethodCalls();
             $argumentNames = \array_merge(
                 $this->getConstructorArgumentNames($class),
-                $this->getConstructorCallNames($class, $definition->getMethodCalls()),
+                $this->getConstructorCallNames($class, $methodCalls),
             );
             $related = \array_filter($argumentNames, static fn (string $key): bool => \str_starts_with($key, '$config'));
             $requiredBindings = \array_intersect_key($bindings, \array_flip($related));
@@ -85,7 +87,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
     {
         $result = [];
 
-        foreach ($methodCalls as [$method, $arguments]) {
+        foreach ($methodCalls as [$method]) {
             if (!\method_exists($class, $method)) {
                 continue;
             }
@@ -128,6 +130,9 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
         return false;
     }
 
+    /**
+     * @return string[]
+     */
     private function getParameterTypes(?\ReflectionType $type): array
     {
         if ($type instanceof \ReflectionNamedType) {
