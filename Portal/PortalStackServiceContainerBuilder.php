@@ -10,12 +10,13 @@ use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
-use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\SetConfigurationAsParameterCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
@@ -58,6 +59,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -86,6 +88,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     public const WEB_HTTP_HANDLER_SOURCE_TAG = 'heptaconnect.flow_component.web_http_handler_source';
 
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
+
+    public const PORTAL_CONFIGURATION_PARAMETER_PREFIX = 'portal_config.';
 
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
 
@@ -160,19 +164,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $definition->addTag(self::SERVICE_FROM_A_PORTAL_TAG);
         }
 
-        $configuration = [];
-
-        try {
-            $configuration = $this->configurationService->getPortalNodeConfiguration($portalNodeKey);
-        } catch (\Throwable $throwable) {
-            $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
-                'portal_node_key' => $portalNodeKey,
-                'exception' => $throwable,
-            ]);
-        }
-
-        $portalConfiguration = new PortalConfiguration($configuration ?? []);
-
         $fileReferenceFactory = new FileReferenceFactory(
             $portalNodeKey,
             Psr17FactoryDiscovery::findStreamFactory(),
@@ -197,7 +188,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             PortalNodeKeyInterface::class => $portalNodeKey,
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::' . $this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
-            ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
@@ -237,12 +227,36 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 ->addMethodCall('withMaxRetry', [2], true)
                 ->addMethodCall('withMaxWaitTimeout', [], true)
         );
+        $containerBuilder->setDefinition(
+            ConfigurationContract::class,
+            (new Definition())
+                ->setClass(PortalConfiguration::class)
+                ->setArguments([
+                    new BoundArgument('%' . self::PORTAL_CONFIGURATION_PARAMETER_PREFIX . '%'),
+                ])
+        );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
         $containerBuilder->addCompilerPass(new AddHttpMiddlewareClientCompilerPass());
         $containerBuilder->addCompilerPass(new AddHttpMiddlewareCollectorCompilerPass());
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
-        $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
+
+        try {
+            $containerBuilder->addCompilerPass(
+                new SetConfigurationAsParameterCompilerPass(
+                    $this->configurationService->getPortalNodeConfiguration($portalNodeKey) ?? []
+                ),
+                PassConfig::TYPE_BEFORE_OPTIMIZATION,
+                20000
+            );
+        } catch (\Throwable $throwable) {
+            $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
+                'portal_node_key' => $portalNodeKey,
+                'exception' => $throwable,
+            ]);
+        }
+
+        $containerBuilder->addCompilerPass(new AddConfigurationBindingsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
         return $containerBuilder;
     }
