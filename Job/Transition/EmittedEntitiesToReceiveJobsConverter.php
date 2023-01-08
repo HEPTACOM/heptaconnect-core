@@ -38,7 +38,7 @@ final class EmittedEntitiesToReceiveJobsConverter implements EmittedEntitiesToJo
             $receptionRoutes = \iterable_to_array($this->receptionRouteListAction->list($routeListCriteria));
 
             foreach ($receptionRoutes as $receptionRoute) {
-                $result->push($entities->map(
+                $result->push($typedEntities->map(
                     static fn (DatasetEntityContract $entity): Reception => new Reception(
                         new MappingComponentStruct($portalNodeKey, $entityType, (string) $entity->getPrimaryKey()),
                         $receptionRoute->getRouteKey(),

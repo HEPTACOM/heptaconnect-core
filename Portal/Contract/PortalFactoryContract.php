@@ -24,7 +24,20 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortal(PortalType $class): PortalContract
     {
-        return $this->instantiateObject((string) $class);
+        $classString = (string) $class;
+        $reflection = new \ReflectionClass($classString);
+
+        if (!$reflection->isInstantiable()) {
+            throw new InaccessableConstructorOnInstantionException($classString);
+        }
+
+        $ctor = $reflection->getConstructor();
+
+        if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
+            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
+        }
+
+        return new $classString();
     }
 
     /**
@@ -34,32 +47,19 @@ abstract class PortalFactoryContract
      */
     public function instantiatePortalExtension(PortalExtensionType $class): PortalExtensionContract
     {
-        return $this->instantiateObject((string) $class);
-    }
-
-    /**
-     * @template T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @throws AbstractInstantiationException
-     *
-     * @return T
-     */
-    private function instantiateObject(string $class): object
-    {
-        $reflection = new \ReflectionClass($class);
+        $classString = (string) $class;
+        $reflection = new \ReflectionClass($classString);
 
         if (!$reflection->isInstantiable()) {
-            throw new InaccessableConstructorOnInstantionException($class);
+            throw new InaccessableConstructorOnInstantionException($classString);
         }
 
         $ctor = $reflection->getConstructor();
 
         if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
-            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($class);
+            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
         }
 
-        return new $class();
+        return new $classString();
     }
 }

@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterCodeOriginFinderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
@@ -47,9 +48,9 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
         $entityFilter = static fn (iterable $fcs): iterable => $fcs;
 
         if ($entityType !== null) {
-            $entityFilter = static fn (iterable $fcs): iterable => \iterable_filter(
+            $entityFilter = fn (iterable $fcs): iterable => \iterable_filter(
                 $fcs,
-                static fn ($fc): bool => $fc->getSupportedEntityType()->equals($entityType)
+                $this->isFlowComponentOfType($entityType)
             );
         }
 
@@ -128,5 +129,15 @@ final class PortalNodeEntityListUi implements PortalNodeEntityListUiActionInterf
         }
 
         return $components;
+    }
+
+    /**
+     * @return \Closure(ExplorerContract|EmitterContract|ReceiverContract): bool
+     */
+    private function isFlowComponentOfType(ClassStringReferenceContract $entityType): \Closure
+    {
+        return static function (ExplorerContract|EmitterContract|ReceiverContract $fc) use ($entityType): bool {
+            return $fc->getSupportedEntityType()->equals($entityType);
+        };
     }
 }

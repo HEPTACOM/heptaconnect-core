@@ -39,12 +39,12 @@ final class HttpMiddlewareClient implements ClientInterface
             $next = \Closure::fromCallable(fn (RequestInterface $request) => $this->next($request, ...$middlewares));
 
             $handler = new class($next) implements ClientInterface {
-                private \Closure $next;
-
+                /**
+                 * @param \Closure(RequestInterface): ResponseInterface $next
+                 */
                 public function __construct(
-                    \Closure $next
+                    private \Closure $next
                 ) {
-                    $this->next = $next;
                 }
 
                 public function sendRequest(RequestInterface $request): ResponseInterface

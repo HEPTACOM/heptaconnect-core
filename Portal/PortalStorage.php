@@ -25,6 +25,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalN
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageListActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageSetActionInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 final class PortalStorage implements PortalStorageInterface
 {
@@ -199,8 +200,7 @@ final class PortalStorage implements PortalStorageInterface
 
     public function getMultiple($keys, $default = null): iterable
     {
-        /** @var array<int, string> $keysArray */
-        $keysArray = \array_values(\array_map('strval', \iterable_to_array($keys)));
+        $keysArray = $this->validateKeys($keys);
         $criteria = new PortalNodeStorageGetCriteria($this->portalNodeKey, new StringCollection($keysArray));
         $notReturnedKeys = \array_fill_keys($keysArray, true);
         $deleteCriteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection([]));
@@ -243,7 +243,7 @@ final class PortalStorage implements PortalStorageInterface
         $payload = new PortalNodeStorageSetPayload($this->portalNodeKey, new PortalNodeStorageSetItems());
 
         foreach ($values as $key => $value) {
-            $item = $this->packSetItem($key, $value, $ttl);
+            $item = $this->packSetItem((string) $key, $value, $ttl);
 
             if (!$item instanceof PortalNodeStorageSetItem) {
                 return false;
@@ -270,7 +270,7 @@ final class PortalStorage implements PortalStorageInterface
     public function deleteMultiple($keys): bool
     {
         try {
-            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection(\array_values(\array_map('strval', \iterable_to_array($keys)))));
+            $criteria = new PortalNodeStorageDeleteCriteria($this->portalNodeKey, new StringCollection($this->validateKeys($keys)));
             $this->portalNodeStorageDeleteAction->delete($criteria);
 
             return true;
@@ -302,7 +302,7 @@ final class PortalStorage implements PortalStorageInterface
         }
     }
 
-    private function unpackGetResult(PortalNodeStorageItemContract $getResult)
+    private function unpackGetResult(PortalNodeStorageItemContract $getResult): mixed
     {
         $denormalizer = $this->normalizationRegistry->getDenormalizer($getResult->getType());
 
@@ -335,7 +335,7 @@ final class PortalStorage implements PortalStorageInterface
         return null;
     }
 
-    private function packSetItem(string $key, $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
+    private function packSetItem(string $key, mixed $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
     {
         $normalizer = $this->normalizationRegistry->getNormalizer($value);
 
@@ -373,5 +373,26 @@ final class PortalStorage implements PortalStorageInterface
         }
 
         return new PortalNodeStorageSetItem($key, $normalizedValue, $normalizer->getType(), $ttl);
+    }
+
+    /**
+     * @return array<int, string>
+     *
+     * @throw InvalidArgumentException
+     */
+    private function validateKeys(iterable $keys): array
+    {
+        /** @var array<int, string> $keysArray */
+        $keysArray = [];
+
+        foreach ($keys as $key) {
+            if (!\is_string($key)) {
+                throw new InvalidArgumentException();
+            }
+
+            $keysArray[] = $key;
+        }
+
+        return $keysArray;
     }
 }

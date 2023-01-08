@@ -63,12 +63,17 @@ final class AuditableDataSerializer implements AuditableDataSerializerInterface
 
     /**
      * @return class-string[]
+     *
+     * @TODO inline return value with updated iterable helpers
      */
     private function extractAttachableData(AttachmentAwareInterface $auditableDataAware): array
     {
-        return \iterable_to_array($auditableDataAware->getAttachments()->map(
+        /** @var class-string[] $result */
+        $result = \iterable_to_array($auditableDataAware->getAttachments()->map(
             static fn (AttachableInterface $attachable) => $attachable::class
         ));
+
+        return $result;
     }
 
     private function jsonEncode(array $result): string

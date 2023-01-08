@@ -10,9 +10,13 @@ use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReceiveContextFactory implements ReceiveContextFactoryInterface
 {
+    /**
+     * @var EventSubscriberInterface[]
+     */
     private array $postProcessors;
 
     public function __construct(

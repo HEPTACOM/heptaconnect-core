@@ -22,7 +22,7 @@ final class ScalarDenormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        if (!$this->supportsDenormalization($data, $type)) {
+        if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
         }
 
@@ -31,6 +31,8 @@ final class ScalarDenormalizer implements DenormalizerInterface
 
     /**
      * @param string|null $format
+     *
+     * @psalm-assert string $data
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

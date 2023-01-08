@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Exploration;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\CollectionInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\PrimaryKeyAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
@@ -38,7 +39,9 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
 
     protected function processBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
-        $pks = \iterable_to_array($buffer->column('getPrimaryKey'));
+        $pks = \iterable_to_array($buffer->map(
+            static fn (PrimaryKeyAwareInterface $entity): ?string => $entity->getPrimaryKey()
+        ));
 
         $this->logger->debug('DirectEmittingExplorer: Flush a batch of direct emissions', [
             'portalNodeKey' => $context->getPortalNodeKey(),

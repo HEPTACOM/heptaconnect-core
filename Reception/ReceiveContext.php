@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
 {
@@ -20,6 +21,9 @@ final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveC
 
     private PostProcessorDataBag $postProcessingBag;
 
+    /**
+     * @param EventSubscriberInterface[] $postProcessors
+     */
     public function __construct(
         PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,

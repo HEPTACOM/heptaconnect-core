@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
+use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 
 final class Psr7RequestDenormalizer implements DenormalizerInterface
@@ -27,11 +28,17 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
      */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
+        if (!$this->supportsDenormalization($data, $type, $format)) {
+            throw new InvalidArgumentException();
+        }
+
         return $this->deserializer->deserialize($data);
     }
 
     /**
      * @param string|null $format
+     *
+     * @psalm-assert string $data
      */
     public function supportsDenormalization($data, $type, $format = null)
     {

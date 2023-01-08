@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\Contract\PrimaryKeyAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
@@ -54,7 +55,9 @@ final class LockingReceiver extends ReceiverContract
             $this->logger->critical('Failed to lock and receive entities after retrying', [
                 'portalNodeKey' => $context->getPortalNodeKey(),
                 'entityType' => (string) $this->getSupportedEntityType(),
-                'primaryKeys' => \iterable_to_array($todo->column('getPrimaryKey')),
+                'primaryKeys' => \iterable_to_array($todo->map(
+                    static fn (PrimaryKeyAwareInterface $entity): ?string => $entity->getPrimaryKey()
+                )),
                 'code' => 1661818272,
                 'retries' => 3,
             ]);
@@ -94,7 +97,7 @@ final class LockingReceiver extends ReceiverContract
 
             if ($lock->acquire()) {
                 $slice->push([$entity]);
-                $lockedLocks[$entity->getPrimaryKey() ?? $entityKey] = $lock;
+                $lockedLocks[$entity->getPrimaryKey() ?? (string) $entityKey] = $lock;
 
                 $this->logger->debug('Locking an entity', [
                     'portalNodeKey' => $portalNodeKey,

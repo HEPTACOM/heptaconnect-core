@@ -31,6 +31,7 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
 
     public function handle(PostReceptionEvent $event): void
     {
+        /** @var SaveMappingsData[] $saveMappingsData */
         $saveMappingsData = \iterable_to_array($event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class));
         $entities = \array_map(static fn (SaveMappingsData $data): DatasetEntityContract => $data->getEntity(), $saveMappingsData);
 

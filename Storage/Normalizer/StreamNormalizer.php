@@ -59,6 +59,11 @@ final class StreamNormalizer implements NormalizerInterface
         }
 
         $mediaId = $context['mediaId'] ?? null;
+
+        if (!\is_string($mediaId)) {
+            $mediaId = null;
+        }
+
         $filename = $this->generateFilename(
             $mediaId === null ? Uuid::uuid4() : Uuid::uuid5(self::NS_FILENAME, $mediaId)
         );

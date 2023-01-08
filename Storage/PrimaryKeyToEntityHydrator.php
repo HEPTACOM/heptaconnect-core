@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Storage;
 
-use Heptacom\HeptaConnect\Dataset\Base\AttachmentCollection;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
-use Heptacom\HeptaConnect\Dataset\Base\DependencyCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
@@ -29,11 +27,6 @@ class PrimaryKeyToEntityHydrator
             $entityType,
             $primaryKeys->map(static function (string $pk) use ($factory): DatasetEntityContract {
                 $entity = $factory->newInstanceWithoutConstructor();
-
-                \Closure::bind(function (DatasetEntityContract $entity): void {
-                    $entity->attachments = new AttachmentCollection();
-                    $entity->dependencies = new DependencyCollection();
-                }, null, $entity)($entity);
 
                 $entity->setPrimaryKey($pk);
 

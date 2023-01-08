@@ -51,22 +51,17 @@ abstract class AbstractFilesystem implements FilesystemInterface
     public function listContents($directory = '', $recursive = false): array
     {
         $directory = $this->preparePath($directory);
+        /** @var array{path: string, dirname: string}[] $contents */
+        $contents = $this->filesystem->listContents($directory, $recursive);
 
-        return \array_map(
-            function ($info) {
-                $info['dirname'] = $this->stripPath($info['dirname']);
-                $info['path'] = $this->stripPath($info['path']);
-
-                return $info;
-            },
-            $this->filesystem->listContents($directory, $recursive)
-        );
+        return \array_map([$this, 'stripPathFromContent'], $contents);
     }
 
     public function getMetadata($path)
     {
         $path = $this->preparePath($path);
 
+        /** @var array{path: string}|array{dirname: string, path: string}|false $meta */
         $meta = $this->filesystem->getMetadata($path);
 
         if (!\is_array($meta)) {
@@ -240,4 +235,17 @@ abstract class AbstractFilesystem implements FilesystemInterface
      * Remove the modified parts from the filesystem
      */
     abstract public function stripPath(string $path): string;
+
+    /**
+     * @param array{dirname: string, path: string} $info
+     *
+     * @return array{dirname: string, path: string}
+     */
+    private function stripPathFromContent(array $info)
+    {
+        $info['dirname'] = $this->stripPath($info['dirname']);
+        $info['path'] = $this->stripPath($info['path']);
+
+        return $info;
+    }
 }

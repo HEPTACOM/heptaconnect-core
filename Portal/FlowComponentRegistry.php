@@ -14,6 +14,9 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 
 class FlowComponentRegistry
 {
+    /**
+     * @var class-string[]|null
+     */
     private ?array $orderedSources = null;
 
     /**

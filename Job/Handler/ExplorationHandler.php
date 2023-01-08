@@ -13,6 +13,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
@@ -30,6 +31,7 @@ final class ExplorationHandler implements ExplorationHandlerInterface
     {
         $keys = [];
         $types = [];
+        /** @var JobKeyInterface[][] $jobKeys */
         $jobKeys = [];
 
         /** @var JobData $job */

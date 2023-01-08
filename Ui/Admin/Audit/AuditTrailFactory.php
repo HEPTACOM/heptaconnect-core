@@ -151,6 +151,10 @@ final class AuditTrailFactory implements AuditTrailFactoryInterface
         $result = new TaggedStringCollection();
 
         foreach ($unpackables as $key => $unpackable) {
+            if (!\is_iterable($unpackable) && !\is_object($unpackable)) {
+                throw new \InvalidArgumentException('Unpackable is neither an object nor an iterable');
+            }
+
             foreach ($this->deepObjectIterator->iterate($unpackable) as $item) {
                 if ($item instanceof AuditableDataAwareInterface) {
                     $result[$key]->getCollection()->push([

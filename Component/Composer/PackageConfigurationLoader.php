@@ -31,7 +31,11 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class) . '-' . $cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                $result = $cacheItem->get();
+
+                if ($result instanceof PackageConfigurationCollection) {
+                    return $result;
+                }
             }
         } else {
             $cacheItem = null;
@@ -78,6 +82,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
         if ($locker instanceof Locker && $locker->isLocked()) {
             $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
+            /** @var array{name: string, version: string}[] $packageLockData */
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
             foreach ($packageLockData as $package) {
@@ -94,6 +99,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
             if ($localRepository->getDevMode() ?? false) {
                 $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
+                /** @var array{name: string, version: string}[] $packageDevLockData */
                 $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
 
                 foreach ($packageDevLockData as $package) {
@@ -122,7 +128,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload());
         $installPath = $composer->getInstallationManager()->getInstallPath($package);
 
-        foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
+        foreach ($classLoader->getPrefixesPsr4() as $dirs) {
             foreach ($dirs as $dir) {
                 if (\is_dir($absolute = $installPath . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
@@ -167,10 +173,11 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         foreach ($this->iteratePackages($composer) as $packageInstance) {
             /** @var array|null $keywords */
             $keywords = $packageInstance->getKeywords();
-            $heptaconnectKeywords = \array_filter(
+            /** @var array<int, string> $heptaconnectKeywords */
+            $heptaconnectKeywords = \array_values(\array_filter(
                 $keywords ?? [],
                 static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
-            );
+            ));
 
             if ($heptaconnectKeywords === []) {
                 continue;
@@ -184,6 +191,9 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         return $result;
     }
 
+    /**
+     * @param array<int, string> $heptaconnectKeywords
+     */
     private function getConfigFromPackage(
         CompletePackageInterface $packageInstance,
         array $heptaconnectKeywords,

@@ -31,7 +31,7 @@ interface PackageQueryMatcherInterface
      * Tests all given portal extensions against the given query and returns every matching portal extension.
      * Query by class-string must be implemented.
      *
-     * @param class-string $query
+     * @param class-string|string $query
      */
     public function matchPortalExtensions(string $query, PortalExtensionCollection $portalExtensions): PortalExtensionCollection;
 }

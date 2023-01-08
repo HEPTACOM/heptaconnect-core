@@ -6,6 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
@@ -61,9 +62,9 @@ final class ReceptionHandler implements ReceptionHandlerInterface
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];
-        $routeKeys = new RouteKeyCollection(\iterable_map(
-            $jobs->column('getPayload'),
-            static fn (?array $payload): ?RouteKeyInterface => $payload[Reception::ROUTE_KEY] ?? null
+        $routeKeys = new RouteKeyCollection();
+        $routeKeys->pushIgnoreInvalidItems($jobs->map(
+            static fn (JobData $jobData): mixed => $jobData->getPayload()[Reception::ROUTE_KEY] ?? null
         ));
 
         $uniqueRouteKeys = new RouteKeyCollection();
@@ -177,12 +178,10 @@ final class ReceptionHandler implements ReceptionHandlerInterface
 
                     /** @var DatasetEntityContract[] $rawEntities */
                     $rawEntities = \array_merge([], ...$rawEntityGroups);
-                    $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
+                    $jobKeys = new JobKeyCollection(\array_merge(...$jobKeyGroups));
 
-                    /** @var array<DatasetEntityContract|object> $allEntities */
-                    $allEntities = $this->objectIterator->iterate($rawEntities);
-                    /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
-                    $filteredEntityObjects = new DatasetEntityCollection($allEntities);
+                    $filteredEntityObjects = new DatasetEntityCollection();
+                    $filteredEntityObjects->pushIgnoreInvalidItems($this->objectIterator->iterate($rawEntities));
                     // TODO inspect memory raise - probably fixed by new storage
                     $mappedEntities = $this->identityMapAction
                         ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))

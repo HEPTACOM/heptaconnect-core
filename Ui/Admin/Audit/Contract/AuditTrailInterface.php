@@ -48,9 +48,9 @@ interface AuditTrailInterface
      *
      * @template TResult of object
      *
-     * @param iterable<TResult> $result
+     * @param iterable<array-key, TResult> $result
      *
-     * @return iterable<TResult>
+     * @return iterable<array-key, TResult>
      */
     public function returnIterable(iterable $result): iterable;
 

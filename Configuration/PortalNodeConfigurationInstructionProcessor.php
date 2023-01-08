@@ -20,6 +20,9 @@ use Psr\Log\LoggerInterface;
  */
 final class PortalNodeConfigurationInstructionProcessor implements PortalNodeConfigurationProcessorInterface
 {
+    /**
+     * @var InstructionTokenContract[]|null
+     */
     private ?array $instructions = null;
 
     /**
@@ -42,13 +45,13 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         $instructions = $this->filterInstructions($portalNodeKey);
-        $readConfig = static fn () => $read();
+        $readConfig = static fn (): array => $read();
 
         foreach ($instructions as $instruction) {
             if ($instruction instanceof ClosureInstructionToken) {
                 $instructionCall = $instruction->getClosure();
                 $readConfigCall = $readConfig;
-                $readConfig = static fn () => $instructionCall($readConfigCall);
+                $readConfig = static fn (): array => $instructionCall($readConfigCall);
             }
         }
 
