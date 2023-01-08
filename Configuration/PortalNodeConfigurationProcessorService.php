@@ -46,6 +46,6 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
             $write = static fn (array $config) => $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
         }
 
-        $write($configuration ?? []);
+        $write($configuration);
     }
 }
