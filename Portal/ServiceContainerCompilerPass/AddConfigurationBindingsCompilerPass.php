@@ -18,8 +18,8 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
         $keys = [];
 
         foreach (\array_keys($container->getParameterBag()->all()) as $key) {
-            if (\str_starts_with($key, 'portal_config.')) {
-                $keys[] = \mb_substr($key, 14);
+            if (\str_starts_with($key, PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX)) {
+                $keys[] = \mb_substr($key, \mb_strlen(PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX));
             }
         }
 
