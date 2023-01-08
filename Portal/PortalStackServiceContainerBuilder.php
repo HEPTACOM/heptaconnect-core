@@ -247,7 +247,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                     $this->configurationService->getPortalNodeConfiguration($portalNodeKey) ?? []
                 ),
                 PassConfig::TYPE_BEFORE_OPTIMIZATION,
-                \PHP_INT_MAX
+                20000
             );
         } catch (\Throwable $throwable) {
             $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
