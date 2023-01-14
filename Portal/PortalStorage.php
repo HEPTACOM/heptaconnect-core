@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker;
+use Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
-use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
-use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
-use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Clear\PortalNodeStorageClearCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Delete\PortalNodeStorageDeleteCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Get\PortalNodeStorageGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Listing\PortalNodeStorageListCriteria;
-use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\PortalNodeStorageItemContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItem;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetItems;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\Set\PortalNodeStorageSetPayload;
@@ -30,7 +28,8 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 final class PortalStorage implements PortalStorageInterface
 {
     public function __construct(
-        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalNodeStorageItemPacker $portalNodeStorageItemPacker,
+        private PortalNodeStorageItemUnpacker $portalNodeStorageItemUnpacker,
         private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
         private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,
@@ -55,7 +54,7 @@ final class PortalStorage implements PortalStorageInterface
 
             /** @var PortalNodeStorageGetResult $getResult */
             $getResult = \current($getResults);
-            $result = $this->unpackGetResult($getResult);
+            $result = $this->portalNodeStorageItemUnpacker->unpack($getResult);
 
             if ($result === null) {
                 $this->portalNodeStorageDeleteAction->delete(new PortalNodeStorageDeleteCriteria($this->portalNodeKey, $storageKeys));
@@ -81,7 +80,7 @@ final class PortalStorage implements PortalStorageInterface
         $ttl = $this->convertTtl($ttl);
 
         try {
-            $item = $this->packSetItem($key, $value, $ttl);
+            $item = $this->portalNodeStorageItemPacker->pack($key, $value, $ttl);
 
             if (!$item instanceof PortalNodeStorageSetItem) {
                 return false;
@@ -112,7 +111,7 @@ final class PortalStorage implements PortalStorageInterface
         try {
             foreach ($this->portalNodeStorageListAction->list($criteria) as $result) {
                 try {
-                    $value = $this->unpackGetResult($result);
+                    $value = $this->portalNodeStorageItemUnpacker->unpack($result);
                 } catch (\Throwable $throwable) {
                     $this->logger->error('Failed unpack a portal storage value for listing', [
                         'code' => 1651338559,
@@ -145,7 +144,7 @@ final class PortalStorage implements PortalStorageInterface
             $getCriteria = new PortalNodeStorageGetCriteria($this->portalNodeKey, $storageKeys);
 
             foreach ($this->portalNodeStorageGetAction->get($getCriteria) as $getResult) {
-                return $this->unpackGetResult($getResult) !== null;
+                return $this->portalNodeStorageItemUnpacker->unpack($getResult) !== null;
             }
 
             return false;
@@ -209,7 +208,7 @@ final class PortalStorage implements PortalStorageInterface
             foreach ($this->portalNodeStorageGetAction->get($criteria) as $getResult) {
                 unset($notReturnedKeys[$getResult->getStorageKey()]);
 
-                $value = $this->unpackGetResult($getResult);
+                $value = $this->portalNodeStorageItemUnpacker->unpack($getResult);
 
                 if ($value === null) {
                     $deleteCriteria->getStorageKeys()->push([$getResult->getStorageKey()]);
@@ -243,7 +242,7 @@ final class PortalStorage implements PortalStorageInterface
         $payload = new PortalNodeStorageSetPayload($this->portalNodeKey, new PortalNodeStorageSetItems());
 
         foreach ($values as $key => $value) {
-            $item = $this->packSetItem((string) $key, $value, $ttl);
+            $item = $this->portalNodeStorageItemPacker->pack((string) $key, $value, $ttl);
 
             if (!$item instanceof PortalNodeStorageSetItem) {
                 return false;
@@ -286,10 +285,7 @@ final class PortalStorage implements PortalStorageInterface
         }
     }
 
-    /**
-     * @param \DateInterval|int|null $ttl
-     */
-    private function convertTtl($ttl): ?\DateInterval
+    private function convertTtl(\DateInterval|int|null $ttl): ?\DateInterval
     {
         if (!\is_int($ttl)) {
             return $ttl;
@@ -302,83 +298,10 @@ final class PortalStorage implements PortalStorageInterface
         }
     }
 
-    private function unpackGetResult(PortalNodeStorageItemContract $getResult): mixed
-    {
-        $denormalizer = $this->normalizationRegistry->getDenormalizer($getResult->getType());
-
-        if (!$denormalizer instanceof DenormalizerInterface) {
-            $this->logger->error('Failed retrieving a normalizer for a value from the portal storage', [
-                'code' => 1631565257,
-                'portalNodeKey' => $getResult->getPortalNodeKey(),
-                'key' => $getResult->getStorageKey(),
-            ]);
-
-            return null;
-        }
-
-        if (!$denormalizer->supportsDenormalization($getResult->getValue(), $getResult->getType())) {
-            return null;
-        }
-
-        try {
-            return $denormalizer->denormalize($getResult->getValue(), $getResult->getType());
-        } catch (\Throwable $throwable) {
-            $this->logger->error('Failed denormalizing a portal storage value', [
-                'code' => 1651338621,
-                'exception' => $throwable,
-                'portalNodeKey' => $this->portalNodeKey,
-                'key' => $getResult->getStorageKey(),
-                'type' => $getResult->getType(),
-            ]);
-        }
-
-        return null;
-    }
-
-    private function packSetItem(string $key, mixed $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
-    {
-        $normalizer = $this->normalizationRegistry->getNormalizer($value);
-
-        if (!$normalizer instanceof NormalizerInterface) {
-            $this->logger->error('Failed getting a normalizer for a value for storing a value in the portal storage', [
-                'code' => 1631562097,
-                'portalNodeKey' => $this->portalNodeKey,
-                'key' => $key,
-            ]);
-
-            return null;
-        }
-
-        try {
-            $normalizedValue = $normalizer->normalize($value);
-        } catch (\Throwable $throwable) {
-            $this->logger->error('Failed normalizing a value for a value for storing it in the portal storage', [
-                'code' => 1631562928,
-                'exception' => $throwable,
-                'portalNodeKey' => $this->portalNodeKey,
-                'key' => $key,
-            ]);
-
-            return null;
-        }
-
-        if (!\is_string($normalizedValue)) {
-            $this->logger->error('Normalization result of a value for storing a value in the portal storage is not a string', [
-                'code' => 1631562285,
-                'portalNodeKey' => $this->portalNodeKey,
-                'key' => $key,
-            ]);
-
-            return null;
-        }
-
-        return new PortalNodeStorageSetItem($key, $normalizedValue, $normalizer->getType(), $ttl);
-    }
-
     /**
-     * @return array<int, string>
+     * @throws InvalidArgumentException
      *
-     * @throw InvalidArgumentException
+     * @return array<int, string>
      */
     private function validateKeys(iterable $keys): array
     {
