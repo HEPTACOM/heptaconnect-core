@@ -74,6 +74,18 @@ final class HttpHandleService implements HttpHandleServiceInterface
         // TODO push onto global logging context stack
         $correlationId = Uuid::uuid4()->toString();
 
+        $response = $this->handlePortalNodeRequest($portalNodeKey, $path, $request, $correlationId, $response);
+
+        return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);
+    }
+
+    private function handlePortalNodeRequest(
+        PortalNodeKeyInterface $portalNodeKey,
+        string $path,
+        ServerRequestInterface $request,
+        string $correlationId,
+        ResponseInterface $response
+    ): ResponseInterface {
         $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(
             new WebHttpHandlerConfigurationFindCriteria($portalNodeKey, $path, 'enabled')
         );
@@ -89,7 +101,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
 
-            return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId)->withStatus(423);
+            return $response->withStatus(423);
         }
 
         $stack = $this->getStack($portalNodeKey, $path);
@@ -103,10 +115,10 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 'web_http_correlation_id' => $correlationId,
             ]);
         } else {
-            $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
+            return $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($portalNodeKey));
         }
 
-        return $response->withHeader('X-HeptaConnect-Correlation-Id', $correlationId);
+        return $response;
     }
 
     private function getStack(PortalNodeKeyInterface $portalNodeKey, string $path): ?HttpHandlerStackInterface
