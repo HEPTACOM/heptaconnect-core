@@ -334,7 +334,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         try {
             $package->buildContainer($containerBuilder);
         } catch (DelegatingLoaderLoadException $exception) {
-            /** @deprecated This catch-block will be removed in version 0.10 */
+            /* @deprecated This catch-block will be removed in version 0.10 */
             throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
         }
 
