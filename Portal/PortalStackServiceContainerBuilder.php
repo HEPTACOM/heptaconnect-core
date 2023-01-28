@@ -337,6 +337,10 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
         $package->buildContainer($containerBuilder);
         $this->alreadyBuiltPackages[] = $packageType;
+
+        foreach ($package->getAdditionalPackages() as $additionalPackage) {
+            $this->buildPackage($additionalPackage, $containerBuilder);
+        }
     }
 
     /**
