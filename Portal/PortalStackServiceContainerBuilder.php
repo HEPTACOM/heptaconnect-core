@@ -375,11 +375,16 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $fileLocator = new FileLocator($path);
             $fileLoader = new GlobFileLoader($containerBuilder, $fileLocator);
 
+            $excludesPerNamespace = \array_filter(
+                $exclude,
+                static fn ($excludeItem): bool => \str_starts_with($excludeItem, $path)
+            );
+
             $fileLoader->registerClasses(
                 new Definition(),
                 $namespace,
                 \rtrim($path, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . '*',
-                $exclude
+                $excludesPerNamespace
             );
         }
     }
