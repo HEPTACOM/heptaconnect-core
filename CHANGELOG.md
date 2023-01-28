@@ -13,9 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+- Deprecate class `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException`. Use `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` instead.
+
 ### Removed
 
 ### Fixed
+
+- Fix issue in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` when a composer package with a portal has multiple PSR-4 entries in its `composer.json`
 
 ### Security
 
