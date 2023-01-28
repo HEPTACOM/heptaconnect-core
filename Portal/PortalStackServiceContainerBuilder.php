@@ -377,7 +377,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
             $excludesPerNamespace = \array_filter(
                 $exclude,
-                static fn ($excludeItem): bool => \str_starts_with($excludeItem, $path)
+                static fn (string $excludeItem): bool => \str_starts_with($excludeItem, $path)
             );
 
             $fileLoader->registerClasses(
