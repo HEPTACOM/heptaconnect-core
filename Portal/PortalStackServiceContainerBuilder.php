@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException as LegacyDelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
@@ -32,6 +32,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
@@ -56,15 +57,10 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\DelegatingLoader;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
-use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 final class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
@@ -140,7 +136,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     }
 
     /**
-     * @throws DelegatingLoaderLoadException
+     * @throws LegacyDelegatingLoaderLoadException
      */
     public function build(
         PortalContract $portal,
@@ -335,7 +331,13 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             return;
         }
 
-        $package->buildContainer($containerBuilder);
+        try {
+            $package->buildContainer($containerBuilder);
+        } catch (DelegatingLoaderLoadException $exception) {
+            /** @deprecated This catch-block will be removed in version 0.10 */
+            throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
+        }
+
         $this->alreadyBuiltPackages[] = $packageType;
 
         foreach ($package->getAdditionalPackages() as $additionalPackage) {
