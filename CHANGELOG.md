@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix issue in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` when a composer package with a portal has multiple psr-4 entries in its `composer.json`
+
 ### Security
 
 ## [0.9.3.0] - 2022-11-26
