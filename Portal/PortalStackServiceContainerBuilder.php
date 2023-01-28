@@ -109,6 +109,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
+    private array $alreadyBuiltPackages = [];
+
     public function __construct(
         LoggerInterface $logger,
         NormalizationRegistryContract $normalizationRegistry,
@@ -151,19 +153,32 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $seenDefinitions = [];
         $flowBuilderFiles = [];
 
+        $this->alreadyBuiltPackages = [];
+
         /** @var PackageContract $package */
         foreach ([$portal, ...$portalExtensions] as $package) {
             $containerConfigurationPath = $package->getContainerConfigurationPath();
             $flowComponentsPath = $package->getFlowComponentsPath();
 
-            $prototypedIds = $this->getChangedServiceIds($containerBuilder, function () use ($flowComponentsPath, $containerConfigurationPath, $package, $containerBuilder): void {
+            $prototypedIds = $this->getChangedServiceIds($containerBuilder, function (
+                ContainerBuilder $containerBuilder
+            ) use (
+                $flowComponentsPath,
+                $containerConfigurationPath,
+                $package
+            ): void {
                 $this->registerPsr4Prototype($containerBuilder, $package->getPsr4(), [
                     $containerConfigurationPath,
                     $flowComponentsPath,
                 ]);
             });
-            $definedIds = $this->getChangedServiceIds($containerBuilder, function () use ($containerConfigurationPath, $containerBuilder): void {
-                $this->registerContainerConfiguration($containerBuilder, $containerConfigurationPath);
+
+            $definedIds = $this->getChangedServiceIds($containerBuilder, function (
+                ContainerBuilder $containerBuilder
+            ) use (
+                $package
+            ): void {
+                $this->buildPackage($package, $containerBuilder);
             });
 
             $containerBuilder->addCompilerPass(new RemoveAutoPrototypedDefinitionsCompilerPass(
@@ -182,8 +197,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $this->tagDefinitionSource($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, HttpHandlerContract::class, self::WEB_HTTP_HANDLER_SOURCE_TAG, $packageClass);
             $flowBuilderFiles[$packageClass] = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php') ?: [];
-
-            $package->buildContainer($containerBuilder);
         }
 
         foreach ($containerBuilder->getDefinitions() as $definition) {
@@ -283,7 +296,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     }
 
     /**
-     * @param callable():void $registration
+     * @param callable(ContainerBuilder $containerBuilder):void $registration
      *
      * @return string[]
      *
@@ -298,7 +311,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $definition->addTag($tag);
         }
 
-        $registration();
+        $registration($containerBuilder);
 
         $allPreviousServices = \array_keys($containerBuilder->findTaggedServiceIds($tag));
 
@@ -310,6 +323,20 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             \array_diff($containerBuilder->getServiceIds(), $currentIds),
             \array_diff($containerBuilder->getServiceIds(), $allPreviousServices),
         );
+    }
+
+    private function buildPackage(
+        PackageContract $package,
+        ContainerBuilder $containerBuilder
+    ): void {
+        $packageType = \get_class($package);
+
+        if (\in_array($packageType, $this->alreadyBuiltPackages, true)) {
+            return;
+        }
+
+        $package->buildContainer($containerBuilder);
+        $this->alreadyBuiltPackages[] = $packageType;
     }
 
     /**
@@ -348,41 +375,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 \rtrim($path, \DIRECTORY_SEPARATOR) . \DIRECTORY_SEPARATOR . '*',
                 $exclude
             );
-        }
-    }
-
-    /**
-     * @throws DelegatingLoaderLoadException
-     */
-    private function registerContainerConfiguration(
-        ContainerBuilder $containerBuilder,
-        string $containerConfigurationPath
-    ): void {
-        $fileLocator = new FileLocator($containerConfigurationPath);
-        $loaderResolver = new LoaderResolver([
-            new XmlFileLoader($containerBuilder, $fileLocator),
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            new PhpFileLoader($containerBuilder, $fileLocator),
-        ]);
-        $delegatingLoader = new DelegatingLoader($loaderResolver);
-        $directory = $containerConfigurationPath . \DIRECTORY_SEPARATOR . 'services.';
-        $files = [
-            $directory . 'yml',
-            $directory . 'yaml',
-            $directory . 'xml',
-            $directory . 'php',
-        ];
-
-        foreach ($files as $serviceDefinitionPath) {
-            if (!\is_file($serviceDefinitionPath)) {
-                continue;
-            }
-
-            try {
-                $delegatingLoader->load($serviceDefinitionPath);
-            } catch (\Throwable $throwable) {
-                throw new DelegatingLoaderLoadException($serviceDefinitionPath, $throwable);
-            }
         }
     }
 
