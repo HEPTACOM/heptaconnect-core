@@ -17,11 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1674950002` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::formatMessage` when the given message is neither a request nor a response
 - Add exception code `1674950003` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::getFileExtension` when the given message is neither a request nor a response
 - Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpDirectoryPathProviderInterface`, that needs to be implemented by bridges and integrations, to return the directory path for placing HTTP handler dumps
+- Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_PREFIX` to identify all request attributes, that can be used as value holders for additional parameters attached to requests to the core layer
+- Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST` as request attribute key holding an instance of `\Psr\Http\Message\ServerRequestInterface` of the original inbound HTTP request used for debugging purposes
+- Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_DUMPS_EXPECTED` as request attribute key holding a boolean indicating, whether dumps are expected to be done
 
 ### Changed
 
 - Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for raw HTTP message formatting
 - Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for cURL shell command formatting
+- Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract` and `\Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpDirectoryPathProviderInterface` into `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to dump requests and responses from HTTP handling
 
 ### Deprecated
 
