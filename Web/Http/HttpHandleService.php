@@ -93,7 +93,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 $originalRequest = null;
             }
 
-            $logPath = $this->httpHandlerDumpDirectoryPathProvider->provide($portalNodeKey) . $correlationId;
+            $logPath = $this->httpHandlerDumpDirectoryPathProvider->provide($portalNodeKey) . $correlationId . '.';
 
             if ($originalRequest instanceof ServerRequestInterface) {
                 \file_put_contents(
