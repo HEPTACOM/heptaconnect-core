@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1674950001` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter::getFileExtension` when the given message is neither a request nor a response
 - Add exception code `1674950002` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::formatMessage` when the given message is neither a request nor a response
 - Add exception code `1674950003` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::getFileExtension` when the given message is neither a request nor a response
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpDirectoryPathProviderInterface`, that needs to be implemented by bridges and integrations, to return the directory path for placing HTTP handler dumps
 
 ### Changed
 
