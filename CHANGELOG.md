@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for raw HTTP message formatting
+- Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for cURL shell command formatting
+
 ### Deprecated
 
 - Deprecate class `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException`. Use `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` instead.
