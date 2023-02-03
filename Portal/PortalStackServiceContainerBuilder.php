@@ -46,6 +46,7 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContrac
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -256,6 +257,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+        $containerBuilder->setAlias(Psr7MessageFormatterContract::class, Psr7MessageRawHttpFormatterContract::class);
 
         if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
             $this->setSyntheticServices($containerBuilder, [
