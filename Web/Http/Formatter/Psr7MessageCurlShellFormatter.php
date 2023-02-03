@@ -58,7 +58,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
     {
         $request = $this->headerUtility->sortRequestHeaders($request);
 
-        if (\in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true) && $request->hasHeader('content-length')) {
+        if (\in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true)) {
             $request = $request->withoutHeader('content-length');
         }
 
