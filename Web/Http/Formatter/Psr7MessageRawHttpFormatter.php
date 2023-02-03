@@ -55,7 +55,7 @@ final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContr
             ->withFragment('')
             ->withScheme('');
 
-        if (\in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true) && $request->hasHeader('content-length')) {
+        if (\in_array($request->getMethod(), ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true)) {
             $request = $request->withoutHeader('content-length');
         }
 
