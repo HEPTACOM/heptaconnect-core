@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http\Formatter;
 
-use Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\HeaderUtility;
+use Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract\HeaderUtilityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -12,14 +12,14 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterContract
 {
-    private HeaderUtility $headerUtility;
+    private HeaderUtilityInterface $headerUtility;
 
     private Psr7MessageRawHttpFormatter $rawFormatter;
 
     private string $curlCommand;
 
     public function __construct(
-        HeaderUtility $headerUtility,
+        HeaderUtilityInterface $headerUtility,
         Psr7MessageRawHttpFormatter $rawFormatter,
         string $curlCommand
     ) {
