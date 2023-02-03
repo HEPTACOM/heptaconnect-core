@@ -78,12 +78,11 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
     {
-        // TODO push onto global logging context stack
-        $correlationId = Uuid::uuid4()->toString();
-
         $portalNodeKey = $portalNodeKey->withoutAlias();
         $path = $request->getUri()->getPath();
         $response = $this->responseFactory->createResponse(501);
+        // TODO push onto global logging context stack
+        $correlationId = Uuid::uuid4()->toString();
         $bridgeExpectsDumps = $request->getAttribute(self::REQUEST_ATTRIBUTE_DUMPS_EXPECTED, false);
 
         if ($bridgeExpectsDumps) {
