@@ -62,7 +62,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
             $request = $request->withoutHeader('content-length');
         }
 
-        return $this->curlCommand . ' ' . \implode(' \\' . \PHP_EOL . ' ', $this->getCurlCommandParts($request));
+        return $this->curlCommand . ' ' . \implode(' \\' . \PHP_EOL . '  ', $this->getCurlCommandParts($request));
     }
 
     private function formatResponse(ResponseInterface $response): string
