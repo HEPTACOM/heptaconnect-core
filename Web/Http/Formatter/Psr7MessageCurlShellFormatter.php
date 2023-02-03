@@ -76,24 +76,22 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         $commandParts[] = (string) $request->getUri();
         $commandParts[] = '-X ' . $request->getMethod();
 
-        if ($request->getProtocolVersion() === '0.9') {
-            $commandParts[] = '--http0.9';
-        }
-
-        if ($request->getProtocolVersion() === '1.0') {
-            $commandParts[] = '--http1.0';
-        }
-
-        if ($request->getProtocolVersion() === '1.1') {
-            $commandParts[] = '--http1.1';
-        }
-
-        if ($request->getProtocolVersion() === '2.0') {
-            $commandParts[] = '--http2';
-        }
-
-        if ($request->getProtocolVersion() === '3.0') {
-            $commandParts[] = '--http3';
+        switch ($request->getProtocolVersion()) {
+            case '0.9':
+                $commandParts[] = '--http0.9';
+                break;
+            case '1.0':
+                $commandParts[] = '--http1.0';
+                break;
+            case '1.1':
+                $commandParts[] = '--http1.1';
+                break;
+            case '2.0':
+                $commandParts[] = '--http2';
+                break;
+            case '3.0':
+                $commandParts[] = '--http3';
+                break;
         }
 
         foreach ($request->getHeaders() as $header => $values) {
