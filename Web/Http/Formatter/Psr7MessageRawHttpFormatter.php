@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http\Formatter;
 
-use Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\HeaderUtility;
+use Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract\HeaderUtilityInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Psr\Http\Message\MessageInterface;
 use Psr\Http\Message\RequestInterface;
@@ -12,9 +12,9 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContract
 {
-    private HeaderUtility $headerUtility;
+    private HeaderUtilityInterface $headerUtility;
 
-    public function __construct(HeaderUtility $headerUtility)
+    public function __construct(HeaderUtilityInterface $headerUtility)
     {
         $this->headerUtility = $headerUtility;
     }
