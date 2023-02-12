@@ -21,10 +21,5 @@ interface HttpHandleServiceInterface
      */
     public const REQUEST_ATTRIBUTE_ORIGINAL_REQUEST = self::REQUEST_ATTRIBUTE_PREFIX . 'original_request';
 
-    /**
-     * Boolean value indicating whether the request is expected to be dumped.
-     */
-    public const REQUEST_ATTRIBUTE_DUMPS_EXPECTED = self::REQUEST_ATTRIBUTE_PREFIX . 'dumps_expected';
-
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface;
 }
