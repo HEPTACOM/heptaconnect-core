@@ -79,18 +79,23 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         switch ($request->getProtocolVersion()) {
             case '0.9':
                 $commandParts[] = '--http0.9';
+
                 break;
             case '1.0':
                 $commandParts[] = '--http1.0';
+
                 break;
             case '1.1':
                 $commandParts[] = '--http1.1';
+
                 break;
             case '2.0':
                 $commandParts[] = '--http2';
+
                 break;
             case '3.0':
                 $commandParts[] = '--http3';
+
                 break;
         }
 

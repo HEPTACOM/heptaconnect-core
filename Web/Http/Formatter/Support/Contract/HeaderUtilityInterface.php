@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract;
 
 use Psr\Http\Message\RequestInterface;
