@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST` as request attribute key holding an instance of `\Psr\Http\Message\ServerRequestInterface` of the original inbound HTTP request used for debugging purposes
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_DUMPS_EXPECTED` as request attribute key holding a boolean indicating, whether dumps are expected to be done
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\Dump\RequestResponsePairDumper` described by `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface` to dump a request and a response in a way, that they can be associated, when accessing the dumps
+- Add sample rate strategy implementation `\Heptacom\HeptaConnect\Core\Web\Http\Dump\SampleRateServerRequestDumpChecker` for new interface `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestDumpCheckerInterface` using configuration `dump-sample-rate` for HTTP handlers, which can be an integer between 0 and 100, that will be used to determine whether a request-response-pair will be dumped. Use value 100 for a request-response dump on every request
 
 ### Changed
 
