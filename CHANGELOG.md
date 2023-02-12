@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\HeaderUtility` described by `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract\HeaderUtilityInterface` to work with PSR-7 message headers
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatter` to provide raw HTTP message formatting
-- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` to provade cURL shell command formatting
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` to provide cURL shell command formatting
 - Add exception code `1674950000` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter::formatMessage` when the given message is neither a request nor a response
 - Add exception code `1674950001` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter::getFileExtension` when the given message is neither a request nor a response
 - Add exception code `1674950002` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::formatMessage` when the given message is neither a request nor a response
