@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http\Dump;
 
-use Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpDirectoryPathProviderInterface;
+use Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpPathProviderInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
@@ -14,12 +14,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class RequestResponsePairDumper implements RequestResponsePairDumperInterface
 {
-    private HttpHandlerDumpDirectoryPathProviderInterface $pathProvider;
+    private HttpHandlerDumpPathProviderInterface $pathProvider;
 
     private Psr7MessageFormatterContract $formatter;
 
     public function __construct(
-        HttpHandlerDumpDirectoryPathProviderInterface $pathProvider,
+        HttpHandlerDumpPathProviderInterface $pathProvider,
         Psr7MessageFormatterContract $formatter
     ) {
         $this->pathProvider = $pathProvider;
