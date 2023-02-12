@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_PREFIX` to identify all request attributes, that can be used as value holders for additional parameters attached to requests to the core layer
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST` as request attribute key holding an instance of `\Psr\Http\Message\ServerRequestInterface` of the original inbound HTTP request used for debugging purposes
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_DUMPS_EXPECTED` as request attribute key holding a boolean indicating, whether dumps are expected to be done
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Dump\RequestResponsePairDumper` described by `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface` to dump a request and a response in a way, that they can be associated, when accessing the dumps
 
 ### Changed
 
