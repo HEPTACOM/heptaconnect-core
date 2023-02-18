@@ -19,14 +19,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpPathProviderInterface`, that needs to be implemented by bridges and integrations, to return the path for placing HTTP handler dumps
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_PREFIX` to identify all request attributes, that can be used as value holders for additional parameters attached to requests to the core layer
 - Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST` as request attribute key holding an instance of `\Psr\Http\Message\ServerRequestInterface` of the original inbound HTTP request used for debugging purposes
-- Add `\Heptacom\HeptaConnect\Core\Web\Http\Dump\RequestResponsePairDumper` described by `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface` to dump a request and a response in a way, that they can be associated, when accessing the dumps
-- Add sample rate strategy implementation `\Heptacom\HeptaConnect\Core\Web\Http\Dump\SampleRateServerRequestDumpChecker` for new interface `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestDumpCheckerInterface` using configuration `dump-sample-rate` for HTTP handlers, which can be an integer between 0 and 100, that will be used to determine whether a request-response-pair will be dumped. Use value 100 for a request-response dump on every request
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Dump\ServerRequestCycleDumper` described by `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface` to dump a request cycle in a way, that they can be associated, when accessing the dumps
+- Add sample rate strategy implementation `\Heptacom\HeptaConnect\Core\Web\Http\Dump\SampleRateServerRequestCycleDumpChecker` for new interface `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface` using configuration `dump-sample-rate` for HTTP handlers, which can be an integer between 0 and 100, that will be used to determine whether a request-cycle will be dumped. Use value 100 for a request-response dump on every request
 
 ### Changed
 
 - Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for raw HTTP message formatting
 - Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for cURL shell command formatting
-- Add dependency on `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestDumpCheckerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface` into `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to dump requests and responses from HTTP handling
+- Add dependency on `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface` into `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to dump requests and responses from HTTP handling
 
 ### Deprecated
 

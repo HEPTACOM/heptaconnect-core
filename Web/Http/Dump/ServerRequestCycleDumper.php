@@ -6,13 +6,13 @@ namespace Heptacom\HeptaConnect\Core\Web\Http\Dump;
 
 use Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpPathProviderInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
-use Psr\Http\Message\ResponseInterface;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\ServerRequestCycle;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RequestResponsePairDumper implements RequestResponsePairDumperInterface
+final class ServerRequestCycleDumper implements ServerRequestCycleDumperInterface
 {
     private HttpHandlerDumpPathProviderInterface $pathProvider;
 
@@ -26,11 +26,11 @@ final class RequestResponsePairDumper implements RequestResponsePairDumperInterf
         $this->formatter = $formatter;
     }
 
-    public function dump(
-        HttpHandlerStackIdentifier $httpHandler,
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ): void {
+    public function dump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): void
+    {
+        $request = $requestCycle->getRequest();
+        $response = $requestCycle->getResponse();
+
         $originalRequest = $request->getAttribute(HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST);
 
         if ($originalRequest instanceof ServerRequestInterface) {
