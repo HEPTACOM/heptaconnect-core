@@ -9,13 +9,14 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterfa
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\RequestResponsePairDumperInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestDumpCheckerInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\ServerRequestCycle;
 use Heptacom\HeptaConnect\Storage\Base\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\WebHttpHandlerConfigurationFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -51,9 +52,9 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
     private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
 
-    private ServerRequestDumpCheckerInterface $dumpChecker;
+    private ServerRequestCycleDumpCheckerInterface $dumpChecker;
 
-    private RequestResponsePairDumperInterface $requestResponsePairDumper;
+    private ServerRequestCycleDumperInterface $requestResponsePairDumper;
 
     public function __construct(
         HttpHandlingActorInterface $actor,
@@ -63,8 +64,8 @@ final class HttpHandleService implements HttpHandleServiceInterface
         StorageKeyGeneratorContract $storageKeyGenerator,
         ResponseFactoryInterface $responseFactory,
         WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
-        ServerRequestDumpCheckerInterface $dumpChecker,
-        RequestResponsePairDumperInterface $requestResponsePairDumper
+        ServerRequestCycleDumpCheckerInterface $dumpChecker,
+        ServerRequestCycleDumperInterface $requestResponsePairDumper
     ) {
         $this->actor = $actor;
         $this->contextFactory = $contextFactory;
@@ -84,11 +85,11 @@ final class HttpHandleService implements HttpHandleServiceInterface
             $request->getUri()->getPath()
         );
         $response = $this->responseFactory->createResponse(501);
-
         $response = $this->handlePortalNodeRequest($httpHandlerStackIdentifier, $request, $response);
+        $requestCycle = new ServerRequestCycle($request, $response);
 
-        if ($this->dumpChecker->shallDump($httpHandlerStackIdentifier, $request)) {
-            $this->requestResponsePairDumper->dump($httpHandlerStackIdentifier, $request, $response);
+        if ($this->dumpChecker->shallDump($httpHandlerStackIdentifier, $requestCycle)) {
+            $this->requestResponsePairDumper->dump($httpHandlerStackIdentifier, $requestCycle);
         }
 
         return $response;

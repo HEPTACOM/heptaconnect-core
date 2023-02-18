@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Web\Http\Dump;
 
-use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestDumpCheckerInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\ServerRequestCycle;
 use Heptacom\HeptaConnect\Storage\Base\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\WebHttpHandlerConfigurationFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
-use Psr\Http\Message\ServerRequestInterface;
 
-final class SampleRateServerRequestDumpChecker implements ServerRequestDumpCheckerInterface
+final class SampleRateServerRequestCycleDumpChecker implements ServerRequestCycleDumpCheckerInterface
 {
     private WebHttpHandlerConfigurationFindActionInterface $configurationFindAction;
 
@@ -21,7 +21,7 @@ final class SampleRateServerRequestDumpChecker implements ServerRequestDumpCheck
         $this->configurationFindAction = $configurationFindAction;
     }
 
-    public function shallDump(HttpHandlerStackIdentifier $httpHandler, ServerRequestInterface $request): bool
+    public function shallDump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): bool
     {
         $dumpSampleRate = $this->getDumpSampleRate($httpHandler);
 
