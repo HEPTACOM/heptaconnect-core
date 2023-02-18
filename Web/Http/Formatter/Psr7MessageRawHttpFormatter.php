@@ -35,11 +35,11 @@ final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContr
     public function getFileExtension(MessageInterface $message): string
     {
         if ($message instanceof RequestInterface) {
-            return 'request.http';
+            return 'http';
         }
 
         if ($message instanceof ResponseInterface) {
-            return 'response.bin';
+            return 'bin';
         }
 
         throw new \InvalidArgumentException('Message must be a request or a response', 1674950001);
