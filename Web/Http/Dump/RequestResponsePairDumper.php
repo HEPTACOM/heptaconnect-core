@@ -38,15 +38,15 @@ final class RequestResponsePairDumper implements RequestResponsePairDumperInterf
         }
 
         $correlationId = $response->getHeaderLine('X-HeptaConnect-Correlation-Id');
-        $dumpDir = $this->pathProvider->provide($httpHandler->getPortalNodeKey()) . '-' . $correlationId;
+        $dumpDir = $this->pathProvider->provide($httpHandler->getPortalNodeKey()) . $correlationId;
         $message = $this->formatter->formatMessage($request);
-        $extension = $this->formatter->getFileExtension($request);
+        $extension = '.request.' . $this->formatter->getFileExtension($request);
 
-        \file_put_contents($dumpDir . '.' . $extension, $message);
+        \file_put_contents($dumpDir . $extension, $message);
 
         $message = $this->formatter->formatMessage($response);
-        $extension = $this->formatter->getFileExtension($response);
+        $extension = '.response.' . $this->formatter->getFileExtension($response);
 
-        \file_put_contents($dumpDir . '.' . $extension, $message);
+        \file_put_contents($dumpDir . $extension, $message);
     }
 }
