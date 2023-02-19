@@ -40,7 +40,7 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
         try {
             $separation = $this->portalNodeExistenceSeparator->separateKeys(new PortalNodeKeyCollection([$criteria->getPortalNodeKey()]));
         } catch (\Throwable $throwable) {
-            throw new ReadException(1673129100, $throwable);
+            throw $trail->throwable(new ReadException(1673129100, $throwable));
         }
 
         $separation->throwWhenKeysAreMissing($trail);

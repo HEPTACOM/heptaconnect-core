@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
-final class PortalNodeExistenceSeparationResult
+class PortalNodeExistenceSeparationResult
 {
     public function __construct(
         private PortalNodeKeyCollection $previewKeys,

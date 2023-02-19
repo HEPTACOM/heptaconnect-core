@@ -35,10 +35,14 @@ class PortalNodeExistenceSeparator
             }
         }
 
-        $found = new PortalNodeKeyCollection(\iterable_map(
-            $criteria->getPortalNodeKeys()->isEmpty() ? [] : $this->getAction->get($criteria),
-            static fn (PortalNodeGetResult $getResult): PortalNodeKeyInterface => $getResult->getPortalNodeKey()
-        ));
+        $found = new PortalNodeKeyCollection();
+
+        if (!$criteria->getPortalNodeKeys()->isEmpty()) {
+            $found->push(\iterable_map(
+                $this->getAction->get($criteria),
+                static fn (PortalNodeGetResult $getResult): PortalNodeKeyInterface => $getResult->getPortalNodeKey()
+            ));
+        }
         $notFound = $criteria->getPortalNodeKeys()->filter(
             static fn (PortalNodeKeyInterface $lookedFor): bool => !$found->contains($lookedFor)
         );
