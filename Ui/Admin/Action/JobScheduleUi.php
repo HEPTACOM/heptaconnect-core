@@ -54,14 +54,14 @@ final class JobScheduleUi implements JobScheduleUiActionInterface
             throw $trail->throwable(new JobsMissingException($jobsNotFound, 1677424700));
         }
 
-        $startResult = $this->jobScheduleAction->schedule(new JobSchedulePayload($foundJobKeys, new \DateTimeImmutable(), 'UI schedule'));
+        $result = $this->jobScheduleAction->schedule(new JobSchedulePayload($foundJobKeys, new \DateTimeImmutable(), 'UI schedule'));
 
-        if (!$startResult->getScheduledJobs()->isEmpty()) {
+        if (!$result->getScheduledJobs()->isEmpty()) {
             $message = new JobMessage();
-            $message->getJobKeys()->push($startResult->getScheduledJobs());
+            $message->getJobKeys()->push($result->getScheduledJobs());
             $this->messageBus->dispatch($message);
         }
 
-        return $trail->return(new JobScheduleResult($startResult->getScheduledJobs(), $startResult->getSkippedJobs()));
+        return $trail->return(new JobScheduleResult($result->getScheduledJobs(), $result->getSkippedJobs()));
     }
 }
