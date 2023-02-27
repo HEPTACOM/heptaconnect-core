@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemPackerInterface;
 use Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface;
-use Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -28,7 +28,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 final class PortalStorage implements PortalStorageInterface
 {
     public function __construct(
-        private PortalNodeStorageItemPacker $portalNodeStorageItemPacker,
+        private PortalNodeStorageItemPackerInterface $portalNodeStorageItemPacker,
         private PortalNodeStorageItemUnpackerInterface $portalNodeStorageItemUnpacker,
         private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
