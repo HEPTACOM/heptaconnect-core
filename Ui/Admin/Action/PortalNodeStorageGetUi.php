@@ -102,9 +102,9 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
             throw new ReadException(1673129100, $throwable);
         }
 
-        $missingPortalNodes = new PortalNodeKeyCollection($pnKeysToLoad->filter(
+        $missingPortalNodes = $pnKeysToLoad->filter(
             static fn (PortalNodeKeyInterface $pnKey): bool => !$gotPortalNodeKeys->contains($pnKey)
-        )->getIterator());
+        );
 
         if (!$missingPortalNodes->isEmpty()) {
             throw new PortalNodesMissingException($missingPortalNodes, 1673129101);
