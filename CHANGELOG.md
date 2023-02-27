@@ -50,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeRemoveUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationGetUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeConfigurationGetUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationRenderUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeConfigurationRenderUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteAddUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteBrowseUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface`
