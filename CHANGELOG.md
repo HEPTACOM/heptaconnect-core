@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobRunUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobScheduleUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobScheduleUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface`
@@ -67,6 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1660417913` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when deserialization failed in the storage implementation
 - Add exception code `1659721163` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when one of the given jobs are not found in the job storage
 - Add exception code `1659721164` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when running the jobs fails at one point
+- Add exception code `1677424700` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobScheduleUi::schedule` when one of the given jobs are not found in the job storage
 - Add exception code `1663051795` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi::list` when reading entity support fails
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
