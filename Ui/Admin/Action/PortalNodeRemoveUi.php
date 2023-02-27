@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
-use Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparator;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Delete\PortalNodeDeleteCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeDeleteActionInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Action\PortalNode\PortalNodeRemove\PortalNodeRemoveCriteria;
@@ -19,7 +19,7 @@ final class PortalNodeRemoveUi implements PortalNodeRemoveUiActionInterface
 {
     public function __construct(
         private AuditTrailFactoryInterface $auditTrailFactory,
-        private PortalNodeExistenceSeparator $portalNodeExistenceSeparator,
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
         private PortalNodeDeleteActionInterface $portalNodeDeleteAction
     ) {
     }

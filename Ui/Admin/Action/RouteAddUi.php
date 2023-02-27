@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface;
-use Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparator;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayloads;
@@ -43,7 +43,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         private RouteFindActionInterface $routeFindAction,
         private RouteGetActionInterface $routeGetAction,
         private RouteDeleteActionInterface $routeDeleteAction,
-        private PortalNodeExistenceSeparator $portalNodeExistenceSeparator,
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
     ) {
     }
 

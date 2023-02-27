@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Portal\PortalStorageFactory;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
-use Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparator;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -23,7 +23,7 @@ final class PortalNodeStorageGetUi implements PortalNodeStorageGetUiActionInterf
 {
     public function __construct(
         private AuditTrailFactoryInterface $auditTrailFactory,
-        private PortalNodeExistenceSeparator $portalNodeExistenceSeparator,
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
         private PortalStorageFactory $portalStorageFactory
     ) {
     }

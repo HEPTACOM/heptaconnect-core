@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
-use Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparator;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionTypeCollection;
@@ -28,7 +28,7 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
 {
     public function __construct(
         private AuditTrailFactoryInterface $auditTrailFactory,
-        private PortalNodeExistenceSeparator $portalNodeExistenceSeparator,
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
         private PortalNodeGetActionInterface $portalNodeGetAction,
         private PortalExtensionFindActionInterface $portalExtensionFindAction,
         private PortalExtensionActivateActionInterface $portalExtensionActivateAction,
