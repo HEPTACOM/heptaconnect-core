@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface;
 use Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker;
-use Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeStorage\PortalNodeStorageClearActionInterface;
@@ -20,7 +20,7 @@ class PortalStorageFactory
 {
     public function __construct(
         private PortalNodeStorageItemPacker $portalNodeStorageItemPacker,
-        private PortalNodeStorageItemUnpacker $portalNodeStorageItemUnpacker,
+        private PortalNodeStorageItemUnpackerInterface $portalNodeStorageItemUnpacker,
         private PortalNodeStorageClearActionInterface $portalNodeStorageClearAction,
         private PortalNodeStorageDeleteActionInterface $portalNodeStorageDeleteAction,
         private PortalNodeStorageGetActionInterface $portalNodeStorageGetAction,

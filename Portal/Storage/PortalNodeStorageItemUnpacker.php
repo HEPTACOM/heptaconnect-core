@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal\Storage;
 
+use Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\PortalNodeStorageItemContract;
 use Psr\Log\LoggerInterface;
 
-class PortalNodeStorageItemUnpacker
+final class PortalNodeStorageItemUnpacker implements PortalNodeStorageItemUnpackerInterface
 {
     public function __construct(
         private NormalizationRegistryContract $normalizationRegistry,
