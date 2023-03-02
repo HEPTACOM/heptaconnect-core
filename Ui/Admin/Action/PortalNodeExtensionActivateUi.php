@@ -7,6 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 use Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ClassStringReferenceContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionTypeCollection;
@@ -22,12 +23,12 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExt
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\NoMatchForPackageQueryException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalExtensionsAreAlreadyActiveOnPortalNodeException;
-use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\PortalNodesMissingException;
 
 final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivateUiActionInterface
 {
     public function __construct(
         private AuditTrailFactoryInterface $auditTrailFactory,
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
         private PortalNodeGetActionInterface $portalNodeGetAction,
         private PortalExtensionFindActionInterface $portalExtensionFindAction,
         private PortalExtensionActivateActionInterface $portalExtensionActivateAction,
@@ -51,10 +52,17 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
             return;
         }
 
-        $portalNodeKey = $payload->getPortalNodeKey();
-        $portalNodeGetCriteria = new PortalNodeGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
+        $separation = $this->portalNodeExistenceSeparator->separateKeys(
+            new PortalNodeKeyCollection([$payload->getPortalNodeKey()])
+        );
+
+        $separation->throwWhenKeysAreMissing($trail);
+        $separation->throwWhenPreviewKeysAreGiven($trail);
+
+        $portalNodeGetCriteria = new PortalNodeGetCriteria($separation->getExistingKeys());
 
         foreach ($this->portalNodeGetAction->get($portalNodeGetCriteria) as $portalNodeGetResult) {
+            $portalNodeKey = $portalNodeGetResult->getPortalNodeKey();
             $portalExtensionActivePayload = new PortalExtensionActivatePayload($portalNodeKey);
             $portalExtensions = $this->portalLoader->getPortalExtensions()->bySupport($portalNodeGetResult->getPortalClass());
             $portalExtensionState = $this->portalExtensionFindAction->find($portalNodeKey);
@@ -85,11 +93,8 @@ final class PortalNodeExtensionActivateUi implements PortalNodeExtensionActivate
             }
 
             $this->portalExtensionActivateAction->activate($portalExtensionActivePayload);
-            $trail->end();
-
-            return;
         }
 
-        throw $trail->throwable(new PortalNodesMissingException(new PortalNodeKeyCollection([$portalNodeKey]), 1650142328));
+        $trail->end();
     }
 }

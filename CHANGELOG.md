@@ -36,17 +36,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract query matching from `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationInstructionProcessor` into `\Heptacom\HeptaConnect\Core\Portal\PackageQueryMatcher` described by `\Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface`
 - Add UI audit trail class to stateful log a UI actions behaviour described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface`, implemented in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrail`, `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\NullAuditTrail` and factorized by `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditTrailFactory` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface`
 - Add `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\AuditableDataSerializer` described in `\Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditableDataSerializerInterface` to transform auditable data into a string for storing later
+- Add `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparator` described by `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface` with `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparationResult` to split portal nodes into the groups: preview portal node keys, portal node keys found in the storage and those, which are missing 
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\Context\UiActionContext` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\Context\UiActionContextFactory` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\UiActionContextFactoryInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\PortalNodeAliasResolverInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobRunUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobScheduleUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Job\JobScheduleUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Portal\PortalEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeEntityListUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeEntityListUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionBrowseUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStatusReportUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStatusReportUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionActivateUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeExtensionDeactivateUiActionInterface`
+- Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStorageGetUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeStorageGetUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeAddUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeRemoveUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationGetUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\PortalNode\PortalNodeConfigurationGetUiActionInterface`
@@ -55,6 +58,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteBrowseUiActionInterface`
 - Add implementation `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteRemoveUi` for `\Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Action\Route\RouteRemoveUiActionInterface`
 - Add exception code `1655051115` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeAliasResolver::resolve` when resolving the give portal node alias has no result
+- Add exception code `1650732001` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparationResult::throwWhenKeysAreMissing` when a portal node key does not refer to a known portal node
+- Add exception code `1650732002` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\PortalNodeExistenceSeparationResult::throwWhenPreviewKeysAreGiven` when a portal node key does not refer to a known portal node but a preview portal instead
 - Add exception code `1660417907` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when the given storage key data is not compatible with the storage implementation
 - Add exception code `1660417908` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::serialize` when the given storage key is not compatible with the storage implementation
 - Add exception code `1660417909` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::exists` when the given storage key is not compatible with the storage implementation
@@ -64,25 +69,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1660417913` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Support\StorageKeyAccessor::deserialize` when deserialization failed in the storage implementation
 - Add exception code `1659721163` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when one of the given jobs are not found in the job storage
 - Add exception code `1659721164` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobRunUi::run` when running the jobs fails at one point
+- Add exception code `1677424700` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\JobScheduleUi::schedule` when one of the given jobs are not found in the job storage
 - Add exception code `1663051795` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalEntityListUi::list` when reading entity support fails
 - Add exception code `1650142326` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the given query does not match any supporting portal extension
 - Add exception code `1650142327` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when all matched portal extensions are already active on the portal node
-- Add exception code `1650142328` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionActivateUi::activate` when the portal node key does not refer to a known portal node
 - Add exception code `1650731999` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi::deactivate` when the given query does not match any supporting portal extension
 - Add exception code `1650732000` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi::deactivate` when all matched portal extensions are already inactive on the portal node
-- Add exception code `1650732001` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeExtensionDeactivateUi::deactivate` when the portal node key does not refer to a known portal node
+- Add exception code `1673129100` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStorageGetUi::get` when looking up a portal node key failed in the storage implementation
+- Add exception code `1673129102` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStorageGetUi::get` when a requested storage key is not a scalar value
+- Add exception code `1673129103` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeStorageGetUi::get` when accessing data from the portal node storage failed
 - Add exception code `1650718860` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node alias validation fails due to a storage exception
 - Add exception code `1650718861` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when the portal node alias is already taken
 - Add exception code `1650718862` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation fails due to a storage exception
 - Add exception code `1650718863` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeAddUi::add` when portal node creation did not create a portal node
 - Add exception code `1650758000` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeRemoveUi::remove` when reading known portal nodes from storage fails
-- Add exception code `1650758001` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeRemoveUi::remove` when portal node that does not exist is tried to be deleted
 - Add exception code `1650758002` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeRemoveUi::remove` when deleting portal nodes fails in storage
 - Add exception code `1670832600` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationGetUi::get` when reading portal nodes to validate their existence fails due to a storage exception
-- Add exception code `1670832601` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationGetUi::get` when at least one of the requested portal nodes do not exist
 - Add exception code `1670832602` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\PortalNodeConfigurationGetUi::get` when reading portal node configuration fails due to a storage exception
 - Add exception code `1654573095` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when one of the requested route payloads already exists
-- Add exception code `1654573096` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when the portal node key does not refer to a known portal node
 - Add exception code `1654573097` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation did not create the expected routes
 - Add exception code `1654573098` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteAddUi::add` when route creation fails due to a storage exception
 - Add exception code `1670625000` to `\Heptacom\HeptaConnect\Core\Ui\Admin\Action\RouteBrowseUi::browse` when the given sorting direction is not supported
@@ -139,6 +143,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Split `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass` into `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass` and `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\SetConfigurationAsParameterCompilerPass` to separate parameter assignment and generating name bindings
 - Extract processing of portal node configuration processors from `\Heptacom\HeptaConnect\Core\Configuration\ConfigurationService` into `\Heptacom\HeptaConnect\Core\Configuration\PortalNodeConfigurationProcessorService` described by `\Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorServiceInterface`
 - Change composer dependency `symfony/dependency-injection: ^4.4 || ^5.0` to `symfony/dependency-injection: ^4.4.11 || ^5.0` to ensure auto wiring works with PHP 8 union types
+- Extract packing and unpacking storage related structs from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` into `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemPackerInterface` and `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface` and with it moving the dependency `\Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract`
+- Move log message codes `1631562097`, `1631562285` and `1631562928` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` without change in meaning
+- Move log message codes `1651338621` and `1631565257` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` without change in meaning
 
 ### Deprecated
 

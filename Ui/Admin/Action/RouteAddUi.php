@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Ui\Admin\Action;
 
 use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailFactoryInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Audit\Contract\AuditTrailInterface;
+use Heptacom\HeptaConnect\Core\Ui\Admin\Support\Contract\PortalNodeExistenceSeparatorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
-use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
-use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreatePayloads;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Create\RouteCreateResult;
@@ -17,7 +16,6 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Route\Find\RouteFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Find\RouteFindResult;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
-use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteCreateActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteDeleteActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteFindActionInterface;
@@ -45,7 +43,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         private RouteFindActionInterface $routeFindAction,
         private RouteGetActionInterface $routeGetAction,
         private RouteDeleteActionInterface $routeDeleteAction,
-        private PortalNodeGetActionInterface $portalNodeGetAction
+        private PortalNodeExistenceSeparatorInterface $portalNodeExistenceSeparator,
     ) {
     }
 
@@ -59,7 +57,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
         $trail = $this->auditTrailFactory->create($this, $context->getAuditContext(), [$payloads, $context]);
 
         try {
-            $createPayload = $this->validatePayloads($payloads);
+            $createPayload = $this->validatePayloads($payloads, $trail);
         } catch (\Throwable $e) {
             throw $trail->throwable($e);
         }
@@ -128,7 +126,7 @@ final class RouteAddUi implements RouteAddUiActionInterface
      * @throws RouteAlreadyExistsException
      * @throws UnsupportedStorageKeyException
      */
-    private function validatePayloads(RouteAddPayloadCollection $payloads): RouteCreatePayloads
+    private function validatePayloads(RouteAddPayloadCollection $payloads, AuditTrailInterface $auditTrail): RouteCreatePayloads
     {
         $result = new RouteCreatePayloads();
         $checkedScenarios = [];
@@ -170,19 +168,9 @@ final class RouteAddUi implements RouteAddUiActionInterface
             ]);
         }
 
-        $portalNodeKeys = $portalNodeKeys->asUnique();
-        $foundPortalNodes = $this->portalNodeGetAction->get(new PortalNodeGetCriteria($portalNodeKeys));
+        $separation = $this->portalNodeExistenceSeparator->separateKeys($portalNodeKeys);
 
-        /** @var PortalNodeGetResult $foundPortalNode */
-        foreach ($foundPortalNodes as $foundPortalNode) {
-            $portalNodeKeys = $portalNodeKeys->filter(
-                static fn (PortalNodeKeyInterface $pnKey): bool => !$pnKey->equals($foundPortalNode->getPortalNodeKey())
-            );
-        }
-
-        if (!$portalNodeKeys->isEmpty()) {
-            throw new PortalNodesMissingException($portalNodeKeys, 1654573096);
-        }
+        $separation->throwWhenKeysAreMissing($auditTrail);
 
         return $result;
     }
