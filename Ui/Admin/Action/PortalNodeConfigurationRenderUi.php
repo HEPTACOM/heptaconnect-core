@@ -43,7 +43,7 @@ final class PortalNodeConfigurationRenderUi implements PortalNodeConfigurationRe
         return $trail->returnIterable($keys->map(
             fn (PortalNodeKeyInterface $portalNodeKey): PortalNodeConfigurationRenderResult => new PortalNodeConfigurationRenderResult(
                 $portalNodeKey,
-                $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
+                $this->configurationService->getPortalNodeConfiguration($portalNodeKey) ?? []
             )
         ));
     }
