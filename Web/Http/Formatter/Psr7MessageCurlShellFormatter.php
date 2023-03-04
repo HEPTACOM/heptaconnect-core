@@ -73,7 +73,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
     private function getCurlCommandParts(RequestInterface $request): array
     {
         $commandParts = [];
-        $commandParts[] = (string) $request->getUri();
+        $commandParts[] = "'" . \addcslashes((string) $request->getUri(), "\\'") . "'";
         $commandParts[] = '-X ' . $request->getMethod();
 
         switch ($request->getProtocolVersion()) {
