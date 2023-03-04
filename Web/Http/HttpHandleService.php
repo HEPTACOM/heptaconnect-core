@@ -13,7 +13,6 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
@@ -41,13 +40,14 @@ final class HttpHandleService implements HttpHandleServiceInterface
     private array $contextCache = [];
 
     public function __construct(
-        private HttpHandlingActorInterface $actor,
+        private HttpHandlerStackProcessorInterface $stackProcessor,
         private HttpHandleContextFactoryInterface $contextFactory,
         private LoggerInterface $logger,
         private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         private StorageKeyGeneratorContract $storageKeyGenerator,
         private ResponseFactoryInterface $responseFactory,
         private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
+        private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory,
         private ServerRequestCycleDumpCheckerInterface $dumpChecker,
         private ServerRequestCycleDumperInterface $requestResponsePairDumper
     ) {
@@ -114,7 +114,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
                     'web_http_correlation_id' => $correlationId,
                 ]);
             } else {
-                $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($stackIdentifier->getPortalNodeKey()));
+                $response = $this->stackProcessor->processStack($request, $response, $stack, $this->getContext($stackIdentifier->getPortalNodeKey()));
             }
         }
 
@@ -135,7 +135,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
             } else {
                 $builder = $builder->pushDecorators();
 
-                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($portalNodeKey, $path) as $handler) {
+                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($identifier->getPortalNodeKey(), $identifier->getPath()) as $handler) {
                     $builder = $builder->push($handler);
                 }
 
