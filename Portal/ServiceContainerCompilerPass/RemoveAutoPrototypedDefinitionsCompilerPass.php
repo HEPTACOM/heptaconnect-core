@@ -41,6 +41,12 @@ final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassI
 
             $container->removeDefinition($serviceId);
         }
+
+        foreach ($this->excludedClasses as $aliasId) {
+            if ($container->hasAlias($aliasId)) {
+                $container->removeAlias($aliasId);
+            }
+        }
     }
 
     protected function isPrototypable(string $class): bool
