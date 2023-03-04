@@ -45,6 +45,9 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
@@ -103,6 +106,10 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private FilesystemFactoryInterface $filesystemFactory2;
 
+    private Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter;
+
+    private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter;
+
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     private array $alreadyBuiltPackages = [];
@@ -119,7 +126,9 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         PublisherInterface $publisher,
         HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
         RequestStorageContract $requestStorage,
-        FilesystemFactoryInterface $filesystemFactory2
+        FilesystemFactoryInterface $filesystemFactory2,
+        Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
+        Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -133,6 +142,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
         $this->requestStorage = $requestStorage;
         $this->filesystemFactory2 = $filesystemFactory2;
+        $this->psr7MessageCurlShellFormatter = $psr7MessageCurlShellFormatter;
+        $this->psr7MessageRawHttpFormatter = $psr7MessageRawHttpFormatter;
     }
 
     /**
@@ -242,8 +253,11 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             FileReferenceFactoryContract::class => $fileReferenceFactory,
             FileReferenceResolverContract::class => $this->fileReferenceResolver,
             HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
+            Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
+            Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+        $containerBuilder->setAlias(Psr7MessageFormatterContract::class, Psr7MessageRawHttpFormatterContract::class);
 
         if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
             $this->setSyntheticServices($containerBuilder, [
