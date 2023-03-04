@@ -116,6 +116,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         $commandParts[] = '-i';
         $commandParts[] = '-L';
         $commandParts[] = '-w "HTTP/%{http_version} %{response_code}"';
+        $commandParts[] = '--output -';
 
         return $commandParts;
     }
