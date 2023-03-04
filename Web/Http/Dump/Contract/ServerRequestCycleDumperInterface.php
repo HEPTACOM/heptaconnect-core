@@ -11,7 +11,7 @@ interface ServerRequestCycleDumperInterface
 {
     /**
      * Dumps the given request cycle.
-     * The request cycle are stored in a way, that they can be identified as belonging together.
+     * The request and response are stored in a way, that they can be identified as belonging together.
      */
     public function dump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): void;
 }
