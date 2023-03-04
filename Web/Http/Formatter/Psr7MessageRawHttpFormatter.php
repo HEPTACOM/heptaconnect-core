@@ -90,6 +90,9 @@ final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContr
             $raw[] = (string) $message->getBody();
         }
 
+        $raw[] = '';
+        $raw[] = '';
+
         return \implode(\PHP_EOL, $raw);
     }
 }
