@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.9.4.0] - 2023-03-04
+
+### Added
+
 - Add `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\HeaderUtility` described by `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract\HeaderUtilityInterface` to work with PSR-7 message headers
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatter` to provide raw HTTP message formatting
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` to provide cURL shell command formatting
@@ -32,14 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Deprecate class `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException`. Use `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` instead.
 
-### Removed
-
 ### Fixed
 
 - Fix issue in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` when a composer package with a portal has multiple PSR-4 entries in its `composer.json`
 - Fix container compile error when an excluded service has an automatic alias from its interface.
-
-### Security
 
 ## [0.9.3.0] - 2022-11-26
 
