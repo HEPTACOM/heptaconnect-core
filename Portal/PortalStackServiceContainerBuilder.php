@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException as LegacyDelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
@@ -115,7 +114,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     }
 
     /**
-     * @throws LegacyDelegatingLoaderLoadException
+     * @throws DelegatingLoaderLoadException
      */
     public function build(
         PortalContract $portal,
@@ -330,12 +329,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             return;
         }
 
-        try {
-            $package->buildContainer($containerBuilder);
-        } catch (DelegatingLoaderLoadException $exception) {
-            /* @deprecated This catch-block will be removed in version 0.10 */
-            throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
-        }
+        $package->buildContainer($containerBuilder);
 
         $this->alreadyBuiltPackages[] = $packageType;
 
