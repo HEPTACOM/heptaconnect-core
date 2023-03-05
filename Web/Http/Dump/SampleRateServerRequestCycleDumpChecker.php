@@ -13,12 +13,9 @@ use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
 final class SampleRateServerRequestCycleDumpChecker implements ServerRequestCycleDumpCheckerInterface
 {
-    private WebHttpHandlerConfigurationFindActionInterface $configurationFindAction;
-
     public function __construct(
-        WebHttpHandlerConfigurationFindActionInterface $configurationFindAction
+        private WebHttpHandlerConfigurationFindActionInterface $configurationFindAction
     ) {
-        $this->configurationFindAction = $configurationFindAction;
     }
 
     public function shallDump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): bool

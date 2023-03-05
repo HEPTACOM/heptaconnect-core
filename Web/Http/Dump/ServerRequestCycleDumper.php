@@ -14,16 +14,10 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class ServerRequestCycleDumper implements ServerRequestCycleDumperInterface
 {
-    private HttpHandlerDumpPathProviderInterface $pathProvider;
-
-    private Psr7MessageFormatterContract $formatter;
-
     public function __construct(
-        HttpHandlerDumpPathProviderInterface $pathProvider,
-        Psr7MessageFormatterContract $formatter
+        private HttpHandlerDumpPathProviderInterface $pathProvider,
+        private Psr7MessageFormatterContract $formatter
     ) {
-        $this->pathProvider = $pathProvider;
-        $this->formatter = $formatter;
     }
 
     public function dump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): void

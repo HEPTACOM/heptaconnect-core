@@ -12,11 +12,9 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContract
 {
-    private HeaderUtilityInterface $headerUtility;
-
-    public function __construct(HeaderUtilityInterface $headerUtility)
-    {
-        $this->headerUtility = $headerUtility;
+    public function __construct(
+        private HeaderUtilityInterface $headerUtility
+    ) {
     }
 
     public function formatMessage(MessageInterface $message): string

@@ -12,20 +12,11 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterContract
 {
-    private HeaderUtilityInterface $headerUtility;
-
-    private Psr7MessageRawHttpFormatter $rawFormatter;
-
-    private string $curlCommand;
-
     public function __construct(
-        HeaderUtilityInterface $headerUtility,
-        Psr7MessageRawHttpFormatter $rawFormatter,
-        string $curlCommand
+        private HeaderUtilityInterface $headerUtility,
+        private Psr7MessageRawHttpFormatter $rawFormatter,
+        private string $curlCommand
     ) {
-        $this->headerUtility = $headerUtility;
-        $this->rawFormatter = $rawFormatter;
-        $this->curlCommand = $curlCommand;
     }
 
     public function formatMessage(MessageInterface $message): string
