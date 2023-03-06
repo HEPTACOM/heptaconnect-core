@@ -6,7 +6,6 @@ namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
 use Heptacom\HeptaConnect\Core\Portal\Exception\InaccessableConstructorOnInstantionException;
-use Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
@@ -31,12 +30,6 @@ abstract class PortalFactoryContract
             throw new InaccessableConstructorOnInstantionException($classString);
         }
 
-        $ctor = $reflection->getConstructor();
-
-        if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
-            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
-        }
-
         return new $classString();
     }
 
@@ -52,12 +45,6 @@ abstract class PortalFactoryContract
 
         if (!$reflection->isInstantiable()) {
             throw new InaccessableConstructorOnInstantionException($classString);
-        }
-
-        $ctor = $reflection->getConstructor();
-
-        if ($ctor instanceof \ReflectionMethod && $ctor->getNumberOfRequiredParameters() > 0) {
-            throw new UnexpectedRequiredParameterInConstructorOnInstantionException($classString);
         }
 
         return new $classString();

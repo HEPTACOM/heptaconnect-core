@@ -145,6 +145,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract packing and unpacking storage related structs from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` into `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemPackerInterface` and `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface` and with it moving the dependency `\Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract`
 - Move log message codes `1631562097`, `1631562285` and `1631562928` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` without change in meaning
 - Move log message codes `1651338621` and `1631565257` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` without change in meaning
+- Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
 
 ### Deprecated
 
@@ -154,6 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove composer dependency `symfony/polyfill-php80` as minimum PHP version is raised to PHP 8.0
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException` and `\Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException` as their condition origin will occur earlier related to either `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException`, `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException` or `\Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException` will be thrown instead
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` will be thrown instead
+- Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` is final and therefore has no unexpected parameters
 
 ### Fixed
 
