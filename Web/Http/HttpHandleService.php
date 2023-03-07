@@ -78,6 +78,8 @@ final class HttpHandleService implements HttpHandleServiceInterface
         $correlationId = Uuid::uuid4()->toString();
 
         foreach (\array_keys($request->getAttributes()) as $attributeKey) {
+            $attributeKey = (string) $attributeKey;
+
             if (\str_starts_with($attributeKey, self::REQUEST_ATTRIBUTE_PREFIX)) {
                 $request = $request->withoutAttribute($attributeKey);
             }

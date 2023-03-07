@@ -61,6 +61,9 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         return $this->rawFormatter->formatMessage($response);
     }
 
+    /**
+     * @return string[]
+     */
     private function getCurlCommandParts(RequestInterface $request): array
     {
         $commandParts = [];
@@ -91,7 +94,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         }
 
         foreach ($request->getHeaders() as $header => $values) {
-            if (\in_array(\strtolower($header), ['content-length', 'transfer-encoding'], true)) {
+            if (\in_array(\strtolower((string) $header), ['content-length', 'transfer-encoding'], true)) {
                 continue;
             }
 

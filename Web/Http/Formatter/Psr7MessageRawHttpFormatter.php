@@ -76,7 +76,7 @@ final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContr
         $raw = [];
 
         foreach ($message->getHeaders() as $header => $values) {
-            if (\in_array(\strtolower($header), ['transfer-encoding'], true)) {
+            if (\in_array(\strtolower((string) $header), ['transfer-encoding'], true)) {
                 continue;
             }
 
