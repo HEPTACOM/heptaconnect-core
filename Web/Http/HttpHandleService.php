@@ -26,6 +26,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 final class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
@@ -45,7 +48,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
         private StorageKeyGeneratorContract $storageKeyGenerator,
         private ResponseFactoryInterface $responseFactory,
-        private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
+        private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
         private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory,
         private ServerRequestCycleDumpCheckerInterface $dumpChecker,
         private ServerRequestCycleDumperInterface $requestResponsePairDumper
@@ -85,7 +88,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
             }
         }
 
-        $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
             $stackIdentifier,
             'enabled'
         ));
