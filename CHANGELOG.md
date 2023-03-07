@@ -146,6 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move log message codes `1631562097`, `1631562285` and `1631562928` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` without change in meaning
 - Move log message codes `1651338621` and `1631565257` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` without change in meaning
 - Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
+- Combine `portalNodeKey` and `path` parameter in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface::createHttpHandlerStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory::createHttpHandlerStackBuilder` using `\Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier`
 
 ### Deprecated
 

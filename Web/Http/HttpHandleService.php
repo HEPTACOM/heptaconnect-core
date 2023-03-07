@@ -84,8 +84,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         }
 
         $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
-            $stackIdentifier->getPortalNodeKey(),
-            $stackIdentifier->getPath(),
+            $stackIdentifier,
             'enabled'
         ));
 
@@ -126,7 +125,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory
-                ->createHttpHandlerStackBuilder($identifier->getPortalNodeKey(), $identifier->getPath())
+                ->createHttpHandlerStackBuilder($identifier)
                 ->pushSource();
 
             if ($builder->isEmpty()) {
@@ -134,7 +133,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
             } else {
                 $builder = $builder->pushDecorators();
 
-                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($identifier->getPortalNodeKey(), $identifier->getPath()) as $handler) {
+                foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($identifier) as $handler) {
                     $builder = $builder->push($handler);
                 }
 

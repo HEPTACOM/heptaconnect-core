@@ -33,8 +33,7 @@ final class SampleRateServerRequestCycleDumpChecker implements ServerRequestCycl
     private function getDumpSampleRate(HttpHandlerStackIdentifier $httpHandler): int
     {
         $result = $this->configurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
-            $httpHandler->getPortalNodeKey(),
-            $httpHandler->getPath(),
+            $httpHandler,
             'dump-sample-rate'
         ));
 
