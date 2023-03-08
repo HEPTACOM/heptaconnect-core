@@ -44,6 +44,7 @@ final class HeaderUtility implements HeaderUtilityInterface
 
     /**
      * @param string[][] $headers
+     *
      * @return string[][]
      */
     private function sortHeaders(array $headers): array
