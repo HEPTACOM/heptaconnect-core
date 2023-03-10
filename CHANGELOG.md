@@ -146,6 +146,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract packing and unpacking storage related structs from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` into `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemPackerInterface` and `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` described by `\Heptacom\HeptaConnect\Core\Portal\Storage\Contract\PortalNodeStorageItemUnpackerInterface` and with it moving the dependency `\Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegistryContract`
 - Move log message codes `1631562097`, `1631562285` and `1631562928` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemPacker` without change in meaning
 - Move log message codes `1651338621` and `1631565257` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` without change in meaning
+- Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
+- Combine `portalNodeKey` and `path` parameter in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface::createHttpHandlerStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory::createHttpHandlerStackBuilder` using `\Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier`
 
 ### Deprecated
 
@@ -154,10 +156,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove support for `php: 7.4` as it will not receive any updates anymore, it is unlikely to be used. By raising the minimum PHP version we also make use of features introduced by PHP 8.0, which mainly have no effect on public API
 - Remove composer dependency `symfony/polyfill-php80` as minimum PHP version is raised to PHP 8.0
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedClassInheritanceOnInstantionException` and `\Heptacom\HeptaConnect\Core\Portal\Exception\ClassNotFoundOnInstantionException` as their condition origin will occur earlier related to either `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException`, `\Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException` or `\Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException` will be thrown instead
+- Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` will be thrown instead
+- Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` is final and therefore has no unexpected parameters
 
 ### Fixed
 
 ### Security
+
+## [0.9.4.0] - 2023-03-04
+
+### Added
+
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\HeaderUtility` described by `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Support\Contract\HeaderUtilityInterface` to work with PSR-7 message headers
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatter` to provide raw HTTP message formatting
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter` extending `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` to provide cURL shell command formatting
+- Add exception code `1674950000` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter::formatMessage` when the given message is neither a request nor a response
+- Add exception code `1674950001` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter::getFileExtension` when the given message is neither a request nor a response
+- Add exception code `1674950002` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::formatMessage` when the given message is neither a request nor a response
+- Add exception code `1674950003` in `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter::getFileExtension` when the given message is neither a request nor a response
+- Add interface `\Heptacom\HeptaConnect\Core\Bridge\File\HttpHandlerDumpPathProviderInterface`, that needs to be implemented by bridges and integrations, to return the path for placing HTTP handler dumps
+- Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_PREFIX` to identify all request attributes, that can be used as value holders for additional parameters attached to requests to the core layer
+- Add constant `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface::REQUEST_ATTRIBUTE_ORIGINAL_REQUEST` as request attribute key holding an instance of `\Psr\Http\Message\ServerRequestInterface` of the original inbound HTTP request used for debugging purposes
+- Add `\Heptacom\HeptaConnect\Core\Web\Http\Dump\ServerRequestCycleDumper` described by `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface` to dump a request cycle in a way, that they can be associated, when accessing the dumps
+- Add sample rate strategy implementation `\Heptacom\HeptaConnect\Core\Web\Http\Dump\SampleRateServerRequestCycleDumpChecker` for new interface `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface` using configuration `dump-sample-rate` for HTTP handlers, which can be an integer between 0 and 100, that will be used to determine whether a request-cycle will be dumped. Use value 100 for a request-response dump on every request
+
+### Changed
+
+- Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for raw HTTP message formatting
+- Add dependency on `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract` into `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` to provide service for cURL shell command formatting
+- Add dependency on `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface` into `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to dump requests and responses from HTTP handling
+
+### Deprecated
+
+- Deprecate class `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException`. Use `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` instead.
+
+### Fixed
+
+- Fix issue in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` when a composer package with a portal has multiple PSR-4 entries in its `composer.json`
+- Fix container compile error when an excluded service has an automatic alias from its interface.
 
 ## [0.9.3.0] - 2022-11-26
 

@@ -7,8 +7,8 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterface;
-use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
 use Psr\Log\LoggerInterface;
 
 final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
@@ -19,12 +19,10 @@ final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFac
     ) {
     }
 
-    public function createHttpHandlerStackBuilder(
-        PortalNodeKeyInterface $portalNodeKey,
-        string $path
-    ): HttpHandlerStackBuilderInterface {
+    public function createHttpHandlerStackBuilder(HttpHandlerStackIdentifier $stackIdentifier): HttpHandlerStackBuilderInterface
+    {
         $flowComponentRegistry = $this->portalContainerFactory
-            ->create($portalNodeKey)
+            ->create($stackIdentifier->getPortalNodeKey())
             ->getFlowComponentRegistry();
         $components = new HttpHandlerCollection();
 
@@ -32,6 +30,6 @@ final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFac
             $components->push($flowComponentRegistry->getWebHttpHandlers($source));
         }
 
-        return new HttpHandlerStackBuilder($components, $path, $this->logger);
+        return new HttpHandlerStackBuilder($components, $stackIdentifier->getPath(), $this->logger);
     }
 }
