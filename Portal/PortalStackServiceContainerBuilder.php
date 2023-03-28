@@ -19,7 +19,9 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPro
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
+use Heptacom\HeptaConnect\Core\Web\Http\HttpKernel;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
@@ -45,6 +47,7 @@ use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepCloneContract;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
@@ -112,6 +115,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
+
+    private ?HttpHandleServiceInterface $httpHandleService = null;
 
     private array $alreadyBuiltPackages = [];
 
@@ -256,6 +261,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
             Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
+            HttpKernelInterface::class => new HttpKernel($portalNodeKey, $this->httpHandleService),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
         $containerBuilder->setAlias(Psr7MessageFormatterContract::class, Psr7MessageRawHttpFormatterContract::class);
@@ -305,6 +311,11 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     public function setFileReferenceResolver(FileReferenceResolverContract $fileReferenceResolver): void
     {
         $this->fileReferenceResolver = $fileReferenceResolver;
+    }
+
+    public function setHttpHandleService(HttpHandleServiceInterface $httpHandleService): void
+    {
+        $this->httpHandleService = $httpHandleService;
     }
 
     /**
