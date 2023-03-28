@@ -29,6 +29,29 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
         $body = null,
         array $headers = []
     ): ResponseInterface {
+        if (!$uri instanceof UriInterface && !\is_string($uri)) {
+            throw $this->getInvalidArgumentException(
+                1,
+                '$uri',
+                '\Psr\Http\Message\UriInterface|string',
+                $uri
+            );
+        }
+
+        if (
+            !$body instanceof StreamInterface
+            && !\is_array($body)
+            && !\is_string($body)
+            && !\is_null($body)
+        ) {
+            throw $this->getInvalidArgumentException(
+                3,
+                '$body',
+                '\Psr\Http\Message\StreamInterface|array|string|null',
+                $body
+            );
+        }
+
         /** @var ServerRequestFactoryInterface $requestFactory */
         $requestFactory = $this->getContainer()->get(ServerRequestFactoryInterface::class);
         /** @var StreamFactoryInterface $streamFactory */
@@ -57,5 +80,26 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
         }
 
         return $httpKernel->handle($request);
+    }
+
+    private function getInvalidArgumentException(
+        int $position,
+        string $name,
+        string $expectedType,
+        $argument
+    ): \InvalidArgumentException {
+        $actualType = \gettype($argument);
+
+        if ($actualType === 'object') {
+            $actualType = \get_class($argument);
+        }
+
+        return new \InvalidArgumentException(\sprintf(
+            'Argument #%d (%s) must be of type %s, %s given',
+            $position,
+            $name,
+            $expectedType,
+            $actualType
+        ));
     }
 }
