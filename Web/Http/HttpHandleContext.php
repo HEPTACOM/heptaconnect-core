@@ -15,14 +15,6 @@ use Psr\Http\Message\UriInterface;
 
 final class HttpHandleContext extends AbstractPortalNodeContext implements HttpHandleContextInterface
 {
-    /**
-     * @param UriInterface|string $uri
-     * @param string $method
-     * @param StreamInterface|array|string|null $body
-     * @param array<string, string>|array<string, array<array-key, string>> $headers
-     *
-     * @return ResponseInterface
-     */
     public function forward(
         $uri,
         string $method = 'GET',
@@ -30,12 +22,7 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
         array $headers = []
     ): ResponseInterface {
         if (!$uri instanceof UriInterface && !\is_string($uri)) {
-            throw $this->getInvalidArgumentException(
-                1,
-                '$uri',
-                '\Psr\Http\Message\UriInterface|string',
-                $uri
-            );
+            throw $this->createTypeError(1, '$uri', '\Psr\Http\Message\UriInterface|string', $uri);
         }
 
         if (
@@ -44,12 +31,7 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
             && !\is_string($body)
             && !\is_null($body)
         ) {
-            throw $this->getInvalidArgumentException(
-                3,
-                '$body',
-                '\Psr\Http\Message\StreamInterface|array|string|null',
-                $body
-            );
+            throw $this->createTypeError(3, '$body', '\Psr\Http\Message\StreamInterface|array|string|null',$body);
         }
 
         /** @var ServerRequestFactoryInterface $requestFactory */
@@ -82,19 +64,19 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
         return $httpKernel->handle($request);
     }
 
-    private function getInvalidArgumentException(
+    private function createTypeError(
         int $position,
         string $name,
         string $expectedType,
         $argument
-    ): \InvalidArgumentException {
+    ): \TypeError {
         $actualType = \gettype($argument);
 
         if ($actualType === 'object') {
             $actualType = \get_class($argument);
         }
 
-        return new \InvalidArgumentException(\sprintf(
+        return new \TypeError(\sprintf(
             'Argument #%d (%s) must be of type %s, %s given',
             $position,
             $name,
