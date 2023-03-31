@@ -61,6 +61,7 @@ use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ServerRequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
@@ -261,7 +262,12 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
             Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
-            HttpKernelInterface::class => new HttpKernel($portalNodeKey, $this->httpHandleService),
+            HttpKernelInterface::class => new HttpKernel(
+                $portalNodeKey,
+                $this->httpHandleService,
+                Psr17FactoryDiscovery::findStreamFactory(),
+                Psr17FactoryDiscovery::findUploadedFileFactory()
+            ),
         ]);
         $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
         $containerBuilder->setAlias(Psr7MessageFormatterContract::class, Psr7MessageRawHttpFormatterContract::class);
@@ -280,6 +286,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUriFactory']));
         $containerBuilder->setDefinition(ResponseFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findResponseFactory']));
         $containerBuilder->setDefinition(StreamFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findStreamFactory']));
+        $containerBuilder->setDefinition(UploadedFileFactoryInterface::class, (new Definition())->setFactory([Psr17FactoryDiscovery::class, 'findUploadedFileFactory']));
         $containerBuilder->setDefinition(
             HttpClientContract::class,
             (new Definition())
