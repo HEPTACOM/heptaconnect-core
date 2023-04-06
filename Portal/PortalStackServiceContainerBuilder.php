@@ -230,7 +230,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $this->requestStorage
         );
 
-        $this->removeAboutToBeSyntheticlyInjectedServices($containerBuilder);
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
             PortalExtensionCollection::class => $portalExtensions,
@@ -401,25 +400,6 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 $excludesPerNamespace
             );
         }
-    }
-
-    private function removeAboutToBeSyntheticlyInjectedServices(ContainerBuilder $containerBuilder): void
-    {
-        $automaticLoadedDefinitionsToRemove = [];
-
-        foreach ($containerBuilder->getDefinitions() as $id => $definition) {
-            $class = $definition->getClass() ?? $id;
-
-            if (!\class_exists($class)) {
-                continue;
-            }
-
-            if (\is_a($class, PackageContract::class, true)) {
-                $automaticLoadedDefinitionsToRemove[] = $id;
-            }
-        }
-
-        \array_walk($automaticLoadedDefinitionsToRemove, [$containerBuilder, 'removeDefinition']);
     }
 
     /**
