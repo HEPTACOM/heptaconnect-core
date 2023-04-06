@@ -33,6 +33,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerContract;
 use Heptacom\HeptaConnect\Portal\Base\Profiling\ProfilerFactoryContract;
@@ -112,6 +113,9 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
+    /**
+     * @var array<class-string<PackageContract>, PackageContract>
+     */
     private array $alreadyBuiltPackages = [];
 
     public function __construct(
@@ -233,6 +237,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
             PortalExtensionCollection::class => $portalExtensions,
+            PackageCollection::class => new PackageCollection($this->alreadyBuiltPackages),
             LoggerInterface::class => new PortalLogger(
                 $this->logger,
                 \sprintf('[%s] ', $this->storageKeyGenerator->serialize($portalNodeKey)),
@@ -291,6 +296,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
+        $this->alreadyBuiltPackages = [];
+
         return $containerBuilder;
     }
 
@@ -340,7 +347,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     ): void {
         $packageType = \get_class($package);
 
-        if (\in_array($packageType, $this->alreadyBuiltPackages, true)) {
+        if (isset($this->alreadyBuiltPackages[$packageType])) {
             return;
         }
 
@@ -351,7 +358,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
         }
 
-        $this->alreadyBuiltPackages[] = $packageType;
+        $this->alreadyBuiltPackages[$packageType] = $package;
 
         foreach ($package->getAdditionalPackages() as $additionalPackage) {
             $this->buildPackage($additionalPackage, $containerBuilder);
