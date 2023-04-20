@@ -46,6 +46,10 @@ final class HttpKernel implements HttpKernelInterface
 
     private function getRequestWithCookieParams(ServerRequestInterface $request): ServerRequestInterface
     {
+⁄        if ($request->getCookieParams() !== []) {
+            return $request;
+        }
+
         $cookies = \explode(';', $request->getHeaderLine('Cookie'));
         $cookieParams = [];
 
@@ -67,6 +71,10 @@ final class HttpKernel implements HttpKernelInterface
 
     private function getRequestWithQueryParams(ServerRequestInterface $request): ServerRequestInterface
     {
+        if ($request->getQueryParams() !== []) {
+            return $request;
+        }
+
         \parse_str($request->getUri()->getQuery(), $queryParams);
 
         return $request->withQueryParams($queryParams);
@@ -74,6 +82,10 @@ final class HttpKernel implements HttpKernelInterface
 
     private function getRequestWithParsedBodyAndUploadedFiles(ServerRequestInterface $request): ServerRequestInterface
     {
+        if ($request->getParsedBody() !== null || $request->getUploadedFiles() !== []) {
+            return $request;
+        }
+
         $contentType = $request->getHeaderLine('Content-Type');
 
         if (\str_starts_with($contentType, 'multipart/form-data')) {
