@@ -46,7 +46,7 @@ final class HttpKernel implements HttpKernelInterface
 
     private function getRequestWithCookieParams(ServerRequestInterface $request): ServerRequestInterface
     {
-⁄        if ($request->getCookieParams() !== []) {
+        if ($request->getCookieParams() !== []) {
             return $request;
         }
 
