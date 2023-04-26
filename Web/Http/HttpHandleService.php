@@ -154,12 +154,8 @@ final class HttpHandleService implements HttpHandleServiceInterface
             $builder = $this->stackBuilderFactory
                 ->createHttpHandlerStackBuilder($identifier->getPortalNodeKey(), $identifier->getPath())
                 ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
-
-            if (!$builder->isEmpty()) {
-                $builder->push(new HttpMiddlewareChainHandler($identifier->getPath()));
-            }
+                ->pushDecorators()
+                ->push(new HttpMiddlewareChainHandler($identifier->getPath()));
 
             $this->stackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
         }
