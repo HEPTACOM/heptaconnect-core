@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add service `Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection` to portal-container, containing the portal, all portal-extensions and all packages involved in building the container
+- Allow handling of http requests, even when no http handler exists for the requested path. This means, middlewares for http handlers will run for every request.
 
 ### Changed
 
