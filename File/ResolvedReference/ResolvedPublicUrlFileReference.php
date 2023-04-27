@@ -36,8 +36,9 @@ final class ResolvedPublicUrlFileReference extends ResolvedFileReferenceContract
 
     public function getContents(): string
     {
-        return $this->client->sendRequest(
-            $this->requestFactory->createRequest('GET', $this->publicUrl)
-        )->getBody()->getContents();
+        $request = $this->requestFactory->createRequest('GET', $this->publicUrl);
+        $response = $this->client->sendRequest($request);
+
+        return (string) $response->getBody();
     }
 }
