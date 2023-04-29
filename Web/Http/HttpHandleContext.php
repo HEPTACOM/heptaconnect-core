@@ -29,9 +29,9 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
             !$body instanceof StreamInterface
             && !\is_array($body)
             && !\is_string($body)
-            && !\is_null($body)
+            && $body !== null
         ) {
-            throw $this->createTypeError(3, '$body', '\Psr\Http\Message\StreamInterface|array|string|null',$body);
+            throw $this->createTypeError(3, '$body', '\Psr\Http\Message\StreamInterface|array|string|null', $body);
         }
 
         /** @var ServerRequestFactoryInterface $requestFactory */
