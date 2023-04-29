@@ -16,12 +16,14 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Reflect\IdentityReflectPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityReflectActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
@@ -56,6 +58,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
 
     private IdentityReflectActionInterface $identityReflectAction;
 
+    private JobFailActionInterface $jobFailAction;
+
     public function __construct(
         LockFactory $lockFactory,
         StorageKeyGeneratorContract $storageKeyGenerator,
@@ -66,7 +70,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
         JobStartActionInterface $jobStartAction,
         JobFinishActionInterface $jobFinishAction,
         IdentityMapActionInterface $identityMapAction,
-        IdentityReflectActionInterface $identityReflectAction
+        IdentityReflectActionInterface $identityReflectAction,
+        JobFailActionInterface $jobFailAction
     ) {
         $this->lockFactory = $lockFactory;
         $this->storageKeyGenerator = $storageKeyGenerator;
@@ -78,6 +83,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
         $this->jobFinishAction = $jobFinishAction;
         $this->identityMapAction = $identityMapAction;
         $this->identityReflectAction = $identityReflectAction;
+        $this->jobFailAction = $jobFailAction;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
@@ -225,9 +231,32 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                             ->getMappedDatasetEntityCollection();
                         $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
-                        $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                        $this->receiveService->receive(new TypedDatasetEntityCollection($dataType, $rawEntities), $targetPortalNodeKey);
-                        $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+                        $this->jobStartAction->start(new JobStartPayload(
+                            $jobKeys,
+                            new \DateTimeImmutable(),
+                            null
+                        ));
+
+                        try {
+                            $this->receiveService->receive(
+                                new TypedDatasetEntityCollection($dataType, $rawEntities),
+                                $targetPortalNodeKey
+                            );
+                        } catch (\Throwable $exception) {
+                            $this->jobFailAction->fail(new JobFailPayload(
+                                $jobKeys,
+                                new \DateTimeImmutable(),
+                                $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
+                            ));
+
+                            continue;
+                        }
+
+                        $this->jobFinishAction->finish(new JobFinishPayload(
+                            $jobKeys,
+                            new \DateTimeImmutable(),
+                            null
+                        ));
                     }
                 }
             }
