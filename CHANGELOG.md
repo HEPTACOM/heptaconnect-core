@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface` to portal-container to execute http-handlers from inside a portal
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext::forward` for `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface::forward`
 - Add composer dependency `riverline/multipart-parser:^2.1` to support parsing body-data of `\Psr\Http\Message\ServerRequestInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel`
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder` for `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface` to build http payloads for multipart messages
 
 ### Changed
 
