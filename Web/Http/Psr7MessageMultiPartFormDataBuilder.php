@@ -90,7 +90,6 @@ final class Psr7MessageMultiPartFormDataBuilder implements Psr7MessageMultiPartF
                     $partLines[] = 'Content-Type: ' . $value->getClientMediaType();
                     $partLines[] = '';
                     $partLines[] = (string) $value->getStream();
-
                 } else {
                     $partLines[] = \sprintf(
                         'Content-Disposition: form-data; name="%s"',
