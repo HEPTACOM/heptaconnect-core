@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Remove a step in building a portal-container that would remove all services that extend `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract` 
-- Catch exceptions when running jobs and setting the affected jobs to failed state. Also change behavior to continue with the remaining jobs. In `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`.
+- Catch exceptions when running jobs and setting the affected jobs to failed state. Also change behavior in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to continue with the remaining jobs.
 
 ### Security
 
