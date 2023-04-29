@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Use `\Psr\Http\Message\StreamInterface::__toString` instead of `\Psr\Http\Message\StreamInterface::getContents` to retrieve stream contents in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference`, `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` and `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference`. This way, all stream contents are retrieved, regardless of the position of the stream pointer.
+
 ### Deprecated
 
 ### Removed
