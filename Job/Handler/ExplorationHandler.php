@@ -7,8 +7,10 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -24,16 +26,20 @@ final class ExplorationHandler implements ExplorationHandlerInterface
 
     private JobFinishActionInterface $jobFinishAction;
 
+    private JobFailActionInterface $jobFailAction;
+
     public function __construct(
         ExploreServiceInterface $exploreService,
         StorageKeyGeneratorContract $storageKeyGenerator,
         JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction
+        JobFinishActionInterface $jobFinishAction,
+        JobFailActionInterface $jobFailAction
     ) {
         $this->exploreService = $exploreService;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->jobStartAction = $jobStartAction;
         $this->jobFinishAction = $jobFinishAction;
+        $this->jobFailAction = $jobFailAction;
     }
 
     public function triggerExplorations(JobDataCollection $jobs): void
@@ -60,9 +66,32 @@ final class ExplorationHandler implements ExplorationHandlerInterface
 
             $jobKeys = new JobKeyCollection($jobKeys[$key]);
 
-            $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-            $this->exploreService->explore($portalNodeKey, $type);
-            $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+            $this->jobStartAction->start(new JobStartPayload(
+                $jobKeys,
+                new \DateTimeImmutable(),
+                null
+            ));
+
+            try {
+                $this->exploreService->explore(
+                    $portalNodeKey,
+                    $type
+                );
+            } catch (\Throwable $exception) {
+                $this->jobFailAction->fail(new JobFailPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    $exception->getMessage()
+                ));
+
+                continue;
+            }
+
+            $this->jobFinishAction->finish(new JobFinishPayload(
+                $jobKeys,
+                new \DateTimeImmutable(),
+                null
+            ));
         }
     }
 }
