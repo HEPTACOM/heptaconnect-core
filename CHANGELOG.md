@@ -12,10 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add service `Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection` to portal-container, containing the portal, all portal-extensions and all packages involved in building the container
 - Add service `Psr\Http\Message\ServerRequestFactoryInterface` to portal-container
 - Add service `Psr\Http\Message\UploadedFileFactoryInterface` to portal-container
-- Add service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface` to portal-container to execute http-handlers from inside a portal
+- Add service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface` to portal-container to execute a `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` from inside a portal
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext::forward` for `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface::forward`
 - Add composer dependency `riverline/multipart-parser:^2.1` to support parsing body-data of `\Psr\Http\Message\ServerRequestInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel`
-- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder` for `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface` to build http payloads for multipart messages
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder` for `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface` to build HTTP payloads for multipart messages
+- Add exception code `1682806294` in `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder::build` when an input parameter is of an illegal type 
 
 ### Changed
 
