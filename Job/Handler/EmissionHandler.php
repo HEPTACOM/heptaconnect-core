@@ -68,11 +68,11 @@ final class EmissionHandler implements EmissionHandlerInterface
                         $dataType,
                         $emissionChunk
                     ));
-                } catch (\Throwable $throwable) {
+                } catch (\Throwable $exception) {
                     $this->jobFailAction->fail(new JobFailPayload(
                         $jobKeys,
                         new \DateTimeImmutable(),
-                        $throwable->getMessage()
+                        $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
                     ));
 
                     continue;

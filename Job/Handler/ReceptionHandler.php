@@ -246,7 +246,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                             $this->jobFailAction->fail(new JobFailPayload(
                                 $jobKeys,
                                 new \DateTimeImmutable(),
-                                $exception->getMessage()
+                                $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
                             ));
 
                             continue;
