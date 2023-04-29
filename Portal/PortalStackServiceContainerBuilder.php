@@ -51,6 +51,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageCurlShellFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterContract;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
@@ -116,6 +117,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter;
 
+    private Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder;
+
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     private ?HttpHandleServiceInterface $httpHandleService = null;
@@ -139,7 +142,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         RequestStorageContract $requestStorage,
         FilesystemFactoryInterface $filesystemFactory2,
         Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
-        Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter
+        Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
+        Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -155,6 +159,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $this->filesystemFactory2 = $filesystemFactory2;
         $this->psr7MessageCurlShellFormatter = $psr7MessageCurlShellFormatter;
         $this->psr7MessageRawHttpFormatter = $psr7MessageRawHttpFormatter;
+        $this->psr7MessageMultiPartFormDataBuilder = $psr7MessageMultiPartFormDataBuilder;
     }
 
     /**
@@ -266,6 +271,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
             Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
+            Psr7MessageMultiPartFormDataBuilderInterface::class => $this->psr7MessageMultiPartFormDataBuilder,
             HttpKernelInterface::class => new HttpKernel(
                 $portalNodeKey,
                 $this->httpHandleService,
