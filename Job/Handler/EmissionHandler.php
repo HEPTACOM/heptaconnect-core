@@ -8,8 +8,10 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
@@ -23,14 +25,18 @@ final class EmissionHandler implements EmissionHandlerInterface
 
     private JobFinishActionInterface $jobFinishAction;
 
+    private JobFailActionInterface $jobFailAction;
+
     public function __construct(
         EmitServiceInterface $emitService,
         JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction
+        JobFinishActionInterface $jobFinishAction,
+        JobFailActionInterface $jobFailAction
     ) {
         $this->emitService = $emitService;
         $this->jobStartAction = $jobStartAction;
         $this->jobFinishAction = $jobFinishAction;
+        $this->jobFailAction = $jobFailAction;
     }
 
     public function triggerEmission(JobDataCollection $jobs): void
@@ -51,9 +57,32 @@ final class EmissionHandler implements EmissionHandlerInterface
             foreach ($emissionChunks as $chunkKey => $emissionChunk) {
                 $jobKeys = new JobKeyCollection($processedChunks[$chunkKey] ?? []);
 
-                $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                $this->emitService->emit(new TypedMappingComponentCollection($dataType, $emissionChunk));
-                $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+                $this->jobStartAction->start(new JobStartPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    null
+                ));
+
+                try {
+                    $this->emitService->emit(new TypedMappingComponentCollection(
+                        $dataType,
+                        $emissionChunk
+                    ));
+                } catch (\Throwable $exception) {
+                    $this->jobFailAction->fail(new JobFailPayload(
+                        $jobKeys,
+                        new \DateTimeImmutable(),
+                        $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
+                    ));
+
+                    continue;
+                }
+
+                $this->jobFinishAction->finish(new JobFinishPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    null
+                ));
             }
         }
     }
