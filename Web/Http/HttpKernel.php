@@ -105,15 +105,25 @@ final class HttpKernel implements HttpKernelInterface
                     $fileName = $part->getFileName();
                     $mimeType = $part->getMimeType();
 
-                    $uploadedFiles[$name ?? $uploadedFilesIndex++] = $this->uploadedFileFactory->createUploadedFile(
+                    $uploadedFile = $this->uploadedFileFactory->createUploadedFile(
                         $this->streamFactory->createStream($body),
                         null,
                         \UPLOAD_ERR_OK,
                         $fileName,
                         $mimeType
                     );
+
+                    $name ??= $uploadedFilesIndex++;
+
+                    \parse_str(\sprintf('%s=1', $name), $result);
+                    \array_walk_recursive($result, fn (&$value) => $value = $uploadedFile);
+                    $uploadedFiles = \array_replace_recursive($uploadedFiles, $result);
                 } else {
-                    $parsedBody[$name ?? $parsedBodyIndex++] = $body;
+                    $name ??= $parsedBodyIndex++;
+
+                    \parse_str(\sprintf('%s=1', $name), $result);
+                    \array_walk_recursive($result, fn (&$value) => $value = $body);
+                    $parsedBody = \array_replace_recursive($parsedBody, $result);
                 }
             }
 
