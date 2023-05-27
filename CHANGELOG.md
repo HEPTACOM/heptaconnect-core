@@ -17,12 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add composer dependency `riverline/multipart-parser:^2.1` to support parsing body-data of `\Psr\Http\Message\ServerRequestInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel`
 - Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder` for `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface` to build HTTP payloads for multipart messages
 - Add exception code `1682806294` in `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder::build` when an input parameter is of an illegal type 
-- Allow handling of http requests, even when no http handler exists for the requested path. This means, middlewares for http handlers will run for every request.
 
 ### Changed
 
 - Use `\Psr\Http\Message\StreamInterface::__toString` instead of `\Psr\Http\Message\StreamInterface::getContents` to retrieve stream contents in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference`, `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` and `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference`. This way, all stream contents are retrieved, regardless of the position of the stream pointer.
 - Add dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface` into `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to set job-states to `failed` in case of an error
+- Allow handling of HTTP requests, even when no HTTP handler exists for the requested path. This means, middlewares for HTTP handlers will run for every request.
 
 ### Deprecated
 
