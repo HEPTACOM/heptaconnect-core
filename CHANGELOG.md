@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.9.5.0] - 2023-05-27
+
+### Added
+
 - Add service `Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection` to portal-container, containing the portal, all portal-extensions and all packages involved in building the container
 - Add service `Psr\Http\Message\ServerRequestFactoryInterface` to portal-container
 - Add service `Psr\Http\Message\UploadedFileFactoryInterface` to portal-container
@@ -26,16 +40,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add argument `bool $isStackEmpty` to `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` to indicate whether the related instance of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` is empty.
 - Change log level of code `1636845086` from `critical` to `notice`
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Remove a step in building a portal-container that would remove all services that extend `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract` 
 - Catch exceptions when running jobs and setting the affected jobs to failed state. Also change behavior in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to continue with the remaining jobs.
-
-### Security
 
 ## [0.9.4.0] - 2023-03-04
 
