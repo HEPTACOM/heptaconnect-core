@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface` into `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to set job-states to `failed` in case of an error
 - Allow handling of HTTP requests, even when no HTTP handler exists for the requested path. This means, middlewares for HTTP handlers will run for every request.
 - Add argument `bool $isStackEmpty` to `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` to indicate whether the related instance of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` is empty.
+- Change log level of code `1636845086` from `critical` to `notice`
 
 ### Deprecated
 
