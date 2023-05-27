@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `\Psr\Http\Message\StreamInterface::__toString` instead of `\Psr\Http\Message\StreamInterface::getContents` to retrieve stream contents in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference`, `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` and `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference`. This way, all stream contents are retrieved, regardless of the position of the stream pointer.
 - Add dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface` into `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to set job-states to `failed` in case of an error
 - Allow handling of HTTP requests, even when no HTTP handler exists for the requested path. This means, middlewares for HTTP handlers will run for every request.
+- Add argument `bool $isStackEmpty` to `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` to indicate whether the related instance of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` is empty.
 
 ### Deprecated
 
