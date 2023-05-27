@@ -139,7 +139,12 @@ final class HttpHandleService implements HttpHandleServiceInterface
                     'web_http_correlation_id' => $correlationId,
                 ]);
             } else {
-                $response = $this->actor->performHttpHandling($request, $response, $stack, $this->getContext($stackIdentifier->getPortalNodeKey()));
+                $response = $this->actor->performHttpHandling(
+                    $request,
+                    $response,
+                    $stack,
+                    $this->getContext($stackIdentifier->getPortalNodeKey())
+                );
             }
         }
 
@@ -154,10 +159,14 @@ final class HttpHandleService implements HttpHandleServiceInterface
             $builder = $this->stackBuilderFactory
                 ->createHttpHandlerStackBuilder($identifier->getPortalNodeKey(), $identifier->getPath())
                 ->pushSource()
-                ->pushDecorators()
-                ->push(new HttpMiddlewareChainHandler($identifier->getPath()));
+                ->pushDecorators();
 
-            $this->stackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            $builder->push(new HttpMiddlewareChainHandler(
+                $identifier->getPath(),
+                $builder->isEmpty()
+            ));
+
+            $this->stackCache[$cacheKey] = $builder->build();
         }
 
         $result = $this->stackCache[$cacheKey];
