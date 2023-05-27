@@ -17,9 +17,12 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
 {
     private string $path;
 
-    public function __construct(string $path)
+    private bool $isStackEmpty;
+
+    public function __construct(string $path, bool $isStackEmpty)
     {
         $this->path = $path;
+        $this->isStackEmpty = $isStackEmpty;
     }
 
     public function handle(
@@ -39,6 +42,11 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
                 $context,
                 $stack
             )
+        );
+
+        $request = $request->withAttribute(
+            HttpHandleContextInterface::REQUEST_ATTRIBUTE_IS_STACK_EMPTY,
+            $this->isStackEmpty
         );
 
         $middlewareHandler = new HttpMiddlewareHandler($executeHttpHandlerStack, ...$middlewares);
