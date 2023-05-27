@@ -14,7 +14,7 @@ final class HttpHandleFlowHttpHandlersFactory implements HttpHandleFlowHttpHandl
     public function createHttpHandlers(HttpHandlerStackIdentifier $stackIdentifier): HttpHandlerCollection
     {
         return new HttpHandlerCollection([
-            new HttpMiddlewareChainHandler($stackIdentifier->getPath()),
+            new HttpMiddlewareChainHandler($stackIdentifier->getPath(), false),
         ]);
     }
 }

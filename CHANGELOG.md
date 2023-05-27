@@ -163,6 +163,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
+## [0.9.5.0] - 2023-05-27
+
+### Added
+
+- Add service `Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection` to portal-container, containing the portal, all portal-extensions and all packages involved in building the container
+- Add service `Psr\Http\Message\ServerRequestFactoryInterface` to portal-container
+- Add service `Psr\Http\Message\UploadedFileFactoryInterface` to portal-container
+- Add service `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpKernelInterface` to portal-container to execute a `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` from inside a portal
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext::forward` for `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface::forward`
+- Add composer dependency `riverline/multipart-parser:^2.1` to support parsing body-data of `\Psr\Http\Message\ServerRequestInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel`
+- Add implementation `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder` for `Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface` to build HTTP payloads for multipart messages
+- Add exception code `1682806294` in `\Heptacom\HeptaConnect\Core\Web\Http\Psr7MessageMultiPartFormDataBuilder::build` when an input parameter is of an illegal type 
+
+### Changed
+
+- Use `\Psr\Http\Message\StreamInterface::__toString` instead of `\Psr\Http\Message\StreamInterface::getContents` to retrieve stream contents in `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedContentsFileReference`, `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedPublicUrlFileReference` and `\Heptacom\HeptaConnect\Core\File\ResolvedReference\ResolvedRequestFileReference`. This way, all stream contents are retrieved, regardless of the position of the stream pointer.
+- Add dependency on `\Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface` into `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to set job-states to `failed` in case of an error
+- Allow handling of HTTP requests, even when no HTTP handler exists for the requested path. This means, middlewares for HTTP handlers will run for every request.
+- Add argument `bool $isStackEmpty` to `\Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler` to indicate whether the related instance of `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface` is empty.
+- Change log level of code `1636845086` from `critical` to `notice`
+
+### Fixed
+
+- Remove a step in building a portal-container that would remove all services that extend `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract` 
+- Catch exceptions when running jobs and setting the affected jobs to failed state. Also change behavior in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`, `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler` and `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler` to continue with the remaining jobs.
+
 ## [0.9.4.0] - 2023-03-04
 
 ### Added
@@ -286,9 +312,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Implement `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerCodeOriginFinderInterface` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder`
-- Add exception code `1637607699` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler is a short-notation http handler and has no configured callback
-- Add exception code `1637607700` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler class cannot be read via reflection
-- Add exception code `1637607701` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when http handler class does not belong to a physical file
+- Add exception code `1637607699` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when HTTP handler is a short-notation HTTP handler and has no configured callback
+- Add exception code `1637607700` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when HTTP handler class cannot be read via reflection
+- Add exception code `1637607701` in `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerCodeOriginFinder::findOrigin` when HTTP handler class does not belong to a physical file
 - Implement `\Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterCodeOriginFinderInterface` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder`
 - Add exception code `1637607653` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder::findOrigin` when emitter is a short-notation emitter and has no configured callback
 - Add exception code `1637607654` in `\Heptacom\HeptaConnect\Core\Emission\EmitterCodeOriginFinder::findOrigin` when emitter class cannot be read via reflection
@@ -471,10 +497,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add log exception code `1636503506` to `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` when job refers to a route that is not configured to allow receptions
 - Add log exception code `1636503507` to `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` when job has an entity, that is of a different type than the route's entity type
 - Add log exception code `1636503508` to `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler::triggerReception` when job has an entity, that has a different primary key than the one saved on the job
-- Add web http handler context factory interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContextFactory` as well as `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext`
-- Add web http stack building interfaces `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface`, `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterface` and implementations `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder` for acting with web http handlers
-- Add web http service interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to validate and handle requests
-- Add web http actor interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to process any request through a web http handler stack
+- Add web HTTP handler context factory interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContextFactory` as well as `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleContext`
+- Add web HTTP stack building interfaces `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface`, `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterface` and implementations `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory`, `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilder` for acting with web HTTP handlers
+- Add web HTTP service interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandleService` to validate and handle requests
+- Add web HTTP actor interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface` and implementation `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlingActor` to process any request through a web HTTP handler stack
 - Add interface `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface` for bridges to provide implementation as bridges implement routing
 - Add log message `\Heptacom\HeptaConnect\Core\Component\LogMessage::WEB_HTTP_HANDLE_NO_THROW` used with log message code `1636845126` when handling the web request triggered an exception in the flow component
 - Add log message `\Heptacom\HeptaConnect\Core\Component\LogMessage::WEB_HTTP_HANDLE_NO_HANDLER_FOR_PATH` used with log message code `1636845086` when handling the web request could not match any flow component
@@ -591,8 +617,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `\Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface::dispatchExploreJob` to start an exploration as a job via `\Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract::dispatch`
 - Add `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler` to handle exploration jobs `\Heptacom\HeptaConnect\Core\Job\Type\Exploration`
 - Add support for handling exploration jobs in `\Heptacom\HeptaConnect\Core\Job\DelegatingJobActor` with using `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`
-- Add `\Psr\Http\Message\ResponseFactoryInterface` service to the portal containers in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` for better http and messaging PSR support for portal developers
-- Add `\Psr\Http\Message\StreamFactoryInterface` service to the portal containers in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` for better http and messaging PSR support for portal developers
+- Add `\Psr\Http\Message\ResponseFactoryInterface` service to the portal containers in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` for better HTTP and messaging PSR support for portal developers
+- Add `\Psr\Http\Message\StreamFactoryInterface` service to the portal containers in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder` for better HTTP and messaging PSR support for portal developers
 
 ### Changed
 

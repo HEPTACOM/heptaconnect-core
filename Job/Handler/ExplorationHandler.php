@@ -9,8 +9,10 @@ use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
@@ -23,7 +25,8 @@ final class ExplorationHandler implements ExplorationHandlerInterface
         private ExploreServiceInterface $exploreService,
         private StorageKeyGeneratorContract $storageKeyGenerator,
         private JobStartActionInterface $jobStartAction,
-        private JobFinishActionInterface $jobFinishAction
+        private JobFinishActionInterface $jobFinishAction,
+        private JobFailActionInterface $jobFailAction,
     ) {
     }
 
@@ -53,9 +56,32 @@ final class ExplorationHandler implements ExplorationHandlerInterface
 
             $jobKeys = new JobKeyCollection($jobKeys[$key]);
 
-            $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-            $this->exploreService->explore($portalNodeKey, new EntityTypeCollection($type));
-            $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+            $this->jobStartAction->start(new JobStartPayload(
+                $jobKeys,
+                new \DateTimeImmutable(),
+                null
+            ));
+
+            try {
+                $this->exploreService->explore(
+                    $portalNodeKey,
+                    new EntityTypeCollection($type)
+                );
+            } catch (\Throwable $exception) {
+                $this->jobFailAction->fail(new JobFailPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
+                ));
+
+                continue;
+            }
+
+            $this->jobFinishAction->finish(new JobFinishPayload(
+                $jobKeys,
+                new \DateTimeImmutable(),
+                null
+            ));
         }
     }
 }

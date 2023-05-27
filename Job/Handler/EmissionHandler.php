@@ -10,8 +10,10 @@ use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
@@ -22,7 +24,8 @@ final class EmissionHandler implements EmissionHandlerInterface
     public function __construct(
         private EmitServiceInterface $emitService,
         private JobStartActionInterface $jobStartAction,
-        private JobFinishActionInterface $jobFinishAction
+        private JobFinishActionInterface $jobFinishAction,
+        private JobFailActionInterface $jobFailAction,
     ) {
     }
 
@@ -45,9 +48,32 @@ final class EmissionHandler implements EmissionHandlerInterface
             foreach ($emissionChunks as $chunkKey => $emissionChunk) {
                 $jobKeys = new JobKeyCollection($processedChunks[$chunkKey] ?? []);
 
-                $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                $this->emitService->emit(new TypedMappingComponentCollection(new EntityType($dataType), $emissionChunk));
-                $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
+                $this->jobStartAction->start(new JobStartPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    null
+                ));
+
+                try {
+                    $this->emitService->emit(new TypedMappingComponentCollection(
+                        new EntityType($dataType),
+                        $emissionChunk
+                    ));
+                } catch (\Throwable $exception) {
+                    $this->jobFailAction->fail(new JobFailPayload(
+                        $jobKeys,
+                        new \DateTimeImmutable(),
+                        $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
+                    ));
+
+                    continue;
+                }
+
+                $this->jobFinishAction->finish(new JobFinishPayload(
+                    $jobKeys,
+                    new \DateTimeImmutable(),
+                    null
+                ));
             }
         }
     }

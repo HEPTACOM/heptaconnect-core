@@ -31,7 +31,8 @@ final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
     public function getContents(): string
     {
         $request = $this->requestStorage->load($this->getPortalNodeKey(), $this->requestId);
+        $response = $this->client->sendRequest($request);
 
-        return $this->client->sendRequest($request)->getBody()->getContents();
+        return (string) $response->getBody();
     }
 }

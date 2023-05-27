@@ -42,6 +42,6 @@ final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
             );
         }
 
-        return $stream->getContents();
+        return (string) $stream;
     }
 }

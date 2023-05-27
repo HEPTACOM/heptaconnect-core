@@ -15,7 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 final class HttpMiddlewareChainHandler extends HttpHandlerContract
 {
     public function __construct(
-        private string $path
+        private string $path,
+        private bool $isStackEmpty,
     ) {
     }
 
@@ -35,6 +36,11 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
                 $context,
                 $stack
             )
+        );
+
+        $request = $request->withAttribute(
+            HttpHandleContextInterface::REQUEST_ATTRIBUTE_IS_STACK_EMPTY,
+            $this->isStackEmpty
         );
 
         $middlewareHandler = new HttpMiddlewareHandler($executeHttpHandlerStack, ...$middlewares);

@@ -19,12 +19,14 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Reflect\IdentityReflectPayload;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Action\Route\Get\RouteGetResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityReflectActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
@@ -55,7 +57,8 @@ final class ReceptionHandler implements ReceptionHandlerInterface
         private JobStartActionInterface $jobStartAction,
         private JobFinishActionInterface $jobFinishAction,
         private IdentityMapActionInterface $identityMapAction,
-        private IdentityReflectActionInterface $identityReflectAction
+        private IdentityReflectActionInterface $identityReflectAction,
+        private JobFailActionInterface $jobFailAction,
     ) {
     }
 
@@ -189,7 +192,20 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
                     $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
-                    $this->receiveService->receive(new TypedDatasetEntityCollection($entityType, $rawEntities), $targetPortalNodeKey);
+                    try {
+                        $this->receiveService->receive(
+                            new TypedDatasetEntityCollection($dataType, $rawEntities),
+                            $targetPortalNodeKey
+                        );
+                    } catch (\Throwable $exception) {
+                        $this->jobFailAction->fail(new JobFailPayload(
+                            $jobKeys,
+                            new \DateTimeImmutable(),
+                            $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
+                        ));
+
+                        continue;
+                    }
                     $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                 }
             }
