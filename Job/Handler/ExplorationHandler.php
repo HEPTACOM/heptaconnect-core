@@ -15,6 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterf
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
+use Psr\Log\LoggerInterface;
 
 final class ExplorationHandler implements ExplorationHandlerInterface
 {
@@ -28,18 +29,22 @@ final class ExplorationHandler implements ExplorationHandlerInterface
 
     private JobFailActionInterface $jobFailAction;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         ExploreServiceInterface $exploreService,
         StorageKeyGeneratorContract $storageKeyGenerator,
         JobStartActionInterface $jobStartAction,
         JobFinishActionInterface $jobFinishAction,
-        JobFailActionInterface $jobFailAction
+        JobFailActionInterface $jobFailAction,
+        LoggerInterface $logger
     ) {
         $this->exploreService = $exploreService;
         $this->storageKeyGenerator = $storageKeyGenerator;
         $this->jobStartAction = $jobStartAction;
         $this->jobFinishAction = $jobFinishAction;
         $this->jobFailAction = $jobFailAction;
+        $this->logger = $logger;
     }
 
     public function triggerExplorations(JobDataCollection $jobs): void
@@ -78,6 +83,11 @@ final class ExplorationHandler implements ExplorationHandlerInterface
                     $type
                 );
             } catch (\Throwable $exception) {
+                $this->logger->error($exception->getMessage(), [
+                    'code' => 1686752879,
+                    'jobKeys' => $jobKeys->asArray(),
+                ]);
+
                 $this->jobFailAction->fail(new JobFailPayload(
                     $jobKeys,
                     new \DateTimeImmutable(),

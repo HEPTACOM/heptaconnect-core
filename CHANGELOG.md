@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add log message code `1686752874` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`
+- Add log message code `1686752879` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`
+- Add log message code `1686752889` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+
 ### Changed
 
 ### Deprecated

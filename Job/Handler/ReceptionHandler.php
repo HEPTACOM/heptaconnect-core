@@ -243,6 +243,11 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                                 $targetPortalNodeKey
                             );
                         } catch (\Throwable $exception) {
+                            $this->logger->error($exception->getMessage(), [
+                                'code' => 1686752889,
+                                'jobKeys' => $jobKeys->asArray(),
+                            ]);
+
                             $this->jobFailAction->fail(new JobFailPayload(
                                 $jobKeys,
                                 new \DateTimeImmutable(),
