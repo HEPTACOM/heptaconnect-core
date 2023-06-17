@@ -18,6 +18,6 @@ final class EntityStatus extends EntityStatusContract
             return false;
         }
 
-        return \is_string($sharer->getForeignKey());
+        return \is_string($sharer->getExternalId());
     }
 }
