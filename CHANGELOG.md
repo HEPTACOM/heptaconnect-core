@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix a bug in `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem` that occurred when adapters don't populate the `path` key in metadata.
+
 ### Security
 
 ## [0.9.5.0] - 2023-05-27
