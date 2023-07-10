@@ -377,17 +377,17 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             return;
         }
 
+        $this->alreadyBuiltPackages[$packageType] = $package;
+
+        foreach ($package->getAdditionalPackages() as $additionalPackage) {
+            $this->buildPackage($additionalPackage, $containerBuilder);
+        }
+
         try {
             $package->buildContainer($containerBuilder);
         } catch (DelegatingLoaderLoadException $exception) {
             /* @deprecated This catch-block will be removed in version 0.10 */
             throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
-        }
-
-        $this->alreadyBuiltPackages[$packageType] = $package;
-
-        foreach ($package->getAdditionalPackages() as $additionalPackage) {
-            $this->buildPackage($additionalPackage, $containerBuilder);
         }
     }
 
