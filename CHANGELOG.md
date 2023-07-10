@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix a bug in `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem` that occurred when adapters don't populate the `path` key in metadata.
+- Fix a bug in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel` that broke sub-requests when the request contains no `Cookie` header.
 
 ### Security
 
