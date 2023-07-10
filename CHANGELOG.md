@@ -9,10 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add log message code `1686752874` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`
-- Add log message code `1686752879` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`
-- Add log message code `1686752889` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
-
 ### Changed
 
 ### Deprecated
@@ -21,12 +17,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+### Security
+
+## [0.9.6.0] - 2023-07-10
+
+### Added
+
+- Add log message code `1686752874` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\EmissionHandler`
+- Add log message code `1686752879` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ExplorationHandler`
+- Add log message code `1686752889` when handling of job failed in `\Heptacom\HeptaConnect\Core\Job\Handler\ReceptionHandler`
+
+### Fixed
+
 - Fix a bug in `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem` that occurred when adapters don't populate the `path` key in metadata.
 - Fix a bug in `\Heptacom\HeptaConnect\Core\Web\Http\HttpKernel` that broke sub-requests when the request contains no `Cookie` header.
 - Fix order of packages when building a portal-container in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`. Packages can now access services of other packages in their service definition, if they list that package in `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::getAdditionalPackages`.
 - Fix emission check in `\Heptacom\HeptaConnect\Core\Support\EntityStatus::isMappedByEmitter` by validating external id instead of foreign key
-
-### Security
 
 ## [0.9.5.0] - 2023-05-27
 
