@@ -18,6 +18,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterf
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
+use Psr\Log\LoggerInterface;
 
 final class EmissionHandler implements EmissionHandlerInterface
 {
@@ -26,6 +27,7 @@ final class EmissionHandler implements EmissionHandlerInterface
         private JobStartActionInterface $jobStartAction,
         private JobFinishActionInterface $jobFinishAction,
         private JobFailActionInterface $jobFailAction,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -60,6 +62,11 @@ final class EmissionHandler implements EmissionHandlerInterface
                         $emissionChunk
                     ));
                 } catch (\Throwable $exception) {
+                    $this->logger->error($exception->getMessage(), [
+                        'code' => 1686752874,
+                        'jobKeys' => $jobKeys->asArray(),
+                    ]);
+
                     $this->jobFailAction->fail(new JobFailPayload(
                         $jobKeys,
                         new \DateTimeImmutable(),

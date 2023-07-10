@@ -18,6 +18,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterfa
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
+use Psr\Log\LoggerInterface;
 
 final class ExplorationHandler implements ExplorationHandlerInterface
 {
@@ -27,6 +28,7 @@ final class ExplorationHandler implements ExplorationHandlerInterface
         private JobStartActionInterface $jobStartAction,
         private JobFinishActionInterface $jobFinishAction,
         private JobFailActionInterface $jobFailAction,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -68,6 +70,11 @@ final class ExplorationHandler implements ExplorationHandlerInterface
                     new EntityTypeCollection($type)
                 );
             } catch (\Throwable $exception) {
+                $this->logger->error($exception->getMessage(), [
+                    'code' => 1686752879,
+                    'jobKeys' => $jobKeys->asArray(),
+                ]);
+
                 $this->jobFailAction->fail(new JobFailPayload(
                     $jobKeys,
                     new \DateTimeImmutable(),
