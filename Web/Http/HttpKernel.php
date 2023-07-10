@@ -54,7 +54,13 @@ final class HttpKernel implements HttpKernelInterface
         $cookieParams = [];
 
         foreach ($cookies as $cookie) {
-            [$cookieName, $cookieValue] = \explode('=', $cookie, 2);
+            $cookieParts = \explode('=', $cookie, 2);
+
+            if (\count($cookieParts) !== 2) {
+                continue;
+            }
+
+            [$cookieName, $cookieValue] = $cookieParts;
 
             if (!\is_string($cookieName) || !\is_string($cookieValue)) {
                 continue;
