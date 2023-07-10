@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fix emission check in `\Heptacom\HeptaConnect\Core\Support\EntityStatus::isMappedByEmitter` by validating external id instead of foreign key
+
 ### Security
 
 ## [0.9.5.0] - 2023-05-27
