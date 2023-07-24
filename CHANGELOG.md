@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Sort flow component stacks by priority, if the service definition tag has a priority attribute.
+
 ### Deprecated
 
 ### Removed
