@@ -12,12 +12,14 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
-use Symfony\Component\DependencyInjection\Reference;
 
 final class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPassInterface
 {
+    use PriorityTaggedServiceTrait;
+
     /**
      * @var array<string, string[]>
      */
@@ -62,13 +64,16 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
     private function getServiceReferencesGroupedBySource(ContainerBuilder $container, string $tag): array
     {
         $grouped = [];
-        $serviceIds = $container->findTaggedServiceIds($tag);
+        $serviceIds = $this->findAndSortTaggedServices($tag, $container);
 
-        foreach ($serviceIds as $serviceId => $tagData) {
+        foreach ($serviceIds as $reference) {
+            $definition = $container->findDefinition((string) $reference);
+            $tagData = $definition->getTag($tag);
+
             $groupKey = $tagData[0]['source'] ?? null;
 
             if ($groupKey !== null) {
-                $grouped[$groupKey][] = new Reference($serviceId);
+                $grouped[$groupKey][] = $reference;
             }
         }
 
