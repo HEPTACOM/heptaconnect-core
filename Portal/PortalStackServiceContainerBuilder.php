@@ -405,8 +405,17 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 continue;
             }
 
+            $definedTags = $definition->getTag($tag);
             $definition->clearTag($tag);
-            $definition->addTag($tag, ['source' => $packageClass]);
+
+            if ($definedTags === []) {
+                $definedTags[] = ['source' => $packageClass];
+            }
+
+            foreach ($definedTags as $definedTag) {
+                $definedTag['source'] = $packageClass;
+                $definition->addTag($tag, $definedTag);
+            }
         }
     }
 

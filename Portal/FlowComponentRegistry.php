@@ -14,44 +14,44 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 
 class FlowComponentRegistry
 {
-    private ?array $orderedSources = null;
+    private bool $isLoaded = false;
 
     /**
-     * @var array<class-string, ExplorerCollection>
+     * @var array<int, ExplorerCollection>
      */
     private array $sourcedExplorers;
 
     /**
-     * @var array<class-string, EmitterCollection>
+     * @var array<int, EmitterCollection>
      */
     private array $sourcedEmitters;
 
     /**
-     * @var array<class-string, ReceiverCollection>
+     * @var array<int, ReceiverCollection>
      */
     private array $sourcedReceivers;
 
     /**
-     * @var array<class-string, StatusReporterCollection>
+     * @var array<int, StatusReporterCollection>
      */
     private array $sourcedStatusReporters;
 
     /**
-     * @var array<class-string, HttpHandlerCollection>
+     * @var array<int, HttpHandlerCollection>
      */
     private array $sourcedWebHttpHandlers;
 
     /**
-     * @var array<class-string, string[]>
+     * @var array<int, string[]>
      */
     private array $flowBuilderFiles;
 
     /**
-     * @param array<class-string, ExplorerCollection>       $sourcedExplorers
-     * @param array<class-string, EmitterCollection>        $sourcedEmitters
-     * @param array<class-string, ReceiverCollection>       $sourcedReceivers
-     * @param array<class-string, StatusReporterCollection> $sourcedStatusReporters
-     * @param array<class-string, HttpHandlerCollection>    $sourcedWebHttpHandlers
+     * @param array<int, ExplorerCollection>       $sourcedExplorers
+     * @param array<int, EmitterCollection>        $sourcedEmitters
+     * @param array<int, ReceiverCollection>       $sourcedReceivers
+     * @param array<int, StatusReporterCollection> $sourcedStatusReporters
+     * @param array<int, HttpHandlerCollection>    $sourcedWebHttpHandlers
      * @param array<class-string, string[]>                 $flowBuilderFiles
      */
     public function __construct(
@@ -70,39 +70,54 @@ class FlowComponentRegistry
         $this->flowBuilderFiles = $flowBuilderFiles;
     }
 
-    public function getExplorers(string $source): ExplorerCollection
+    /**
+     * @deprecated Parameter $source will be removed
+     */
+    public function getExplorers(?string $source = null): ExplorerCollection
     {
-        $this->loadSource($source);
+        $this->loadSource();
 
-        return new ExplorerCollection($this->sourcedExplorers[$source] ?? []);
+        return new ExplorerCollection($this->sourcedExplorers);
     }
 
-    public function getEmitters(string $source): EmitterCollection
+    /**
+     * @deprecated Parameter $source will be removed
+     */
+    public function getEmitters(?string $source = null): EmitterCollection
     {
-        $this->loadSource($source);
+        $this->loadSource();
 
-        return new EmitterCollection($this->sourcedEmitters[$source] ?? []);
+        return new EmitterCollection($this->sourcedEmitters);
     }
 
-    public function getReceivers(string $source): ReceiverCollection
+    /**
+     * @deprecated Parameter $source will be removed
+     */
+    public function getReceivers(?string $source = null): ReceiverCollection
     {
-        $this->loadSource($source);
+        $this->loadSource();
 
-        return new ReceiverCollection($this->sourcedReceivers[$source] ?? []);
+        return new ReceiverCollection($this->sourcedReceivers);
     }
 
-    public function getStatusReporters(string $source): StatusReporterCollection
+    /**
+     * @deprecated Parameter $source will be removed
+     */
+    public function getStatusReporters(?string $source = null): StatusReporterCollection
     {
-        $this->loadSource($source);
+        $this->loadSource();
 
-        return new StatusReporterCollection($this->sourcedStatusReporters[$source] ?? []);
+        return new StatusReporterCollection($this->sourcedStatusReporters);
     }
 
-    public function getWebHttpHandlers(string $source): HttpHandlerCollection
+    /**
+     * @deprecated Parameter $source will be removed
+     */
+    public function getWebHttpHandlers(?string $source = null): HttpHandlerCollection
     {
-        $this->loadSource($source);
+        $this->loadSource();
 
-        return new HttpHandlerCollection($this->sourcedWebHttpHandlers[$source] ?? []);
+        return new HttpHandlerCollection($this->sourcedWebHttpHandlers);
     }
 
     /**
@@ -110,61 +125,81 @@ class FlowComponentRegistry
      * contribute flow components to the current portal container. The first item will be the FQCN of the portal class.
      * The supporting portal extension FQCNs will be ordered lexicographically.
      *
+     * @deprecated Method will be removed. Call the corresponding getter directly without any arguments.
+     *
      * @return class-string[]
      */
     public function getOrderedSources(): array
     {
-        $result = $this->orderedSources;
-
-        if ($result === null) {
-            $result = \array_unique([
-                ...\array_keys($this->sourcedExplorers),
-                ...\array_keys($this->sourcedEmitters),
-                ...\array_keys($this->sourcedReceivers),
-                ...\array_keys($this->sourcedStatusReporters),
-                ...\array_keys($this->sourcedWebHttpHandlers),
-                ...\array_keys($this->flowBuilderFiles),
-            ]);
-            \usort($result, static function (string $a, string $b): int {
-                $aT = (int) \is_a($a, PortalContract::class, true);
-                $bT = (int) \is_a($b, PortalContract::class, true);
-
-                if ($aT === $bT) {
-                    return \strcmp($a, $b);
-                }
-
-                return $bT <=> $aT;
-            });
-
-            $this->orderedSources = $result;
-        }
-
-        return $result;
+        return [PortalContract::class];
     }
 
-    private function loadSource(string $source): void
+    private function loadSource(): void
     {
-        $files = $this->flowBuilderFiles[$source] ?? [];
-
-        if ($files !== []) {
-            $flowBuilder = new FlowComponent();
-
-            $flowBuilder->reset();
-
-            foreach ($files as $file) {
-                // prevent access to object context
-                (static function (string $file): void {
-                    include $file;
-                })($file);
-            }
-
-            ($this->sourcedExplorers[$source] ??= new ExplorerCollection())->push($flowBuilder->buildExplorers());
-            ($this->sourcedEmitters[$source] ??= new EmitterCollection())->push($flowBuilder->buildEmitters());
-            ($this->sourcedReceivers[$source] ??= new ReceiverCollection())->push($flowBuilder->buildReceivers());
-            ($this->sourcedStatusReporters[$source] ??= new StatusReporterCollection())->push($flowBuilder->buildStatusReporters());
-            ($this->sourcedWebHttpHandlers[$source] ??= new HttpHandlerCollection())->push($flowBuilder->buildHttpHandlers());
-
-            unset($this->flowBuilderFiles[$source]);
+        if ($this->isLoaded) {
+            return;
         }
+
+        foreach ($this->flowBuilderFiles as $source => $files) {
+            if ($files !== []) {
+                $flowBuilder = new FlowComponent();
+
+                $flowBuilder->reset();
+
+                foreach ($files as $file) {
+                    // prevent access to object context
+                    (static function (string $file): void {
+                        include $file;
+                    })($file);
+                }
+
+                if (\is_a($source, PortalContract::class, true)) {
+                    $priority = 0;
+                } else {
+                    $priority = 1000;
+                }
+
+                ($this->sourcedExplorers[$priority] ??= new ExplorerCollection())->push($flowBuilder->buildExplorers());
+                ($this->sourcedEmitters[$priority] ??= new EmitterCollection())->push($flowBuilder->buildEmitters());
+                ($this->sourcedReceivers[$priority] ??= new ReceiverCollection())->push($flowBuilder->buildReceivers());
+                ($this->sourcedStatusReporters[$priority] ??= new StatusReporterCollection())->push($flowBuilder->buildStatusReporters());
+                ($this->sourcedWebHttpHandlers[$priority] ??= new HttpHandlerCollection())->push($flowBuilder->buildHttpHandlers());
+            }
+        }
+
+        $this->flowBuilderFiles = [];
+
+        \ksort($this->sourcedExplorers);
+        \ksort($this->sourcedEmitters);
+        \ksort($this->sourcedReceivers);
+        \ksort($this->sourcedStatusReporters);
+        \ksort($this->sourcedWebHttpHandlers);
+
+        $this->sourcedExplorers = \array_merge(...\array_map(
+            static fn (ExplorerCollection $explorers) => $explorers->asArray(),
+            $this->sourcedExplorers
+        ));
+
+        $this->sourcedEmitters = \array_merge(...\array_map(
+            static fn (EmitterCollection $emitters) => $emitters->asArray(),
+            $this->sourcedEmitters
+        ));
+
+        $this->sourcedReceivers = \array_merge(...\array_map(
+            static fn (ReceiverCollection $receivers) => $receivers->asArray(),
+            $this->sourcedReceivers
+        ));
+
+        $this->sourcedStatusReporters = \array_merge(...\array_map(
+            static fn (StatusReporterCollection $statusReporters) => $statusReporters->asArray(),
+            $this->sourcedStatusReporters
+        ));
+
+        $this->sourcedWebHttpHandlers = \array_merge(...\array_map(
+            static fn (HttpHandlerCollection $webHttpHandlers) => $webHttpHandlers->asArray(),
+            $this->sourcedWebHttpHandlers
+        ));
+
+        $this->isLoaded = true;
     }
 }

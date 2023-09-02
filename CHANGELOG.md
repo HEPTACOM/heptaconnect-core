@@ -9,11 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add exception code `1693671570` in `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass::getServiceReferencesGroupedBySource` when a flow component service is missing a source attribute on its tag
+
 ### Changed
 
-- Sort flow component stacks by priority, if the service definition tag has a priority attribute.
+- Sort flow components by priority, if the service definition tag has a priority attribute
 
 ### Deprecated
+
+- Deprecate parameter `$source` in method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getExplorers`
+- Deprecate parameter `$source` in method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getEmitters`
+- Deprecate parameter `$source` in method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getReceivers`
+- Deprecate parameter `$source` in method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getStatusReporters`
+- Deprecate parameter `$source` in method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getWebHttpHandlers`
+- Deprecate method `\Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry::getOrderedSources`
 
 ### Removed
 
