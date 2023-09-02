@@ -8,6 +8,7 @@ use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
@@ -70,12 +71,29 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
             $definition = $container->findDefinition((string) $reference);
             $tagData = $definition->getTag($tag);
 
-            $groupKey = $tagData[0]['source'] ?? null;
+            $priority = $tagData[0]['priority'] ?? null;
 
-            if ($groupKey !== null) {
-                $grouped[$groupKey][] = $reference;
+            if (!\is_int($priority)) {
+                $source = $tagData[0]['source'] ?? null;
+
+                if (!\is_string($source)) {
+                    throw new \Exception(
+                        'Tag "' . $tag . '" of service "' . $reference . '" is missing "source" attribute.',
+                        1693671570
+                    );
+                }
+
+                if (\is_a($source, PortalContract::class, true)) {
+                    $priority = 0;
+                } else {
+                    $priority = 1000;
+                }
             }
+
+            $grouped[$priority][] = $reference;
         }
+
+        \ksort($grouped);
 
         return $grouped;
     }
