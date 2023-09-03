@@ -56,7 +56,7 @@ class FlowComponentRegistry
      * @param array<int, ReceiverCollection>       $sourcedReceivers
      * @param array<int, StatusReporterCollection> $sourcedStatusReporters
      * @param array<int, HttpHandlerCollection>    $sourcedWebHttpHandlers
-     * @param array<class-string, string[]>                 $flowBuilderFiles
+     * @param array<class-string, string[]>        $flowBuilderFiles
      */
     public function __construct(
         PackageCollection $packages,
