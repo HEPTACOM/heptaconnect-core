@@ -8,7 +8,8 @@ use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
@@ -16,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\PriorityTaggedServiceTrait;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 final class BuildDefinitionForFlowComponentRegistryCompilerPass implements CompilerPassInterface
 {
@@ -43,6 +45,7 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
         $groupedWebHttpHandlers = $this->getServiceReferencesGroupedBySource($container, PortalStackServiceContainerBuilder::WEB_HTTP_HANDLER_SOURCE_TAG);
 
         $container->setDefinition(FlowComponentRegistry::class, (new Definition(FlowComponentRegistry::class))->setArguments([
+            new Reference(PackageCollection::class),
             $this->groupServices(ExplorerCollection::class, $groupedExplorers),
             $this->groupServices(EmitterCollection::class, $groupedEmitters),
             $this->groupServices(ReceiverCollection::class, $groupedReceivers),
@@ -64,6 +67,9 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
 
     private function getServiceReferencesGroupedBySource(ContainerBuilder $container, string $tag): array
     {
+        /** @var PackageCollection $packages */
+        $packages = $container->get(PackageCollection::class);
+
         $grouped = [];
         $serviceIds = $this->findAndSortTaggedServices($tag, $container);
 
@@ -83,11 +89,8 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
                     );
                 }
 
-                if (\is_a($source, PortalContract::class, true)) {
-                    $priority = 0;
-                } else {
-                    $priority = 1000;
-                }
+                $sourcePackage = $this->getSourcePackage($packages, $source);
+                $priority = $sourcePackage->getDefaultFlowComponentPriority();
             }
 
             $grouped[$priority][] = $reference;
@@ -96,5 +99,25 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
         \ksort($grouped);
 
         return $grouped;
+    }
+
+    private function getSourcePackage(PackageCollection $builtPackages, string $source): PackageContract
+    {
+        $packages = $builtPackages->withoutItems();
+
+        $packages->push($builtPackages->filter(
+            static fn (PackageContract $package): bool => \is_a($package, $source)
+        ));
+
+        $sourcePackage = $packages->first();
+
+        if (!$sourcePackage instanceof PackageContract) {
+            throw new \Exception(
+                'Unable to find source package "' . $source . '" in built packages.',
+                1693698154
+            );
+        }
+
+        return $sourcePackage;
     }
 }

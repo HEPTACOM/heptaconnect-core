@@ -7,7 +7,9 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
@@ -15,6 +17,8 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 class FlowComponentRegistry
 {
     private bool $isLoaded = false;
+
+    private PackageCollection $packages;
 
     /**
      * @var array<int, ExplorerCollection>
@@ -55,6 +59,7 @@ class FlowComponentRegistry
      * @param array<class-string, string[]>                 $flowBuilderFiles
      */
     public function __construct(
+        PackageCollection $packages,
         array $sourcedExplorers,
         array $sourcedEmitters,
         array $sourcedReceivers,
@@ -62,6 +67,7 @@ class FlowComponentRegistry
         array $sourcedWebHttpHandlers,
         array $flowBuilderFiles
     ) {
+        $this->packages = $packages;
         $this->sourcedExplorers = $sourcedExplorers;
         $this->sourcedEmitters = $sourcedEmitters;
         $this->sourcedReceivers = $sourcedReceivers;
@@ -145,6 +151,9 @@ class FlowComponentRegistry
                 $flowBuilder = new FlowComponent();
 
                 $flowBuilder->reset();
+                $flowBuilder->setDefaultPriority(
+                    $this->getSourcePackage($source)->getDefaultFlowComponentPriority()
+                );
 
                 foreach ($files as $file) {
                     // prevent access to object context
@@ -153,17 +162,25 @@ class FlowComponentRegistry
                     })($file);
                 }
 
-                if (\is_a($source, PortalContract::class, true)) {
-                    $priority = 0;
-                } else {
-                    $priority = 1000;
+                foreach ($flowBuilder->buildExplorers() as $priority => $explorer) {
+                    ($this->sourcedExplorers[$priority] ??= new ExplorerCollection())->push([$explorer]);
                 }
 
-                ($this->sourcedExplorers[$priority] ??= new ExplorerCollection())->push($flowBuilder->buildExplorers());
-                ($this->sourcedEmitters[$priority] ??= new EmitterCollection())->push($flowBuilder->buildEmitters());
-                ($this->sourcedReceivers[$priority] ??= new ReceiverCollection())->push($flowBuilder->buildReceivers());
-                ($this->sourcedStatusReporters[$priority] ??= new StatusReporterCollection())->push($flowBuilder->buildStatusReporters());
-                ($this->sourcedWebHttpHandlers[$priority] ??= new HttpHandlerCollection())->push($flowBuilder->buildHttpHandlers());
+                foreach ($flowBuilder->buildEmitters() as $priority => $emitter) {
+                    ($this->sourcedEmitters[$priority] ??= new EmitterCollection())->push([$emitter]);
+                }
+
+                foreach ($flowBuilder->buildReceivers() as $priority => $receiver) {
+                    ($this->sourcedReceivers[$priority] ??= new ReceiverCollection())->push([$receiver]);
+                }
+
+                foreach ($flowBuilder->buildStatusReporters() as $priority => $statusReporter) {
+                    ($this->sourcedStatusReporters[$priority] ??= new StatusReporterCollection())->push([$statusReporter]);
+                }
+
+                foreach ($flowBuilder->buildHttpHandlers() as $priority => $httpHandler) {
+                    ($this->sourcedWebHttpHandlers[$priority] ??= new HttpHandlerCollection())->push([$httpHandler]);
+                }
             }
         }
 
@@ -201,5 +218,25 @@ class FlowComponentRegistry
         ));
 
         $this->isLoaded = true;
+    }
+
+    private function getSourcePackage(string $source): PackageContract
+    {
+        $packages = $this->packages->withoutItems();
+
+        $packages->push($this->packages->filter(
+            static fn (PackageContract $package): bool => \is_a($package, $source)
+        ));
+
+        $sourcePackage = $packages->first();
+
+        if (!$sourcePackage instanceof PackageContract) {
+            throw new \Exception(
+                'Unable to find source package "' . $source . '" in built packages.',
+                1693695453
+            );
+        }
+
+        return $sourcePackage;
     }
 }
