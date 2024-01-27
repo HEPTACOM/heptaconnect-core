@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add exception code `1693671570` in `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass::getServiceReferencesGroupedBySource` when a flow component service is missing a source attribute on its tag
+- Add exception code `1693698154` in `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass::getSourcePackage` when a referenced flow component package is not found in known packages
 
 ### Changed
 
