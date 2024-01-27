@@ -112,12 +112,7 @@ final class ExploreService implements ExploreServiceInterface
         $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
         /** @var FlowComponentRegistry $flowComponentRegistry */
         $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
-        $components = new ExplorerCollection();
 
-        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
-            $components->push($flowComponentRegistry->getExplorers($source));
-        }
-
-        return $components;
+        return $flowComponentRegistry->getExplorers();
     }
 }
