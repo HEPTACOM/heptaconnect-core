@@ -8,7 +8,6 @@ use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInter
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
@@ -25,12 +24,11 @@ final class EmitterStackBuilderFactory implements EmitterStackBuilderFactoryInte
         EntityType $entityType
     ): EmitterStackBuilderInterface {
         $flowComponentRegistry = $this->portalContainerFactory->create($portalNodeKey)->getFlowComponentRegistry();
-        $components = new EmitterCollection();
 
-        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
-            $components->push($flowComponentRegistry->getEmitters($source));
-        }
-
-        return new EmitterStackBuilder($components, $entityType, $this->logger);
+        return new EmitterStackBuilder(
+            $flowComponentRegistry->getEmitters(),
+            $entityType,
+            $this->logger
+        );
     }
 }

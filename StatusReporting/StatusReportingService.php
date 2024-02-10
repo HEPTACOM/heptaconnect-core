@@ -36,11 +36,6 @@ final class StatusReportingService implements StatusReportingServiceInterface
         $flowComponentRegistry = $this->portalStackServiceContainerFactory
             ->create($portalNodeKey)
             ->getFlowComponentRegistry();
-        $statusReporters = new StatusReporterCollection();
-
-        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
-            $statusReporters->push($flowComponentRegistry->getStatusReporters($source));
-        }
 
         $context = $this->statusReportingContextFactory->factory($portalNodeKey);
         $result = [];

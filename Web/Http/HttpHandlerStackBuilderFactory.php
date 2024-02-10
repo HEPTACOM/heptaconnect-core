@@ -7,7 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterface;
-use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
 use Psr\Log\LoggerInterface;
 
@@ -24,12 +23,7 @@ final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFac
         $flowComponentRegistry = $this->portalContainerFactory
             ->create($stackIdentifier->getPortalNodeKey())
             ->getFlowComponentRegistry();
-        $components = new HttpHandlerCollection();
 
-        foreach ($flowComponentRegistry->getOrderedSources() as $source) {
-            $components->push($flowComponentRegistry->getWebHttpHandlers($source));
-        }
-
-        return new HttpHandlerStackBuilder($components, $stackIdentifier->getPath(), $this->logger);
+        return new HttpHandlerStackBuilder($flowComponentRegistry->getWebHttpHandlers(), $stackIdentifier->getPath(), $this->logger);
     }
 }
