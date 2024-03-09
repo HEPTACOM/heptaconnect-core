@@ -7,22 +7,19 @@ namespace Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
 {
-    private array $prototypedIds;
-
-    /**
-     * @var class-string[]
-     */
-    private array $excludedClasses;
-
     /**
      * @param class-string[] $excludedClasses
      */
-    public function __construct(array $prototypedIds, array $excludedClasses)
-    {
-        $this->prototypedIds = $prototypedIds;
-        $this->excludedClasses = $excludedClasses;
+    public function __construct(
+        private array $prototypedIds,
+        private array $excludedClasses
+    ) {
     }
 
     public function process(ContainerBuilder $container): void
@@ -49,7 +46,7 @@ final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassI
         }
     }
 
-    protected function isPrototypable(string $class): bool
+    private function isPrototypable(string $class): bool
     {
         if (!\class_exists($class)) {
             return false;

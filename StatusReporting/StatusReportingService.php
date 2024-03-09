@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\StatusReporting;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
-use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\StatusReporting\Contract\StatusReportingServiceInterface;
@@ -19,36 +18,24 @@ use Psr\Log\LoggerInterface;
 
 final class StatusReportingService implements StatusReportingServiceInterface
 {
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @return array<array-key, StatusReporterStackInterface>
      */
     private array $statusReporterStackCache = [];
 
-    private PortalStackServiceContainerFactory $portalStackServiceContainerFactory;
-
-    private StatusReportingContextFactoryInterface $statusReportingContextFactory;
-
     public function __construct(
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        StatusReportingContextFactoryInterface $statusReportingContextFactory
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private StatusReportingContextFactoryInterface $statusReportingContextFactory
     ) {
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->portalStackServiceContainerFactory = $portalStackServiceContainerFactory;
-        $this->statusReportingContextFactory = $statusReportingContextFactory;
     }
 
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array
     {
-        $container = $this->portalStackServiceContainerFactory->create($portalNodeKey);
-        /** @var FlowComponentRegistry $flowComponentRegistry */
-        $flowComponentRegistry = $container->get(FlowComponentRegistry::class);
+        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+            ->create($portalNodeKey)
+            ->getFlowComponentRegistry();
         $statusReporters = $flowComponentRegistry->getStatusReporters();
 
         $context = $this->statusReportingContextFactory->factory($portalNodeKey);
@@ -78,7 +65,7 @@ final class StatusReportingService implements StatusReportingServiceInterface
         StatusReporterCollection $statusReporters,
         string $topic
     ): array {
-        $topicStatusReporters = new StatusReporterCollection($statusReporters->bySupportedTopic($topic));
+        $topicStatusReporters = $statusReporters->bySupportedTopic($topic);
 
         if ($topicStatusReporters->isEmpty()) {
             $this->logger->critical(LogMessage::STATUS_REPORT_NO_STATUS_REPORTER_FOR_TYPE(), [
@@ -115,11 +102,13 @@ final class StatusReportingService implements StatusReportingServiceInterface
         string $topic
     ): StatusReporterStackInterface {
         $cacheKey = \md5(\implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $topic]));
+        $result = $this->statusReporterStackCache[$cacheKey] ?? null;
 
-        if (!isset($this->statusReporterStackCache[$cacheKey])) {
-            $this->statusReporterStackCache[$cacheKey] = new StatusReporterStack($statusReporters, $this->logger);
+        if (!$result instanceof StatusReporterStackInterface) {
+            $result = new StatusReporterStack($statusReporters, $this->logger);
+            $this->statusReporterStackCache[$cacheKey] = $result;
         }
 
-        return clone $this->statusReporterStackCache[$cacheKey];
+        return clone $result;
     }
 }

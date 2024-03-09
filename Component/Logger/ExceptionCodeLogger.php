@@ -9,11 +9,9 @@ use Psr\Log\LoggerInterface;
 
 class ExceptionCodeLogger extends AbstractLogger
 {
-    private LoggerInterface $decorated;
-
-    public function __construct(LoggerInterface $decorated)
-    {
-        $this->decorated = $decorated;
+    public function __construct(
+        private LoggerInterface $decorated
+    ) {
     }
 
     public function log($level, $message, array $context = []): void
@@ -21,7 +19,7 @@ class ExceptionCodeLogger extends AbstractLogger
         $codeMessage = '';
         foreach ($context as $throwable) {
             if ($throwable instanceof \Throwable) {
-                $codeMessage .= '[' . \get_class($throwable) . ' Code: ' . $throwable->getCode() . '] ';
+                $codeMessage .= '[' . $throwable::class . ' Code: ' . $throwable->getCode() . '] ';
             }
         }
         $this->decorated->log($level, $codeMessage . $message, $context);

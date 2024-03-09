@@ -23,6 +23,12 @@ use Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamWrapperInterface;
  *         "prepend_safe_separator": true // if "prepend" is handled as directory and shall be merged with the path using a directory separator
  *     ]
  * ]
+ *
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 final class RewritePathStreamWrapper implements StreamWrapperInterface
 {
@@ -62,14 +68,22 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     public function stream_cast(int $cast_as)
     {
-        return $this->file;
+        $result = $this->file;
+
+        if (\is_resource($result)) {
+            return $result;
+        }
+
+        return false;
     }
 
     public function stream_close(): void
     {
         try {
             if (\is_resource($this->file)) {
-                \fclose($this->file);
+                $stream = $this->file;
+                $this->file = null;
+                \fclose($stream);
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
@@ -155,7 +169,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (\is_resource($this->file)) {
-                return \ftell($this->file);
+                $result = \ftell($this->file);
+
+                if ($result !== false) {
+                    return $result;
+                }
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
@@ -179,7 +197,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (\is_resource($this->file)) {
-                return \fwrite($this->file, $data);
+                $result = \fwrite($this->file, $data);
+
+                if ($result !== false) {
+                    return $result;
+                }
             }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
@@ -208,7 +230,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
-    public function dir_readdir()
+    public function dir_readdir(): mixed
     {
         try {
             if (\is_resource($this->directory)) {
@@ -230,7 +252,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     public function dir_rewinddir(): bool
     {
         try {
-            return \is_resource($this->directory) && (\rewinddir($this->directory) ?? false);
+            if (\is_resource($this->directory)) {
+                \rewinddir($this->directory);
+
+                return true;
+            }
         } catch (\Throwable $throwable) {
             \trigger_error($throwable->getMessage(), \E_USER_WARNING);
         }
@@ -242,18 +268,26 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     // START NODE OPERATIONS
 
-    public function stream_metadata(string $path, int $option, $value): bool
+    public function stream_metadata(string $path, int $option, mixed $value): bool
     {
         try {
             $path = $this->toNewPath($path);
 
             switch ($option) {
                 case \STREAM_META_TOUCH:
-                    return \touch(
-                        $path,
-                        \is_array($value) && \array_key_exists(0, $value) ? $value[0] : \time(),
-                        \is_array($value) && \array_key_exists(1, $value) ? $value[1] : \time()
-                    );
+                    if (\is_array($value) && \array_key_exists(0, $value) && \is_numeric($value[0])) {
+                        $mtime = (int) $value[0];
+                    } else {
+                        $mtime = \time();
+                    }
+
+                    if (\is_array($value) && \array_key_exists(1, $value) && \is_numeric($value[1])) {
+                        $atime = (int) $value[1];
+                    } else {
+                        $atime = \time();
+                    }
+
+                    return \touch($path, $mtime, $atime);
                 case \STREAM_META_OWNER_NAME:
                     if (!\is_string($value)) {
                         throw new \InvalidArgumentException('Parameter is expected to be string');
@@ -279,6 +313,10 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
                     return \chgrp($path, $value);
                 case \STREAM_META_ACCESS:
+                    if (!\is_int($value)) {
+                        throw new \InvalidArgumentException('Parameter is expected to be int');
+                    }
+
                     return \chmod($path, $value);
             }
         } catch (\Throwable $throwable) {
@@ -383,7 +421,11 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (($flags & \STREAM_URL_STAT_LINK) === \STREAM_URL_STAT_LINK) {
-                $path = \readlink($this->toNewPath($path));
+                $linkedPath = \readlink($this->toNewPath($path));
+
+                if ($linkedPath !== false) {
+                    $path = $linkedPath;
+                }
             }
 
             return @\stat($this->toNewPath($path));
@@ -398,12 +440,16 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     private function toNewPath(string $path): string
     {
-        $protocolOptions = $this->getOptions($path)['protocol'];
+        $protocolOptions = $this->getOptions($path)['protocol'] ?? [];
         $pathOptions = $this->getOptions($path)['path'] ?? [];
         [
             'protocol' => $oldProtocol,
             'remaining' => $remaining,
         ] = $this->trimProtocol($path);
+
+        if ($oldProtocol === null) {
+            \trigger_error('Option resolution failed due to missing protocol', \E_USER_ERROR);
+        }
 
         $protocol = $oldProtocol;
 
@@ -465,6 +511,21 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return $path;
     }
 
+    /**
+     * @return array{
+     *     path?: array{
+     *          set?: string,
+     *          prepend?: string,
+     *          append?: string,
+     *          prepend_safe_separator?: bool
+     *     },
+     *     protocol?: array{
+     *          set?: string,
+     *          prepend?: string,
+     *          append?: string
+     *     }
+     * }
+     */
     private function getOptions(?string $path): array
     {
         $protocol = $this->lastProtocol;
@@ -474,7 +535,66 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
             $this->lastProtocol = $protocol;
         }
 
-        return \stream_context_get_options($this->getContext())[$protocol];
+        if ($protocol === null) {
+            \trigger_error('Option resolution failed due to missing protocol', \E_USER_ERROR);
+        }
+
+        $options = \stream_context_get_options($this->getContext())[$protocol] ?? [];
+
+        if (!\is_array($options)) {
+            return [];
+        }
+
+        if (isset($options['path'])) {
+            if (!\is_array($options['path'])) {
+                \trigger_error(\sprintf('Option "path" is not a valid array/object for protocol: "%s"', $protocol), \E_USER_WARNING);
+                unset($options['path']);
+            } else {
+                if (isset($options['path']['set']) && !\is_string($options['path']['set'])) {
+                    \trigger_error(\sprintf('Option "path.set" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['set']);
+                }
+
+                if (isset($options['path']['prepend']) && !\is_string($options['path']['prepend'])) {
+                    \trigger_error(\sprintf('Option "path.prepend" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['prepend']);
+                }
+
+                if (isset($options['path']['append']) && !\is_string($options['path']['append'])) {
+                    \trigger_error(\sprintf('Option "path.append" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['append']);
+                }
+
+                if (isset($options['path']['prepend_safe_separator']) && !\is_bool($options['path']['prepend_safe_separator'])) {
+                    \trigger_error(\sprintf('Option "path.prepend_safe_separator" is not a valid bool for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['path']['prepend_safe_separator']);
+                }
+            }
+        }
+
+        if (isset($options['protocol'])) {
+            if (!\is_array($options['protocol'])) {
+                \trigger_error(\sprintf('Option "protocol" is not a valid array/object for protocol: "%s"', $protocol), \E_USER_WARNING);
+                unset($options['protocol']);
+            } else {
+                if (isset($options['protocol']['set']) && !\is_string($options['protocol']['set'])) {
+                    \trigger_error(\sprintf('Option "protocol.set" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['set']);
+                }
+
+                if (isset($options['protocol']['prepend']) && !\is_string($options['protocol']['prepend'])) {
+                    \trigger_error(\sprintf('Option "protocol.prepend" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['prepend']);
+                }
+
+                if (isset($options['protocol']['append']) && !\is_string($options['protocol']['append'])) {
+                    \trigger_error(\sprintf('Option "protocol.append" is not a valid string for protocol: "%s"', $protocol), \E_USER_WARNING);
+                    unset($options['protocol']['append']);
+                }
+            }
+        }
+
+        return $options;
     }
 
     /**

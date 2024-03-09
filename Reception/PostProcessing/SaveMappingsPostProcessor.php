@@ -14,6 +14,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistCr
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistDeletePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistPayloadCollection;
+use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistPayloadContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Persist\IdentityPersistUpdatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityPersistActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
@@ -21,24 +22,16 @@ use Psr\Log\LoggerInterface;
 
 final class SaveMappingsPostProcessor extends PostProcessorContract
 {
-    private DeepObjectIteratorContract $deepObjectIterator;
-
-    private IdentityPersistActionInterface $identityPersistAction;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        DeepObjectIteratorContract $deepObjectIterator,
-        IdentityPersistActionInterface $identityPersistAction,
-        LoggerInterface $logger
+        private DeepObjectIteratorContract $deepObjectIterator,
+        private IdentityPersistActionInterface $identityPersistAction,
+        private LoggerInterface $logger
     ) {
-        $this->deepObjectIterator = $deepObjectIterator;
-        $this->identityPersistAction = $identityPersistAction;
-        $this->logger = $logger;
     }
 
     public function handle(PostReceptionEvent $event): void
     {
+        /** @var SaveMappingsData[] $saveMappingsData */
         $saveMappingsData = \iterable_to_array($event->getContext()->getPostProcessingBag()->of(SaveMappingsData::class));
         $entities = \array_map(static fn (SaveMappingsData $data): DatasetEntityContract => $data->getEntity(), $saveMappingsData);
 
@@ -66,60 +59,65 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
                 continue;
             }
 
-            $primaryKeyChanges = $entity->getAttachment(PrimaryKeyChangesAttachable::class);
+            $persistPayload = $this->getPersistPayloadFromEntity($entity);
 
-            if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable) {
-                // no change
+            if ($persistPayload === null) {
                 continue;
             }
 
-            $externalId = $primaryKeyChanges->getForeignKey();
-            $firstForeignKey = $primaryKeyChanges->getFirstForeignKey();
-
-            if ($firstForeignKey === $externalId) {
-                // no change
-                continue;
-            }
-
-            $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
-
-            if (!$mapping instanceof PrimaryKeySharingMappingStruct) {
-                $this->logger->critical('Unknown mapping origin', [
-                    'code' => 1637527920,
-                    'firstForeignKey' => $firstForeignKey,
-                    'externalId' => $externalId,
-                    'entityType' => \get_class($entity),
-                ]);
-
-                continue;
-            }
-
-            if ($mapping->getExternalId() === null) {
-                $this->logger->critical('Invalid mapping origin', [
-                    'code' => 1637527921,
-                    'firstForeignKey' => $firstForeignKey,
-                    'externalId' => $externalId,
-                    'entityType' => \get_class($entity),
-                ]);
-
-                continue;
-            }
-
-            if ($firstForeignKey === null && $externalId !== null) {
-                $payload->getIdentityPersistPayloads()->push([
-                    new IdentityPersistCreatePayload($mapping->getMappingNodeKey(), $externalId),
-                ]);
-            } elseif ($externalId === null) {
-                $payload->getIdentityPersistPayloads()->push([
-                    new IdentityPersistDeletePayload($mapping->getMappingNodeKey()),
-                ]);
-            } else {
-                $payload->getIdentityPersistPayloads()->push([
-                    new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId),
-                ]);
-            }
+            $payload->getIdentityPersistPayloads()->push([$persistPayload]);
         }
 
         $this->identityPersistAction->persist($payload);
+    }
+
+    private function getPersistPayloadFromEntity(DatasetEntityContract $entity): ?IdentityPersistPayloadContract
+    {
+        $primaryKeyChanges = $entity->getAttachment(PrimaryKeyChangesAttachable::class);
+
+        if (!$primaryKeyChanges instanceof PrimaryKeyChangesAttachable) {
+            // no change
+            return null;
+        }
+
+        $externalId = $primaryKeyChanges->getForeignKey();
+        $firstForeignKey = $primaryKeyChanges->getFirstForeignKey();
+
+        if ($firstForeignKey === $externalId) {
+            // no change
+            return null;
+        }
+
+        $mapping = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);
+
+        if (!$mapping instanceof PrimaryKeySharingMappingStruct) {
+            $this->logger->critical('Unknown mapping origin', [
+                'code' => 1637527920,
+                'firstForeignKey' => $firstForeignKey,
+                'externalId' => $externalId,
+                'entityType' => $entity::class,
+            ]);
+
+            return null;
+        }
+
+        if ($mapping->getExternalId() === null) {
+            $this->logger->critical('Invalid mapping origin', [
+                'code' => 1637527921,
+                'firstForeignKey' => $firstForeignKey,
+                'externalId' => $externalId,
+                'entityType' => $entity::class,
+            ]);
+
+            return null;
+        }
+
+        if ($firstForeignKey === null && $externalId !== null) {
+            return new IdentityPersistCreatePayload($mapping->getMappingNodeKey(), $externalId);
+        } elseif ($externalId === null) {
+            return new IdentityPersistDeletePayload($mapping->getMappingNodeKey());
+        }
+
+        return new IdentityPersistUpdatePayload($mapping->getMappingNodeKey(), $externalId);
     }
 }

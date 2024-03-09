@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
+use Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
+use Heptacom\HeptaConnect\Dataset\Base\Support\AttachmentAwareTrait;
 
-class PackageConfiguration
+final class PackageConfiguration implements AttachmentAwareInterface
 {
+    use AttachmentAwareTrait;
+
     private string $name = '';
 
     private StringCollection $tags;

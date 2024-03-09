@@ -17,15 +17,23 @@ final class ScalarDenormalizer implements DenormalizerInterface
         return 'scalar';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        if (!$this->supportsDenormalization($data, $type)) {
+        if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
         }
 
         return \unserialize($data, ['allowed_classes' => false]);
     }
 
+    /**
+     * @param string|null $format
+     *
+     * @psalm-assert string $data
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()

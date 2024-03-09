@@ -12,11 +12,9 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContract
 {
-    private HeaderUtilityInterface $headerUtility;
-
-    public function __construct(HeaderUtilityInterface $headerUtility)
-    {
-        $this->headerUtility = $headerUtility;
+    public function __construct(
+        private HeaderUtilityInterface $headerUtility
+    ) {
     }
 
     public function formatMessage(MessageInterface $message): string
@@ -78,7 +76,7 @@ final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContr
         $raw = [];
 
         foreach ($message->getHeaders() as $header => $values) {
-            if (\in_array(\strtolower($header), ['transfer-encoding'], true)) {
+            if (\in_array(\strtolower((string) $header), ['transfer-encoding'], true)) {
                 continue;
             }
 

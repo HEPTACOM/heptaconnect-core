@@ -9,11 +9,9 @@ use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterfa
 
 final class Filesystem implements FilesystemInterface
 {
-    private StreamUriSchemePathConverterInterface $uriSchemePathConverter;
-
-    public function __construct(StreamUriSchemePathConverterInterface $uriSchemePathConverter)
-    {
-        $this->uriSchemePathConverter = $uriSchemePathConverter;
+    public function __construct(
+        private StreamUriSchemePathConverterInterface $uriSchemePathConverter
+    ) {
     }
 
     public function toStoragePath(string $path): string

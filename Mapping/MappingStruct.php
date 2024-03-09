@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Mapping;
 
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\MappingNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -13,16 +14,10 @@ final class MappingStruct implements MappingInterface
 {
     private ?string $externalId = null;
 
-    private PortalNodeKeyInterface $portalNodeId;
-
-    private MappingNodeStructInterface $mappingNodeStruct;
-
     public function __construct(
-        PortalNodeKeyInterface $portalNodeId,
-        MappingNodeStructInterface $mappingNodeStruct
+        private PortalNodeKeyInterface $portalNodeId,
+        private MappingNodeStructInterface $mappingNodeStruct
     ) {
-        $this->portalNodeId = $portalNodeId;
-        $this->mappingNodeStruct = $mappingNodeStruct;
     }
 
     public function getExternalId(): ?string
@@ -47,7 +42,7 @@ final class MappingStruct implements MappingInterface
         return $this->mappingNodeStruct->getKey();
     }
 
-    public function getEntityType(): string
+    public function getEntityType(): EntityType
     {
         return $this->mappingNodeStruct->getEntityType();
     }

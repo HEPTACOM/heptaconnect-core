@@ -6,7 +6,9 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\EmissionHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
@@ -20,28 +22,13 @@ use Psr\Log\LoggerInterface;
 
 final class EmissionHandler implements EmissionHandlerInterface
 {
-    private EmitServiceInterface $emitService;
-
-    private JobStartActionInterface $jobStartAction;
-
-    private JobFinishActionInterface $jobFinishAction;
-
-    private JobFailActionInterface $jobFailAction;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        EmitServiceInterface $emitService,
-        JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction,
-        JobFailActionInterface $jobFailAction,
-        LoggerInterface $logger
+        private EmitServiceInterface $emitService,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction,
+        private JobFailActionInterface $jobFailAction,
+        private LoggerInterface $logger
     ) {
-        $this->emitService = $emitService;
-        $this->jobStartAction = $jobStartAction;
-        $this->jobFinishAction = $jobFinishAction;
-        $this->jobFailAction = $jobFailAction;
-        $this->logger = $logger;
     }
 
     public function triggerEmission(JobDataCollection $jobs): void
@@ -50,9 +37,10 @@ final class EmissionHandler implements EmissionHandlerInterface
         /** @var JobKeyInterface[][] $processed */
         $processed = [];
 
+        /** @var JobData $job */
         foreach ($jobs as $job) {
-            $emissions[$job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
-            $processed[$job->getMappingComponent()->getEntityType()][] = $job->getJobKey();
+            $emissions[(string) $job->getMappingComponent()->getEntityType()][] = $job->getMappingComponent();
+            $processed[(string) $job->getMappingComponent()->getEntityType()][] = $job->getJobKey();
         }
 
         foreach ($emissions as $dataType => $emission) {
@@ -70,7 +58,7 @@ final class EmissionHandler implements EmissionHandlerInterface
 
                 try {
                     $this->emitService->emit(new TypedMappingComponentCollection(
-                        $dataType,
+                        new EntityType($dataType),
                         $emissionChunk
                     ));
                 } catch (\Throwable $exception) {

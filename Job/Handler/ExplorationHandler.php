@@ -6,53 +6,40 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExploreServiceInterface;
 use Heptacom\HeptaConnect\Core\Job\Contract\ExplorationHandlerInterface;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityTypeCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Fail\JobFailPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Finish\JobFinishPayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Start\JobStartPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Psr\Log\LoggerInterface;
 
 final class ExplorationHandler implements ExplorationHandlerInterface
 {
-    private ExploreServiceInterface $exploreService;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private JobStartActionInterface $jobStartAction;
-
-    private JobFinishActionInterface $jobFinishAction;
-
-    private JobFailActionInterface $jobFailAction;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        ExploreServiceInterface $exploreService,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction,
-        JobFailActionInterface $jobFailAction,
-        LoggerInterface $logger
+        private ExploreServiceInterface $exploreService,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction,
+        private JobFailActionInterface $jobFailAction,
+        private LoggerInterface $logger
     ) {
-        $this->exploreService = $exploreService;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->jobStartAction = $jobStartAction;
-        $this->jobFinishAction = $jobFinishAction;
-        $this->jobFailAction = $jobFailAction;
-        $this->logger = $logger;
     }
 
     public function triggerExplorations(JobDataCollection $jobs): void
     {
         $keys = [];
         $types = [];
+        /** @var JobKeyInterface[][] $jobKeys */
         $jobKeys = [];
 
+        /** @var JobData $job */
         foreach ($jobs as $job) {
             $mapping = $job->getMappingComponent();
             $key = $this->storageKeyGenerator->serialize($mapping->getPortalNodeKey());
@@ -80,7 +67,7 @@ final class ExplorationHandler implements ExplorationHandlerInterface
             try {
                 $this->exploreService->explore(
                     $portalNodeKey,
-                    $type
+                    new EntityTypeCollection($type)
                 );
             } catch (\Throwable $exception) {
                 $this->logger->error($exception->getMessage(), [

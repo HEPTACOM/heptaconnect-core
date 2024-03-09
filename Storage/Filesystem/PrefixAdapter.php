@@ -8,6 +8,9 @@ use League\Flysystem\Adapter\AbstractAdapter;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\Config;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 final class PrefixAdapter extends AbstractAdapter
 {
     private AdapterInterface $decorated;
@@ -90,6 +93,7 @@ final class PrefixAdapter extends AbstractAdapter
 
     public function listContents($directory = '', $recursive = false)
     {
+        /** @var array{path: string}[] $original */
         $original = $this->decorated->listContents($this->applyPathPrefix($directory), $recursive);
         $result = [];
 

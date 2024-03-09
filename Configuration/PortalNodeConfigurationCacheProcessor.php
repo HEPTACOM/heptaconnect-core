@@ -11,27 +11,27 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigurationProcessorInterface
 {
-    private CacheItemPoolInterface $cache;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    public function __construct(CacheItemPoolInterface $cache, StorageKeyGeneratorContract $storageKeyGenerator)
-    {
-        $this->cache = $cache;
-        $this->storageKeyGenerator = $storageKeyGenerator;
+    public function __construct(
+        private CacheItemPoolInterface $cache,
+        private StorageKeyGeneratorContract $storageKeyGenerator
+    ) {
     }
 
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
 
-        if (!$cachedConfig->isHit()) {
-            $configuration = $read();
-
-            $this->cache->save($cachedConfig->set($configuration));
-        } else {
+        if ($cachedConfig->isHit()) {
             $configuration = $cachedConfig->get();
+
+            if (\is_array($configuration)) {
+                return $configuration;
+            }
         }
+
+        $configuration = $read();
+
+        $this->cache->save($cachedConfig->set($configuration));
 
         return $configuration;
     }

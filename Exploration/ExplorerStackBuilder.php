@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
 use Heptacom\HeptaConnect\Core\Exploration\Contract\ExplorerStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
-use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerStack;
 use Psr\Log\LoggerInterface;
 
 final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
@@ -18,36 +17,27 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     private ExplorerCollection $decorators;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
-
-    private LoggerInterface $logger;
+    private EntityType $entityType;
 
     /**
      * @var ExplorerContract[]
      */
     private array $explorers = [];
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
     public function __construct(
         ExplorerCollection $sources,
-        string $entityType,
-        LoggerInterface $logger
+        EntityType $entityType,
+        private LoggerInterface $logger
     ) {
-        $sources = new ExplorerCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
-        $this->logger = $logger;
     }
 
     public function push(ExplorerContract $explorer): self
     {
-        if (\is_a($this->entityType, $explorer->supports(), true)) {
+        if ($this->entityType->equals($explorer->getSupportedEntityType())) {
             $this->logger->debug('ExplorerStackBuilder: Pushed an arbitrary explorer.', [
                 'explorer' => $explorer,
             ]);
@@ -100,11 +90,14 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 
     public function build(): ExplorerStackInterface
     {
-        $explorerStack = new ExplorerStack(\array_map(
-            static fn (ExplorerContract $e) => clone $e,
-            \array_reverse($this->explorers, false),
-        ));
-        $explorerStack->setLogger($this->logger);
+        $explorerStack = new ExplorerStack(
+            \array_map(
+                static fn (ExplorerContract $explorer): ExplorerContract => clone $explorer,
+                \array_reverse($this->explorers, false),
+            ),
+            $this->entityType,
+            $this->logger
+        );
 
         $this->logger->debug('ExplorerStackBuilder: Built explorer stack.');
 

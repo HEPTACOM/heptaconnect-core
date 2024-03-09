@@ -16,11 +16,11 @@ final class HeaderUtility implements HeaderUtilityInterface
         $headers = $this->sortHeaders($headers);
 
         foreach (\array_keys($headers) as $header) {
-            $response = $response->withoutHeader($header);
+            $response = $response->withoutHeader((string) $header);
         }
 
         foreach ($headers as $header => $values) {
-            $response = $response->withHeader($header, $values);
+            $response = $response->withHeader((string) $header, $values);
         }
 
         return $response;
@@ -32,16 +32,21 @@ final class HeaderUtility implements HeaderUtilityInterface
         $headers = $this->sortHeaders($headers);
 
         foreach (\array_keys($headers) as $header) {
-            $request = $request->withoutHeader($header);
+            $request = $request->withoutHeader((string) $header);
         }
 
         foreach ($headers as $header => $values) {
-            $request = $request->withHeader($header, $values);
+            $request = $request->withHeader((string) $header, $values);
         }
 
         return $request;
     }
 
+    /**
+     * @param string[][] $headers
+     *
+     * @return string[][]
+     */
     private function sortHeaders(array $headers): array
     {
         $normalizedKeys = \array_combine(\array_keys($headers), \array_keys($headers));

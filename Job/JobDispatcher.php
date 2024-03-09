@@ -9,19 +9,17 @@ use Heptacom\HeptaConnect\Core\Job\Contract\JobContract;
 use Heptacom\HeptaConnect\Core\Job\Contract\JobDispatcherContract;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreatePayload;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreatePayloads;
+use Heptacom\HeptaConnect\Storage\Base\Action\Job\Create\JobCreateResult;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobCreateActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 final class JobDispatcher extends JobDispatcherContract
 {
-    private MessageBusInterface $bus;
-
-    private JobCreateActionInterface $jobCreateAction;
-
-    public function __construct(MessageBusInterface $bus, JobCreateActionInterface $jobCreateAction)
-    {
-        $this->bus = $bus;
-        $this->jobCreateAction = $jobCreateAction;
+    public function __construct(
+        private MessageBusInterface $bus,
+        private JobCreateActionInterface $jobCreateAction
+    ) {
     }
 
     public function dispatch(JobCollection $jobs): void
@@ -29,14 +27,16 @@ final class JobDispatcher extends JobDispatcherContract
         $createPayload = new JobCreatePayloads($jobs->map(
             static fn (JobContract $j): JobCreatePayload => new JobCreatePayload($j->getType(), $j->getMappingComponent(), $j->getPayload())
         ));
-        $createResult = $this->jobCreateAction->create($createPayload);
+        $createResults = $this->jobCreateAction->create($createPayload);
 
-        if ($createResult->isEmpty()) {
+        if ($createResults->isEmpty()) {
             return;
         }
 
         $message = new JobMessage();
-        $message->getJobKeys()->push($createResult->column('getJobKey'));
+        $message->getJobKeys()->push($createResults->map(
+            static fn (JobCreateResult $createResult): JobKeyInterface => $createResult->getJobKey()
+        ));
         $this->bus->dispatch($message);
     }
 }

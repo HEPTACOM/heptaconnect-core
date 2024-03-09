@@ -12,26 +12,14 @@ use Psr\Http\Message\StreamInterface;
 
 final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 {
-    private string $normalizedStream;
-
-    private string $mimeType;
-
-    private DenormalizerInterface $denormalizer;
-
-    private FileContentsUrlProviderInterface $fileContentsUrlProvider;
-
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        string $normalizedStream,
-        string $mimeType,
-        DenormalizerInterface $denormalizer,
-        FileContentsUrlProviderInterface $fileContentsUrlProvider
+        private string $normalizedStream,
+        private string $mimeType,
+        private DenormalizerInterface $denormalizer,
+        private FileContentsUrlProviderInterface $fileContentsUrlProvider
     ) {
         parent::__construct($portalNodeKey);
-        $this->normalizedStream = $normalizedStream;
-        $this->mimeType = $mimeType;
-        $this->denormalizer = $denormalizer;
-        $this->fileContentsUrlProvider = $fileContentsUrlProvider;
     }
 
     public function getPublicUrl(): string

@@ -10,25 +10,17 @@ use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface;
+use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
 
-class MessageHandler implements MessageSubscriberInterface
+final class MessageHandler implements MessageSubscriberInterface
 {
-    private JobGetActionInterface $jobGetAction;
-
-    private DelegatingJobActorContract $jobActor;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        JobGetActionInterface $jobGetAction,
-        DelegatingJobActorContract $jobActor,
-        LoggerInterface $logger
+        private JobGetActionInterface $jobGetAction,
+        private DelegatingJobActorContract $jobActor,
+        private LoggerInterface $logger
     ) {
-        $this->jobGetAction = $jobGetAction;
-        $this->jobActor = $jobActor;
-        $this->logger = $logger;
     }
 
     public static function getHandledMessages(): iterable
@@ -38,7 +30,7 @@ class MessageHandler implements MessageSubscriberInterface
 
     public function handleJob(JobMessage $message): void
     {
-        /** @var JobDataCollection[] $jobs */
+        /** @var array<string, JobDataCollection> $jobs */
         $jobs = [];
 
         try {
@@ -61,7 +53,9 @@ class MessageHandler implements MessageSubscriberInterface
                 $this->logger->emergency('Jobs can not be processed', [
                     'type' => $type,
                     'exception' => $throwable,
-                    'jobData' => \iterable_to_array($jobData->column('getJobKey')),
+                    'jobData' => \iterable_to_array($jobData->map(
+                        static fn (JobData $data): JobKeyInterface => $data->getJobKey()
+                    )),
                     'code' => 1647396034,
                 ]);
             }

@@ -11,13 +11,13 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 final class ClosureInstructionToken extends InstructionTokenContract
 {
     /**
-     * @var \Closure(\Closure(): array)
+     * @var \Closure(\Closure(): array): array
      */
     private \Closure $closure;
 
     /**
-     * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $type
-     * @param \Closure(\Closure(): array)                                                            $closure
+     * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
+     * @param \Closure(\Closure(): array): array                                                     $closure
      */
     public function __construct(string $query, \Closure $closure)
     {
@@ -26,7 +26,7 @@ final class ClosureInstructionToken extends InstructionTokenContract
     }
 
     /**
-     * @return \Closure(\Closure(): array)
+     * @return \Closure(\Closure(): array): array
      */
     public function getClosure(): \Closure
     {

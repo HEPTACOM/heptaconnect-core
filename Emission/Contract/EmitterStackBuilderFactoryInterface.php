@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Emission\Contract;
 
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
 interface EmitterStackBuilderFactoryInterface
 {
     /**
-     * @param class-string<DatasetEntityContract> $entityType
+     * Creates a stack builder, that is used to order @see EmitterContract in the right order for the given scenario.
      */
     public function createEmitterStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
-        string $entityType
+        EntityType $entityType
     ): EmitterStackBuilderInterface;
 }

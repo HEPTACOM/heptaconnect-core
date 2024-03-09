@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Event\PostReceptionEvent;
-use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Reception\PostProcessing\SaveMappingsData;
 use Heptacom\HeptaConnect\Core\Reception\Support\PrimaryKeyChangesAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
@@ -16,19 +16,15 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
 use Psr\Log\LoggerInterface;
 
-final class ReceptionActor implements ReceptionActorInterface
+final class ReceiverStackProcessor implements ReceiverStackProcessorInterface
 {
-    private LoggerInterface $logger;
-
-    private DeepObjectIteratorContract $deepObjectIterator;
-
-    public function __construct(LoggerInterface $logger, DeepObjectIteratorContract $deepObjectIterator)
-    {
-        $this->logger = $logger;
-        $this->deepObjectIterator = $deepObjectIterator;
+    public function __construct(
+        private LoggerInterface $logger,
+        private DeepObjectIteratorContract $deepObjectIterator
+    ) {
     }
 
-    public function performReception(
+    public function processStack(
         TypedDatasetEntityCollection $entities,
         ReceiverStackInterface $stack,
         ReceiveContextInterface $context
@@ -42,7 +38,7 @@ final class ReceptionActor implements ReceptionActorInterface
                 continue;
             }
 
-            $attachable = new PrimaryKeyChangesAttachable(\get_class($object));
+            $attachable = new PrimaryKeyChangesAttachable($object::class());
             $attachable->setForeignKey($object->getPrimaryKey());
             $object->attach($attachable);
         }
@@ -53,7 +49,7 @@ final class ReceptionActor implements ReceptionActorInterface
             }
         } catch (\Throwable $exception) {
             $this->logger->critical(LogMessage::RECEIVE_NO_THROW(), [
-                'type' => $entities->getType(),
+                'type' => (string) $entities->getEntityType(),
                 'portalNodeKey' => $context->getPortalNodeKey(),
                 'stack' => $stack,
                 'exception' => $exception,

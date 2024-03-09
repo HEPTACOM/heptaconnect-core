@@ -11,22 +11,13 @@ use Psr\Http\Message\RequestFactoryInterface;
 
 final class ResolvedPublicUrlFileReference extends ResolvedFileReferenceContract
 {
-    private string $publicUrl;
-
-    private ClientInterface $client;
-
-    private RequestFactoryInterface $requestFactory;
-
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        string $publicUrl,
-        ClientInterface $client,
-        RequestFactoryInterface $requestFactory
+        private string $publicUrl,
+        private ClientInterface $client,
+        private RequestFactoryInterface $requestFactory
     ) {
         parent::__construct($portalNodeKey);
-        $this->publicUrl = $publicUrl;
-        $this->client = $client;
-        $this->requestFactory = $requestFactory;
     }
 
     public function getPublicUrl(): string

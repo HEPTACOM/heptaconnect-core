@@ -12,20 +12,11 @@ use Psr\Http\Message\ResponseInterface;
 
 final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterContract
 {
-    private HeaderUtilityInterface $headerUtility;
-
-    private Psr7MessageRawHttpFormatter $rawFormatter;
-
-    private string $curlCommand;
-
     public function __construct(
-        HeaderUtilityInterface $headerUtility,
-        Psr7MessageRawHttpFormatter $rawFormatter,
-        string $curlCommand
+        private HeaderUtilityInterface $headerUtility,
+        private Psr7MessageRawHttpFormatter $rawFormatter,
+        private string $curlCommand
     ) {
-        $this->headerUtility = $headerUtility;
-        $this->rawFormatter = $rawFormatter;
-        $this->curlCommand = $curlCommand;
     }
 
     public function formatMessage(MessageInterface $message): string
@@ -70,6 +61,9 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         return $this->rawFormatter->formatMessage($response);
     }
 
+    /**
+     * @return string[]
+     */
     private function getCurlCommandParts(RequestInterface $request): array
     {
         $commandParts = [];
@@ -100,7 +94,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         }
 
         foreach ($request->getHeaders() as $header => $values) {
-            if (\in_array(\strtolower($header), ['content-length', 'transfer-encoding'], true)) {
+            if (\in_array(\strtolower((string) $header), ['content-length', 'transfer-encoding'], true)) {
                 continue;
             }
 

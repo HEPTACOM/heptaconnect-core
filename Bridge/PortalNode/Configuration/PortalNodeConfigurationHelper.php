@@ -16,9 +16,7 @@ class PortalNodeConfigurationHelper
      */
     public function env(array $mappings): \Closure
     {
-        return function () use ($mappings): array {
-            return $this->resolveMapping($mappings, static fn (string $i) => \getenv($i));
-        };
+        return fn (): array => $this->resolveMapping($mappings, static fn (string $i): false|string => \getenv($i));
     }
 
     /**
@@ -39,7 +37,7 @@ class PortalNodeConfigurationHelper
                 return $config;
             }
 
-            return $this->resolveMapping($mappings, fn (string $i) => $this->resolveDotPath($i, $config));
+            return $this->resolveMapping($mappings, fn (string $i): mixed => $this->resolveDotPath($i, $config));
         };
     }
 
@@ -51,7 +49,13 @@ class PortalNodeConfigurationHelper
     public function json(string $jsonFile, ?array $mappings = null): \Closure
     {
         return function () use ($mappings, $jsonFile): array {
-            $config = \json_decode(\file_get_contents($jsonFile), true, 512, \JSON_THROW_ON_ERROR);
+            $json = \file_get_contents($jsonFile);
+
+            if (!\is_string($json)) {
+                throw new \RuntimeException('Can not read JSON file', 1647801830);
+            }
+
+            $config = \json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
 
             if (!\is_array($config)) {
                 throw new \RuntimeException('Can not load JSON file', 1647801829);
@@ -61,7 +65,7 @@ class PortalNodeConfigurationHelper
                 return $config;
             }
 
-            return $this->resolveMapping($mappings, fn (string $i) => $this->resolveDotPath($i, $config));
+            return $this->resolveMapping($mappings, fn (string $i): mixed => $this->resolveDotPath($i, $config));
         };
     }
 
@@ -72,13 +76,11 @@ class PortalNodeConfigurationHelper
      */
     public function array(array $array, array $mappings): \Closure
     {
-        return function () use ($mappings, $array): array {
-            return $this->resolveMapping($mappings, fn (string $i) => $this->resolveDotPath($i, $array));
-        };
+        return fn (): array => $this->resolveMapping($mappings, fn (string $i): mixed => $this->resolveDotPath($i, $array));
     }
 
     /**
-     * @param \Closure(string) $lookUp
+     * @param \Closure(string): mixed $lookUp
      */
     private function resolveMapping(array $mappings, \Closure $lookUp): array
     {
@@ -97,10 +99,7 @@ class PortalNodeConfigurationHelper
         return $result;
     }
 
-    /**
-     * @psalm-return mixed
-     */
-    private function resolveDotPath(string $path, array $payload)
+    private function resolveDotPath(string $path, array $payload): mixed
     {
         foreach (\explode('.', $path) as $step) {
             if (!isset($payload[$step])) {

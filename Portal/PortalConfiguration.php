@@ -8,13 +8,14 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\ConfigurationContract;
 
 final class PortalConfiguration extends ConfigurationContract
 {
-    private array $configuration;
-
+    /**
+     * @var array<string, mixed>|null
+     */
     private ?array $flat = null;
 
-    public function __construct(array $configuration)
-    {
-        $this->configuration = $configuration;
+    public function __construct(
+        private array $configuration
+    ) {
     }
 
     public function get(string $name)
@@ -32,6 +33,9 @@ final class PortalConfiguration extends ConfigurationContract
         return \array_keys($this->flattened());
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function &flattened(): array
     {
         if ($this->flat === null) {

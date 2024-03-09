@@ -8,14 +8,14 @@ use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
 use Heptacom\HeptaConnect\Core\File\FileReferenceFactory;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
-use Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException as LegacyDelegatingLoaderLoadException;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass;
-use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddPortalConfigurationBindingsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AllDefinitionDefaultsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefinitionForFlowComponentRegistryCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
+use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\SetConfigurationAsParameterCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
@@ -67,12 +67,19 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.LongVariableName)
+ */
 final class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
 {
     public const STATUS_REPORTER_SOURCE_TAG = 'heptaconnect.flow_component.status_reporter_source';
@@ -87,37 +94,9 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
-    private LoggerInterface $logger;
-
-    private NormalizationRegistryContract $normalizationRegistry;
-
-    private PortalStorageFactory $portalStorageFactory;
-
-    private ResourceLockingContract $resourceLocking;
-
-    private ProfilerFactoryContract $profilerFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private FilesystemFactory $filesystemFactory;
-
-    private ConfigurationServiceInterface $configurationService;
-
-    private PublisherInterface $publisher;
+    public const PORTAL_CONFIGURATION_PARAMETER_PREFIX = 'portal_config.';
 
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
-
-    private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory;
-
-    private RequestStorageContract $requestStorage;
-
-    private FilesystemFactoryInterface $filesystemFactory2;
-
-    private Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter;
-
-    private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter;
-
-    private Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder;
 
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
@@ -129,41 +108,26 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     private array $alreadyBuiltPackages = [];
 
     public function __construct(
-        LoggerInterface $logger,
-        NormalizationRegistryContract $normalizationRegistry,
-        PortalStorageFactory $portalStorageFactory,
-        ResourceLockingContract $resourceLocking,
-        ProfilerFactoryContract $profilerFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        FilesystemFactory $filesystemFactory,
-        ConfigurationServiceInterface $configurationService,
-        PublisherInterface $publisher,
-        HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        RequestStorageContract $requestStorage,
-        FilesystemFactoryInterface $filesystemFactory2,
-        Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
-        Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
-        Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder
+        private LoggerInterface $logger,
+        private NormalizationRegistryContract $normalizationRegistry,
+        private PortalStorageFactory $portalStorageFactory,
+        private ResourceLockingContract $resourceLocking,
+        private ProfilerFactoryContract $profilerFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private FilesystemFactory $filesystemFactory,
+        private ConfigurationServiceInterface $configurationService,
+        private PublisherInterface $publisher,
+        private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        private RequestStorageContract $requestStorage,
+        private FilesystemFactoryInterface $filesystemFactory2,
+        private Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
+        private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
+        private Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder,
     ) {
-        $this->logger = $logger;
-        $this->normalizationRegistry = $normalizationRegistry;
-        $this->portalStorageFactory = $portalStorageFactory;
-        $this->resourceLocking = $resourceLocking;
-        $this->profilerFactory = $profilerFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->filesystemFactory = $filesystemFactory;
-        $this->configurationService = $configurationService;
-        $this->publisher = $publisher;
-        $this->httpHandlerUrlProviderFactory = $httpHandlerUrlProviderFactory;
-        $this->requestStorage = $requestStorage;
-        $this->filesystemFactory2 = $filesystemFactory2;
-        $this->psr7MessageCurlShellFormatter = $psr7MessageCurlShellFormatter;
-        $this->psr7MessageRawHttpFormatter = $psr7MessageRawHttpFormatter;
-        $this->psr7MessageMultiPartFormDataBuilder = $psr7MessageMultiPartFormDataBuilder;
     }
 
     /**
-     * @throws LegacyDelegatingLoaderLoadException
+     * @throws DelegatingLoaderLoadException
      */
     public function build(
         PortalContract $portal,
@@ -212,32 +176,21 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             /** @var Definition[] $newDefinitions */
             $newDefinitions = \array_diff_key($containerBuilder->getDefinitions(), $seenDefinitions);
             $seenDefinitions = $containerBuilder->getDefinitions();
-            $packageClass = \get_class($package);
+            $packageClass = $package::class;
 
             $this->tagDefinitionSource($newDefinitions, ExplorerContract::class, self::EXPLORER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, EmitterContract::class, self::EMITTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, ReceiverContract::class, self::RECEIVER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, StatusReporterContract::class, self::STATUS_REPORTER_SOURCE_TAG, $packageClass);
             $this->tagDefinitionSource($newDefinitions, HttpHandlerContract::class, self::WEB_HTTP_HANDLER_SOURCE_TAG, $packageClass);
-            $flowBuilderFiles[$packageClass] = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php') ?: [];
+
+            $globMatches = \glob($flowComponentsPath . \DIRECTORY_SEPARATOR . '*.php');
+            $flowBuilderFiles[$packageClass] = $globMatches !== false ? $globMatches : [];
         }
 
         foreach ($containerBuilder->getDefinitions() as $definition) {
             $definition->addTag(self::SERVICE_FROM_A_PORTAL_TAG);
         }
-
-        $configuration = [];
-
-        try {
-            $configuration = $this->configurationService->getPortalNodeConfiguration($portalNodeKey);
-        } catch (\Throwable $throwable) {
-            $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
-                'portal_node_key' => $portalNodeKey,
-                'exception' => $throwable,
-            ]);
-        }
-
-        $portalConfiguration = new PortalConfiguration($configuration ?? []);
 
         $fileReferenceFactory = new FileReferenceFactory(
             $portalNodeKey,
@@ -263,11 +216,9 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             PortalNodeKeyInterface::class => $portalNodeKey,
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::' . $this->storageKeyGenerator->serialize($portalNodeKey)),
             FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
-            ConfigurationContract::class => $portalConfiguration,
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
-            FileReferenceResolverContract::class => $this->fileReferenceResolver,
             HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
             Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
@@ -279,12 +230,18 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 Psr17FactoryDiscovery::findUploadedFileFactory()
             ),
         ]);
-        $containerBuilder->setAlias(\get_class($portal), PortalContract::class);
+        $containerBuilder->setAlias($portal::class, PortalContract::class);
         $containerBuilder->setAlias(Psr7MessageFormatterContract::class, Psr7MessageRawHttpFormatterContract::class);
 
         if ($this->directEmissionFlow instanceof DirectEmissionFlowContract) {
             $this->setSyntheticServices($containerBuilder, [
                 DirectEmissionFlowContract::class => $this->directEmissionFlow,
+            ]);
+        }
+
+        if ($this->fileReferenceResolver instanceof FileReferenceResolverContract) {
+            $this->setSyntheticServices($containerBuilder, [
+                FileReferenceResolverContract::class => $this->fileReferenceResolver,
             ]);
         }
 
@@ -310,13 +267,36 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
                 ->addMethodCall('withMaxRetry', [2], true)
                 ->addMethodCall('withMaxWaitTimeout', [], true)
         );
+        $containerBuilder->setDefinition(
+            ConfigurationContract::class,
+            (new Definition())
+                ->setClass(PortalConfiguration::class)
+                ->setArguments([
+                    new BoundArgument('%' . self::PORTAL_CONFIGURATION_PARAMETER_PREFIX . '%'),
+                ])
+        );
 
         $containerBuilder->addCompilerPass(new BuildDefinitionForFlowComponentRegistryCompilerPass($flowBuilderFiles));
         $containerBuilder->addCompilerPass(new AddHttpMiddlewareClientCompilerPass());
         $containerBuilder->addCompilerPass(new AddHttpMiddlewareCollectorCompilerPass());
         $containerBuilder->addCompilerPass(new AllDefinitionDefaultsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
-        $containerBuilder->addCompilerPass(new AddPortalConfigurationBindingsCompilerPass($portalConfiguration), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
 
+        try {
+            $containerBuilder->addCompilerPass(
+                new SetConfigurationAsParameterCompilerPass(
+                    $this->configurationService->getPortalNodeConfiguration($portalNodeKey) ?? []
+                ),
+                PassConfig::TYPE_BEFORE_OPTIMIZATION,
+                20000
+            );
+        } catch (\Throwable $throwable) {
+            $this->logger->error(LogMessage::PORTAL_NODE_CONFIGURATION_INVALID(), [
+                'portal_node_key' => $portalNodeKey,
+                'exception' => $throwable,
+            ]);
+        }
+
+        $containerBuilder->addCompilerPass(new AddConfigurationBindingsCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -10000);
         $this->alreadyBuiltPackages = [];
 
         return $containerBuilder;
@@ -383,16 +363,12 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $this->buildPackage($additionalPackage, $containerBuilder);
         }
 
-        try {
-            $package->buildContainer($containerBuilder);
-        } catch (DelegatingLoaderLoadException $exception) {
-            /* @deprecated This catch-block will be removed in version 0.10 */
-            throw new LegacyDelegatingLoaderLoadException($exception->getPath(), $exception);
-        }
+        $package->buildContainer($containerBuilder);
     }
 
     /**
      * @param Definition[] $definitions
+     *
      * @psalm-param class-string $interface
      * @psalm-param class-string $packageClass
      */
@@ -419,6 +395,10 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         }
     }
 
+    /**
+     * @param array<string, string> $psr4
+     * @param string[]              $exclude
+     */
     private function registerPsr4Prototype(
         ContainerBuilder $containerBuilder,
         array $psr4,
@@ -445,17 +425,16 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     }
 
     /**
-     * @param object[] $services
+     * @param array<class-string, object> $services
      */
     private function setSyntheticServices(ContainerBuilder $containerBuilder, array $services): void
     {
         foreach ($services as $id => $service) {
-            $definitionId = (string) $id;
-            $containerBuilder->set($definitionId, $service);
+            $containerBuilder->set($id, $service);
             $definition = (new Definition())
                 ->setSynthetic(true)
-                ->setClass(\get_class($service));
-            $containerBuilder->setDefinition($definitionId, $definition);
+                ->setClass($service::class);
+            $containerBuilder->setDefinition($id, $definition);
         }
     }
 }

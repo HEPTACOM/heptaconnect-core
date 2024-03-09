@@ -10,30 +10,25 @@ use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Exception\AbstractInstantiationException;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
+use Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidClassNameException;
+use Heptacom\HeptaConnect\Dataset\Base\Exception\InvalidSubtypeClassNameException;
+use Heptacom\HeptaConnect\Dataset\Base\Exception\UnexpectedLeadingNamespaceSeparatorInClassNameException;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalExtensionContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionCollection;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Psr\Log\LoggerInterface;
 
 class ComposerPortalLoader
 {
-    private PackageConfigurationLoaderInterface $packageConfigLoader;
-
-    private PortalFactoryContract $portalFactory;
-
-    private LoggerInterface $logger;
-
     private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
 
     public function __construct(
-        PackageConfigurationLoaderInterface $packageConfigLoader,
-        PortalFactoryContract $portalFactory,
-        LoggerInterface $logger
+        private PackageConfigurationLoaderInterface $packageConfigLoader,
+        private PortalFactoryContract $portalFactory,
+        private LoggerInterface $logger
     ) {
-        $this->packageConfigLoader = $packageConfigLoader;
-        $this->portalFactory = $portalFactory;
-        $this->logger = $logger;
     }
 
     public function getPortals(): PortalCollection
@@ -44,11 +39,14 @@ class ComposerPortalLoader
         foreach ($this->getPackageConfigurationsCached() as $package) {
             $portals = (array) ($package->getConfiguration()['portals'] ?? []);
 
-            /** @var class-string<PortalContract> $portal */
             foreach ($portals as $portal) {
+                if (!\is_string($portal)) {
+                    continue;
+                }
+
                 try {
-                    $portalCollection->push([$this->portalFactory->instantiatePortal($portal)]);
-                } catch (AbstractInstantiationException $exception) {
+                    $portalCollection->push([$this->portalFactory->instantiatePortal(new PortalType($portal))]);
+                } catch (AbstractInstantiationException|InvalidSubtypeClassNameException|InvalidClassNameException $exception) {
                     $this->logger->critical(LogMessage::PORTAL_LOAD_ERROR(), [
                         'portal' => $portal,
                         'exception' => $exception,
@@ -70,8 +68,10 @@ class ComposerPortalLoader
             /** @var class-string<PortalExtensionContract> $portalExtension */
             foreach ($portalExtensions as $portalExtension) {
                 try {
-                    $result->push([$this->portalFactory->instantiatePortalExtension($portalExtension)]);
-                } catch (AbstractInstantiationException $exception) {
+                    $result->push([$this->portalFactory->instantiatePortalExtension(
+                        new PortalExtensionType($portalExtension)
+                    )]);
+                } catch (AbstractInstantiationException|InvalidSubtypeClassNameException|InvalidClassNameException|UnexpectedLeadingNamespaceSeparatorInClassNameException $exception) {
                     $this->logger->critical(LogMessage::PORTAL_EXTENSION_LOAD_ERROR(), [
                         'portalExtension' => $portalExtension,
                         'exception' => $exception,

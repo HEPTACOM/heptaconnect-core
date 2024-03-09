@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Emission;
 
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
-use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterStack;
 use Psr\Log\LoggerInterface;
 
 final class EmitterStackBuilder implements EmitterStackBuilderInterface
@@ -18,36 +17,27 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     private EmitterCollection $decorators;
 
-    /**
-     * @var class-string<DatasetEntityContract>
-     */
-    private string $entityType;
-
-    private LoggerInterface $logger;
+    private EntityType $entityType;
 
     /**
      * @var EmitterContract[]
      */
     private array $emitters = [];
 
-    /**
-     * @param class-string<DatasetEntityContract> $entityType
-     */
     public function __construct(
         EmitterCollection $sources,
-        string $entityType,
-        LoggerInterface $logger
+        EntityType $entityType,
+        private LoggerInterface $logger
     ) {
-        $sources = new EmitterCollection($sources->bySupport($entityType));
+        $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->entityType = $entityType;
-        $this->logger = $logger;
     }
 
     public function push(EmitterContract $emitter): self
     {
-        if (\is_a($this->entityType, $emitter->supports(), true)) {
+        if ($this->entityType->equals($emitter->getSupportedEntityType())) {
             $this->logger->debug('EmitterStackBuilder: Pushed an arbitrary emitter.', [
                 'emitter' => $emitter,
             ]);
@@ -100,11 +90,14 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
 
     public function build(): EmitterStackInterface
     {
-        $emitterStack = new EmitterStack(\array_map(
-            static fn (EmitterContract $e) => clone $e,
-            \array_reverse($this->emitters, false),
-        ), $this->entityType);
-        $emitterStack->setLogger($this->logger);
+        $emitterStack = new EmitterStack(
+            \array_map(
+                static fn (EmitterContract $emitter): EmitterContract => clone $emitter,
+                \array_reverse($this->emitters, false),
+            ),
+            $this->entityType,
+            $this->logger
+        );
 
         $this->logger->debug('EmitterStackBuilder: Built emitter stack.');
 

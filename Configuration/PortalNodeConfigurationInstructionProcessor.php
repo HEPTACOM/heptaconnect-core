@@ -8,21 +8,22 @@ use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\ClosureInstructio
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface;
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
+use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
+use Heptacom\HeptaConnect\Portal\Base\Portal\PortalCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
+use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.LongClassName)
+ */
 final class PortalNodeConfigurationInstructionProcessor implements PortalNodeConfigurationProcessorInterface
 {
+    /**
+     * @var InstructionTokenContract[]|null
+     */
     private ?array $instructions = null;
-
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private PortalRegistryInterface $portalRegistry;
 
     /**
      * @var InstructionLoaderInterface[]
@@ -33,27 +34,24 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
      * @param iterable<InstructionLoaderInterface> $instructionLoaders
      */
     public function __construct(
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        PortalRegistryInterface $portalRegistry,
+        private LoggerInterface $logger,
+        private PortalRegistryInterface $portalRegistry,
+        private PackageQueryMatcherInterface $packageQueryMatcher,
         iterable $instructionLoaders
     ) {
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->portalRegistry = $portalRegistry;
         $this->instructionLoaders = \iterable_to_array($instructionLoaders);
     }
 
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         $instructions = $this->filterInstructions($portalNodeKey);
-        $readConfig = static fn () => $read();
+        $readConfig = static fn (): array => $read();
 
         foreach ($instructions as $instruction) {
             if ($instruction instanceof ClosureInstructionToken) {
                 $instructionCall = $instruction->getClosure();
                 $readConfigCall = $readConfig;
-                $readConfig = static fn () => $instructionCall($readConfigCall);
+                $readConfig = static fn (): array => $instructionCall($readConfigCall);
             }
         }
 
@@ -71,66 +69,39 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
     private function filterInstructions(PortalNodeKeyInterface $portalNodeKey): array
     {
         $result = [];
+        $portalExtensions = null;
 
         foreach ($this->getInstructions() as $instruction) {
             $query = $instruction->getQuery();
+            $matchedKeys = $this->packageQueryMatcher->matchPortalNodeKeys($query, new PortalNodeKeyCollection([
+                $portalNodeKey,
+            ]));
 
-            if (\class_exists($query) || \interface_exists($query)) {
-                if (
-                    !$this->isQueryMatchingPortalNode($portalNodeKey, $query)
-                    && !$this->isQueryMatchingPortalExtension($portalNodeKey, $query)
-                ) {
-                    continue;
-                }
-            } elseif (!$this->isQueryMatchingPortalNodeKey($portalNodeKey, $query)) {
+            if ($matchedKeys->count() > 0) {
+                $result[] = $instruction;
+
                 continue;
             }
 
-            $result[] = $instruction;
+            $portalExtensions ??= $this->portalRegistry->getPortalExtensions($portalNodeKey);
+            $matchedPortals = $this->packageQueryMatcher->matchPortals($query, new PortalCollection([
+                $this->portalRegistry->getPortal($portalNodeKey),
+            ]));
+
+            if ($matchedPortals->count() > 0) {
+                $result[] = $instruction;
+
+                continue;
+            }
+
+            $matchedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
+
+            if ($matchedPortalExtensions->count() > 0) {
+                $result[] = $instruction;
+            }
         }
 
         return $result;
-    }
-
-    private function isQueryMatchingPortalNodeKey(PortalNodeKeyInterface $portalNodeKey, string $query): bool
-    {
-        try {
-            return $this->storageKeyGenerator->deserialize($query)->equals($portalNodeKey);
-        } catch (UnsupportedStorageKeyException $e) {
-            if ($this->storageKeyGenerator->serialize($portalNodeKey->withoutAlias()) === $query) {
-                return true;
-            }
-
-            if ($this->storageKeyGenerator->serialize($portalNodeKey->withAlias()) === $query) {
-                return true;
-            }
-
-            return false;
-        }
-    }
-
-    /**
-     * @param class-string $classString
-     */
-    private function isQueryMatchingPortalNode(PortalNodeKeyInterface $portalNodeKey, string $classString): bool
-    {
-        $portal = $this->portalRegistry->getPortal($portalNodeKey);
-
-        return $portal instanceof $classString;
-    }
-
-    /**
-     * @param class-string $classString
-     */
-    private function isQueryMatchingPortalExtension(PortalNodeKeyInterface $portalNodeKey, string $classString): bool
-    {
-        foreach ($this->portalRegistry->getPortalExtensions($portalNodeKey) as $portalExtension) {
-            if ($portalExtension instanceof $classString) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -153,7 +124,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
                 $result[] = $instructionLoader->loadInstructions();
             } catch (\Throwable $throwable) {
                 $this->logger->critical('Failed loading instructions', [
-                    'class' => \get_class($instructionLoader),
+                    'class' => $instructionLoader::class,
                     'exception' => $throwable,
                     'code' => 1647826121,
                 ]);

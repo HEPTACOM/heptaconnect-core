@@ -8,14 +8,12 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 
-interface ExplorationActorInterface
+interface ExplorerStackProcessorInterface
 {
     /**
-     * @param class-string<DatasetEntityContract> $entityType
+     * Iterates over the result of the explorers of the stack.
+     *
+     * @return iterable<array-key, DatasetEntityContract|string>
      */
-    public function performExploration(
-        string $entityType,
-        ExplorerStackInterface $stack,
-        ExploreContextInterface $context
-    ): void;
+    public function processStack(ExplorerStackInterface $stack, ExploreContextInterface $context): iterable;
 }

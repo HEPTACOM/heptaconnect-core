@@ -6,11 +6,14 @@ namespace Heptacom\HeptaConnect\Core\Job\Handler;
 
 use Heptacom\HeptaConnect\Core\Job\Contract\ReceptionHandlerInterface;
 use Heptacom\HeptaConnect\Core\Job\Exception\ReceptionJobHandlingException;
+use Heptacom\HeptaConnect\Core\Job\JobData;
 use Heptacom\HeptaConnect\Core\Job\JobDataCollection;
 use Heptacom\HeptaConnect\Core\Job\Type\Reception;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
+use Heptacom\HeptaConnect\Core\Reception\Support\LockAttachable;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\DeepObjectIteratorContract;
@@ -36,62 +39,35 @@ use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\LockFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+ * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class ReceptionHandler implements ReceptionHandlerInterface
 {
-    private LockFactory $lockFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private ReceiveServiceInterface $receiveService;
-
-    private DeepObjectIteratorContract $objectIterator;
-
-    private RouteGetActionInterface $routeGetAction;
-
-    private LoggerInterface $logger;
-
-    private JobStartActionInterface $jobStartAction;
-
-    private JobFinishActionInterface $jobFinishAction;
-
-    private IdentityMapActionInterface $identityMapAction;
-
-    private IdentityReflectActionInterface $identityReflectAction;
-
-    private JobFailActionInterface $jobFailAction;
-
     public function __construct(
-        LockFactory $lockFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ReceiveServiceInterface $receiveService,
-        DeepObjectIteratorContract $objectIterator,
-        RouteGetActionInterface $routeGetAction,
-        LoggerInterface $logger,
-        JobStartActionInterface $jobStartAction,
-        JobFinishActionInterface $jobFinishAction,
-        IdentityMapActionInterface $identityMapAction,
-        IdentityReflectActionInterface $identityReflectAction,
-        JobFailActionInterface $jobFailAction
+        private LockFactory $lockFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ReceiveServiceInterface $receiveService,
+        private DeepObjectIteratorContract $objectIterator,
+        private RouteGetActionInterface $routeGetAction,
+        private LoggerInterface $logger,
+        private JobStartActionInterface $jobStartAction,
+        private JobFinishActionInterface $jobFinishAction,
+        private IdentityMapActionInterface $identityMapAction,
+        private IdentityReflectActionInterface $identityReflectAction,
+        private JobFailActionInterface $jobFailAction,
     ) {
-        $this->lockFactory = $lockFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->receiveService = $receiveService;
-        $this->objectIterator = $objectIterator;
-        $this->routeGetAction = $routeGetAction;
-        $this->logger = $logger;
-        $this->jobStartAction = $jobStartAction;
-        $this->jobFinishAction = $jobFinishAction;
-        $this->identityMapAction = $identityMapAction;
-        $this->identityReflectAction = $identityReflectAction;
-        $this->jobFailAction = $jobFailAction;
     }
 
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];
-        $routeKeys = new RouteKeyCollection(\iterable_map(
-            $jobs->column('getPayload'),
-            static fn (?array $p): ?RouteKeyInterface => $p[Reception::ROUTE_KEY] ?? null
+        $routeKeys = new RouteKeyCollection();
+        $routeKeys->pushIgnoreInvalidItems($jobs->map(
+            static fn (JobData $jobData): mixed => $jobData->getPayload()[Reception::ROUTE_KEY] ?? null
         ));
 
         $uniqueRouteKeys = new RouteKeyCollection();
@@ -140,7 +116,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     throw new ReceptionJobHandlingException($job, 1636503506);
                 }
 
-                if ($route->getEntityType() !== \get_class($entity)) {
+                if (!$route->getEntityType()->equals($entity::class())) {
                     throw new ReceptionJobHandlingException($job, 1636503507);
                 }
 
@@ -161,114 +137,80 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                 continue;
             }
 
-            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['mapping'] = $job->getMappingComponent();
-            $receptions[$route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['jobs'][] = [
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['mapping'] = $job->getMappingComponent();
+            $receptions[(string) $route->getEntityType()][$targetPortal][$sourcePortal][$externalId]['jobs'][] = [
                 'entity' => $entity,
                 'jobKey' => $job->getJobKey(),
             ];
         }
 
-        $lockedReceptions = [];
-        $locks = [];
+        foreach ($receptions as $dataType => $portaledEntities) {
+            foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
+                foreach ($sourcePortaledEntities as $sourcePortalKey => $entityGroups) {
+                    foreach ($entityGroups as $externalId => $entityGroup) {
+                        $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
+                            $sourcePortalKey,
+                            $targetPortalKey,
+                            $dataType,
+                            $externalId,
+                        ])));
 
-        try {
-            foreach ($receptions as $dataType => $portaledEntities) {
-                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
-                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entities) {
-                        foreach ($entities as $externalId => $entityGroup) {
-                            $lock = $this->lockFactory->createLock('ca9137ba5ec646078043b96030a00e70_' . \md5(\implode('_', [
-                                $sourcePortalKey,
-                                $targetPortalKey,
-                                $dataType,
-                                $externalId,
-                            ])));
-
-                            if (!$lock->acquire()) {
-                                continue;
-                            }
-
-                            $locks[] = $lock;
-                            $lockedReceptions[$dataType][$targetPortalKey][$sourcePortalKey][$externalId] = $entityGroup;
-                        }
+                        $entityGroup['jobs'][0]['entity']->attach(new LockAttachable($lock));
                     }
-                }
-            }
 
-            foreach ($lockedReceptions as $dataType => $portaledEntities) {
-                foreach ($portaledEntities as $targetPortalKey => $sourcePortaledEntities) {
-                    foreach ($sourcePortaledEntities as $sourcePortalKey => $entityGroups) {
-                        $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
+                    $sourcePortalNodeKey = $this->storageKeyGenerator->deserialize($sourcePortalKey);
 
-                        if (!$sourcePortalNodeKey instanceof PortalNodeKeyInterface) {
-                            continue;
-                        }
+                    if (!$sourcePortalNodeKey instanceof PortalNodeKeyInterface) {
+                        continue;
+                    }
 
-                        $targetPortalNodeKey = $this->storageKeyGenerator->deserialize($targetPortalKey);
+                    $targetPortalNodeKey = $this->storageKeyGenerator->deserialize($targetPortalKey);
 
-                        if (!$targetPortalNodeKey instanceof PortalNodeKeyInterface) {
-                            continue;
-                        }
+                    if (!$targetPortalNodeKey instanceof PortalNodeKeyInterface) {
+                        continue;
+                    }
 
-                        $rawEntityGroups = [];
-                        $jobKeyGroups = [];
+                    $entityType = new EntityType($dataType);
+                    $rawEntityGroups = [];
+                    $jobKeyGroups = [];
 
-                        foreach ($entityGroups as $entityGroup) {
-                            $rawEntityGroups[] = \array_column($entityGroup['jobs'], 'entity');
-                            $jobKeyGroups[] = \array_column($entityGroup['jobs'], 'jobKey');
-                        }
+                    foreach ($entityGroups as $entityGroup) {
+                        $rawEntityGroups[] = \array_column($entityGroup['jobs'], 'entity');
+                        $jobKeyGroups[] = \array_column($entityGroup['jobs'], 'jobKey');
+                    }
 
-                        /** @var DatasetEntityContract[] $rawEntities */
-                        $rawEntities = \array_merge([], ...$rawEntityGroups);
-                        $jobKeys = new JobKeyCollection(\array_values(\array_merge([], ...$jobKeyGroups)));
+                    /** @var DatasetEntityContract[] $rawEntities */
+                    $rawEntities = \array_merge([], ...$rawEntityGroups);
+                    $jobKeys = new JobKeyCollection(\array_merge(...$jobKeyGroups));
 
-                        /** @var array<DatasetEntityContract|object> $allEntities */
-                        $allEntities = $this->objectIterator->iterate($rawEntities);
-                        /* @phpstan-ignore-next-line intended array of objects as collection will filter unwanted values */
-                        $filteredEntityObjects = new DatasetEntityCollection($allEntities);
-                        // TODO inspect memory raise - probably fixed by new storage
-                        $mappedEntities = $this->identityMapAction
-                            ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
-                            ->getMappedDatasetEntityCollection();
-                        $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
+                    $filteredEntityObjects = new DatasetEntityCollection();
+                    $filteredEntityObjects->pushIgnoreInvalidItems($this->objectIterator->iterate($rawEntities));
+                    // TODO inspect memory raise - probably fixed by new storage
+                    $mappedEntities = $this->identityMapAction
+                        ->map(new IdentityMapPayload($sourcePortalNodeKey, $filteredEntityObjects))
+                        ->getMappedDatasetEntityCollection();
+                    $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
-                        $this->jobStartAction->start(new JobStartPayload(
+                    $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
+                    try {
+                        $this->receiveService->receive(
+                            new TypedDatasetEntityCollection($dataType, $rawEntities),
+                            $targetPortalNodeKey
+                        );
+                    } catch (\Throwable $exception) {
+                        $this->logger->error($exception->getMessage(), [
+                            'code' => 1686752889,
+                            'jobKeys' => $jobKeys->asArray(),
+                        ]);
+                        $this->jobFailAction->fail(new JobFailPayload(
                             $jobKeys,
                             new \DateTimeImmutable(),
-                            null
+                            $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
                         ));
 
-                        try {
-                            $this->receiveService->receive(
-                                new TypedDatasetEntityCollection($dataType, $rawEntities),
-                                $targetPortalNodeKey
-                            );
-                        } catch (\Throwable $exception) {
-                            $this->logger->error($exception->getMessage(), [
-                                'code' => 1686752889,
-                                'jobKeys' => $jobKeys->asArray(),
-                            ]);
-
-                            $this->jobFailAction->fail(new JobFailPayload(
-                                $jobKeys,
-                                new \DateTimeImmutable(),
-                                $exception->getMessage() . \PHP_EOL . 'Code: ' . $exception->getCode()
-                            ));
-
-                            continue;
-                        }
-
-                        $this->jobFinishAction->finish(new JobFinishPayload(
-                            $jobKeys,
-                            new \DateTimeImmutable(),
-                            null
-                        ));
+                        continue;
                     }
-                }
-            }
-        } finally {
-            foreach ($locks as $lock) {
-                if ($lock->isAcquired()) {
-                    $lock->release();
+                    $this->jobFinishAction->finish(new JobFinishPayload($jobKeys, new \DateTimeImmutable(), null));
                 }
             }
         }

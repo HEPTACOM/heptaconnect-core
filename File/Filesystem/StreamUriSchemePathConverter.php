@@ -8,16 +8,15 @@ use Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConve
 use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Exception\UnexpectedFormatOfUriException;
 use Psr\Http\Message\UriFactoryInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.NPathComplexity)
+ */
 final class StreamUriSchemePathConverter implements StreamUriSchemePathConverterInterface
 {
-    private UriFactoryInterface $uriFactory;
-
-    private string $scheme;
-
-    public function __construct(UriFactoryInterface $uriFactory, string $scheme)
-    {
-        $this->uriFactory = $uriFactory;
-        $this->scheme = $scheme;
+    public function __construct(
+        private UriFactoryInterface $uriFactory,
+        private string $scheme
+    ) {
     }
 
     public function convertToUri(string $path): string

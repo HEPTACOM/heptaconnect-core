@@ -13,26 +13,14 @@ use Psr\Http\Client\ClientInterface;
 
 final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
 {
-    private FileReferenceRequestKeyInterface $requestId;
-
-    private ClientInterface $client;
-
-    private FileRequestUrlProviderInterface $fileRequestUrlProvider;
-
-    private RequestStorageContract $requestStorage;
-
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        FileReferenceRequestKeyInterface $requestId,
-        ClientInterface $client,
-        FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        RequestStorageContract $requestStorage
+        private FileReferenceRequestKeyInterface $requestId,
+        private ClientInterface $client,
+        private FileRequestUrlProviderInterface $fileRequestUrlProvider,
+        private RequestStorageContract $requestStorage
     ) {
         parent::__construct($portalNodeKey);
-        $this->requestId = $requestId;
-        $this->client = $client;
-        $this->fileRequestUrlProvider = $fileRequestUrlProvider;
-        $this->requestStorage = $requestStorage;
     }
 
     public function getPublicUrl(): string

@@ -11,8 +11,6 @@ use Psr\Http\Message\ResponseInterface;
 
 final class HttpMiddlewareClient implements ClientInterface
 {
-    private ClientInterface $client;
-
     /**
      * @var HttpClientMiddlewareInterface[]
      */
@@ -22,10 +20,9 @@ final class HttpMiddlewareClient implements ClientInterface
      * @param iterable<HttpClientMiddlewareInterface> $middlewares
      */
     public function __construct(
-        ClientInterface $client,
+        private ClientInterface $client,
         iterable $middlewares
     ) {
-        $this->client = $client;
         $this->middlewares = \iterable_to_array($middlewares);
     }
 
@@ -39,16 +36,15 @@ final class HttpMiddlewareClient implements ClientInterface
         $middleware = \array_shift($middlewares);
 
         if ($middleware instanceof HttpClientMiddlewareInterface) {
-            $next = \Closure::fromCallable(function (RequestInterface $request) use ($middlewares) {
-                return $this->next($request, ...$middlewares);
-            });
+            $next = \Closure::fromCallable(fn (RequestInterface $request) => $this->next($request, ...$middlewares));
 
             $handler = new class($next) implements ClientInterface {
-                private \Closure $next;
-
-                public function __construct(\Closure $next)
-                {
-                    $this->next = $next;
+                /**
+                 * @param \Closure(RequestInterface): ResponseInterface $next
+                 */
+                public function __construct(
+                    private \Closure $next
+                ) {
                 }
 
                 public function sendRequest(RequestInterface $request): ResponseInterface

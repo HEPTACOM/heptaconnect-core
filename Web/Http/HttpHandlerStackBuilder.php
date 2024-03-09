@@ -19,8 +19,6 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 
     private string $path;
 
-    private LoggerInterface $logger;
-
     /**
      * @var HttpHandlerContract[]
      */
@@ -29,13 +27,12 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function __construct(
         HttpHandlerCollection $sources,
         string $path,
-        LoggerInterface $logger
+        private LoggerInterface $logger
     ) {
-        $sources = new HttpHandlerCollection($sources->bySupport($path));
+        $sources = $sources->bySupport($path);
         $this->source = $sources->shift();
         $this->decorators = $sources;
         $this->path = $path;
-        $this->logger = $logger;
     }
 
     public function push(HttpHandlerContract $httpHandler): self
@@ -94,7 +91,7 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function build(): HttpHandlerStackInterface
     {
         $stack = new HttpHandlerStack(\array_map(
-            static fn (HttpHandlerContract $e) => clone $e,
+            static fn (HttpHandlerContract $handler): HttpHandlerContract => clone $handler,
             \array_reverse($this->selection, false),
         ));
         $stack->setLogger($this->logger);

@@ -6,12 +6,12 @@ namespace Heptacom\HeptaConnect\Core\Web\Http;
 
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleContextFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleFlowHttpHandlersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlingActorInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumpCheckerInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Dump\Contract\ServerRequestCycleDumperInterface;
-use Heptacom\HeptaConnect\Core\Web\Http\Handler\HttpMiddlewareChainHandler;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandleContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerStackInterface;
@@ -27,6 +27,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+ */
 final class HttpHandleService implements HttpHandleServiceInterface
 {
     /**
@@ -39,44 +42,18 @@ final class HttpHandleService implements HttpHandleServiceInterface
      */
     private array $contextCache = [];
 
-    private HttpHandlingActorInterface $actor;
-
-    private HttpHandleContextFactoryInterface $contextFactory;
-
-    private LoggerInterface $logger;
-
-    private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
-    private ResponseFactoryInterface $responseFactory;
-
-    private WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction;
-
-    private ServerRequestCycleDumpCheckerInterface $dumpChecker;
-
-    private ServerRequestCycleDumperInterface $requestResponsePairDumper;
-
     public function __construct(
-        HttpHandlingActorInterface $actor,
-        HttpHandleContextFactoryInterface $contextFactory,
-        LoggerInterface $logger,
-        HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ResponseFactoryInterface $responseFactory,
-        WebHttpHandlerConfigurationFindActionInterface $webHttpHandlerConfigurationFindAction,
-        ServerRequestCycleDumpCheckerInterface $dumpChecker,
-        ServerRequestCycleDumperInterface $requestResponsePairDumper
+        private HttpHandlerStackProcessorInterface $stackProcessor,
+        private HttpHandleContextFactoryInterface $contextFactory,
+        private LoggerInterface $logger,
+        private HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ResponseFactoryInterface $responseFactory,
+        private WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
+        private HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory,
+        private ServerRequestCycleDumpCheckerInterface $dumpChecker,
+        private ServerRequestCycleDumperInterface $requestResponsePairDumper
     ) {
-        $this->actor = $actor;
-        $this->contextFactory = $contextFactory;
-        $this->logger = $logger;
-        $this->stackBuilderFactory = $stackBuilderFactory;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->responseFactory = $responseFactory;
-        $this->webHttpHandlerConfigurationFindAction = $webHttpHandlerConfigurationFindAction;
-        $this->dumpChecker = $dumpChecker;
-        $this->requestResponsePairDumper = $requestResponsePairDumper;
     }
 
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
@@ -105,14 +82,15 @@ final class HttpHandleService implements HttpHandleServiceInterface
         $correlationId = Uuid::uuid4()->toString();
 
         foreach (\array_keys($request->getAttributes()) as $attributeKey) {
+            $attributeKey = (string) $attributeKey;
+
             if (\str_starts_with($attributeKey, self::REQUEST_ATTRIBUTE_PREFIX)) {
                 $request = $request->withoutAttribute($attributeKey);
             }
         }
 
-        $enabledCheck = $this->webHttpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
-            $stackIdentifier->getPortalNodeKey(),
-            $stackIdentifier->getPath(),
+        $enabledCheck = $this->httpHandlerConfigurationFindAction->find(new WebHttpHandlerConfigurationFindCriteria(
+            $stackIdentifier,
             'enabled'
         ));
 
@@ -129,12 +107,10 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
             $response = $response->withStatus(423);
         } else {
-            $stack = $this->getStack($stackIdentifier, $request, $correlationId);
-
-            $response = $this->actor->performHttpHandling(
+            $response = $this->stackProcessor->processStack(
                 $request,
                 $response,
-                $stack,
+                $this->getStack($stackIdentifier, $request, $correlationId),
                 $this->getContext($stackIdentifier->getPortalNodeKey())
             );
         }
@@ -151,13 +127,10 @@ final class HttpHandleService implements HttpHandleServiceInterface
 
         if (!\array_key_exists($cacheKey, $this->stackCache)) {
             $builder = $this->stackBuilderFactory
-                ->createHttpHandlerStackBuilder($identifier->getPortalNodeKey(), $identifier->getPath())
-                ->pushSource()
-                ->pushDecorators();
+                ->createHttpHandlerStackBuilder($identifier)
+                ->pushSource();
 
-            $isStackEmpty = $builder->isEmpty();
-
-            if ($isStackEmpty) {
+            if ($builder->isEmpty()) {
                 $this->logger->notice(LogMessage::WEB_HTTP_HANDLE_NO_HANDLER_FOR_PATH(), [
                     'code' => 1636845086,
                     'path' => $identifier->getPath(),
@@ -167,10 +140,11 @@ final class HttpHandleService implements HttpHandleServiceInterface
                 ]);
             }
 
-            $builder->push(new HttpMiddlewareChainHandler(
-                $identifier->getPath(),
-                $isStackEmpty
-            ));
+            $builder = $builder->pushDecorators();
+
+            foreach ($this->httpHandleFlowHttpHandlersFactory->createHttpHandlers($identifier) as $handler) {
+                $builder = $builder->push($handler);
+            }
 
             $this->stackCache[$cacheKey] = $builder->build();
         }

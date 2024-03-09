@@ -11,6 +11,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 final class HttpMiddlewareHandler implements RequestHandlerInterface
 {
+    /**
+     * @var \Closure(ServerRequestInterface): ResponseInterface
+     */
     private \Closure $handleStack;
 
     /**
@@ -18,8 +21,13 @@ final class HttpMiddlewareHandler implements RequestHandlerInterface
      */
     private array $middlewares;
 
-    public function __construct(\Closure $next, MiddlewareInterface ...$middlewares)
-    {
+    /**
+     * @param \Closure(ServerRequestInterface): ResponseInterface $next
+     */
+    public function __construct(
+        \Closure $next,
+        MiddlewareInterface ...$middlewares
+    ) {
         $this->handleStack = $next;
         $this->middlewares = $middlewares;
     }
@@ -34,16 +42,16 @@ final class HttpMiddlewareHandler implements RequestHandlerInterface
         $middleware = \array_shift($middlewares);
 
         if ($middleware instanceof MiddlewareInterface) {
-            $next = \Closure::fromCallable(function (ServerRequestInterface $request) use ($middlewares) {
-                return $this->next($request, ...$middlewares);
-            });
+            /** @var \Closure(ServerRequestInterface): ResponseInterface $next */
+            $next = \Closure::fromCallable(fn (ServerRequestInterface $request) => $this->next($request, ...$middlewares));
 
             $handler = new class($next) implements RequestHandlerInterface {
-                private \Closure $next;
-
-                public function __construct(\Closure $next)
-                {
-                    $this->next = $next;
+                /**
+                 * @param \Closure(ServerRequestInterface): ResponseInterface $next
+                 */
+                public function __construct(
+                    private \Closure $next
+                ) {
                 }
 
                 public function handle(ServerRequestInterface $request): ResponseInterface

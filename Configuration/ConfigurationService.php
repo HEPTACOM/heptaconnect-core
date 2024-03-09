@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\ConfigurationServiceInterface;
-use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
+use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorServiceInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
@@ -19,36 +19,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class ConfigurationService implements ConfigurationServiceInterface
 {
-    private PortalRegistryInterface $portalRegistry;
-
-    private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet;
-
-    private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet;
-
-    /**
-     * @var PortalNodeConfigurationProcessorInterface[]
-     */
-    private array $configurationProcessors;
-
-    /**
-     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationFileReader
-     */
     public function __construct(
-        PortalRegistryInterface $portalRegistry,
-        PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
-        iterable $configurationProcessors
+        private PortalRegistryInterface $portalRegistry,
+        private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
+        private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
+        private PortalNodeConfigurationProcessorServiceInterface $configurationProcessorService
     ) {
-        $this->portalRegistry = $portalRegistry;
-        $this->portalNodeConfigurationGet = $portalNodeConfigurationGet;
-        $this->portalNodeConfigurationSet = $portalNodeConfigurationSet;
-        $this->configurationProcessors = \iterable_to_array($configurationProcessors);
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-        $configuration = $this->processReadConfiguration(
+        $configuration = $this->configurationProcessorService->applyRead(
             $portalNodeKey,
             fn () => $this->getPortalNodeConfigurationInternal($portalNodeKey)
         );
@@ -64,14 +46,20 @@ final class ConfigurationService implements ConfigurationServiceInterface
             $data = null;
         } else {
             $data = $this->getPortalNodeConfigurationInternal($portalNodeKey);
-            $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration ?? []);
-            $configuration = $this->removeStorageKeysWhenValueIsNull($configuration, $configuration ?? []);
+            $data = $this->removeStorageKeysWhenValueIsNull($data, $configuration);
+            $configuration = $this->removeStorageKeysWhenValueIsNull($configuration, $configuration);
             $data = \array_replace_recursive($data, $configuration);
 
             $template->resolve($data);
         }
 
-        $this->processWriteConfiguration($portalNodeKey, $data);
+        $this->configurationProcessorService->applyWrite(
+            $portalNodeKey,
+            $data ?? [],
+            fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+                new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
+            ]))
+        );
     }
 
     /**
@@ -80,7 +68,7 @@ final class ConfigurationService implements ConfigurationServiceInterface
     private function removeStorageKeysWhenValueIsNull(array $editable, array $nullArray): array
     {
         foreach ($nullArray as $key => $value) {
-            if (\is_array($value) && \array_key_exists($key, $editable)) {
+            if (\is_array($value) && \array_key_exists($key, $editable) && \is_array($editable[$key])) {
                 $editable[$key] = $this->removeStorageKeysWhenValueIsNull($editable[$key], $value);
 
                 continue;
@@ -123,29 +111,5 @@ final class ConfigurationService implements ConfigurationServiceInterface
         }
 
         return [];
-    }
-
-    private function processReadConfiguration(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
-    {
-        foreach ($this->configurationProcessors as $configurationProcessor) {
-            $readConfiguration = $read;
-            $read = static fn () => $configurationProcessor->read($portalNodeKey, $readConfiguration);
-        }
-
-        return $read();
-    }
-
-    private function processWriteConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
-    {
-        $write = fn (array $c) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
-            new PortalNodeConfigurationSetPayload($portalNodeKey, $c),
-        ]));
-
-        foreach ($this->configurationProcessors as $configurationProcessor) {
-            $writeConfiguration = $write;
-            $write = static fn (array $c) => $configurationProcessor->write($portalNodeKey, $c, $writeConfiguration);
-        }
-
-        $write($configuration ?? []);
     }
 }

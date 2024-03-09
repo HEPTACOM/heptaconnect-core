@@ -5,22 +5,28 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Storage\Filesystem;
 
 use League\Flysystem\AdapterInterface;
+use League\Flysystem\Config;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Handler;
 use League\Flysystem\PluginInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 abstract class AbstractFilesystem implements FilesystemInterface
 {
-    protected FilesystemInterface $filesystem;
+    public function __construct(
+        protected FilesystemInterface $filesystem
+    ) {
+        if (!\method_exists($this->filesystem, 'getConfig')) {
+            throw new \UnexpectedValueException('Filesystem does not expose config');
+        }
 
-    public function __construct(FilesystemInterface $filesystem)
-    {
-        $this->filesystem = $filesystem;
+        if (!\method_exists($this->filesystem, 'getAdapter')) {
+            throw new \UnexpectedValueException('Filesystem does not expose adapter');
+        }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function has($path): bool
     {
         $path = $this->preparePath($path);
@@ -28,9 +34,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->has($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function read($path)
     {
         $path = $this->preparePath($path);
@@ -38,9 +41,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->read($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function readStream($path)
     {
         $path = $this->preparePath($path);
@@ -48,31 +48,20 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->readStream($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function listContents($directory = '', $recursive = false): array
     {
         $directory = $this->preparePath($directory);
+        /** @var array{path: string, dirname: string}[] $contents */
+        $contents = $this->filesystem->listContents($directory, $recursive);
 
-        return \array_map(
-            function ($info) {
-                $info['dirname'] = $this->stripPath($info['dirname']);
-                $info['path'] = $this->stripPath($info['path']);
-
-                return $info;
-            },
-            $this->filesystem->listContents($directory, $recursive)
-        );
+        return \array_map([$this, 'stripPathFromContent'], $contents);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMetadata($path)
     {
         $path = $this->preparePath($path);
 
+        /** @var array{path: string}|array{dirname: string, path: string}|false $meta */
         $meta = $this->filesystem->getMetadata($path);
 
         if (!\is_array($meta)) {
@@ -90,9 +79,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $meta;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getSize($path)
     {
         $path = $this->preparePath($path);
@@ -100,9 +86,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getSize($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getMimetype($path)
     {
         $path = $this->preparePath($path);
@@ -110,9 +93,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getMimetype($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTimestamp($path)
     {
         $path = $this->preparePath($path);
@@ -120,9 +100,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getTimestamp($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getVisibility($path)
     {
         $path = $this->preparePath($path);
@@ -130,9 +107,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getVisibility($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function write($path, $contents, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -140,9 +114,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->write($path, $contents, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function writeStream($path, $resource, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -150,9 +121,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->writeStream($path, $resource, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update($path, $contents, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -160,9 +128,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->update($path, $contents, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function updateStream($path, $resource, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -170,9 +135,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->updateStream($path, $resource, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rename($path, $newpath): bool
     {
         $path = $this->preparePath($path);
@@ -181,9 +143,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->rename($path, $newpath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function copy($path, $newpath): bool
     {
         $path = $this->preparePath($path);
@@ -192,9 +151,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->copy($path, $newpath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function delete($path): bool
     {
         $path = $this->preparePath($path);
@@ -202,9 +158,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->delete($path);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteDir($dirname): bool
     {
         $dirname = $this->preparePath($dirname);
@@ -212,9 +165,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->deleteDir($dirname);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createDir($dirname, array $config = []): bool
     {
         $dirname = $this->preparePath($dirname);
@@ -222,9 +172,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->createDir($dirname, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setVisibility($path, $visibility): bool
     {
         $path = $this->preparePath($path);
@@ -232,9 +179,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->setVisibility($path, $visibility);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function put($path, $contents, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -242,9 +186,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->put($path, $contents, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function putStream($path, $resource, array $config = []): bool
     {
         $path = $this->preparePath($path);
@@ -252,9 +193,6 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->putStream($path, $resource, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function readAndDelete($path)
     {
         $path = $this->preparePath($path);
@@ -262,16 +200,10 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->readAndDelete($path);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @phpstan-ignore-next-line
-     */
     public function get($path, ?Handler $handler = null): Handler
     {
         $path = $this->preparePath($path);
 
-        /* @phpstan-ignore-next-line */
         return $this->filesystem->get($path, $handler);
     }
 
@@ -291,7 +223,7 @@ abstract class AbstractFilesystem implements FilesystemInterface
         return $this->filesystem->getAdapter();
     }
 
-    public function getConfig()
+    public function getConfig(): Config
     {
         return $this->filesystem->getConfig();
     }
@@ -305,4 +237,17 @@ abstract class AbstractFilesystem implements FilesystemInterface
      * Remove the modified parts from the filesystem
      */
     abstract public function stripPath(string $path): string;
+
+    /**
+     * @param array{dirname: string, path: string} $info
+     *
+     * @return array{dirname: string, path: string}
+     */
+    private function stripPathFromContent(array $info)
+    {
+        $info['dirname'] = $this->stripPath($info['dirname']);
+        $info['path'] = $this->stripPath($info['path']);
+
+        return $info;
+    }
 }

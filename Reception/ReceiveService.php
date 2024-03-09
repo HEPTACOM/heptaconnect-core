@@ -7,9 +7,10 @@ namespace Heptacom\HeptaConnect\Core\Reception;
 use Heptacom\HeptaConnect\Core\Component\LogMessage;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveContextFactoryInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiverStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Reception\Contract\ReceiveServiceInterface;
-use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionActorInterface;
-use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
+use Heptacom\HeptaConnect\Core\Reception\Contract\ReceptionFlowReceiversFactoryInterface;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
@@ -20,12 +21,6 @@ use Psr\Log\LoggerInterface;
 
 final class ReceiveService implements ReceiveServiceInterface
 {
-    private ReceiveContextFactoryInterface $receiveContextFactory;
-
-    private LoggerInterface $logger;
-
-    private StorageKeyGeneratorContract $storageKeyGenerator;
-
     /**
      * @var array<array-key, ReceiverStackInterface|null>
      */
@@ -36,22 +31,14 @@ final class ReceiveService implements ReceiveServiceInterface
      */
     private array $receiveContextCache = [];
 
-    private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory;
-
-    private ReceptionActorInterface $receptionActor;
-
     public function __construct(
-        ReceiveContextFactoryInterface $receiveContextFactory,
-        LoggerInterface $logger,
-        StorageKeyGeneratorContract $storageKeyGenerator,
-        ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
-        ReceptionActorInterface $receptionActor
+        private ReceiveContextFactoryInterface $receiveContextFactory,
+        private LoggerInterface $logger,
+        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
+        private ReceiverStackProcessorInterface $receiverStackProcessor,
+        private ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory
     ) {
-        $this->receiveContextFactory = $receiveContextFactory;
-        $this->logger = $logger;
-        $this->storageKeyGenerator = $storageKeyGenerator;
-        $this->receiverStackBuilderFactory = $receiverStackBuilderFactory;
-        $this->receptionActor = $receptionActor;
     }
 
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void
@@ -60,7 +47,7 @@ final class ReceiveService implements ReceiveServiceInterface
             return;
         }
 
-        $type = $entities->getType();
+        $type = $entities->getEntityType();
         $stack = $this->getReceiverStack($portalNodeKey, $type);
 
         if (!$stack instanceof ReceiverStackInterface) {
@@ -72,26 +59,34 @@ final class ReceiveService implements ReceiveServiceInterface
             return;
         }
 
-        $this->receptionActor->performReception($entities, $stack, $this->getReceiveContext($portalNodeKey));
+        $this->receiverStackProcessor->processStack($entities, $stack, $this->getReceiveContext($portalNodeKey));
     }
 
     /**
-     * @param class-string<DatasetEntityContract> $entityType
-     *
      * @throws UnsupportedStorageKeyException
      */
-    private function getReceiverStack(PortalNodeKeyInterface $portalNodeKey, string $entityType): ?ReceiverStackInterface
-    {
+    private function getReceiverStack(
+        PortalNodeKeyInterface $portalNodeKey,
+        EntityType $entityType
+    ): ?ReceiverStackInterface {
         $cacheKey = \implode('', [$this->storageKeyGenerator->serialize($portalNodeKey), $entityType]);
 
         if (!\array_key_exists($cacheKey, $this->receiverStackCache)) {
             $builder = $this->receiverStackBuilderFactory
                 ->createReceiverStackBuilder($portalNodeKey, $entityType)
-                ->pushSource()
-                // TODO break when source is already empty
-                ->pushDecorators();
+                ->pushSource();
 
-            $this->receiverStackCache[$cacheKey] = $builder->isEmpty() ? null : $builder->build();
+            if ($builder->isEmpty()) {
+                $this->receiverStackCache[$cacheKey] = null;
+            } else {
+                $builder = $builder->pushDecorators();
+
+                foreach ($this->receptionFlowReceiversFactory->createReceivers($portalNodeKey, $entityType) as $receiver) {
+                    $builder = $builder->push($receiver);
+                }
+
+                $this->receiverStackCache[$cacheKey] = $builder->build();
+            }
         }
 
         $result = $this->receiverStackCache[$cacheKey];

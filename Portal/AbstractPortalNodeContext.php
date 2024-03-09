@@ -4,23 +4,21 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
-    private ContainerInterface $container;
-
-    private ?array $configuration;
-
-    public function __construct(ContainerInterface $container, ?array $configuration)
-    {
-        $this->container = $container;
-        $this->configuration = $configuration;
+    public function __construct(
+        private PortalNodeContainerFacadeContract $containerFacade,
+        private ?array $configuration
+    ) {
     }
 
     public function getConfig(): ?array
@@ -30,26 +28,31 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 
     public function getPortal(): PortalContract
     {
-        return $this->getContainer()->get(PortalContract::class);
+        return $this->containerFacade->getPortal();
     }
 
     public function getPortalNodeKey(): PortalNodeKeyInterface
     {
-        return $this->getContainer()->get(PortalNodeKeyInterface::class);
+        return $this->containerFacade->getPortalNodeKey();
     }
 
     public function getResourceLocker(): ResourceLockFacade
     {
-        return $this->getContainer()->get(ResourceLockFacade::class);
+        return $this->containerFacade->getResourceLocker();
     }
 
     public function getStorage(): PortalStorageInterface
     {
-        return $this->getContainer()->get(PortalStorageInterface::class);
+        return $this->containerFacade->getStorage();
+    }
+
+    public function getLogger(): LoggerInterface
+    {
+        return $this->containerFacade->getLogger();
     }
 
     public function getContainer(): ContainerInterface
     {
-        return $this->container;
+        return $this->containerFacade;
     }
 }

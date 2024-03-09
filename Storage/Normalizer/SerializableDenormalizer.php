@@ -17,9 +17,12 @@ final class SerializableDenormalizer implements DenormalizerInterface
         return 'serializable';
     }
 
+    /**
+     * @param string|null $format
+     */
     public function denormalize($data, $type, $format = null, array $context = [])
     {
-        if (!$this->supportsDenormalization($data, $type)) {
+        if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
         }
 
@@ -30,7 +33,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
             \ini_set('unserialize_callback_func', self::class . '::handleUnserializeClass');
 
             $result = \unserialize($data);
-        } catch (\Throwable $exception) {
+        } catch (\Throwable) {
             return null;
         } finally {
             if (\is_string($unserialize_callback_func)) {
@@ -41,6 +44,11 @@ final class SerializableDenormalizer implements DenormalizerInterface
         return $result;
     }
 
+    /**
+     * @param string|null $format
+     *
+     * @psalm-assert string $data
+     */
     public function supportsDenormalization($data, $type, $format = null)
     {
         return $type === $this->getType()

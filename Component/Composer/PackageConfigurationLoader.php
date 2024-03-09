@@ -17,14 +17,10 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
 {
-    private ?string $composerJson;
-
-    private CacheItemPoolInterface $cache;
-
-    public function __construct(?string $composerJson, CacheItemPoolInterface $cache)
-    {
-        $this->composerJson = $composerJson;
-        $this->cache = $cache;
+    public function __construct(
+        private ?string $composerJson,
+        private CacheItemPoolInterface $cache
+    ) {
     }
 
     public function getPackageConfigurations(): PackageConfigurationCollection
@@ -35,62 +31,17 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
             $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class) . '-' . $cacheKey);
 
             if ($cacheItem->isHit()) {
-                return $cacheItem->get();
+                $result = $cacheItem->get();
+
+                if ($result instanceof PackageConfigurationCollection) {
+                    return $result;
+                }
             }
         } else {
             $cacheItem = null;
         }
 
-        $factory = new Factory();
-        $workingDir = null;
-
-        if ($this->composerJson !== null) {
-            $workingDir = \dirname($this->composerJson);
-
-            if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
-                $workingDir = null;
-            }
-        }
-
-        $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
-        $result = new PackageConfigurationCollection();
-
-        if ($workingDir === null) {
-            $cwd = \getcwd();
-
-            if (\is_string($cwd)) {
-                $workingDir = $cwd;
-            }
-        }
-
-        foreach ($this->iteratePackages($composer) as $packageInstance) {
-            $config = new PackageConfiguration();
-            $heptaconnectKeywords = \array_filter(
-                $packageInstance->getKeywords() ?? [],
-                fn (string $k): bool => \str_starts_with($k, 'heptaconnect-')
-            );
-
-            if ($heptaconnectKeywords === []) {
-                continue;
-            }
-
-            $config->setName($packageInstance->getName());
-            $config->setTags(new StringCollection($heptaconnectKeywords));
-
-            $extra = $packageInstance->getExtra() ?? [];
-            $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
-
-            if ($heptaconnect !== []) {
-                /* @var array<array-key, string> $keywords */
-                $config->setConfiguration($heptaconnect);
-            }
-
-            foreach ($this->iterateClassMaps($composer, $packageInstance, $workingDir) as $class => $file) {
-                $config->getAutoloadedFiles()->addClass($class, $file);
-            }
-
-            $result->push([$config]);
-        }
+        $result = $this->getPackageConfigurationUncached();
 
         if ($cacheItem instanceof CacheItemInterface) {
             $cacheItem->set($result);
@@ -131,6 +82,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
         if ($locker instanceof Locker && $locker->isLocked()) {
             $packageLockData = (array) ($locker->getLockData()['packages'] ?? []);
+            /** @var array{name: string, version: string}[] $packageLockData */
             $packageLockData = \array_filter($packageLockData, 'is_array');
 
             foreach ($packageLockData as $package) {
@@ -145,8 +97,9 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 
             $localRepository = $composer->getRepositoryManager()->getLocalRepository();
 
-            if (\method_exists($localRepository, 'getDevMode') && $localRepository->getDevMode()) {
+            if ($localRepository->getDevMode() ?? false) {
                 $packageDevLockData = (array) ($locker->getLockData()['packages-dev'] ?? []);
+                /** @var array{name: string, version: string}[] $packageDevLockData */
                 $packageDevLockData = \array_filter($packageDevLockData, 'is_array');
 
                 foreach ($packageDevLockData as $package) {
@@ -172,10 +125,10 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         CompletePackageInterface $package,
         ?string $workingDir
     ): iterable {
-        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload() ?? []);
+        $classLoader = $composer->getAutoloadGenerator()->createLoader($package->getAutoload());
         $installPath = $composer->getInstallationManager()->getInstallPath($package);
 
-        foreach ($classLoader->getPrefixesPsr4() as $namespace => $dirs) {
+        foreach ($classLoader->getPrefixesPsr4() as $dirs) {
             foreach ($dirs as $dir) {
                 if (\is_dir($absolute = $installPath . \DIRECTORY_SEPARATOR . $dir)) {
                     yield from ClassMapGenerator::createMap($absolute);
@@ -189,5 +142,80 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
                 }
             }
         }
+    }
+
+    private function getPackageConfigurationUncached(): PackageConfigurationCollection
+    {
+        $factory = new Factory();
+        $workingDir = null;
+
+        if ($this->composerJson !== null) {
+            $workingDir = \dirname($this->composerJson);
+
+            if (!@\is_dir($workingDir . \DIRECTORY_SEPARATOR . 'vendor')) {
+                $workingDir = null;
+            }
+        }
+
+        $composer = $factory->createComposer(new NullIO(), $this->composerJson, false, $workingDir);
+        $result = new PackageConfigurationCollection();
+
+        if ($workingDir === null) {
+            $cwd = \getcwd();
+
+            if (\is_string($cwd)) {
+                $workingDir = $cwd;
+            }
+        }
+
+        \assert(\is_string($workingDir));
+
+        foreach ($this->iteratePackages($composer) as $packageInstance) {
+            /** @var array|null $keywords */
+            $keywords = $packageInstance->getKeywords();
+            /** @var array<int, string> $heptaconnectKeywords */
+            $heptaconnectKeywords = \array_values(\array_filter(
+                $keywords ?? [],
+                static fn (string $keyword): bool => \str_starts_with($keyword, 'heptaconnect-')
+            ));
+
+            if ($heptaconnectKeywords === []) {
+                continue;
+            }
+
+            $result->push([
+                $this->getConfigFromPackage($packageInstance, $heptaconnectKeywords, $composer, $workingDir),
+            ]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<int, string> $heptaconnectKeywords
+     */
+    private function getConfigFromPackage(
+        CompletePackageInterface $packageInstance,
+        array $heptaconnectKeywords,
+        Composer $composer,
+        string $workingDir
+    ): PackageConfiguration {
+        $config = new PackageConfiguration();
+        $config->setName($packageInstance->getName());
+        $config->setTags(new StringCollection($heptaconnectKeywords));
+
+        $extra = $packageInstance->getExtra();
+        $heptaconnect = (array) ($extra['heptaconnect'] ?? []);
+
+        if ($heptaconnect !== []) {
+            /* @var array<array-key, string> $keywords */
+            $config->setConfiguration($heptaconnect);
+        }
+
+        foreach ($this->iterateClassMaps($composer, $packageInstance, $workingDir) as $class => $file) {
+            $config->getAutoloadedFiles()->addClass($class, $file);
+        }
+
+        return $config;
     }
 }

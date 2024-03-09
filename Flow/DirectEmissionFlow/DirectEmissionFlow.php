@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Flow\DirectEmissionFlow;
 
-use Heptacom\HeptaConnect\Core\Emission\Contract\EmissionActorInterface;
 use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackBuilderFactoryInterface;
+use Heptacom\HeptaConnect\Core\Emission\Contract\EmitterStackProcessorInterface;
 use Heptacom\HeptaConnect\Core\Emission\EmitContextFactory;
+use Heptacom\HeptaConnect\Core\Exploration\Contract\DirectEmissionFlowEmittersFactoryInterface;
 use Heptacom\HeptaConnect\Core\Exploration\DirectEmitter;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\DatasetEntityCollection;
+use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionResult;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\Exception\UnidentifiedEntityException;
@@ -23,24 +25,16 @@ use Psr\Log\NullLogger;
 
 final class DirectEmissionFlow extends DirectEmissionFlowContract implements LoggerAwareInterface, ProfilerAwareInterface
 {
-    private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory;
-
-    private EmitContextFactory $emitContextFactory;
-
-    private EmissionActorInterface $emissionActor;
-
     private LoggerInterface $logger;
 
     private ProfilerContract $profiler;
 
     public function __construct(
-        EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        EmitContextFactory $emitContextFactory,
-        EmissionActorInterface $emissionActor
+        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private EmitContextFactory $emitContextFactory,
+        private EmitterStackProcessorInterface $stackProcessor,
+        private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
     ) {
-        $this->emitterStackBuilderFactory = $emitterStackBuilderFactory;
-        $this->emitContextFactory = $emitContextFactory;
-        $this->emissionActor = $emissionActor;
         $this->logger = new NullLogger();
         $this->profiler = new NullProfiler();
     }
@@ -51,9 +45,9 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
         $emitContext = $this->emitContextFactory->createContext($portalNodeKey, true);
 
         /** @var DatasetEntityContract[] $unidentifiedEntities */
-        $unidentifiedEntities = \iterable_to_array($entities->filter(
+        $unidentifiedEntities = $entities->filter(
             static fn (DatasetEntityContract $entity): bool => $entity->getPrimaryKey() === null
-        ));
+        )->asArray();
 
         foreach ($unidentifiedEntities as $unidentifiedEntity) {
             $exception = new UnidentifiedEntityException($unidentifiedEntity);
@@ -62,24 +56,29 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
             $this->logger->error($exception->getMessage());
         }
 
+        /** @var class-string<DatasetEntityContract> $type */
         foreach ($entities->groupByType() as $type => $entitiesByType) {
+            $entityType = new EntityType($type);
             /** @var string[] $externalIds */
             $externalIds = \array_filter(\iterable_to_array($entitiesByType->map(
                 static fn (DatasetEntityContract $entity): ?string => $entity->getPrimaryKey()
             )), static fn (?string $primaryKey): bool => $primaryKey !== null);
 
             try {
-                $directEmitter = new DirectEmitter($type);
+                $directEmitter = new DirectEmitter($entityType);
                 $directEmitter->getEntities()->push($entitiesByType);
 
-                $emissionStack = $this->emitterStackBuilderFactory
-                    ->createEmitterStackBuilder($portalNodeKey, $type)
+                $emissionStackBuilder = $this->emitterStackBuilderFactory
+                    ->createEmitterStackBuilder($portalNodeKey, $entityType)
                     ->push($directEmitter)
-                    ->pushDecorators()
-                    ->build();
+                    ->pushDecorators();
+
+                foreach ($this->directEmissionFlowEmittersFactory->createEmitters($portalNodeKey, $entityType) as $emitter) {
+                    $emissionStackBuilder = $emissionStackBuilder->push($emitter);
+                }
 
                 $this->profiler->start('EmissionActor::performEmission', 'DirectEmissionFlow');
-                $this->emissionActor->performEmission($externalIds, $emissionStack, $emitContext);
+                $this->stackProcessor->processStack($externalIds, $emissionStackBuilder->build(), $emitContext);
                 $this->profiler->stop();
             } catch (\Throwable $exception) {
                 $this->profiler->stop($exception);

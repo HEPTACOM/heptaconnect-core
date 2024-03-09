@@ -18,38 +18,6 @@ class FlowComponentRegistry
 {
     private bool $isLoaded = false;
 
-    private PackageCollection $packages;
-
-    /**
-     * @var array<int, ExplorerCollection>
-     */
-    private array $sourcedExplorers;
-
-    /**
-     * @var array<int, EmitterCollection>
-     */
-    private array $sourcedEmitters;
-
-    /**
-     * @var array<int, ReceiverCollection>
-     */
-    private array $sourcedReceivers;
-
-    /**
-     * @var array<int, StatusReporterCollection>
-     */
-    private array $sourcedStatusReporters;
-
-    /**
-     * @var array<int, HttpHandlerCollection>
-     */
-    private array $sourcedWebHttpHandlers;
-
-    /**
-     * @var array<int, string[]>
-     */
-    private array $flowBuilderFiles;
-
     /**
      * @param array<int, ExplorerCollection>       $sourcedExplorers
      * @param array<int, EmitterCollection>        $sourcedEmitters
@@ -59,25 +27,19 @@ class FlowComponentRegistry
      * @param array<class-string, string[]>        $flowBuilderFiles
      */
     public function __construct(
-        PackageCollection $packages,
-        array $sourcedExplorers,
-        array $sourcedEmitters,
-        array $sourcedReceivers,
-        array $sourcedStatusReporters,
-        array $sourcedWebHttpHandlers,
-        array $flowBuilderFiles
+        private PackageCollection $packages,
+        private array $sourcedExplorers,
+        private array $sourcedEmitters,
+        private array $sourcedReceivers,
+        private array $sourcedStatusReporters,
+        private array $sourcedWebHttpHandlers,
+        private array $flowBuilderFiles
     ) {
-        $this->packages = $packages;
-        $this->sourcedExplorers = $sourcedExplorers;
-        $this->sourcedEmitters = $sourcedEmitters;
-        $this->sourcedReceivers = $sourcedReceivers;
-        $this->sourcedStatusReporters = $sourcedStatusReporters;
-        $this->sourcedWebHttpHandlers = $sourcedWebHttpHandlers;
-        $this->flowBuilderFiles = $flowBuilderFiles;
     }
 
     /**
      * @deprecated Parameter $source will be removed
+     * @param class-string $source
      */
     public function getExplorers(?string $source = null): ExplorerCollection
     {
@@ -88,6 +50,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     * @param class-string $source
      */
     public function getEmitters(?string $source = null): EmitterCollection
     {
@@ -98,6 +61,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     * @param class-string $source
      */
     public function getReceivers(?string $source = null): ReceiverCollection
     {
@@ -108,6 +72,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     * @param class-string $source
      */
     public function getStatusReporters(?string $source = null): StatusReporterCollection
     {
@@ -118,6 +83,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     * @param class-string $source
      */
     public function getWebHttpHandlers(?string $source = null): HttpHandlerCollection
     {
@@ -220,6 +186,9 @@ class FlowComponentRegistry
         $this->isLoaded = true;
     }
 
+    /**
+     * @param class-string $source
+     */
     private function getSourcePackage(string $source): PackageContract
     {
         $packages = $this->packages->withoutItems();
