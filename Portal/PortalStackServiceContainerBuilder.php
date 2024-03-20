@@ -199,6 +199,15 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             $this->requestStorage
         );
 
+        $httpHandleService = $this->httpHandleService;
+
+        if (!$httpHandleService instanceof HttpHandleServiceInterface) {
+            throw new \LogicException(
+                '\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::$httpHandleService is null. Did you forget to call setHttpHandleService()?',
+                1710936675
+            );
+        }
+
         $this->setSyntheticServices($containerBuilder, [
             PortalContract::class => $portal,
             PortalExtensionCollection::class => $portalExtensions,
@@ -225,7 +234,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             Psr7MessageMultiPartFormDataBuilderInterface::class => $this->psr7MessageMultiPartFormDataBuilder,
             HttpKernelInterface::class => new HttpKernel(
                 $portalNodeKey,
-                $this->httpHandleService,
+                $httpHandleService,
                 Psr17FactoryDiscovery::findStreamFactory(),
                 Psr17FactoryDiscovery::findUploadedFileFactory()
             ),

@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Extract serialization logic of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` into `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer` described by `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Exception\RequestSerializationException` to be explicitly used independent from `\Heptacom\HeptaConnect\Core\Storage\NormalizationRegistry`
 - Add exception code `1666451010` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer::serialize` when the given request cannot be serialized into JSON
 - Add constant `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX`, that is preceding a portal node configuration binding aliases
+- Add exception code `1710936675` to `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::build` when property `httpHandleService` is not set
 
 ### Changed
 
