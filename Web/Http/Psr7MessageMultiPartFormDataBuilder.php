@@ -84,7 +84,7 @@ final class Psr7MessageMultiPartFormDataBuilder implements Psr7MessageMultiPartF
                     $partLines[] = \sprintf(
                         'Content-Disposition: form-data; name="%s"; filename*="%s"',
                         $newPrefix,
-                        "utf-8''" . \addcslashes(\rawurlencode($value->getClientFilename()), '"\\')
+                        "utf-8''" . \addcslashes(\rawurlencode((string) $value->getClientFilename()), '"\\')
                     );
 
                     $partLines[] = 'Content-Type: ' . $value->getClientMediaType();

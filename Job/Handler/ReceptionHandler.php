@@ -195,7 +195,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
 
                     try {
                         $this->receiveService->receive(
-                            new TypedDatasetEntityCollection($dataType, $rawEntities),
+                            new TypedDatasetEntityCollection($entityType, $rawEntities),
                             $targetPortalNodeKey
                         );
                     } catch (\Throwable $exception) {

@@ -16,24 +16,11 @@ use Psr\Http\Message\UriInterface;
 final class HttpHandleContext extends AbstractPortalNodeContext implements HttpHandleContextInterface
 {
     public function forward(
-        $uri,
+        UriInterface|string $uri,
         string $method = 'GET',
-        $body = null,
+        StreamInterface|array|string|null $body = null,
         array $headers = []
     ): ResponseInterface {
-        if (!$uri instanceof UriInterface && !\is_string($uri)) {
-            throw $this->createTypeError(1, '$uri', '\Psr\Http\Message\UriInterface|string', $uri);
-        }
-
-        if (
-            !$body instanceof StreamInterface
-            && !\is_array($body)
-            && !\is_string($body)
-            && $body !== null
-        ) {
-            throw $this->createTypeError(3, '$body', '\Psr\Http\Message\StreamInterface|array|string|null', $body);
-        }
-
         /** @var ServerRequestFactoryInterface $requestFactory */
         $requestFactory = $this->getContainer()->get(ServerRequestFactoryInterface::class);
         /** @var StreamFactoryInterface $streamFactory */
@@ -62,26 +49,5 @@ final class HttpHandleContext extends AbstractPortalNodeContext implements HttpH
         }
 
         return $httpKernel->handle($request);
-    }
-
-    private function createTypeError(
-        int $position,
-        string $name,
-        string $expectedType,
-        $argument
-    ): \TypeError {
-        $actualType = \gettype($argument);
-
-        if ($actualType === 'object') {
-            $actualType = \get_class($argument);
-        }
-
-        return new \TypeError(\sprintf(
-            'Argument #%d (%s) must be of type %s, %s given',
-            $position,
-            $name,
-            $expectedType,
-            $actualType
-        ));
     }
 }

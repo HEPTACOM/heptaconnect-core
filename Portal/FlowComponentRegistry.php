@@ -5,18 +5,48 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Portal\Base\Builder\FlowComponent;
+use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
+use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\ExplorerCollection;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PackageCollection;
+use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
+use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterContract;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
+use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerCollection;
 
 class FlowComponentRegistry
 {
     private bool $isLoaded = false;
+
+    /**
+     * @var array<ExplorerContract>
+     */
+    private array $loadedExplorers = [];
+
+    /**
+     * @var array<EmitterContract>
+     */
+    private array $loadedEmitters = [];
+
+    /**
+     * @var array<ReceiverContract>
+     */
+    private array $loadedReceivers = [];
+
+    /**
+     * @var array<StatusReporterContract>
+     */
+    private array $loadedStatusReporters = [];
+
+    /**
+     * @var array<HttpHandlerContract>
+     */
+    private array $loadedWebHttpHandlers = [];
 
     /**
      * @param array<int, ExplorerCollection>       $sourcedExplorers
@@ -37,64 +67,39 @@ class FlowComponentRegistry
     ) {
     }
 
-    /**
-     * @deprecated Parameter $source will be removed
-     *
-     * @param class-string $source
-     */
-    public function getExplorers(?string $source = null): ExplorerCollection
+    public function getExplorers(): ExplorerCollection
     {
         $this->loadSource();
 
-        return new ExplorerCollection($this->sourcedExplorers);
+        return new ExplorerCollection($this->loadedExplorers);
     }
 
-    /**
-     * @deprecated Parameter $source will be removed
-     *
-     * @param class-string $source
-     */
-    public function getEmitters(?string $source = null): EmitterCollection
+    public function getEmitters(): EmitterCollection
     {
         $this->loadSource();
 
-        return new EmitterCollection($this->sourcedEmitters);
+        return new EmitterCollection($this->loadedEmitters);
     }
 
-    /**
-     * @deprecated Parameter $source will be removed
-     *
-     * @param class-string $source
-     */
-    public function getReceivers(?string $source = null): ReceiverCollection
+    public function getReceivers(): ReceiverCollection
     {
         $this->loadSource();
 
-        return new ReceiverCollection($this->sourcedReceivers);
+        return new ReceiverCollection($this->loadedReceivers);
     }
 
-    /**
-     * @deprecated Parameter $source will be removed
-     *
-     * @param class-string $source
-     */
-    public function getStatusReporters(?string $source = null): StatusReporterCollection
+    public function getStatusReporters(): StatusReporterCollection
     {
         $this->loadSource();
 
-        return new StatusReporterCollection($this->sourcedStatusReporters);
+        return new StatusReporterCollection($this->loadedStatusReporters);
     }
 
-    /**
-     * @deprecated Parameter $source will be removed
-     *
-     * @param class-string $source
-     */
-    public function getWebHttpHandlers(?string $source = null): HttpHandlerCollection
+    public function getWebHttpHandlers(): HttpHandlerCollection
     {
         $this->loadSource();
 
-        return new HttpHandlerCollection($this->sourcedWebHttpHandlers);
+        return new HttpHandlerCollection($this->loadedWebHttpHandlers);
     }
 
     /**
@@ -134,22 +139,27 @@ class FlowComponentRegistry
                 }
 
                 foreach ($flowBuilder->buildExplorers() as $priority => $explorer) {
+                    $priority = (int) $priority;
                     ($this->sourcedExplorers[$priority] ??= new ExplorerCollection())->push([$explorer]);
                 }
 
                 foreach ($flowBuilder->buildEmitters() as $priority => $emitter) {
+                    $priority = (int) $priority;
                     ($this->sourcedEmitters[$priority] ??= new EmitterCollection())->push([$emitter]);
                 }
 
                 foreach ($flowBuilder->buildReceivers() as $priority => $receiver) {
+                    $priority = (int) $priority;
                     ($this->sourcedReceivers[$priority] ??= new ReceiverCollection())->push([$receiver]);
                 }
 
                 foreach ($flowBuilder->buildStatusReporters() as $priority => $statusReporter) {
+                    $priority = (int) $priority;
                     ($this->sourcedStatusReporters[$priority] ??= new StatusReporterCollection())->push([$statusReporter]);
                 }
 
                 foreach ($flowBuilder->buildHttpHandlers() as $priority => $httpHandler) {
+                    $priority = (int) $priority;
                     ($this->sourcedWebHttpHandlers[$priority] ??= new HttpHandlerCollection())->push([$httpHandler]);
                 }
             }
@@ -163,27 +173,27 @@ class FlowComponentRegistry
         \ksort($this->sourcedStatusReporters);
         \ksort($this->sourcedWebHttpHandlers);
 
-        $this->sourcedExplorers = \array_merge(...\array_map(
+        $this->loadedExplorers = \array_merge(...\array_map(
             static fn (ExplorerCollection $explorers) => $explorers->asArray(),
             $this->sourcedExplorers
         ));
 
-        $this->sourcedEmitters = \array_merge(...\array_map(
+        $this->loadedEmitters = \array_merge(...\array_map(
             static fn (EmitterCollection $emitters) => $emitters->asArray(),
             $this->sourcedEmitters
         ));
 
-        $this->sourcedReceivers = \array_merge(...\array_map(
+        $this->loadedReceivers = \array_merge(...\array_map(
             static fn (ReceiverCollection $receivers) => $receivers->asArray(),
             $this->sourcedReceivers
         ));
 
-        $this->sourcedStatusReporters = \array_merge(...\array_map(
+        $this->loadedStatusReporters = \array_merge(...\array_map(
             static fn (StatusReporterCollection $statusReporters) => $statusReporters->asArray(),
             $this->sourcedStatusReporters
         ));
 
-        $this->sourcedWebHttpHandlers = \array_merge(...\array_map(
+        $this->loadedWebHttpHandlers = \array_merge(...\array_map(
             static fn (HttpHandlerCollection $webHttpHandlers) => $webHttpHandlers->asArray(),
             $this->sourcedWebHttpHandlers
         ));

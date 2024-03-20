@@ -62,10 +62,6 @@ final class HttpKernel implements HttpKernelInterface
 
             [$cookieName, $cookieValue] = $cookieParts;
 
-            if (!\is_string($cookieName) || !\is_string($cookieValue)) {
-                continue;
-            }
-
             $cookieName = \trim($cookieName);
             $cookieValue = \trim($cookieValue);
 
