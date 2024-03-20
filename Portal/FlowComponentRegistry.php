@@ -39,6 +39,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     *
      * @param class-string $source
      */
     public function getExplorers(?string $source = null): ExplorerCollection
@@ -50,6 +51,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     *
      * @param class-string $source
      */
     public function getEmitters(?string $source = null): EmitterCollection
@@ -61,6 +63,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     *
      * @param class-string $source
      */
     public function getReceivers(?string $source = null): ReceiverCollection
@@ -72,6 +75,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     *
      * @param class-string $source
      */
     public function getStatusReporters(?string $source = null): StatusReporterCollection
@@ -83,6 +87,7 @@ class FlowComponentRegistry
 
     /**
      * @deprecated Parameter $source will be removed
+     *
      * @param class-string $source
      */
     public function getWebHttpHandlers(?string $source = null): HttpHandlerCollection

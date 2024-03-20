@@ -192,6 +192,7 @@ final class ReceptionHandler implements ReceptionHandlerInterface
                     $this->identityReflectAction->reflect(new IdentityReflectPayload($targetPortalNodeKey, $mappedEntities));
 
                     $this->jobStartAction->start(new JobStartPayload($jobKeys, new \DateTimeImmutable(), null));
+
                     try {
                         $this->receiveService->receive(
                             new TypedDatasetEntityCollection($dataType, $rawEntities),
