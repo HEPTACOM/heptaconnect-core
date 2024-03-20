@@ -15,6 +15,7 @@
             "name": "HEPTACOM GmbH"
         }
     ],
+    "homepage": "https://heptaconnect.io",
     "support": {
         "issues": "https://github.com/HEPTACOM/heptaconnect-framework/issues",
         "source": "https://github.com/HEPTACOM/heptaconnect-framework",
@@ -68,6 +69,5 @@
             "infection/extension-installer": true,
             "php-http/discovery": true
         }
-    },
-    "website": "https://heptaconnect.io"
+    }
 }
