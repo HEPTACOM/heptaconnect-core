@@ -6,7 +6,6 @@ namespace Heptacom\HeptaConnect\Core\Portal;
 
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
@@ -24,11 +23,6 @@ abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
     public function getConfig(): ?array
     {
         return $this->configuration;
-    }
-
-    public function getPortal(): PortalContract
-    {
-        return $this->containerFacade->getPortal();
     }
 
     public function getPortalNodeKey(): PortalNodeKeyInterface

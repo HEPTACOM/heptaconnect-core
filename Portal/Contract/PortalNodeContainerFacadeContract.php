@@ -7,7 +7,6 @@ namespace Heptacom\HeptaConnect\Core\Portal\Contract;
 use Heptacom\HeptaConnect\Core\Portal\FlowComponentRegistry;
 use Heptacom\HeptaConnect\Core\Support\HttpMiddlewareCollector;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
-use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalStorageInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientContract;
@@ -19,11 +18,6 @@ use Psr\Log\LoggerInterface;
  */
 abstract class PortalNodeContainerFacadeContract implements ContainerInterface
 {
-    /**
-     * Gets the portal of the container.
-     */
-    abstract public function getPortal(): PortalContract;
-
     /**
      * Gets the portal node key of the container.
      */
