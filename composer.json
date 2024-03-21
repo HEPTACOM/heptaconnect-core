@@ -23,7 +23,7 @@
         "rss": "https://heptaconnect.io/news/rss2.xml"
     },
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.1",
         "ext-hash": "*",
         "ext-json": "*",
         "ext-zlib": "*",
@@ -43,15 +43,15 @@
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1",
-        "ramsey/uuid": "^3.5 || ^4",
+        "ramsey/uuid": "^4.5",
         "riverline/multipart-parser": "^2.1",
-        "symfony/config": "^4.4 || ^5.0",
-        "symfony/dependency-injection": "^4.4.11 || ^5.0",
-        "symfony/event-dispatcher": "^4.0 || ^5.0",
+        "symfony/config": ">=5.3.7",
+        "symfony/dependency-injection": ">=5.3.7",
+        "symfony/event-dispatcher": ">=5.3.7",
         "symfony/event-dispatcher-contracts": ">=1.1",
-        "symfony/lock": "^4.0 || ^5.0",
-        "symfony/messenger": "^4.0 || ^5.0",
-        "symfony/yaml": "^4.4 || ^5.0"
+        "symfony/lock": ">=5.3.7",
+        "symfony/messenger": ">=5.3.7",
+        "symfony/yaml": ">=5.3.7"
     },
     "repositories": {
         "heptaconnect-sources": {
