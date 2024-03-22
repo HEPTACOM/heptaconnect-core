@@ -21,12 +21,7 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
         return 'psr7-request';
     }
 
-    /**
-     * @param string|null $format
-     *
-     * @return RequestInterface
-     */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): RequestInterface
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
@@ -36,11 +31,9 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param string|null $format
-     *
      * @psalm-assert string $data
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if ($type !== $this->getType() || !\is_string($data)) {
             return false;
@@ -53,5 +46,10 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

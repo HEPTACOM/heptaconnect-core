@@ -18,12 +18,7 @@ final class SerializableNormalizer implements NormalizerInterface
         return 'serializable';
     }
 
-    /**
-     * @param string|null $format
-     *
-     * @return string
-     */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$this->supportsNormalization($object)) {
             throw new InvalidArgumentException();
@@ -32,10 +27,7 @@ final class SerializableNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if ($data instanceof StreamInterface) {
             return false;
@@ -48,5 +40,10 @@ final class SerializableNormalizer implements NormalizerInterface
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

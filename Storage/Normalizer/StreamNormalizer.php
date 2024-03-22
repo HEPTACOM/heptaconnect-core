@@ -31,10 +31,7 @@ final class StreamNormalizer implements NormalizerInterface
     ) {
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof SerializableStream;
     }
@@ -47,12 +44,7 @@ final class StreamNormalizer implements NormalizerInterface
         return 'stream';
     }
 
-    /**
-     * @param string|null $format
-     *
-     * @return string
-     */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof SerializableStream) {
             throw new InvalidArgumentException('$object is no SerializableStream', 1637432853);
@@ -88,6 +80,11 @@ final class StreamNormalizer implements NormalizerInterface
         \fclose($stream);
 
         return $filename;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 
     private function generateFilename(UuidInterface $filenameUuid): string

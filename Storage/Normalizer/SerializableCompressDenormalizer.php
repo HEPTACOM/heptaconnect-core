@@ -19,10 +19,7 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
         return $this->serializableDenormalizer->getType() . '+gzpress';
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
@@ -37,11 +34,9 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param string|null $format
-     *
      * @psalm-assert string $data
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === $this->getType()
             && \is_string($data)
@@ -50,5 +45,10 @@ final class SerializableCompressDenormalizer implements DenormalizerInterface
                 $this->serializableDenormalizer->getType(),
                 $format
             );
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

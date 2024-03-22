@@ -19,10 +19,7 @@ final class SerializableCompressNormalizer implements NormalizerInterface
         return $this->serializableNormalizer->getType() . '+gzpress';
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function normalize($object, $format = null, array $context = []): string
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         $normalizedValue = $this->serializableNormalizer->normalize($object, $format, $context);
 
@@ -39,11 +36,13 @@ final class SerializableCompressNormalizer implements NormalizerInterface
         return $result;
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->serializableNormalizer->supportsNormalization($data, $format);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

@@ -16,10 +16,7 @@ final class Psr7RequestNormalizer implements NormalizerInterface
     ) {
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function supportsNormalization($data, $format = null)
+    public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof RequestInterface;
     }
@@ -29,12 +26,7 @@ final class Psr7RequestNormalizer implements NormalizerInterface
         return 'psr7-request';
     }
 
-    /**
-     * @param string|null $format
-     *
-     * @return string
-     */
-    public function normalize($object, $format = null, array $context = [])
+    public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof RequestInterface) {
             throw new InvalidArgumentException(
@@ -44,5 +36,10 @@ final class Psr7RequestNormalizer implements NormalizerInterface
         }
 
         return $this->serializer->serialize($object);
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

@@ -31,10 +31,7 @@ final class StreamDenormalizer implements DenormalizerInterface
         return 'stream';
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): SerializableStream
     {
         if (!\is_string($data)) {
             throw new UnexpectedValueException('data is null', 1634868818);
@@ -53,10 +50,7 @@ final class StreamDenormalizer implements DenormalizerInterface
         return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!\is_string($data)) {
             return false;
@@ -75,5 +69,10 @@ final class StreamDenormalizer implements DenormalizerInterface
         }
 
         return true;
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }

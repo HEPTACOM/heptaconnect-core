@@ -17,10 +17,7 @@ final class ScalarDenormalizer implements DenormalizerInterface
         return 'scalar';
     }
 
-    /**
-     * @param string|null $format
-     */
-    public function denormalize($data, $type, $format = null, array $context = [])
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
             throw new InvalidArgumentException();
@@ -30,14 +27,17 @@ final class ScalarDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param string|null $format
-     *
      * @psalm-assert string $data
      */
-    public function supportsDenormalization($data, $type, $format = null)
+    public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === $this->getType()
             && \is_string($data)
             && (\unserialize($data, ['allowed_classes' => false]) !== false || $data === 'b:0;');
+    }
+
+    public function getSupportedTypes(?string $format): array
+    {
+        return [$this->getType()];
     }
 }
