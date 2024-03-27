@@ -40,6 +40,6 @@ final class Psr7RequestNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return [$this->getType()];
+        return [$this->getType() => true];
     }
 }

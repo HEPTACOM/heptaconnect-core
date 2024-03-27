@@ -38,6 +38,6 @@ final class ScalarDenormalizer implements DenormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return [$this->getType()];
+        return [$this->getType() => true];
     }
 }

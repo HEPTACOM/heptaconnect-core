@@ -84,7 +84,7 @@ final class StreamNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return [$this->getType()];
+        return [$this->getType() => true];
     }
 
     private function generateFilename(UuidInterface $filenameUuid): string

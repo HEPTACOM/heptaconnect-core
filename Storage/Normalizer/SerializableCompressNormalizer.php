@@ -43,6 +43,6 @@ final class SerializableCompressNormalizer implements NormalizerInterface
 
     public function getSupportedTypes(?string $format): array
     {
-        return [$this->getType()];
+        return [$this->getType() => true];
     }
 }
