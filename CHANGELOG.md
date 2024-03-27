@@ -47,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add exception code `1666451010` to `\Heptacom\HeptaConnect\Core\Web\Http\RequestSerializer::serialize` when the given request cannot be serialized into JSON
 - Add constant `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX`, that is preceding a portal node configuration binding aliases
 - Add exception code `1710936675` to `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::build` when property `httpHandleService` is not set
+- Add `\Heptacom\HeptaConnect\Core\Bridge\Portal\PortalLoaderInterface` to allow for easier decoration of `\Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader`
 
 ### Changed
 
@@ -92,6 +93,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Move log message codes `1651338621` and `1631565257` from `\Heptacom\HeptaConnect\Core\Portal\PortalStorage` to `\Heptacom\HeptaConnect\Core\Portal\Storage\PortalNodeStorageItemUnpacker` without change in meaning
 - Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
 - Combine `portalNodeKey` and `path` parameter in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface::createHttpHandlerStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory::createHttpHandlerStackBuilder` using `\Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier`
+- Make class final: `\Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader`
 
 ### Deprecated
 

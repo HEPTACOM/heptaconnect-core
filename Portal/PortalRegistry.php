@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Bridge\Portal\PortalLoaderInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalFactoryContract;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalContract;
@@ -34,7 +35,7 @@ final class PortalRegistry implements PortalRegistryInterface
 
     public function __construct(
         private PortalFactoryContract $portalFactory,
-        private ComposerPortalLoader $portalLoader,
+        private PortalLoaderInterface $portalLoader,
         private StorageKeyGeneratorContract $storageKeyGenerator,
         private PortalNodeGetActionInterface $portalNodeGetAction,
         private PortalExtensionFindActionInterface $portalExtensionFindAction

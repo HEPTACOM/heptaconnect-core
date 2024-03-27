@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Portal;
 
+use Heptacom\HeptaConnect\Core\Bridge\Portal\PortalLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\Contract\PackageConfigurationLoaderInterface;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration;
 use Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationCollection;
@@ -20,7 +21,7 @@ use Heptacom\HeptaConnect\Portal\Base\Portal\PortalExtensionType;
 use Heptacom\HeptaConnect\Portal\Base\Portal\PortalType;
 use Psr\Log\LoggerInterface;
 
-class ComposerPortalLoader
+final class ComposerPortalLoader implements PortalLoaderInterface
 {
     private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
 
