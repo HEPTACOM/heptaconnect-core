@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Storage\Base\Action\Identity\Map\IdentityMapPayload;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
-use Heptacom\HeptaConnect\Utility\Contract\CollectionInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Contract\CollectionInterface;
 
 /**
  * @extends AbstractBufferedResultProcessingExplorer<string>

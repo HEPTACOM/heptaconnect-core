@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
-use Heptacom\HeptaConnect\Utility\Contract\CollectionInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Contract\CollectionInterface;
 use Psr\Log\LoggerInterface;
 
 /**

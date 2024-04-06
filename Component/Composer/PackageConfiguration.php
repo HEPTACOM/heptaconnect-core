@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Dataset\Base\Support\AttachmentAwareTrait;
-use Heptacom\HeptaConnect\Utility\Contract\AttachmentAwareInterface;
+use Heptacom\HeptaConnect\Utility\Attachment\Contract\AttachmentAwareInterface;
 
 final class PackageConfiguration implements AttachmentAwareInterface
 {

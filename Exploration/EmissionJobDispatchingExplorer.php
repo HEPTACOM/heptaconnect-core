@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
-use Heptacom\HeptaConnect\Utility\Contract\CollectionInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Contract\CollectionInterface;
 use Psr\Log\LoggerInterface;
 
 /**
