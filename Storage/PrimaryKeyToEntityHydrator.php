@@ -6,8 +6,8 @@ namespace Heptacom\HeptaConnect\Core\Storage;
 
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
-use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
+use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 
 /**
  * @deprecated this is useful until the rewrite of identity handling, which is subject for the next major version
