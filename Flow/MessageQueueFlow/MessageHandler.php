@@ -12,9 +12,10 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Job\Get\JobGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Messenger\Handler\MessageSubscriberInterface;
+use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-final class MessageHandler implements MessageSubscriberInterface
+#[AsMessageHandler]
+final class MessageHandler
 {
     public function __construct(
         private JobGetActionInterface $jobGetAction,
@@ -23,12 +24,7 @@ final class MessageHandler implements MessageSubscriberInterface
     ) {
     }
 
-    public static function getHandledMessages(): iterable
-    {
-        yield JobMessage::class => ['method' => 'handleJob'];
-    }
-
-    public function handleJob(JobMessage $message): void
+    public function __invoke(JobMessage $message): void
     {
         /** @var array<string, JobDataCollection> $jobs */
         $jobs = [];
