@@ -17,7 +17,6 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\BuildDefiniti
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass;
 use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\SetConfigurationAsParameterCompilerPass;
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
-use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
@@ -26,7 +25,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceFactoryContract;
 use Heptacom\HeptaConnect\Portal\Base\File\FileReferenceResolverContract;
-use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface as HeptaConnectFilesystemInterface;
+use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface;
 use Heptacom\HeptaConnect\Portal\Base\Flow\DirectEmission\DirectEmissionFlowContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Support\ResourceLockFacade;
@@ -57,7 +56,6 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
-use League\Flysystem\FilesystemInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -114,12 +112,11 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         private ResourceLockingContract $resourceLocking,
         private ProfilerFactoryContract $profilerFactory,
         private StorageKeyGeneratorContract $storageKeyGenerator,
-        private FilesystemFactory $filesystemFactory,
         private ConfigurationServiceInterface $configurationService,
         private PublisherInterface $publisher,
         private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
         private RequestStorageContract $requestStorage,
-        private FilesystemFactoryInterface $filesystemFactory2,
+        private FilesystemFactoryInterface $filesystemFactory,
         private Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
         private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
         private Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder,
@@ -224,11 +221,10 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             ResourceLockFacade::class => new ResourceLockFacade($this->resourceLocking),
             PortalNodeKeyInterface::class => $portalNodeKey,
             ProfilerContract::class => $this->profilerFactory->factory('HeptaConnect\Portal::' . $this->storageKeyGenerator->serialize($portalNodeKey)),
-            FilesystemInterface::class => $this->filesystemFactory->factory($portalNodeKey),
             PublisherInterface::class => $this->publisher,
             HttpHandlerUrlProviderInterface::class => $this->httpHandlerUrlProviderFactory->factory($portalNodeKey),
             FileReferenceFactoryContract::class => $fileReferenceFactory,
-            HeptaConnectFilesystemInterface::class => $this->filesystemFactory2->create($portalNodeKey),
+            FilesystemInterface::class => $this->filesystemFactory->create($portalNodeKey),
             Psr7MessageCurlShellFormatterContract::class => $this->psr7MessageCurlShellFormatter,
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
             Psr7MessageMultiPartFormDataBuilderInterface::class => $this->psr7MessageMultiPartFormDataBuilder,
