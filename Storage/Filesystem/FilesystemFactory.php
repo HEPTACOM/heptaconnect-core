@@ -8,6 +8,9 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use League\Flysystem\FilesystemInterface;
 
+/**
+ * @todo Fix Flysystem compatibility
+ */
 class FilesystemFactory
 {
     public function __construct(
