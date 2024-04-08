@@ -105,6 +105,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\DelegatingLoaderLoadException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Exception\DelegatingLoaderLoadException` will be thrown instead
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Exception\UnexpectedRequiredParameterInConstructorOnInstantionException` as `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` is final and therefore has no unexpected parameters
 - Remove `\Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract::getPortal`, `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::getPortal` and `\Heptacom\HeptaConnect\Core\Portal\PortalNodeContainerFacade::getPortal` without replacement
+- Remove `\Heptacom\HeptaConnect\Core\Storage\Filesystem\AbstractFilesystem`, `\Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory`, `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixAdapter` and `\Heptacom\HeptaConnect\Core\Storage\Filesystem\PrefixFilesystem` as flysystem is removed as core concept 
+- Remove composer dependency `league/flysystem`
 
 ### Fixed
 
