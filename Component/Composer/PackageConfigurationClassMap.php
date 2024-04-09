@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Component\Composer;
 
-use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
+use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 
 class PackageConfigurationClassMap
 {
