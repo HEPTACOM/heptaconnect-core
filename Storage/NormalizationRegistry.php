@@ -13,12 +13,12 @@ final class NormalizationRegistry extends NormalizationRegistryContract
     /**
      * @var NormalizerInterface[]
      */
-    private array $normalizer;
+    private readonly array $normalizer;
 
     /**
      * @var DenormalizerInterface[]
      */
-    private array $denormalizer;
+    private readonly array $denormalizer;
 
     /**
      * @psalm-param iterable<int, NormalizerInterface> $normalizer

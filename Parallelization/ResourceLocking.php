@@ -14,8 +14,8 @@ use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 final class ResourceLocking extends ResourceLockingContract
 {
     public function __construct(
-        private ResourceLockStorageContract $resourceLockStorage,
-        private StorageKeyGeneratorContract $storageKeyGenerator
+        private readonly ResourceLockStorageContract $resourceLockStorage,
+        private readonly StorageKeyGeneratorContract $storageKeyGenerator
     ) {
     }
 

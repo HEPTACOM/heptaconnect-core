@@ -106,20 +106,20 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     private array $alreadyBuiltPackages = [];
 
     public function __construct(
-        private LoggerInterface $logger,
-        private NormalizationRegistryContract $normalizationRegistry,
-        private PortalStorageFactory $portalStorageFactory,
-        private ResourceLockingContract $resourceLocking,
-        private ProfilerFactoryContract $profilerFactory,
-        private StorageKeyGeneratorContract $storageKeyGenerator,
-        private ConfigurationServiceInterface $configurationService,
-        private PublisherInterface $publisher,
-        private HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
-        private RequestStorageContract $requestStorage,
-        private FilesystemFactoryInterface $filesystemFactory,
-        private Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
-        private Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
-        private Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder,
+        private readonly LoggerInterface $logger,
+        private readonly NormalizationRegistryContract $normalizationRegistry,
+        private readonly PortalStorageFactory $portalStorageFactory,
+        private readonly ResourceLockingContract $resourceLocking,
+        private readonly ProfilerFactoryContract $profilerFactory,
+        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly ConfigurationServiceInterface $configurationService,
+        private readonly PublisherInterface $publisher,
+        private readonly HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,
+        private readonly RequestStorageContract $requestStorage,
+        private readonly FilesystemFactoryInterface $filesystemFactory,
+        private readonly Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
+        private readonly Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
+        private readonly Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder,
     ) {
     }
 
@@ -356,7 +356,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         PackageContract $package,
         ContainerBuilder $containerBuilder
     ): void {
-        $packageType = \get_class($package);
+        $packageType = $package::class;
 
         if (isset($this->alreadyBuiltPackages[$packageType])) {
             return;

@@ -22,11 +22,11 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
 {
     public function __construct(
         EntityType $entityType,
-        private DirectEmitter $directEmitter,
-        private EmitterStackProcessorInterface $emitterStackProcessor,
-        private EmitterStackInterface $emitterStack,
-        private EmitContextInterface $emitContext,
-        private LoggerInterface $logger,
+        private readonly DirectEmitter $directEmitter,
+        private readonly EmitterStackProcessorInterface $emitterStackProcessor,
+        private readonly EmitterStackInterface $emitterStack,
+        private readonly EmitContextInterface $emitContext,
+        private readonly LoggerInterface $logger,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);

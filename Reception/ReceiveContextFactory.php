@@ -17,12 +17,12 @@ final class ReceiveContextFactory implements ReceiveContextFactoryInterface
     /**
      * @var EventSubscriberInterface[]
      */
-    private array $postProcessors;
+    private readonly array $postProcessors;
 
     public function __construct(
-        private ConfigurationServiceInterface $configurationService,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
-        private EntityStatusContract $entityStatus,
+        private readonly ConfigurationServiceInterface $configurationService,
+        private readonly PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private readonly EntityStatusContract $entityStatus,
         iterable $postProcessors
     ) {
         $this->postProcessors = $postProcessors instanceof \Traversable ? \iterator_to_array($postProcessors) : $postProcessors;

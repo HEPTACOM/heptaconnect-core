@@ -57,7 +57,7 @@ class FlowComponentRegistry
      * @param array<class-string, string[]>        $flowBuilderFiles
      */
     public function __construct(
-        private PackageCollection $packages,
+        private readonly PackageCollection $packages,
         private array $sourcedExplorers,
         private array $sourcedEmitters,
         private array $sourcedReceivers,

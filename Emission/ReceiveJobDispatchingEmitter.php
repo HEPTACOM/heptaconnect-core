@@ -14,8 +14,8 @@ final class ReceiveJobDispatchingEmitter extends AbstractBufferedResultProcessin
 {
     public function __construct(
         EntityType $entityType,
-        private EmittedEntitiesToJobsConverterInterface $emissionResultToJobConverter,
-        private JobDispatcherContract $jobDispatcher,
+        private readonly EmittedEntitiesToJobsConverterInterface $emissionResultToJobConverter,
+        private readonly JobDispatcherContract $jobDispatcher,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);

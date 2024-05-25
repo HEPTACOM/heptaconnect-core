@@ -13,15 +13,15 @@ use Psr\Log\LoggerInterface;
 
 final class ExplorerStack implements ExplorerStackInterface
 {
-    private ExplorerCollection $explorers;
+    private readonly ExplorerCollection $explorers;
 
     /**
      * @param iterable<array-key, ExplorerContract> $explorers
      */
     public function __construct(
         iterable $explorers,
-        private EntityType $entityType,
-        private LoggerInterface $logger
+        private readonly EntityType $entityType,
+        private readonly LoggerInterface $logger
     ) {
         $this->explorers = new ExplorerCollection($explorers);
     }

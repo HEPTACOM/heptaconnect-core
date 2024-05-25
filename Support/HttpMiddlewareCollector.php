@@ -14,7 +14,7 @@ final class HttpMiddlewareCollector implements \IteratorAggregate
     /**
      * @var MiddlewareInterface[]
      */
-    private array $middlewares;
+    private readonly array $middlewares;
 
     /**
      * @param iterable<MiddlewareInterface> $middlewares

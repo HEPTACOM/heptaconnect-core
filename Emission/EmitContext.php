@@ -18,8 +18,8 @@ final class EmitContext extends AbstractPortalNodeContext implements EmitContext
     public function __construct(
         PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,
-        private IdentityErrorCreateActionInterface $identityErrorCreateAction,
-        private bool $directEmission
+        private readonly IdentityErrorCreateActionInterface $identityErrorCreateAction,
+        private readonly bool $directEmission
     ) {
         parent::__construct($containerFacade, $configuration);
     }

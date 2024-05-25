@@ -11,7 +11,7 @@ final class PublicUrlFileReference extends FileReferenceContract
 {
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        private string $publicUrl
+        private readonly string $publicUrl
     ) {
         parent::__construct($portalNodeKey);
     }

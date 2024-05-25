@@ -21,12 +21,12 @@ use Psr\Log\LogLevel;
 class FlowComponentCodeOriginFinderLogger extends AbstractLogger
 {
     public function __construct(
-        private LoggerInterface $decorated,
-        private EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
-        private ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
-        private ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder,
-        private StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder,
-        private HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder
+        private readonly LoggerInterface $decorated,
+        private readonly EmitterCodeOriginFinderInterface $emitterCodeOriginFinder,
+        private readonly ExplorerCodeOriginFinderInterface $explorerCodeOriginFinder,
+        private readonly ReceiverCodeOriginFinderInterface $receiverCodeOriginFinder,
+        private readonly StatusReporterCodeOriginFinderInterface $statusReporterCodeOriginFinder,
+        private readonly HttpHandlerCodeOriginFinderInterface $httpHandlerCodeOriginFinder
     ) {
     }
 

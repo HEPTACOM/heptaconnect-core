@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 class SaveMappingsData
 {
     public function __construct(
-        private DatasetEntityContract $entity
+        private readonly DatasetEntityContract $entity
     ) {
     }
 

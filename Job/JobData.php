@@ -12,7 +12,7 @@ class JobData
     public function __construct(
         protected MappingComponentStructContract $mappingComponent,
         protected ?array $payload,
-        private JobKeyInterface $jobKey
+        private readonly JobKeyInterface $jobKey
     ) {
     }
 

@@ -15,7 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class MessageHandler
+final readonly class MessageHandler
 {
     public function __construct(
         private JobGetActionInterface $jobGetAction,

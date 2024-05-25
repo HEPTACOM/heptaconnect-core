@@ -16,7 +16,7 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
     /**
      * @var PortalNodeConfigurationProcessorInterface[]
      */
-    private array $configurationProcessors;
+    private readonly array $configurationProcessors;
 
     /**
      * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors

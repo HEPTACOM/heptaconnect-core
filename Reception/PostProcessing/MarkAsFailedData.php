@@ -9,8 +9,8 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 class MarkAsFailedData
 {
     public function __construct(
-        private DatasetEntityContract $entity,
-        private \Throwable $throwable
+        private readonly DatasetEntityContract $entity,
+        private readonly \Throwable $throwable
     ) {
     }
 

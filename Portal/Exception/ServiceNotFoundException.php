@@ -8,7 +8,7 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class ServiceNotFoundException extends \Exception implements NotFoundExceptionInterface
 {
-    private string $id;
+    private readonly string $id;
 
     public function __construct(string $id, int $code, ?\Throwable $previous = null)
     {

@@ -15,10 +15,10 @@ final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
 {
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        private FileReferenceRequestKeyInterface $requestId,
-        private ClientInterface $client,
-        private FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        private RequestStorageContract $requestStorage
+        private readonly FileReferenceRequestKeyInterface $requestId,
+        private readonly ClientInterface $client,
+        private readonly FileRequestUrlProviderInterface $fileRequestUrlProvider,
+        private readonly RequestStorageContract $requestStorage
     ) {
         parent::__construct($portalNodeKey);
     }

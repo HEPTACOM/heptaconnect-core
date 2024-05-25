@@ -10,7 +10,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 class PostReceptionEvent extends Event
 {
     public function __construct(
-        private ReceiveContextInterface $context
+        private readonly ReceiveContextInterface $context
     ) {
     }
 

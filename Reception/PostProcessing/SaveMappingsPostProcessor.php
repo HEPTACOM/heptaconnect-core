@@ -23,9 +23,9 @@ use Psr\Log\LoggerInterface;
 final class SaveMappingsPostProcessor extends PostProcessorContract
 {
     public function __construct(
-        private DeepObjectIteratorContract $deepObjectIterator,
-        private IdentityPersistActionInterface $identityPersistAction,
-        private LoggerInterface $logger
+        private readonly DeepObjectIteratorContract $deepObjectIterator,
+        private readonly IdentityPersistActionInterface $identityPersistAction,
+        private readonly LoggerInterface $logger
     ) {
     }
 

@@ -10,7 +10,7 @@ use Psr\Log\LoggerInterface;
 class ExceptionCodeLogger extends AbstractLogger
 {
     public function __construct(
-        private LoggerInterface $decorated
+        private readonly LoggerInterface $decorated
     ) {
     }
 

@@ -15,9 +15,9 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
 {
     private ?HttpHandlerContract $source;
 
-    private HttpHandlerCollection $decorators;
+    private readonly HttpHandlerCollection $decorators;
 
-    private string $path;
+    private readonly string $path;
 
     /**
      * @var HttpHandlerContract[]
@@ -27,7 +27,7 @@ final class HttpHandlerStackBuilder implements HttpHandlerStackBuilderInterface
     public function __construct(
         HttpHandlerCollection $sources,
         string $path,
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
         $sources = $sources->bySupport($path);
         $this->source = $sources->shift();

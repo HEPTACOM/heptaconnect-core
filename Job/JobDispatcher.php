@@ -17,8 +17,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final class JobDispatcher extends JobDispatcherContract
 {
     public function __construct(
-        private MessageBusInterface $bus,
-        private JobCreateActionInterface $jobCreateAction
+        private readonly MessageBusInterface $bus,
+        private readonly JobCreateActionInterface $jobCreateAction
     ) {
     }
 

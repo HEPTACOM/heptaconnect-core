@@ -13,15 +13,15 @@ use Psr\Log\LoggerInterface;
 
 final class EmitterStack implements EmitterStackInterface
 {
-    private EmitterCollection $emitters;
+    private readonly EmitterCollection $emitters;
 
     /**
      * @param iterable<EmitterContract> $emitters
      */
     public function __construct(
         iterable $emitters,
-        private EntityType $entityType,
-        private LoggerInterface $logger
+        private readonly EntityType $entityType,
+        private readonly LoggerInterface $logger
     ) {
         $this->emitters = new EmitterCollection($emitters);
     }

@@ -14,7 +14,7 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
     /**
      * @psalm-var class-string<DatasetEntityContract> $entityType
      */
-    private string $entityType;
+    private readonly string $entityType;
 
     private array $foreignKeys = [];
 

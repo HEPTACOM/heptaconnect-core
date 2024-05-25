@@ -20,9 +20,9 @@ final class EmissionJobDispatchingExplorer extends AbstractBufferedResultProcess
 {
     public function __construct(
         EntityType $entityType,
-        private ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
-        private JobDispatcherContract $jobDispatcher,
-        private LoggerInterface $logger,
+        private readonly ExploredPrimaryKeysToJobsConverterInterface $exploredPksToJobsConverter,
+        private readonly JobDispatcherContract $jobDispatcher,
+        private readonly LoggerInterface $logger,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);

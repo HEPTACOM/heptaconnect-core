@@ -13,7 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 final class Psr7MessageRawHttpFormatter extends Psr7MessageRawHttpFormatterContract
 {
     public function __construct(
-        private HeaderUtilityInterface $headerUtility
+        private readonly HeaderUtilityInterface $headerUtility
     ) {
     }
 

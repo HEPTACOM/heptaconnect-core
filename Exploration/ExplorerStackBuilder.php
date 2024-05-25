@@ -15,9 +15,9 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
 {
     private ?ExplorerContract $source;
 
-    private ExplorerCollection $decorators;
+    private readonly ExplorerCollection $decorators;
 
-    private EntityType $entityType;
+    private readonly EntityType $entityType;
 
     /**
      * @var ExplorerContract[]
@@ -27,7 +27,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
     public function __construct(
         ExplorerCollection $sources,
         EntityType $entityType,
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
         $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();

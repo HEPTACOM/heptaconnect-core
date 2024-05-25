@@ -51,7 +51,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
             && (\unserialize($data) !== false || $data === 'b:0;');
     }
 
-    public static function handleUnserializeClass(): void
+    public static function handleUnserializeClass(): never
     {
         throw new \Exception();
     }

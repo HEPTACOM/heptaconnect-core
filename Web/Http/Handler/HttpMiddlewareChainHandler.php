@@ -15,8 +15,8 @@ use Psr\Http\Message\ServerRequestInterface;
 final class HttpMiddlewareChainHandler extends HttpHandlerContract
 {
     public function __construct(
-        private string $path,
-        private bool $isStackEmpty,
+        private readonly string $path,
+        private readonly bool $isStackEmpty,
     ) {
     }
 

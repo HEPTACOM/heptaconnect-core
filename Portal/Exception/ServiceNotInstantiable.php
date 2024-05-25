@@ -8,7 +8,7 @@ use Psr\Container\ContainerExceptionInterface;
 
 class ServiceNotInstantiable extends \Exception implements ContainerExceptionInterface
 {
-    private string $id;
+    private readonly string $id;
 
     public function __construct(string $id, ?\Throwable $previous = null)
     {

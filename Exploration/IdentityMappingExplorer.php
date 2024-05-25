@@ -20,8 +20,8 @@ final class IdentityMappingExplorer extends AbstractBufferedResultProcessingExpl
 {
     public function __construct(
         EntityType $entityType,
-        private PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
-        private IdentityMapActionInterface $identityMapAction,
+        private readonly PrimaryKeyToEntityHydrator $primaryKeyToEntityHydrator,
+        private readonly IdentityMapActionInterface $identityMapAction,
         int $batchSize
     ) {
         parent::__construct($entityType, $batchSize);

@@ -11,9 +11,9 @@ final class ContentsFileReference extends FileReferenceContract
 {
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        private string $normalizedStream,
-        private string $normalizationType,
-        private string $mimeType
+        private readonly string $normalizedStream,
+        private readonly string $normalizationType,
+        private readonly string $mimeType
     ) {
         parent::__construct($portalNodeKey);
     }

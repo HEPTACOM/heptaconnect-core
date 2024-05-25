@@ -101,7 +101,7 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
         $packages = $builtPackages->withoutItems();
 
         $packages->push($builtPackages->filter(
-            static fn (PackageContract $package): bool => \get_class($package) === $source
+            static fn (PackageContract $package): bool => $package::class === $source
         ));
 
         $sourcePackage = $packages->first();

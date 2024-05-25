@@ -14,10 +14,10 @@ final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
 {
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        private string $normalizedStream,
-        private string $mimeType,
-        private DenormalizerInterface $denormalizer,
-        private FileContentsUrlProviderInterface $fileContentsUrlProvider
+        private readonly string $normalizedStream,
+        private readonly string $mimeType,
+        private readonly DenormalizerInterface $denormalizer,
+        private readonly FileContentsUrlProviderInterface $fileContentsUrlProvider
     ) {
         parent::__construct($portalNodeKey);
     }

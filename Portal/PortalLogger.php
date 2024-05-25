@@ -10,9 +10,9 @@ use Psr\Log\LoggerInterface;
 class PortalLogger extends AbstractLogger
 {
     public function __construct(
-        private LoggerInterface $decorated,
-        private string $prefix,
-        private array $context
+        private readonly LoggerInterface $decorated,
+        private readonly string $prefix,
+        private readonly array $context
     ) {
     }
 

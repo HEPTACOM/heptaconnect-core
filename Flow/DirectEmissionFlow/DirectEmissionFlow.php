@@ -30,10 +30,10 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
     private ProfilerContract $profiler;
 
     public function __construct(
-        private EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
-        private EmitContextFactory $emitContextFactory,
-        private EmitterStackProcessorInterface $stackProcessor,
-        private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
+        private readonly EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
+        private readonly EmitContextFactory $emitContextFactory,
+        private readonly EmitterStackProcessorInterface $stackProcessor,
+        private readonly DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory
     ) {
         $this->logger = new NullLogger();
         $this->profiler = new NullProfiler();

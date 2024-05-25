@@ -27,8 +27,8 @@ final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveC
     public function __construct(
         PortalNodeContainerFacadeContract $containerFacade,
         ?array $configuration,
-        private EntityStatusContract $entityStatus,
-        private array $postProcessors
+        private readonly EntityStatusContract $entityStatus,
+        private readonly array $postProcessors
     ) {
         parent::__construct($containerFacade, $configuration);
         $this->postProcessingBag = new PostProcessorDataBag();

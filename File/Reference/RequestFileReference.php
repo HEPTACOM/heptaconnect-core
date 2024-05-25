@@ -12,7 +12,7 @@ final class RequestFileReference extends FileReferenceContract
 {
     public function __construct(
         PortalNodeKeyInterface $portalNodeKey,
-        private FileReferenceRequestKeyInterface $requestId
+        private readonly FileReferenceRequestKeyInterface $requestId
     ) {
         parent::__construct($portalNodeKey);
     }

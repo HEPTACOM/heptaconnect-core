@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Core\Job\JobData;
 class ReceptionJobHandlingException extends \RuntimeException
 {
     public function __construct(
-        private JobData $jobData,
+        private readonly JobData $jobData,
         int $code,
         ?\Throwable $throwable = null
     ) {

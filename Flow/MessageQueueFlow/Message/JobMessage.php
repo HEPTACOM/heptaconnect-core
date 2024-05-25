@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 
 class JobMessage
 {
-    private JobKeyCollection $jobKeys;
+    private readonly JobKeyCollection $jobKeys;
 
     public function __construct()
     {

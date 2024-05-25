@@ -26,9 +26,9 @@ final class ComposerPortalLoader implements PortalLoaderInterface
     private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
 
     public function __construct(
-        private PackageConfigurationLoaderInterface $packageConfigLoader,
-        private PortalFactoryContract $portalFactory,
-        private LoggerInterface $logger
+        private readonly PackageConfigurationLoaderInterface $packageConfigLoader,
+        private readonly PortalFactoryContract $portalFactory,
+        private readonly LoggerInterface $logger
     ) {
     }
 

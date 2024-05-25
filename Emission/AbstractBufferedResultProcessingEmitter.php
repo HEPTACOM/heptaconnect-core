@@ -16,11 +16,11 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\Contract\EmitterStackInterface;
  */
 abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
 {
-    private TypedDatasetEntityCollection $buffer;
+    private readonly TypedDatasetEntityCollection $buffer;
 
     public function __construct(
-        private EntityType $entityType,
-        private int $batchSize
+        private readonly EntityType $entityType,
+        private readonly int $batchSize
     ) {
         $this->buffer = $this->createBuffer();
     }

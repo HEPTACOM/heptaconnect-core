@@ -19,8 +19,8 @@ use Heptacom\HeptaConnect\Utility\Collection\Contract\CollectionInterface;
 abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
 {
     public function __construct(
-        private EntityType $entityType,
-        private int $batchSize
+        private readonly EntityType $entityType,
+        private readonly int $batchSize
     ) {
     }
 

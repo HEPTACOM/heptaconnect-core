@@ -15,8 +15,8 @@ use Psr\Log\LoggerInterface;
 abstract class AbstractPortalNodeContext implements PortalNodeContextInterface
 {
     public function __construct(
-        private PortalNodeContainerFacadeContract $containerFacade,
-        private ?array $configuration
+        private readonly PortalNodeContainerFacadeContract $containerFacade,
+        private readonly ?array $configuration
     ) {
     }
 

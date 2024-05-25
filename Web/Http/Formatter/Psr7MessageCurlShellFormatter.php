@@ -13,9 +13,9 @@ use Psr\Http\Message\ResponseInterface;
 final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterContract
 {
     public function __construct(
-        private HeaderUtilityInterface $headerUtility,
-        private Psr7MessageRawHttpFormatter $rawFormatter,
-        private string $curlCommand
+        private readonly HeaderUtilityInterface $headerUtility,
+        private readonly Psr7MessageRawHttpFormatter $rawFormatter,
+        private readonly string $curlCommand
     ) {
     }
 

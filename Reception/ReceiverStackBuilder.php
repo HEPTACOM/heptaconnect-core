@@ -15,9 +15,9 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
 {
     private ?ReceiverContract $source;
 
-    private ReceiverCollection $decorators;
+    private readonly ReceiverCollection $decorators;
 
-    private EntityType $entityType;
+    private readonly EntityType $entityType;
 
     /**
      * @var ReceiverContract[]
@@ -27,7 +27,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
     public function __construct(
         ReceiverCollection $sources,
         EntityType $entityType,
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
         $sources = $sources->bySupport($entityType);
         $this->source = $sources->shift();

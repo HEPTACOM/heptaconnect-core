@@ -13,14 +13,14 @@ use Psr\Log\LoggerInterface;
 
 final class ReceiverStack implements ReceiverStackInterface
 {
-    private ReceiverCollection $receivers;
+    private readonly ReceiverCollection $receivers;
 
     /**
      * @param iterable<array-key, ReceiverContract> $receivers
      */
     public function __construct(
         iterable $receivers,
-        private LoggerInterface $logger
+        private readonly LoggerInterface $logger
     ) {
         $this->receivers = new ReceiverCollection($receivers);
     }

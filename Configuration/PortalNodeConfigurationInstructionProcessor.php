@@ -28,15 +28,15 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
     /**
      * @var InstructionLoaderInterface[]
      */
-    private array $instructionLoaders;
+    private readonly array $instructionLoaders;
 
     /**
      * @param iterable<InstructionLoaderInterface> $instructionLoaders
      */
     public function __construct(
-        private LoggerInterface $logger,
-        private PortalRegistryInterface $portalRegistry,
-        private PackageQueryMatcherInterface $packageQueryMatcher,
+        private readonly LoggerInterface $logger,
+        private readonly PortalRegistryInterface $portalRegistry,
+        private readonly PackageQueryMatcherInterface $packageQueryMatcher,
         iterable $instructionLoaders
     ) {
         $this->instructionLoaders = \iterable_to_array($instructionLoaders);

@@ -19,7 +19,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
 {
     public function __construct(
         private ?string $composerJson,
-        private CacheItemPoolInterface $cache
+        private readonly CacheItemPoolInterface $cache
     ) {
     }
 

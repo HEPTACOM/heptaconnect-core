@@ -14,7 +14,7 @@ final class PortalConfiguration extends ConfigurationContract
     private ?array $flat = null;
 
     public function __construct(
-        private array $configuration
+        private readonly array $configuration
     ) {
     }
 

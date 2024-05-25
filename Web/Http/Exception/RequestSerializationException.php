@@ -8,7 +8,7 @@ use Psr\Http\Message\RequestInterface;
 
 class RequestSerializationException extends \RuntimeException
 {
-    private RequestInterface $request;
+    private readonly RequestInterface $request;
 
     public function __construct(RequestInterface $request, int $code, ?\Throwable $previous = null)
     {

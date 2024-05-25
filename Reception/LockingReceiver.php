@@ -19,8 +19,8 @@ use Symfony\Component\Lock\LockInterface;
 final class LockingReceiver extends ReceiverContract
 {
     public function __construct(
-        private EntityType $entityType,
-        private LoggerInterface $logger
+        private readonly EntityType $entityType,
+        private readonly LoggerInterface $logger
     ) {
     }
 

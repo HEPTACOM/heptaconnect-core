@@ -24,14 +24,14 @@ use Psr\Http\Message\RequestFactoryInterface;
 
 final class FileReferenceResolver extends FileReferenceResolverContract
 {
-    private RequestFactoryInterface $requestFactory;
+    private readonly RequestFactoryInterface $requestFactory;
 
     public function __construct(
-        private FileContentsUrlProviderInterface $fileContentsUrlProvider,
-        private FileRequestUrlProviderInterface $fileRequestUrlProvider,
-        private NormalizationRegistryContract $normalizationRegistry,
-        private RequestStorageContract $requestStorage,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private readonly FileContentsUrlProviderInterface $fileContentsUrlProvider,
+        private readonly FileRequestUrlProviderInterface $fileRequestUrlProvider,
+        private readonly NormalizationRegistryContract $normalizationRegistry,
+        private readonly RequestStorageContract $requestStorage,
+        private readonly PortalStackServiceContainerFactory $portalStackServiceContainerFactory
     ) {
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
     }

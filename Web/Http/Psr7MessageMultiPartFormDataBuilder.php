@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
 
 final class Psr7MessageMultiPartFormDataBuilder implements Psr7MessageMultiPartFormDataBuilderInterface
 {
-    private StreamFactoryInterface $streamFactory;
+    private readonly StreamFactoryInterface $streamFactory;
 
     public function __construct(StreamFactoryInterface $streamFactory)
     {

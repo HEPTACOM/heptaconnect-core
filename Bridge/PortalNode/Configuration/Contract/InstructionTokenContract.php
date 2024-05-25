@@ -13,7 +13,7 @@ abstract class InstructionTokenContract
      * @param class-string<PortalContract>|class-string<PortalExtensionContract>|class-string|string $query
      */
     public function __construct(
-        private string $query
+        private readonly string $query
     ) {
     }
 

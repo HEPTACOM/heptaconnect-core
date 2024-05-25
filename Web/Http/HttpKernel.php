@@ -15,22 +15,16 @@ use Riverline\MultiPartParser\Converters\PSR7 as MultiPartParser;
 
 final class HttpKernel implements HttpKernelInterface
 {
-    private PortalNodeKeyInterface $portalNodeKey;
+    private readonly StreamFactoryInterface $streamFactory;
 
-    private HttpHandleServiceInterface $httpHandleService;
-
-    private StreamFactoryInterface $streamFactory;
-
-    private UploadedFileFactoryInterface $uploadedFileFactory;
+    private readonly UploadedFileFactoryInterface $uploadedFileFactory;
 
     public function __construct(
-        PortalNodeKeyInterface $portalNodeKey,
-        HttpHandleServiceInterface $httpHandleService,
+        private readonly PortalNodeKeyInterface $portalNodeKey,
+        private readonly HttpHandleServiceInterface $httpHandleService,
         StreamFactoryInterface $streamFactory,
         UploadedFileFactoryInterface $uploadedFileFactory
     ) {
-        $this->portalNodeKey = $portalNodeKey;
-        $this->httpHandleService = $httpHandleService;
         $this->streamFactory = $streamFactory;
         $this->uploadedFileFactory = $uploadedFileFactory;
     }
@@ -77,7 +71,7 @@ final class HttpKernel implements HttpKernelInterface
             return $request;
         }
 
-        \parse_str($request->getUri()->getQuery(), $queryParams);
+        \parse_str((string) $request->getUri()->getQuery(), $queryParams);
 
         return $request->withQueryParams($queryParams);
     }
@@ -144,7 +138,7 @@ final class HttpKernel implements HttpKernelInterface
                     512,
                     \JSON_THROW_ON_ERROR
                 );
-            } catch (\JsonException $_) {
+            } catch (\JsonException) {
                 $parsedBody = null;
             }
 

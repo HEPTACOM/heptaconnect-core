@@ -20,7 +20,7 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
      * @throws ServiceNotFoundException
      */
     public function __construct(
-        private ContainerInterface $container
+        private readonly ContainerInterface $container
     ) {
         foreach ((new \ReflectionClass($this))->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             if ($method->getName() === 'get' || !\str_starts_with($method->getName(), 'get')) {
