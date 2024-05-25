@@ -15,7 +15,7 @@ use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
-final class StreamNormalizer implements NormalizerInterface
+final readonly class StreamNormalizer implements NormalizerInterface
 {
     /**
      * @deprecated use \Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract::STORAGE_LOCATION

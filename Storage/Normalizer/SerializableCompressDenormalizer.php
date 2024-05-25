@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 
-final class SerializableCompressDenormalizer implements DenormalizerInterface
+final readonly class SerializableCompressDenormalizer implements DenormalizerInterface
 {
     public function __construct(
         private DenormalizerInterface $serializableDenormalizer

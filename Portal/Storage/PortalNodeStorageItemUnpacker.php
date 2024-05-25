@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizationRegist
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNodeStorage\PortalNodeStorageItemContract;
 use Psr\Log\LoggerInterface;
 
-final class PortalNodeStorageItemUnpacker implements PortalNodeStorageItemUnpackerInterface
+final readonly class PortalNodeStorageItemUnpacker implements PortalNodeStorageItemUnpackerInterface
 {
     public function __construct(
         private NormalizationRegistryContract $normalizationRegistry,

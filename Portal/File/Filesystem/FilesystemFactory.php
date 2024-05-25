@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Http\Message\UriFactoryInterface;
 
-final class FilesystemFactory implements FilesystemFactoryInterface
+final readonly class FilesystemFactory implements FilesystemFactoryInterface
 {
     public function __construct(
         private PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider,

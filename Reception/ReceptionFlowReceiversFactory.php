@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\ReceiverCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-final class ReceptionFlowReceiversFactory implements ReceptionFlowReceiversFactoryInterface
+final readonly class ReceptionFlowReceiversFactory implements ReceptionFlowReceiversFactoryInterface
 {
     public function __construct(
         private LoggerInterface $logger

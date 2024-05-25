@@ -22,7 +22,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-final class ExploreService implements ExploreServiceInterface
+final readonly class ExploreService implements ExploreServiceInterface
 {
     public function __construct(
         private ExploreContextFactoryInterface $exploreContextFactory,

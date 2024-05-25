@@ -25,7 +25,7 @@ use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-final class PortalStorage implements PortalStorageInterface
+final readonly class PortalStorage implements PortalStorageInterface
 {
     public function __construct(
         private PortalNodeStorageItemPackerInterface $portalNodeStorageItemPacker,

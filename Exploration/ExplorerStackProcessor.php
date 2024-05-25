@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterfa
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
 use Psr\Log\LoggerInterface;
 
-final class ExplorerStackProcessor implements ExplorerStackProcessorInterface
+final readonly class ExplorerStackProcessor implements ExplorerStackProcessorInterface
 {
     public function __construct(
         private LoggerInterface $logger

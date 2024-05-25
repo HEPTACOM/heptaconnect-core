@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderInterfac
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
 use Psr\Log\LoggerInterface;
 
-final class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
+final readonly class HttpHandlerStackBuilderFactory implements HttpHandlerStackBuilderFactoryInterface
 {
     public function __construct(
         private PortalStackServiceContainerFactory $portalContainerFactory,

@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Psr\Cache\CacheItemPoolInterface;
 
-final class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigurationProcessorInterface
+final readonly class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigurationProcessorInterface
 {
     public function __construct(
         private CacheItemPoolInterface $cache,

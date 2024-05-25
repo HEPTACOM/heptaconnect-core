@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Reception\Support;
 use Heptacom\HeptaConnect\Utility\Attachment\Contract\AttachableInterface;
 use Symfony\Component\Lock\LockInterface;
 
-final class LockAttachable implements AttachableInterface
+final readonly class LockAttachable implements AttachableInterface
 {
     public function __construct(
         private LockInterface $lock

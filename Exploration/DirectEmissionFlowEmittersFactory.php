@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 
-final class DirectEmissionFlowEmittersFactory implements DirectEmissionFlowEmittersFactoryInterface
+final readonly class DirectEmissionFlowEmittersFactory implements DirectEmissionFlowEmittersFactoryInterface
 {
     public function __construct(
         private EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,

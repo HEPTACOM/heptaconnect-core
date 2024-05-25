@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterfa
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 
-final class Psr7RequestDenormalizer implements DenormalizerInterface
+final readonly class Psr7RequestDenormalizer implements DenormalizerInterface
 {
     public function __construct(
         private RequestDeserializerInterface $deserializer

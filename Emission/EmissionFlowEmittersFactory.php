@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Emission\EmitterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-final class EmissionFlowEmittersFactory implements EmissionFlowEmittersFactoryInterface
+final readonly class EmissionFlowEmittersFactory implements EmissionFlowEmittersFactoryInterface
 {
     public function __construct(
         private EmittedEntitiesToJobsConverterInterface $emittedEntitiesToJobsConverter,

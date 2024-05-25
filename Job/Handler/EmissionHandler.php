@@ -20,7 +20,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Psr\Log\LoggerInterface;
 
-final class EmissionHandler implements EmissionHandlerInterface
+final readonly class EmissionHandler implements EmissionHandlerInterface
 {
     public function __construct(
         private EmitServiceInterface $emitService,

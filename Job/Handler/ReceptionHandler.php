@@ -45,7 +45,7 @@ use Symfony\Component\Lock\LockFactory;
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  * @SuppressWarnings(PHPMD.NPathComplexity)
  */
-final class ReceptionHandler implements ReceptionHandlerInterface
+final readonly class ReceptionHandler implements ReceptionHandlerInterface
 {
     public function __construct(
         private LockFactory $lockFactory,

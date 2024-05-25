@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\Route\Listing\ReceptionRouteListRe
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\ReceptionRouteListActionInterface;
 use Psr\Log\LoggerInterface;
 
-final class EmittedEntitiesToReceiveJobsConverter implements EmittedEntitiesToJobsConverterInterface
+final readonly class EmittedEntitiesToReceiveJobsConverter implements EmittedEntitiesToJobsConverterInterface
 {
     public function __construct(
         private ReceptionRouteListActionInterface $receptionRouteListAction,

@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration;
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface;
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract;
 
-final class InstructionFileLoader implements InstructionLoaderInterface
+final readonly class InstructionFileLoader implements InstructionLoaderInterface
 {
     public function __construct(
         private string $path

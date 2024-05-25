@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 
-final class HttpHandlerStackProcessor implements HttpHandlerStackProcessorInterface
+final readonly class HttpHandlerStackProcessor implements HttpHandlerStackProcessorInterface
 {
     public function __construct(
         private LoggerInterface $logger

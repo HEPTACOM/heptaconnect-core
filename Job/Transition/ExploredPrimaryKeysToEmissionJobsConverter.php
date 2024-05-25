@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @SuppressWarnings(PHPMD.LongClassName)
  */
-final class ExploredPrimaryKeysToEmissionJobsConverter implements ExploredPrimaryKeysToJobsConverterInterface
+final readonly class ExploredPrimaryKeysToEmissionJobsConverter implements ExploredPrimaryKeysToJobsConverterInterface
 {
     public function __construct(
         private LoggerInterface $logger

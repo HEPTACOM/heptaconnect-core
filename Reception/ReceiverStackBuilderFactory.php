@@ -11,7 +11,7 @@ use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 use Psr\Log\LoggerInterface;
 
-final class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
+final readonly class ReceiverStackBuilderFactory implements ReceiverStackBuilderFactoryInterface
 {
     public function __construct(
         private PortalStackServiceContainerFactory $portalContainerFactory,

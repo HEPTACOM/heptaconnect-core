@@ -11,7 +11,7 @@ use Psr\Http\Message\UriFactoryInterface;
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
  */
-final class StreamUriSchemePathConverter implements StreamUriSchemePathConverterInterface
+final readonly class StreamUriSchemePathConverter implements StreamUriSchemePathConverterInterface
 {
     public function __construct(
         private UriFactoryInterface $uriFactory,

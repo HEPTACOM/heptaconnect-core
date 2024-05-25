@@ -14,7 +14,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
-final class PackageQueryMatcher implements PackageQueryMatcherInterface
+final readonly class PackageQueryMatcher implements PackageQueryMatcherInterface
 {
     public function __construct(
         private StorageKeyGeneratorContract $storageKeyGenerator

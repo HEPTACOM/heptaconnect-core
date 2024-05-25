@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
-final class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
+final readonly class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
 {
     public function __construct(
         private DirectEmissionFlowEmittersFactoryInterface $directEmissionFlowEmittersFactory,

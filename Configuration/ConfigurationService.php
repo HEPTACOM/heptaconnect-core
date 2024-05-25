@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNodeConfiguration\P
 use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-final class ConfigurationService implements ConfigurationServiceInterface
+final readonly class ConfigurationService implements ConfigurationServiceInterface
 {
     public function __construct(
         private PortalRegistryInterface $portalRegistry,

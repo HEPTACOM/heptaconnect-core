@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Portal\File\Filesystem;
 use Heptacom\HeptaConnect\Core\File\Filesystem\Contract\StreamUriSchemePathConverterInterface;
 use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface;
 
-final class Filesystem implements FilesystemInterface
+final readonly class Filesystem implements FilesystemInterface
 {
     public function __construct(
         private StreamUriSchemePathConverterInterface $uriSchemePathConverter

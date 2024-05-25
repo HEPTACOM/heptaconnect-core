@@ -7,7 +7,7 @@ namespace Heptacom\HeptaConnect\Core\Storage\Normalizer;
 use Heptacom\HeptaConnect\Core\Storage\Exception\GzipCompressException;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 
-final class SerializableCompressNormalizer implements NormalizerInterface
+final readonly class SerializableCompressNormalizer implements NormalizerInterface
 {
     public function __construct(
         private NormalizerInterface $serializableNormalizer

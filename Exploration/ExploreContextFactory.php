@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerFactory;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-final class ExploreContextFactory implements ExploreContextFactoryInterface
+final readonly class ExploreContextFactory implements ExploreContextFactoryInterface
 {
     public function __construct(
         private ConfigurationServiceInterface $configurationService,

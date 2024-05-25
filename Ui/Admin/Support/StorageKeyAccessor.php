@@ -24,7 +24,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\StorageKeyDataNotSupp
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Exception\StorageKeyNotSupportedException;
 use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInterface;
 
-final class StorageKeyAccessor implements StorageKeyAccessorInterface
+final readonly class StorageKeyAccessor implements StorageKeyAccessorInterface
 {
     public function __construct(
         private StorageKeyGeneratorContract $storageKeyGenerator,

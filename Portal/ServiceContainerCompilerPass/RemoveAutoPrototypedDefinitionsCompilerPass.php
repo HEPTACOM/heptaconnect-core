@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  * @SuppressWarnings(PHPMD.CyclomaticComplexity)
  * @SuppressWarnings(PHPMD.NPathComplexity)
  */
-final class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
+final readonly class RemoveAutoPrototypedDefinitionsCompilerPass implements CompilerPassInterface
 {
     /**
      * @param class-string[] $excludedClasses

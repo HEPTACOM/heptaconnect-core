@@ -9,7 +9,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
-final class Psr7RequestNormalizer implements NormalizerInterface
+final readonly class Psr7RequestNormalizer implements NormalizerInterface
 {
     public function __construct(
         private RequestSerializerInterface $serializer
