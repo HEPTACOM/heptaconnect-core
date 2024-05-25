@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Reception\Support;
 
-use Heptacom\HeptaConnect\Utility\Attachment\Contract\AttachableInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\ForeignKeyAwareInterface;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
+use Heptacom\HeptaConnect\Utility\Attachment\Contract\AttachableInterface;
 
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
