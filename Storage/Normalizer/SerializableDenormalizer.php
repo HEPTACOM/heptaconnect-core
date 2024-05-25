@@ -48,7 +48,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
     {
         return $type === $this->getType()
             && \is_string($data)
-            && (\unserialize($data) !== false || $data === 'b:0;');
+            && (@\unserialize($data) !== false || $data === 'b:0;');
     }
 
     public static function handleUnserializeClass(): never

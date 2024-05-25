@@ -421,7 +421,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
         try {
             if (($flags & \STREAM_URL_STAT_LINK) === \STREAM_URL_STAT_LINK) {
-                $linkedPath = \readlink($this->toNewPath($path));
+                $linkedPath = @\readlink($this->toNewPath($path));
 
                 if ($linkedPath !== false) {
                     $path = $linkedPath;

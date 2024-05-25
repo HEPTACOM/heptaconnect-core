@@ -21,6 +21,11 @@ final readonly class InstructionFileLoader implements InstructionLoaderInterface
     {
         try {
             $config = new Config();
+
+            if (!\file_exists($this->path)) {
+                throw new \RuntimeException(\sprintf('File %s does not exist', $this->path));
+            }
+
             require $this->path;
 
             return $config->buildInstructions();

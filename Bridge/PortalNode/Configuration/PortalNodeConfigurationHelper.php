@@ -27,7 +27,7 @@ class PortalNodeConfigurationHelper
     public function ini(string $iniFile, ?array $mappings = null): \Closure
     {
         return function () use ($mappings, $iniFile): array {
-            $config = \parse_ini_file($iniFile, true, \INI_SCANNER_TYPED);
+            $config = @\parse_ini_file($iniFile, true, \INI_SCANNER_TYPED);
 
             if (!\is_array($config)) {
                 throw new \RuntimeException('Can not load INI file', 1647801828);
