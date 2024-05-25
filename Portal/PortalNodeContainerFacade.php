@@ -83,12 +83,12 @@ final class PortalNodeContainerFacade extends PortalNodeContainerFacadeContract
      *
      * @return ($id is class-string<TGet> ? TGet : object|null)
      */
-    public function get($id)
+    public function get(string $id): mixed
     {
         return $this->container->get($id);
     }
 
-    public function has($id)
+    public function has($id): bool
     {
         return $this->container->has($id);
     }
