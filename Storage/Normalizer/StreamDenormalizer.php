@@ -8,7 +8,8 @@ use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
-use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemReader;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
@@ -17,7 +18,7 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
-        private FilesystemInterface $filesystem,
+        private FilesystemReader $filesystem,
         private StreamPathContract $streamPath
     ) {
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
@@ -41,10 +42,10 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('data is empty', 1634868819);
         }
 
-        $resource = $this->filesystem->readStream($this->streamPath->buildPath($data));
-
-        if ($resource === false) {
-            throw new UnexpectedValueException('File can not be read from', 1637101289);
+        try {
+            $resource = $this->filesystem->readStream($this->streamPath->buildPath($data));
+        } catch (FilesystemException $e) {
+            throw new UnexpectedValueException('File can not be read from', 1637101289, $e);
         }
 
         return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
@@ -64,11 +65,11 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
             return false;
         }
 
-        if (!$this->filesystem->has($this->streamPath->buildPath($data))) {
+        try {
+            return $this->filesystem->fileExists($this->streamPath->buildPath($data));
+        } catch (FilesystemException) {
             return false;
         }
-
-        return true;
     }
 
     public function getSupportedTypes(?string $format): array
