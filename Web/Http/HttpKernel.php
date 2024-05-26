@@ -148,7 +148,7 @@ final class HttpKernel implements HttpKernelInterface
         } elseif (\str_starts_with($contentType, 'application/x-www-form-urlencoded')) {
             \parse_str((string) $request->getBody(), $parsedBody);
 
-            if (\is_array($parsedBody) && $parsedBody !== []) {
+            if ($parsedBody !== []) {
                 $request = $request->withParsedBody($parsedBody);
             }
         }
