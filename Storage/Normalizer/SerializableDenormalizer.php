@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentExc
 final class SerializableDenormalizer implements DenormalizerInterface
 {
     /**
-     * @psalm-return 'serializable'
+     * @phpstan-return 'serializable'
      */
     public function getType(): string
     {
@@ -42,7 +42,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @psalm-assert string $data
+     * @phpstan-assert string $data
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {

@@ -327,7 +327,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
      *
      * @return string[]
      *
-     * @psalm-return array<string>
+     * @phpstan-return array<string>
      */
     private function getChangedServiceIds(ContainerBuilder $containerBuilder, callable $registration): array
     {
@@ -374,8 +374,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     /**
      * @param Definition[] $definitions
      *
-     * @psalm-param class-string $interface
-     * @psalm-param class-string $packageClass
+     * @phpstan-param class-string $interface
+     * @phpstan-param class-string $packageClass
      */
     private function tagDefinitionSource(array $definitions, string $interface, string $tag, string $packageClass): void
     {

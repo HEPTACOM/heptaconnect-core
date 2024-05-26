@@ -12,7 +12,7 @@ use Heptacom\HeptaConnect\Utility\Attachment\Contract\AttachableInterface;
 class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwareInterface
 {
     /**
-     * @psalm-var class-string<DatasetEntityContract> $entityType
+     * @phpstan-var class-string<DatasetEntityContract> $entityType
      */
     private readonly string $entityType;
 

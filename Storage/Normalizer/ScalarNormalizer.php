@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentExc
 final class ScalarNormalizer implements NormalizerInterface
 {
     /**
-     * @psalm-return 'scalar'
+     * @phpstan-return 'scalar'
      */
     public function getType(): string
     {

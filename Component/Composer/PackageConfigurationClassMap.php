@@ -9,14 +9,14 @@ use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 class PackageConfigurationClassMap
 {
     /**
-     * @psalm-var array<class-string, string>
+     * @phpstan-var array<class-string, string>
      *
      * @var array|string[]
      */
     private array $map = [];
 
     /**
-     * @psalm-param class-string $fqcn
+     * @phpstan-param class-string $fqcn
      */
     public function addClass(string $fqcn, string $filePath): void
     {
@@ -34,7 +34,7 @@ class PackageConfigurationClassMap
     }
 
     /**
-     * @psalm-param class-string $fqcn
+     * @phpstan-param class-string $fqcn
      */
     public function getFileForClass(string $fqcn): ?string
     {
@@ -42,7 +42,7 @@ class PackageConfigurationClassMap
     }
 
     /**
-     * @psalm-return class-string|null
+     * @phpstan-return class-string|null
      */
     public function getClassForFile(string $filePath): ?string
     {

@@ -53,7 +53,7 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
     /**
      * @return Definition[]
      *
-     * @psalm-return array<Definition>
+     * @phpstan-return array<Definition>
      */
     private function groupServices(string $collectionClass, array $groupServiceIds): array
     {

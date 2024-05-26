@@ -25,7 +25,7 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @psalm-return 'stream'
+     * @phpstan-return 'stream'
      */
     public function getType(): string
     {

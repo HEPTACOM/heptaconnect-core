@@ -37,7 +37,7 @@ final readonly class StreamNormalizer implements NormalizerInterface
     }
 
     /**
-     * @psalm-return 'stream'
+     * @phpstan-return 'stream'
      */
     public function getType(): string
     {

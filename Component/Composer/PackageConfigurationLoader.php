@@ -118,7 +118,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
     }
 
     /**
-     * @psalm-return iterable<class-string, string>
+     * @phpstan-return iterable<class-string, string>
      */
     private function iterateClassMaps(
         Composer $composer,

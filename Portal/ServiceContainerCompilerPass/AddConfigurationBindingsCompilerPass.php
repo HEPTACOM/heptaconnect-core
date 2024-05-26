@@ -101,7 +101,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
     /**
      * @return string[]
      *
-     * @psalm-return array<int, string>
+     * @phpstan-return array<int, string>
      */
     private function extractParameterParameterNames(?\ReflectionMethod $method): array
     {

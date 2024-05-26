@@ -17,7 +17,7 @@ abstract class AbstractInstantiationException extends \RuntimeException
     }
 
     /**
-     * @psalm-return class-string
+     * @phpstan-return class-string
      */
     public function getClass(): string
     {

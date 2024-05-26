@@ -11,7 +11,7 @@ use Psr\Http\Message\StreamInterface;
 final class SerializableNormalizer implements NormalizerInterface
 {
     /**
-     * @psalm-return 'serializable'
+     * @phpstan-return 'serializable'
      */
     public function getType(): string
     {

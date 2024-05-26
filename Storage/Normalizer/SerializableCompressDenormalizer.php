@@ -34,7 +34,7 @@ final readonly class SerializableCompressDenormalizer implements DenormalizerInt
     }
 
     /**
-     * @psalm-assert string $data
+     * @phpstan-assert string $data
      */
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {

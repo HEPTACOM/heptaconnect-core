@@ -21,8 +21,8 @@ final class NormalizationRegistry extends NormalizationRegistryContract
     private readonly array $denormalizer;
 
     /**
-     * @psalm-param iterable<int, NormalizerInterface> $normalizer
-     * @psalm-param iterable<int, DenormalizerInterface> $denormalizer
+     * @phpstan-param iterable<int, NormalizerInterface> $normalizer
+     * @phpstan-param iterable<int, DenormalizerInterface> $denormalizer
      */
     public function __construct(iterable $normalizer, iterable $denormalizer)
     {
@@ -30,7 +30,7 @@ final class NormalizationRegistry extends NormalizationRegistryContract
         $this->denormalizer = \iterable_to_array($denormalizer);
     }
 
-    public function getNormalizer($value): ?NormalizerInterface
+    public function getNormalizer(mixed $value): ?NormalizerInterface
     {
         foreach ($this->normalizer as $normalizer) {
             if ($normalizer->supportsNormalization($value)) {
