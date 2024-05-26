@@ -16,16 +16,19 @@ final readonly class Psr7RequestNormalizer implements NormalizerInterface
     ) {
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof RequestInterface;
     }
 
+    #[\Override]
     public function getType(): string
     {
         return 'psr7-request';
     }
 
+    #[\Override]
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof RequestInterface) {

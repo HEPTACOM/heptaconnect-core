@@ -23,11 +23,13 @@ final class ResolvedRequestFileReference extends ResolvedFileReferenceContract
         parent::__construct($portalNodeKey);
     }
 
+    #[\Override]
     public function getPublicUrl(): string
     {
         return (string) $this->fileRequestUrlProvider->resolve($this->getPortalNodeKey(), $this->requestId);
     }
 
+    #[\Override]
     public function getContents(): string
     {
         $request = $this->requestStorage->load($this->getPortalNodeKey(), $this->requestId);

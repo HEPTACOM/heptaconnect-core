@@ -35,6 +35,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         $this->entityType = $entityType;
     }
 
+    #[\Override]
     public function push(EmitterContract $emitter): self
     {
         if ($this->entityType->equals($emitter->getSupportedEntityType())) {
@@ -58,6 +59,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushSource(): self
     {
         if ($this->source instanceof EmitterContract) {
@@ -73,6 +75,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $emitter) {
@@ -88,6 +91,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function build(): EmitterStackInterface
     {
         $emitterStack = new EmitterStack(
@@ -104,6 +108,7 @@ final class EmitterStackBuilder implements EmitterStackBuilderInterface
         return $emitterStack;
     }
 
+    #[\Override]
     public function isEmpty(): bool
     {
         return $this->emitters === [];

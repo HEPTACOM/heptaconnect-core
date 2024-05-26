@@ -26,6 +26,7 @@ final class HttpMiddlewareClient implements ClientInterface
         $this->middlewares = \iterable_to_array($middlewares);
     }
 
+    #[\Override]
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         return $this->next($request, ...$this->middlewares);

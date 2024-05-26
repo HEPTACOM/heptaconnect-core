@@ -24,6 +24,7 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
     ) {
     }
 
+    #[\Override]
     public function explore(ExploreContextInterface $context, ExplorerStackInterface $stack): iterable
     {
         $buffer = $this->createBuffer();
@@ -43,6 +44,7 @@ abstract class AbstractBufferedResultProcessingExplorer extends ExplorerContract
         }
     }
 
+    #[\Override]
     protected function supports(): string
     {
         return (string) $this->entityType;

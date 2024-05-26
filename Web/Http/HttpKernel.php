@@ -29,6 +29,7 @@ final class HttpKernel implements HttpKernelInterface
         $this->uploadedFileFactory = $uploadedFileFactory;
     }
 
+    #[\Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $request = $this->getRequestWithQueryParams($request);

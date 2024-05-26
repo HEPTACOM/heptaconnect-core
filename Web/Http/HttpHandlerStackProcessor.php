@@ -19,6 +19,7 @@ final readonly class HttpHandlerStackProcessor implements HttpHandlerStackProces
     ) {
     }
 
+    #[\Override]
     public function processStack(
         ServerRequestInterface $request,
         ResponseInterface $response,

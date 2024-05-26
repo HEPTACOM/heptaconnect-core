@@ -20,6 +20,7 @@ final readonly class EmitContextFactory implements EmitContextFactoryInterface
     ) {
     }
 
+    #[\Override]
     public function createContext(PortalNodeKeyInterface $portalNodeKey, bool $directEmission = false): EmitContextInterface
     {
         return new EmitContext(

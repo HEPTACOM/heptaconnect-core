@@ -20,6 +20,7 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
     ) {
     }
 
+    #[\Override]
     public function handle(
         ServerRequestInterface $request,
         ResponseInterface $response,
@@ -48,6 +49,7 @@ final class HttpMiddlewareChainHandler extends HttpHandlerContract
         return $middlewareHandler->handle($request);
     }
 
+    #[\Override]
     protected function supports(): string
     {
         return $this->path;

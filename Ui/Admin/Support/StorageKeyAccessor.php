@@ -34,6 +34,7 @@ final readonly class StorageKeyAccessor implements StorageKeyAccessorInterface
     ) {
     }
 
+    #[\Override]
     public function deserialize(string $keyData): StorageKeyInterface
     {
         try {
@@ -45,6 +46,7 @@ final readonly class StorageKeyAccessor implements StorageKeyAccessorInterface
         }
     }
 
+    #[\Override]
     public function serialize(StorageKeyInterface $storageKey): string
     {
         try {
@@ -56,6 +58,7 @@ final readonly class StorageKeyAccessor implements StorageKeyAccessorInterface
         }
     }
 
+    #[\Override]
     public function exists(StorageKeyInterface $storageKey): bool
     {
         try {

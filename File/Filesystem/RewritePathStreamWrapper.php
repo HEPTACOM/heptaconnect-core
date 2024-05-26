@@ -47,6 +47,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     {
     }
 
+    #[\Override]
     public function __destruct()
     {
         if (\is_resource($this->file)) {
@@ -60,6 +61,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     // BEGIN FILE STREAM OPERATIONS
 
+    #[\Override]
     public function stream_cast(int $cast_as)
     {
         $result = $this->file;
@@ -71,6 +73,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function stream_close(): void
     {
         try {
@@ -84,6 +87,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
     }
 
+    #[\Override]
     public function stream_eof(): bool
     {
         try {
@@ -95,6 +99,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
     }
 
+    #[\Override]
     public function stream_flush(): bool
     {
         try {
@@ -106,6 +111,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
     }
 
+    #[\Override]
     public function stream_lock(int $operation): bool
     {
         try {
@@ -117,6 +123,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function stream_read(int $count)
     {
         try {
@@ -130,6 +137,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function stream_seek(int $offset, int $whence = \SEEK_SET): bool
     {
         try {
@@ -141,11 +149,13 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
     }
 
+    #[\Override]
     public function stream_set_option(int $option, int $arg1, int $arg2): bool
     {
         return false;
     }
 
+    #[\Override]
     public function stream_stat()
     {
         try {
@@ -159,6 +169,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function stream_tell(): int
     {
         try {
@@ -176,6 +187,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return 0;
     }
 
+    #[\Override]
     public function stream_truncate(int $new_size): bool
     {
         try {
@@ -187,6 +199,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         }
     }
 
+    #[\Override]
     public function stream_write(string $data): int
     {
         try {
@@ -208,6 +221,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     // START DIRECTORY RESOURCE OPERATIONS
 
+    #[\Override]
     public function dir_closedir(): bool
     {
         try {
@@ -224,6 +238,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function dir_readdir(): mixed
     {
         try {
@@ -243,6 +258,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function dir_rewinddir(): bool
     {
         try {
@@ -262,6 +278,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
 
     // START NODE OPERATIONS
 
+    #[\Override]
     public function stream_metadata(string $path, int $option, mixed $value): bool
     {
         try {
@@ -320,6 +337,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function stream_open(
         string $path,
         string $mode,
@@ -343,6 +361,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function dir_opendir(string $path, int $options): bool
     {
         try {
@@ -360,6 +379,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function mkdir(string $path, int $mode, int $options): bool
     {
         try {
@@ -378,6 +398,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function rename(string $path_from, string $path_to): bool
     {
         try {
@@ -389,6 +410,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function rmdir(string $path, int $options): bool
     {
         try {
@@ -400,6 +422,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function unlink(string $path): bool
     {
         try {
@@ -411,6 +434,7 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
         return false;
     }
 
+    #[\Override]
     public function url_stat(string $path, int $flags)
     {
         try {

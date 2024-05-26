@@ -18,6 +18,7 @@ final readonly class StatusReportingContextFactory implements StatusReportingCon
     ) {
     }
 
+    #[\Override]
     public function factory(PortalNodeKeyInterface $portalNodeKey): StatusReportingContextInterface
     {
         return new StatusReportingContext(

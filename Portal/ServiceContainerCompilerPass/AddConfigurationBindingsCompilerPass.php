@@ -13,6 +13,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
 {
     public const CONFIG_KEY_SEPARATORS = '_.-';
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $keys = [];

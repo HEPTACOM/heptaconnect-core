@@ -19,6 +19,7 @@ final class Psr7MessageMultiPartFormDataBuilder implements Psr7MessageMultiPartF
         $this->streamFactory = $streamFactory;
     }
 
+    #[\Override]
     public function build(MessageInterface $message, array $parameters): MessageInterface
     {
         \array_walk_recursive($parameters, static function ($parameter, $key): void {

@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\FlowComponent\Exception\CodeOriginNotFound
 
 final class ExplorerCodeOriginFinder implements ExplorerCodeOriginFinderInterface
 {
+    #[\Override]
     public function findOrigin(ExplorerContract $explorer): CodeOrigin
     {
         if ($explorer instanceof Explorer) {

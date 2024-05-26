@@ -17,6 +17,7 @@ final readonly class InstructionFileLoader implements InstructionLoaderInterface
     /**
      * @return InstructionTokenContract[]
      */
+    #[\Override]
     public function loadInstructions(): array
     {
         try {

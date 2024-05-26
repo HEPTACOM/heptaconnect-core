@@ -30,6 +30,7 @@ final class RequestStorage extends RequestStorageContract
     ) {
     }
 
+    #[\Override]
     public function load(
         PortalNodeKeyInterface $portalNodeKey,
         FileReferenceRequestKeyInterface $fileReferenceRequestKey
@@ -59,6 +60,7 @@ final class RequestStorage extends RequestStorageContract
         ), 1647791094);
     }
 
+    #[\Override]
     public function persist(
         PortalNodeKeyInterface $portalNodeKey,
         RequestInterface $request

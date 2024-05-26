@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReporterCon
 
 final class StatusReporterCodeOriginFinder implements StatusReporterCodeOriginFinderInterface
 {
+    #[\Override]
     public function findOrigin(StatusReporterContract $statusReporter): CodeOrigin
     {
         if ($statusReporter instanceof StatusReporter) {

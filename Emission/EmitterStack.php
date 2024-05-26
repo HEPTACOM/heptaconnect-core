@@ -26,6 +26,7 @@ final class EmitterStack implements EmitterStackInterface
         $this->emitters = new EmitterCollection($emitters);
     }
 
+    #[\Override]
     public function next(iterable $externalIds, EmitContextInterface $context): iterable
     {
         $emitter = $this->emitters->shift();
@@ -41,6 +42,7 @@ final class EmitterStack implements EmitterStackInterface
         return $emitter->emit($externalIds, $context, $this);
     }
 
+    #[\Override]
     public function supports(): EntityType
     {
         return $this->entityType;

@@ -17,6 +17,7 @@ final readonly class ReceptionFlowReceiversFactory implements ReceptionFlowRecei
     ) {
     }
 
+    #[\Override]
     public function createReceivers(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ReceiverCollection
     {
         return new ReceiverCollection([

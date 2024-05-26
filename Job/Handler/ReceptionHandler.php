@@ -56,6 +56,7 @@ final readonly class ReceptionHandler implements ReceptionHandlerInterface
     ) {
     }
 
+    #[\Override]
     public function triggerReception(JobDataCollection $jobs): void
     {
         $receptions = [];

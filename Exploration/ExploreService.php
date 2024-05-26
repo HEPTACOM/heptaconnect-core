@@ -35,6 +35,7 @@ final readonly class ExploreService implements ExploreServiceInterface
     ) {
     }
 
+    #[\Override]
     public function dispatchExploreJob(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
     {
         $jobs = new JobCollection();
@@ -50,6 +51,7 @@ final readonly class ExploreService implements ExploreServiceInterface
         $this->jobDispatcher->dispatch($jobs);
     }
 
+    #[\Override]
     public function explore(PortalNodeKeyInterface $portalNodeKey, ?EntityTypeCollection $entityTypes = null): void
     {
         $context = $this->exploreContextFactory->factory($portalNodeKey);

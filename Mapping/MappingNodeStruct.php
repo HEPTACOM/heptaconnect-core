@@ -16,6 +16,7 @@ final class MappingNodeStruct implements MappingNodeStructInterface
     ) {
     }
 
+    #[\Override]
     public function getKey(): MappingNodeKeyInterface
     {
         return $this->id;
@@ -28,6 +29,7 @@ final class MappingNodeStruct implements MappingNodeStructInterface
         return $this;
     }
 
+    #[\Override]
     public function getEntityType(): EntityType
     {
         return $this->entityType;

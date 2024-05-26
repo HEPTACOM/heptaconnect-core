@@ -22,6 +22,7 @@ final class JobDispatcher extends JobDispatcherContract
     ) {
     }
 
+    #[\Override]
     public function dispatch(JobCollection $jobs): void
     {
         $createPayload = new JobCreatePayloads($jobs->map(

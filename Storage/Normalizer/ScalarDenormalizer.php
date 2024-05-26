@@ -12,11 +12,13 @@ final class ScalarDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-return 'scalar'
      */
+    #[\Override]
     public function getType(): string
     {
         return 'scalar';
     }
 
+    #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
@@ -29,6 +31,7 @@ final class ScalarDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-assert string $data
      */
+    #[\Override]
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === $this->getType()

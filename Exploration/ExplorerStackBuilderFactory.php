@@ -19,6 +19,7 @@ final readonly class ExplorerStackBuilderFactory implements ExplorerStackBuilder
     ) {
     }
 
+    #[\Override]
     public function createExplorerStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
         EntityType $entityType

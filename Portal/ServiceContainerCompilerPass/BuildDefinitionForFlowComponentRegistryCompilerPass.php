@@ -31,6 +31,7 @@ final class BuildDefinitionForFlowComponentRegistryCompilerPass implements Compi
     ) {
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $groupedExplorers = $this->getServiceReferencesGroupedBySource($container, PortalStackServiceContainerBuilder::EXPLORER_SOURCE_TAG);

@@ -27,11 +27,13 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-return 'stream'
      */
+    #[\Override]
     public function getType(): string
     {
         return 'stream';
     }
 
+    #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): SerializableStream
     {
         if (!\is_string($data)) {
@@ -51,6 +53,7 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
         return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
     }
 
+    #[\Override]
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!\is_string($data)) {

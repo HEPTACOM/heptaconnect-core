@@ -26,6 +26,7 @@ final class ExplorerStack implements ExplorerStackInterface
         $this->explorers = new ExplorerCollection($explorers);
     }
 
+    #[\Override]
     public function next(ExploreContextInterface $context): iterable
     {
         $explorer = $this->explorers->shift();
@@ -41,6 +42,7 @@ final class ExplorerStack implements ExplorerStackInterface
         return $explorer->explore($context, $this);
     }
 
+    #[\Override]
     public function supports(): EntityType
     {
         return $this->entityType;

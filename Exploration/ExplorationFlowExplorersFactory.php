@@ -36,6 +36,7 @@ final readonly class ExplorationFlowExplorersFactory implements ExplorationFlowE
     ) {
     }
 
+    #[\Override]
     public function createExplorers(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): ExplorerCollection
     {
         $directEmitter = new DirectEmitter($entityType);

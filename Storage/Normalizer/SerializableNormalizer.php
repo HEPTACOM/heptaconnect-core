@@ -13,11 +13,13 @@ final class SerializableNormalizer implements NormalizerInterface
     /**
      * @phpstan-return 'serializable'
      */
+    #[\Override]
     public function getType(): string
     {
         return 'serializable';
     }
 
+    #[\Override]
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$this->supportsNormalization($object)) {
@@ -27,6 +29,7 @@ final class SerializableNormalizer implements NormalizerInterface
         return \serialize($object);
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         if ($data instanceof StreamInterface) {

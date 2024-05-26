@@ -36,6 +36,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
     }
 
+    #[\Override]
     public function resolve(FileReferenceContract $fileReference): ResolvedFileReferenceContract
     {
         if ($fileReference instanceof PublicUrlFileReference) {

@@ -21,6 +21,7 @@ final class ReceiveJobDispatchingEmitter extends AbstractBufferedResultProcessin
         parent::__construct($entityType, $batchSize);
     }
 
+    #[\Override]
     protected function processBuffer(TypedDatasetEntityCollection $buffer, EmitContextInterface $context): void
     {
         $jobs = $this->emissionResultToJobConverter->convert($context->getPortalNodeKey(), $buffer);

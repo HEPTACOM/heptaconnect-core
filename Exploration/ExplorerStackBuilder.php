@@ -35,6 +35,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         $this->entityType = $entityType;
     }
 
+    #[\Override]
     public function push(ExplorerContract $explorer): self
     {
         if ($this->entityType->equals($explorer->getSupportedEntityType())) {
@@ -58,6 +59,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushSource(): self
     {
         if ($this->source instanceof ExplorerContract) {
@@ -73,6 +75,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $explorer) {
@@ -88,6 +91,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function build(): ExplorerStackInterface
     {
         $explorerStack = new ExplorerStack(
@@ -104,6 +108,7 @@ final class ExplorerStackBuilder implements ExplorerStackBuilderInterface
         return $explorerStack;
     }
 
+    #[\Override]
     public function isEmpty(): bool
     {
         return $this->explorers === [];

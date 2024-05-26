@@ -24,6 +24,7 @@ final class LockingReceiver extends ReceiverContract
     ) {
     }
 
+    #[\Override]
     public function receive(
         TypedDatasetEntityCollection $entities,
         ReceiveContextInterface $context,
@@ -66,6 +67,7 @@ final class LockingReceiver extends ReceiverContract
         return $result;
     }
 
+    #[\Override]
     protected function supports(): string
     {
         return (string) $this->entityType;

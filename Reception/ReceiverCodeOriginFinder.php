@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverContract;
 
 final class ReceiverCodeOriginFinder implements ReceiverCodeOriginFinderInterface
 {
+    #[\Override]
     public function findOrigin(ReceiverContract $receiver): CodeOrigin
     {
         if ($receiver instanceof Receiver) {

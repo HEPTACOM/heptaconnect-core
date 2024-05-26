@@ -21,6 +21,7 @@ final class DirectEmitter extends EmitterContract
         $this->entities = new DatasetEntityCollection();
     }
 
+    #[\Override]
     public function emit(iterable $externalIds, EmitContextInterface $context, EmitterStackInterface $stack): iterable
     {
         $externalIds = \iterable_to_array($externalIds);
@@ -38,11 +39,13 @@ final class DirectEmitter extends EmitterContract
         return $this->entities;
     }
 
+    #[\Override]
     protected function supports(): string
     {
         return (string) $this->supports;
     }
 
+    #[\Override]
     protected function batch(iterable $externalIds, EmitContextInterface $context): iterable
     {
         $externalIds = \iterable_to_array($externalIds);

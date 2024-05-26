@@ -12,6 +12,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpHandlerContract;
 
 final class HttpHandlerCodeOriginFinder implements HttpHandlerCodeOriginFinderInterface
 {
+    #[\Override]
     public function findOrigin(HttpHandlerContract $httpHandler): CodeOrigin
     {
         if ($httpHandler instanceof HttpHandler) {

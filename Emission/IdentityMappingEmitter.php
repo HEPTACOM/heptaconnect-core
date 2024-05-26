@@ -24,6 +24,7 @@ final class IdentityMappingEmitter extends AbstractBufferedResultProcessingEmitt
         parent::__construct($entityType, $batchSize);
     }
 
+    #[\Override]
     protected function processBuffer(TypedDatasetEntityCollection $buffer, EmitContextInterface $context): void
     {
         $primaryKeys = new StringCollection();

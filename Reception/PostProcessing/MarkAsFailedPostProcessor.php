@@ -21,6 +21,7 @@ final class MarkAsFailedPostProcessor extends PostProcessorContract
     ) {
     }
 
+    #[\Override]
     public function handle(PostReceptionEvent $event): void
     {
         $markAsFailedData = \iterable_map(

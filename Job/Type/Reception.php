@@ -22,6 +22,7 @@ class Reception extends AbstractJobType
         parent::__construct($mapping);
     }
 
+    #[\Override]
     public function getPayload(): ?array
     {
         return [

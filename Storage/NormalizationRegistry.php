@@ -30,6 +30,7 @@ final class NormalizationRegistry extends NormalizationRegistryContract
         $this->denormalizer = \iterable_to_array($denormalizer);
     }
 
+    #[\Override]
     public function getNormalizer(mixed $value): ?NormalizerInterface
     {
         foreach ($this->normalizer as $normalizer) {
@@ -41,6 +42,7 @@ final class NormalizationRegistry extends NormalizationRegistryContract
         return parent::getNormalizer($value);
     }
 
+    #[\Override]
     public function getNormalizerByType(string $type): ?NormalizerInterface
     {
         foreach ($this->normalizer as $normalizer) {
@@ -52,6 +54,7 @@ final class NormalizationRegistry extends NormalizationRegistryContract
         return parent::getNormalizerByType($type);
     }
 
+    #[\Override]
     public function getDenormalizer(string $type): ?DenormalizerInterface
     {
         foreach ($this->denormalizer as $denormalizer) {

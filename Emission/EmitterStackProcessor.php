@@ -19,6 +19,7 @@ final readonly class EmitterStackProcessor implements EmitterStackProcessorInter
     ) {
     }
 
+    #[\Override]
     public function processStack(
         iterable $externalIds,
         EmitterStackInterface $stack,

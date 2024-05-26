@@ -20,6 +20,7 @@ final readonly class EmissionFlowEmittersFactory implements EmissionFlowEmitters
     ) {
     }
 
+    #[\Override]
     public function createEmitters(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): EmitterCollection
     {
         return new EmitterCollection([

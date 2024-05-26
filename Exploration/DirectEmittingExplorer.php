@@ -32,11 +32,13 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
         parent::__construct($entityType, $batchSize);
     }
 
+    #[\Override]
     protected function createBuffer(): CollectionInterface
     {
         return new TypedDatasetEntityCollection($this->getSupportedEntityType());
     }
 
+    #[\Override]
     protected function processBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         $pks = \iterable_to_array($buffer->map(
@@ -55,6 +57,7 @@ final class DirectEmittingExplorer extends AbstractBufferedResultProcessingExplo
         $this->directEmitter->getEntities()->clear();
     }
 
+    #[\Override]
     protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if ($value instanceof DatasetEntityContract) {

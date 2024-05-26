@@ -39,6 +39,7 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
         $this->profiler = new NullProfiler();
     }
 
+    #[\Override]
     public function run(PortalNodeKeyInterface $portalNodeKey, DatasetEntityCollection $entities): DirectEmissionResult
     {
         $result = new DirectEmissionResult();
@@ -90,11 +91,13 @@ final class DirectEmissionFlow extends DirectEmissionFlowContract implements Log
         return $result;
     }
 
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function setProfiler(ProfilerContract $profiler): void
     {
         $this->profiler = $profiler;

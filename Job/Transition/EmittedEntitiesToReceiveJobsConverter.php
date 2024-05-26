@@ -25,6 +25,7 @@ final readonly class EmittedEntitiesToReceiveJobsConverter implements EmittedEnt
     ) {
     }
 
+    #[\Override]
     public function convert(PortalNodeKeyInterface $portalNodeKey, DatasetEntityCollection $entities): JobCollection
     {
         $result = new JobCollection();

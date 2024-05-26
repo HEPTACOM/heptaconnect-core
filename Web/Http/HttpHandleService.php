@@ -53,6 +53,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
     ) {
     }
 
+    #[\Override]
     public function handle(ServerRequestInterface $request, PortalNodeKeyInterface $portalNodeKey): ResponseInterface
     {
         $httpHandlerStackIdentifier = new HttpHandlerStackIdentifier(

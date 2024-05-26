@@ -10,6 +10,7 @@ use Psr\Http\Message\RequestInterface;
 
 final class RequestSerializer implements RequestSerializerInterface
 {
+    #[\Override]
     public function serialize(RequestInterface $request): string
     {
         try {

@@ -20,6 +20,7 @@ final readonly class ServerRequestCycleDumper implements ServerRequestCycleDumpe
     ) {
     }
 
+    #[\Override]
     public function dump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): void
     {
         $request = $requestCycle->getRequest();

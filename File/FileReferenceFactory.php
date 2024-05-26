@@ -27,11 +27,13 @@ final class FileReferenceFactory extends FileReferenceFactoryContract
     ) {
     }
 
+    #[\Override]
     public function fromPublicUrl(string $publicUrl): FileReferenceContract
     {
         return new PublicUrlFileReference($this->portalNodeKey, $publicUrl);
     }
 
+    #[\Override]
     public function fromRequest(RequestInterface $request): FileReferenceContract
     {
         $requestKey = $this->requestStorage->persist($this->portalNodeKey, $request);
@@ -39,6 +41,7 @@ final class FileReferenceFactory extends FileReferenceFactoryContract
         return new RequestFileReference($this->portalNodeKey, $requestKey);
     }
 
+    #[\Override]
     public function fromContents(
         string $contents,
         string $mimeType = 'application/octet-stream'

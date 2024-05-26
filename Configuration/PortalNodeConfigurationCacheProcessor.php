@@ -17,6 +17,7 @@ final readonly class PortalNodeConfigurationCacheProcessor implements PortalNode
     ) {
     }
 
+    #[\Override]
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         $cachedConfig = $this->cache->getItem($this->getConfigCacheKey($portalNodeKey));
@@ -36,6 +37,7 @@ final readonly class PortalNodeConfigurationCacheProcessor implements PortalNode
         return $configuration;
     }
 
+    #[\Override]
     public function write(PortalNodeKeyInterface $portalNodeKey, array $payload, \Closure $write): void
     {
         $cachedConfigKey = $this->getConfigCacheKey($portalNodeKey);

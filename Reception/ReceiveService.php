@@ -41,6 +41,7 @@ final class ReceiveService implements ReceiveServiceInterface
     ) {
     }
 
+    #[\Override]
     public function receive(TypedDatasetEntityCollection $entities, PortalNodeKeyInterface $portalNodeKey): void
     {
         if ($entities->isEmpty()) {

@@ -19,6 +19,7 @@ final readonly class EmitterStackBuilderFactory implements EmitterStackBuilderFa
     ) {
     }
 
+    #[\Override]
     public function createEmitterStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
         EntityType $entityType

@@ -22,6 +22,7 @@ final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
         parent::__construct($portalNodeKey);
     }
 
+    #[\Override]
     public function getPublicUrl(): string
     {
         return (string) $this->fileContentsUrlProvider->resolve(
@@ -31,6 +32,7 @@ final class ResolvedContentsFileReference extends ResolvedFileReferenceContract
         );
     }
 
+    #[\Override]
     public function getContents(): string
     {
         $stream = $this->denormalizer->denormalize($this->normalizedStream, $this->denormalizer->getType());

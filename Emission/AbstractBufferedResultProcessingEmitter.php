@@ -25,6 +25,7 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
         $this->buffer = $this->createBuffer();
     }
 
+    #[\Override]
     public function emit(iterable $externalIds, EmitContextInterface $context, EmitterStackInterface $stack): iterable
     {
         try {
@@ -34,11 +35,13 @@ abstract class AbstractBufferedResultProcessingEmitter extends EmitterContract
         }
     }
 
+    #[\Override]
     protected function supports(): string
     {
         return (string) $this->entityType;
     }
 
+    #[\Override]
     protected function extend(DatasetEntityContract $entity, EmitContextInterface $context): DatasetEntityContract
     {
         $this->pushBuffer($entity, $this->buffer, $context);

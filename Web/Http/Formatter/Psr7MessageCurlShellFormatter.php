@@ -19,6 +19,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
     ) {
     }
 
+    #[\Override]
     public function formatMessage(MessageInterface $message): string
     {
         if ($message instanceof RequestInterface) {
@@ -32,6 +33,7 @@ final class Psr7MessageCurlShellFormatter extends Psr7MessageCurlShellFormatterC
         throw new \InvalidArgumentException('Message must be a request or a response', 1674950002);
     }
 
+    #[\Override]
     public function getFileExtension(MessageInterface $message): string
     {
         if ($message instanceof RequestInterface) {

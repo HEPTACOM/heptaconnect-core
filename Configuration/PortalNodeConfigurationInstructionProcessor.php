@@ -39,6 +39,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
         $this->instructionLoaders = \iterable_to_array($instructionLoaders);
     }
 
+    #[\Override]
     public function read(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         $instructions = $this->filterInstructions($portalNodeKey);
@@ -55,6 +56,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
         return $readConfig();
     }
 
+    #[\Override]
     public function write(PortalNodeKeyInterface $portalNodeKey, array $payload, \Closure $write): void
     {
         $write($payload);

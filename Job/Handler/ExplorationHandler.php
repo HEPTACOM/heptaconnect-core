@@ -32,6 +32,7 @@ final readonly class ExplorationHandler implements ExplorationHandlerInterface
     ) {
     }
 
+    #[\Override]
     public function triggerExplorations(JobDataCollection $jobs): void
     {
         $keys = [];

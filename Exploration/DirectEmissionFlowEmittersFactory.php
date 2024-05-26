@@ -23,6 +23,7 @@ final readonly class DirectEmissionFlowEmittersFactory implements DirectEmission
     ) {
     }
 
+    #[\Override]
     public function createEmitters(PortalNodeKeyInterface $portalNodeKey, EntityType $entityType): EmitterCollection
     {
         $result = new EmitterCollection([

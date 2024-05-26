@@ -27,11 +27,13 @@ final class IdentityMappingExplorer extends AbstractBufferedResultProcessingExpl
         parent::__construct($entityType, $batchSize);
     }
 
+    #[\Override]
     protected function createBuffer(): CollectionInterface
     {
         return new StringCollection();
     }
 
+    #[\Override]
     protected function processBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         $this->identityMapAction->map(new IdentityMapPayload(
@@ -40,6 +42,7 @@ final class IdentityMappingExplorer extends AbstractBufferedResultProcessingExpl
         ));
     }
 
+    #[\Override]
     protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if (\is_string($value) || \is_int($value)) {

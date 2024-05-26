@@ -18,6 +18,7 @@ final readonly class PortalNodeStorageItemPacker implements PortalNodeStorageIte
     ) {
     }
 
+    #[\Override]
     public function pack(string $key, mixed $value, ?\DateInterval $ttl): ?PortalNodeStorageSetItem
     {
         $normalizer = $this->normalizationRegistry->getNormalizer($value);

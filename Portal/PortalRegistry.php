@@ -42,6 +42,7 @@ final class PortalRegistry implements PortalRegistryInterface
     ) {
     }
 
+    #[\Override]
     public function getPortal(PortalNodeKeyInterface $portalNodeKey): PortalContract
     {
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);
@@ -54,6 +55,7 @@ final class PortalRegistry implements PortalRegistryInterface
         return $this->cache['portals'][$cacheKey];
     }
 
+    #[\Override]
     public function getPortalExtensions(PortalNodeKeyInterface $portalNodeKey): PortalExtensionCollection
     {
         $portalClass = $this->getPortalNodeClassCached($portalNodeKey);

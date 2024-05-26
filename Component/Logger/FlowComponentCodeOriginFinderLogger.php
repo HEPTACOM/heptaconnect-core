@@ -30,6 +30,7 @@ class FlowComponentCodeOriginFinderLogger extends AbstractLogger
     ) {
     }
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         foreach ($context as $key => &$value) {

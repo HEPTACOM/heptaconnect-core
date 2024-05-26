@@ -16,6 +16,7 @@ final readonly class StreamUriSchemePathConverter implements StreamUriSchemePath
     ) {
     }
 
+    #[\Override]
     public function convertToUri(string $path): string
     {
         try {
@@ -58,6 +59,7 @@ final readonly class StreamUriSchemePathConverter implements StreamUriSchemePath
         return $result;
     }
 
+    #[\Override]
     public function convertToPath(string $uri): string
     {
         try {

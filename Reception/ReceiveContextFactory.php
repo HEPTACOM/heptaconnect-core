@@ -28,6 +28,7 @@ final class ReceiveContextFactory implements ReceiveContextFactoryInterface
         $this->postProcessors = $postProcessors instanceof \Traversable ? \iterator_to_array($postProcessors) : $postProcessors;
     }
 
+    #[\Override]
     public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface
     {
         return new ReceiveContext(

@@ -17,6 +17,7 @@ final readonly class ExplorerStackProcessor implements ExplorerStackProcessorInt
     ) {
     }
 
+    #[\Override]
     public function processStack(ExplorerStackInterface $stack, ExploreContextInterface $context): iterable
     {
         try {

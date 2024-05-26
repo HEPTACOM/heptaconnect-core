@@ -16,6 +16,7 @@ class PortalLogger extends AbstractLogger
     ) {
     }
 
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         $this->decorated->log($level, $this->prefix . $message, \array_merge($context, $this->context));

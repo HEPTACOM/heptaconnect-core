@@ -40,6 +40,7 @@ final readonly class PortalStorage implements PortalStorageInterface
     ) {
     }
 
+    #[\Override]
     public function get($key, $default = null)
     {
         try {
@@ -75,6 +76,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function set($key, $value, $ttl = null): bool
     {
         $ttl = $this->convertTtl($ttl);
@@ -104,6 +106,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function list(): iterable
     {
         $criteria = new PortalNodeStorageListCriteria($this->portalNodeKey);
@@ -137,6 +140,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function has($key): bool
     {
         try {
@@ -160,6 +164,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function delete($key): bool
     {
         try {
@@ -179,6 +184,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function clear(): bool
     {
         try {
@@ -197,6 +203,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function getMultiple($keys, $default = null): iterable
     {
         $keysArray = $this->validateKeys($keys);
@@ -236,6 +243,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function setMultiple($values, $ttl = null): bool
     {
         $ttl = $this->convertTtl($ttl);
@@ -266,6 +274,7 @@ final readonly class PortalStorage implements PortalStorageInterface
         }
     }
 
+    #[\Override]
     public function deleteMultiple($keys): bool
     {
         try {

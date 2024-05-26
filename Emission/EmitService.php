@@ -43,6 +43,7 @@ final class EmitService implements EmitServiceInterface
     ) {
     }
 
+    #[\Override]
     public function emit(TypedMappingComponentCollection $mappingComponents): void
     {
         $emittingPortalNodes = [];

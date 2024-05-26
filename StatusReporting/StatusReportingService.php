@@ -31,6 +31,7 @@ final class StatusReportingService implements StatusReportingServiceInterface
     ) {
     }
 
+    #[\Override]
     public function report(PortalNodeKeyInterface $portalNodeKey, ?string $topic): array
     {
         $flowComponentRegistry = $this->portalStackServiceContainerFactory

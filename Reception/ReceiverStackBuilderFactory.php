@@ -19,6 +19,7 @@ final readonly class ReceiverStackBuilderFactory implements ReceiverStackBuilder
     ) {
     }
 
+    #[\Override]
     public function createReceiverStackBuilder(
         PortalNodeKeyInterface $portalNodeKey,
         EntityType $entityType

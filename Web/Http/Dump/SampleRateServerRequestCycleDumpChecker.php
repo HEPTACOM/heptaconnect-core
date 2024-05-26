@@ -18,6 +18,7 @@ final readonly class SampleRateServerRequestCycleDumpChecker implements ServerRe
     ) {
     }
 
+    #[\Override]
     public function shallDump(HttpHandlerStackIdentifier $httpHandler, ServerRequestCycle $requestCycle): bool
     {
         $dumpSampleRate = $this->getDumpSampleRate($httpHandler);

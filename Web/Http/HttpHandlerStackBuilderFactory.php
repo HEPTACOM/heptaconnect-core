@@ -18,6 +18,7 @@ final readonly class HttpHandlerStackBuilderFactory implements HttpHandlerStackB
     ) {
     }
 
+    #[\Override]
     public function createHttpHandlerStackBuilder(HttpHandlerStackIdentifier $stackIdentifier): HttpHandlerStackBuilderInterface
     {
         $flowComponentRegistry = $this->portalContainerFactory

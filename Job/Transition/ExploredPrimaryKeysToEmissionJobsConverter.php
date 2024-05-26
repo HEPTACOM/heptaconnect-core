@@ -20,6 +20,7 @@ final readonly class ExploredPrimaryKeysToEmissionJobsConverter implements Explo
     ) {
     }
 
+    #[\Override]
     public function convert(
         PortalNodeKeyInterface $portalNodeKey,
         EntityType $entityType,

@@ -23,6 +23,7 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
         $this->configProcessors = \iterable_to_array($configProcessors);
     }
 
+    #[\Override]
     public function applyRead(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
         foreach ($this->configProcessors as $configurationProcessor) {
@@ -33,6 +34,7 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
         return $read();
     }
 
+    #[\Override]
     public function applyWrite(
         PortalNodeKeyInterface $portalNodeKey,
         array $configuration,

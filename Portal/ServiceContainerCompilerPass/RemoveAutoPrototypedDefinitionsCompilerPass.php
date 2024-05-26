@@ -18,6 +18,7 @@ final readonly class RemoveAutoPrototypedDefinitionsCompilerPass implements Comp
     ) {
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         foreach ($this->prototypedIds as $serviceId) {

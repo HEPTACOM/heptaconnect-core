@@ -16,6 +16,7 @@ abstract class PostProcessorContract implements EventSubscriberInterface
      */
     abstract public function handle(PostReceptionEvent $event): void;
 
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

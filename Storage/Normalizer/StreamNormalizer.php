@@ -31,6 +31,7 @@ final readonly class StreamNormalizer implements NormalizerInterface
     ) {
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof SerializableStream;
@@ -39,11 +40,13 @@ final readonly class StreamNormalizer implements NormalizerInterface
     /**
      * @phpstan-return 'stream'
      */
+    #[\Override]
     public function getType(): string
     {
         return 'stream';
     }
 
+    #[\Override]
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         if (!$object instanceof SerializableStream) {

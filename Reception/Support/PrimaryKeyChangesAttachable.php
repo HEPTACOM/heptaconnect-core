@@ -25,6 +25,7 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
         $this->entityType = (string) $entityType;
     }
 
+    #[\Override]
     public function getForeignEntityType(): EntityType
     {
         return new EntityType($this->entityType);
@@ -42,11 +43,13 @@ class PrimaryKeyChangesAttachable implements AttachableInterface, ForeignKeyAwar
         return \is_string($result) ? $result : null;
     }
 
+    #[\Override]
     public function getForeignKey(): ?string
     {
         return $this->foreignKey;
     }
 
+    #[\Override]
     public function setForeignKey(?string $foreignKey): void
     {
         if ($this->foreignKeys === [] || $this->foreignKey !== $foreignKey) {

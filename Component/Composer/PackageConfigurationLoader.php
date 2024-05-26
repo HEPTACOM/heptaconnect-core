@@ -23,6 +23,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
     ) {
     }
 
+    #[\Override]
     public function getPackageConfigurations(): PackageConfigurationCollection
     {
         $cacheKey = $this->getCacheKey();

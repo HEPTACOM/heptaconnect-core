@@ -32,6 +32,7 @@ final class ComposerPortalLoader implements PortalLoaderInterface
     ) {
     }
 
+    #[\Override]
     public function getPortals(): PortalCollection
     {
         $portalCollection = new PortalCollection();
@@ -59,6 +60,7 @@ final class ComposerPortalLoader implements PortalLoaderInterface
         return $portalCollection;
     }
 
+    #[\Override]
     public function getPortalExtensions(): PortalExtensionCollection
     {
         $result = new PortalExtensionCollection();

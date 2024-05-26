@@ -28,11 +28,13 @@ final class EmissionJobDispatchingExplorer extends AbstractBufferedResultProcess
         parent::__construct($entityType, $batchSize);
     }
 
+    #[\Override]
     protected function createBuffer(): CollectionInterface
     {
         return new StringCollection();
     }
 
+    #[\Override]
     protected function processBuffer(CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         $this->logger->debug('EmissionJobDispatchingExplorer: Flush a batch of publications', [
@@ -49,6 +51,7 @@ final class EmissionJobDispatchingExplorer extends AbstractBufferedResultProcess
         $this->jobDispatcher->dispatch($jobs);
     }
 
+    #[\Override]
     protected function pushBuffer(int|string|DatasetEntityContract $value, CollectionInterface $buffer, ExploreContextInterface $context): void
     {
         if (\is_int($value) || \is_string($value)) {

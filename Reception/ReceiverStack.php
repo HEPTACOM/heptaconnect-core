@@ -25,6 +25,7 @@ final class ReceiverStack implements ReceiverStackInterface
         $this->receivers = new ReceiverCollection($receivers);
     }
 
+    #[\Override]
     public function next(TypedDatasetEntityCollection $entities, ReceiveContextInterface $context): iterable
     {
         $receiver = $this->receivers->shift();

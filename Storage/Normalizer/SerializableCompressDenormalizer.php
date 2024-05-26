@@ -14,11 +14,13 @@ final readonly class SerializableCompressDenormalizer implements DenormalizerInt
     ) {
     }
 
+    #[\Override]
     public function getType(): string
     {
         return $this->serializableDenormalizer->getType() . '+gzpress';
     }
 
+    #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
@@ -36,6 +38,7 @@ final readonly class SerializableCompressDenormalizer implements DenormalizerInt
     /**
      * @phpstan-assert string $data
      */
+    #[\Override]
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === $this->getType()

@@ -15,6 +15,7 @@ final class AddHttpMiddlewareCollectorCompilerPass implements CompilerPassInterf
 {
     public const SERVICE_TAG = 'heptaconnect.http.handler.middleware';
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $definitions = $container->getDefinitions();

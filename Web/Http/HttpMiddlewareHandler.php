@@ -26,6 +26,7 @@ final class HttpMiddlewareHandler implements RequestHandlerInterface
         $this->middlewares = $middlewares;
     }
 
+    #[\Override]
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->next($request, ...$this->middlewares);

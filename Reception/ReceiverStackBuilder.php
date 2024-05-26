@@ -35,6 +35,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         $this->entityType = $entityType;
     }
 
+    #[\Override]
     public function push(ReceiverContract $receiver): self
     {
         if ($this->entityType->equals($receiver->getSupportedEntityType())) {
@@ -58,6 +59,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushSource(): self
     {
         if ($this->source instanceof ReceiverContract) {
@@ -73,6 +75,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function pushDecorators(): self
     {
         foreach ($this->decorators as $receiver) {
@@ -88,6 +91,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         return $this;
     }
 
+    #[\Override]
     public function build(): ReceiverStackInterface
     {
         $receiverStack = new ReceiverStack(
@@ -103,6 +107,7 @@ final class ReceiverStackBuilder implements ReceiverStackBuilderInterface
         return $receiverStack;
     }
 
+    #[\Override]
     public function isEmpty(): bool
     {
         return $this->receivers === [];

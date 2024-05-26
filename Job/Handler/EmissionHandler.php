@@ -31,6 +31,7 @@ final readonly class EmissionHandler implements EmissionHandlerInterface
     ) {
     }
 
+    #[\Override]
     public function triggerEmission(JobDataCollection $jobs): void
     {
         $emissions = [];

@@ -16,11 +16,13 @@ final readonly class Psr7RequestDenormalizer implements DenormalizerInterface
     ) {
     }
 
+    #[\Override]
     public function getType(): string
     {
         return 'psr7-request';
     }
 
+    #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): RequestInterface
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
@@ -33,6 +35,7 @@ final readonly class Psr7RequestDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-assert string $data
      */
+    #[\Override]
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         if ($type !== $this->getType() || !\is_string($data)) {

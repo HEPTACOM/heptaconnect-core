@@ -120,6 +120,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
     /**
      * @throws DelegatingLoaderLoadException
      */
+    #[\Override]
     public function build(
         PortalContract $portal,
         PortalExtensionCollection $portalExtensions,

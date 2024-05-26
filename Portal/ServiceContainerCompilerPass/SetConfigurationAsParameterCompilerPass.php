@@ -16,6 +16,7 @@ final readonly class SetConfigurationAsParameterCompilerPass implements Compiler
     ) {
     }
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $config = new PortalConfiguration($this->configuration ?? []);

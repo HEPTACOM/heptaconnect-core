@@ -12,11 +12,13 @@ final class SerializableDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-return 'serializable'
      */
+    #[\Override]
     public function getType(): string
     {
         return 'serializable';
     }
 
+    #[\Override]
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->supportsDenormalization($data, $type, $format)) {
@@ -44,6 +46,7 @@ final class SerializableDenormalizer implements DenormalizerInterface
     /**
      * @phpstan-assert string $data
      */
+    #[\Override]
     public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
     {
         return $type === $this->getType()

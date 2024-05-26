@@ -19,11 +19,13 @@ final class ResourceLocking extends ResourceLockingContract
     ) {
     }
 
+    #[\Override]
     public function isLocked(string $resourceKey, ?StorageKeyInterface $owner): bool
     {
         return $this->resourceLockStorage->has($this->buildKey($resourceKey, $owner));
     }
 
+    #[\Override]
     public function lock(string $resourceKey, ?StorageKeyInterface $owner): void
     {
         $key = $this->buildKey($resourceKey, $owner);
@@ -35,6 +37,7 @@ final class ResourceLocking extends ResourceLockingContract
         $this->resourceLockStorage->create($key);
     }
 
+    #[\Override]
     public function release(string $resourceKey, ?StorageKeyInterface $owner): void
     {
         $key = $this->buildKey($resourceKey, $owner);

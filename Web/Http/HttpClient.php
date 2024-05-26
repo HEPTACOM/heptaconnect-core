@@ -26,11 +26,13 @@ final class HttpClient extends HttpClientContract implements LoggerAwareInterfac
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
+    #[\Override]
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         foreach ($this->getDefaultRequestHeaders()->getHeaders() as $header => $values) {

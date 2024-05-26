@@ -18,6 +18,7 @@ final readonly class RequestDeserializer implements RequestDeserializerInterface
     ) {
     }
 
+    #[\Override]
     public function deserialize(string $requestData): RequestInterface
     {
         $requestPayload = $this->validateRequestData($requestData);

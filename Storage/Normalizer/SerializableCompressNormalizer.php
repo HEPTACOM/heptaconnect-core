@@ -14,11 +14,13 @@ final readonly class SerializableCompressNormalizer implements NormalizerInterfa
     ) {
     }
 
+    #[\Override]
     public function getType(): string
     {
         return $this->serializableNormalizer->getType() . '+gzpress';
     }
 
+    #[\Override]
     public function normalize(mixed $object, ?string $format = null, array $context = []): string
     {
         $normalizedValue = $this->serializableNormalizer->normalize($object, $format, $context);
@@ -36,6 +38,7 @@ final readonly class SerializableCompressNormalizer implements NormalizerInterfa
         return $result;
     }
 
+    #[\Override]
     public function supportsNormalization(mixed $data, ?string $format = null, array $context = []): bool
     {
         return $this->serializableNormalizer->supportsNormalization($data, $format);

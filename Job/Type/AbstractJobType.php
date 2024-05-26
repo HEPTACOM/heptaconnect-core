@@ -14,6 +14,7 @@ abstract class AbstractJobType extends JobContract
     ) {
     }
 
+    #[\Override]
     public function getMappingComponent(): MappingComponentStructContract
     {
         return $this->mapping;

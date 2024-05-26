@@ -18,6 +18,7 @@ final readonly class HttpHandleContextFactory implements HttpHandleContextFactor
     ) {
     }
 
+    #[\Override]
     public function createContext(PortalNodeKeyInterface $portalNodeKey): HttpHandleContextInterface
     {
         return new HttpHandleContext(

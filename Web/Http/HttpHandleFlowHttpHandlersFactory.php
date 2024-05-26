@@ -11,6 +11,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
 
 final class HttpHandleFlowHttpHandlersFactory implements HttpHandleFlowHttpHandlersFactoryInterface
 {
+    #[\Override]
     public function createHttpHandlers(HttpHandlerStackIdentifier $stackIdentifier): HttpHandlerCollection
     {
         return new HttpHandlerCollection([

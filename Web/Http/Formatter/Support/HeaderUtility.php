@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 
 final class HeaderUtility implements HeaderUtilityInterface
 {
+    #[\Override]
     public function sortResponseHeaders(ResponseInterface $response): ResponseInterface
     {
         $headers = $response->getHeaders();
@@ -26,6 +27,7 @@ final class HeaderUtility implements HeaderUtilityInterface
         return $response;
     }
 
+    #[\Override]
     public function sortRequestHeaders(RequestInterface $request): RequestInterface
     {
         $headers = $request->getHeaders();

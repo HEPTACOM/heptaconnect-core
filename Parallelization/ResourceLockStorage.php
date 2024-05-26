@@ -15,6 +15,7 @@ final class ResourceLockStorage extends ResourceLockStorageContract
     ) {
     }
 
+    #[\Override]
     public function create(string $key): void
     {
         try {
@@ -26,11 +27,13 @@ final class ResourceLockStorage extends ResourceLockStorageContract
         }
     }
 
+    #[\Override]
     public function has(string $key): bool
     {
         return $this->lockFactory->createLock($key, 300.0, false)->isAcquired();
     }
 
+    #[\Override]
     public function delete(string $key): void
     {
         $this->lockFactory->createLock($key)->release();

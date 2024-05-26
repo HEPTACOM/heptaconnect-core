@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class AllDefinitionDefaultsCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {

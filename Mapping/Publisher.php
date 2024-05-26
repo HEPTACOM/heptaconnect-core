@@ -18,6 +18,7 @@ final readonly class Publisher implements PublisherInterface
     ) {
     }
 
+    #[\Override]
     public function publishBatch(MappingComponentCollection $mappings): void
     {
         /** @var Emission[] $jobs */

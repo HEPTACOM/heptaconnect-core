@@ -10,6 +10,7 @@ use Heptacom\HeptaConnect\Storage\Base\PrimaryKeySharingMappingStruct;
 
 final class EntityStatus extends EntityStatusContract
 {
+    #[\Override]
     public function isMappedByEmitter(DatasetEntityContract $entity): bool
     {
         $sharer = $entity->getAttachment(PrimaryKeySharingMappingStruct::class);

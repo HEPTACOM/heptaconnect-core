@@ -24,6 +24,7 @@ final readonly class ReceiverStackProcessor implements ReceiverStackProcessorInt
     ) {
     }
 
+    #[\Override]
     public function processStack(
         TypedDatasetEntityCollection $entities,
         ReceiverStackInterface $stack,

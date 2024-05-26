@@ -15,6 +15,7 @@ use Psr\Http\Message\UriInterface;
 
 final class HttpHandleContext extends AbstractPortalNodeContext implements HttpHandleContextInterface
 {
+    #[\Override]
     public function forward(
         UriInterface|string $uri,
         string $method = 'GET',

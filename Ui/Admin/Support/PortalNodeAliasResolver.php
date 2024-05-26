@@ -17,6 +17,7 @@ final readonly class PortalNodeAliasResolver implements PortalNodeAliasResolverI
     ) {
     }
 
+    #[\Override]
     public function resolve(string $portalNodeAlias): PortalNodeKeyInterface
     {
         $criteria = new PortalNodeAliasFindCriteria([$portalNodeAlias]);

@@ -21,6 +21,7 @@ final class DelegatingJobActor extends DelegatingJobActorContract
     ) {
     }
 
+    #[\Override]
     public function performJobs(string $type, JobDataCollection $jobs): void
     {
         switch ($type) {

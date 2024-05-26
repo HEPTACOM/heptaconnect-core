@@ -29,6 +29,7 @@ final class SaveMappingsPostProcessor extends PostProcessorContract
     ) {
     }
 
+    #[\Override]
     public function handle(PostReceptionEvent $event): void
     {
         /** @var SaveMappingsData[] $saveMappingsData */

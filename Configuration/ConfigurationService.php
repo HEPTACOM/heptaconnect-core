@@ -27,6 +27,7 @@ final readonly class ConfigurationService implements ConfigurationServiceInterfa
     ) {
     }
 
+    #[\Override]
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
@@ -38,6 +39,7 @@ final readonly class ConfigurationService implements ConfigurationServiceInterfa
         return $template->resolve($configuration);
     }
 
+    #[\Override]
     public function setPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey, ?array $configuration): void
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);

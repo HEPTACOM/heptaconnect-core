@@ -24,11 +24,13 @@ final class EmitContext extends AbstractPortalNodeContext implements EmitContext
         parent::__construct($containerFacade, $configuration);
     }
 
+    #[\Override]
     public function isDirectEmission(): bool
     {
         return $this->directEmission;
     }
 
+    #[\Override]
     public function markAsFailed(string $externalId, string $entityType, \Throwable $throwable): void
     {
         $mappingComponent = new MappingComponentStruct($this->getPortalNodeKey(), new EntityType($entityType), $externalId);

@@ -18,6 +18,7 @@ final readonly class PortalNodeStorageItemUnpacker implements PortalNodeStorageI
     ) {
     }
 
+    #[\Override]
     public function unpack(PortalNodeStorageItemContract $storageItem): mixed
     {
         $denormalizer = $this->normalizationRegistry->getDenormalizer($storageItem->getType());

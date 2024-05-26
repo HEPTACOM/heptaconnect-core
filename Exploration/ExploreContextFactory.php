@@ -18,6 +18,7 @@ final readonly class ExploreContextFactory implements ExploreContextFactoryInter
     ) {
     }
 
+    #[\Override]
     public function factory(PortalNodeKeyInterface $portalNodeKey): ExploreContextInterface
     {
         return new ExploreContext(
