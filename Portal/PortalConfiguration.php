@@ -18,7 +18,7 @@ final class PortalConfiguration extends ConfigurationContract
     ) {
     }
 
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         return $this->flattened()[$name] ?? null;
     }
