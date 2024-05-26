@@ -32,7 +32,7 @@ final readonly class StreamUriSchemePathConverter implements StreamUriSchemePath
         }
 
         if ($uri->getHost() === '') {
-            $urlParts = \explode('/', \ltrim((string) $uri->getPath(), '/'), 2);
+            $urlParts = \explode('/', \ltrim($uri->getPath(), '/'), 2);
             $uri = $uri->withPath($urlParts[1] ?? '')->withHost($urlParts[0]);
         }
 
@@ -87,6 +87,6 @@ final readonly class StreamUriSchemePathConverter implements StreamUriSchemePath
 
         $path = $parsed->getPath();
 
-        return $path === '' ? $parsed->getAuthority() : ($parsed->getAuthority() . '/' . \ltrim((string) $path, '/'));
+        return $path === '' ? $parsed->getAuthority() : ($parsed->getAuthority() . '/' . \ltrim($path, '/'));
     }
 }

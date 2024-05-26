@@ -71,7 +71,7 @@ final class HttpKernel implements HttpKernelInterface
             return $request;
         }
 
-        \parse_str((string) $request->getUri()->getQuery(), $queryParams);
+        \parse_str($request->getUri()->getQuery(), $queryParams);
 
         return $request->withQueryParams($queryParams);
     }
