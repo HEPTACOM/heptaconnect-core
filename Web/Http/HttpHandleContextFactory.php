@@ -14,14 +14,14 @@ final readonly class HttpHandleContextFactory implements HttpHandleContextFactor
 {
     public function __construct(
         private ConfigurationServiceInterface $configurationService,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private PortalStackServiceContainerFactory $portalStackContainerFactory
     ) {
     }
 
     public function createContext(PortalNodeKeyInterface $portalNodeKey): HttpHandleContextInterface
     {
         return new HttpHandleContext(
-            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->portalStackContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
         );
     }

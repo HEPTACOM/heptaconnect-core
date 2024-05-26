@@ -15,9 +15,6 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Psr\Log\LoggerInterface;
 
-/**
- * @SuppressWarnings(PHPMD.LongClassName)
- */
 final class PortalNodeConfigurationInstructionProcessor implements PortalNodeConfigurationProcessorInterface
 {
     /**
@@ -94,9 +91,9 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
                 continue;
             }
 
-            $matchedPortalExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
+            $matchedExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
 
-            if ($matchedPortalExtensions->count() > 0) {
+            if ($matchedExtensions->count() > 0) {
                 $result[] = $instruction;
             }
         }

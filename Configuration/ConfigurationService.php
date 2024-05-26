@@ -21,16 +21,16 @@ final readonly class ConfigurationService implements ConfigurationServiceInterfa
 {
     public function __construct(
         private PortalRegistryInterface $portalRegistry,
-        private PortalNodeConfigurationGetActionInterface $portalNodeConfigurationGet,
-        private PortalNodeConfigurationSetActionInterface $portalNodeConfigurationSet,
-        private PortalNodeConfigurationProcessorServiceInterface $configurationProcessorService
+        private PortalNodeConfigurationGetActionInterface $configurationGet,
+        private PortalNodeConfigurationSetActionInterface $configurationSet,
+        private PortalNodeConfigurationProcessorServiceInterface $configProcessorService
     ) {
     }
 
     public function getPortalNodeConfiguration(PortalNodeKeyInterface $portalNodeKey): ?array
     {
         $template = $this->getMergedConfigurationTemplate($portalNodeKey);
-        $configuration = $this->configurationProcessorService->applyRead(
+        $configuration = $this->configProcessorService->applyRead(
             $portalNodeKey,
             fn () => $this->getPortalNodeConfigurationInternal($portalNodeKey)
         );
@@ -53,10 +53,10 @@ final readonly class ConfigurationService implements ConfigurationServiceInterfa
             $template->resolve($data);
         }
 
-        $this->configurationProcessorService->applyWrite(
+        $this->configProcessorService->applyWrite(
             $portalNodeKey,
             $data ?? [],
-            fn (array $config) => $this->portalNodeConfigurationSet->set(new PortalNodeConfigurationSetPayloads([
+            fn (array $config) => $this->configurationSet->set(new PortalNodeConfigurationSetPayloads([
                 new PortalNodeConfigurationSetPayload($portalNodeKey, $config),
             ]))
         );
@@ -106,7 +106,7 @@ final readonly class ConfigurationService implements ConfigurationServiceInterfa
 
         $criteria = new PortalNodeConfigurationGetCriteria(new PortalNodeKeyCollection([$portalNodeKey]));
 
-        foreach ($this->portalNodeConfigurationGet->get($criteria) as $configuration) {
+        foreach ($this->configurationGet->get($criteria) as $configuration) {
             return $configuration->getValue();
         }
 

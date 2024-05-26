@@ -18,9 +18,6 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Identity\IdentityMapActionInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveParameterList)
- */
 final readonly class ExplorationFlowExplorersFactory implements ExplorationFlowExplorersFactoryInterface
 {
     public function __construct(

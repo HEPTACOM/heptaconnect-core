@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
 
 final class ComposerPortalLoader implements PortalLoaderInterface
 {
-    private ?PackageConfigurationCollection $cachedPackageConfiguration = null;
+    private ?PackageConfigurationCollection $packageConfigCache = null;
 
     public function __construct(
         private readonly PackageConfigurationLoaderInterface $packageConfigLoader,
@@ -86,6 +86,6 @@ final class ComposerPortalLoader implements PortalLoaderInterface
 
     private function getPackageConfigurationsCached(): PackageConfigurationCollection
     {
-        return $this->cachedPackageConfiguration ??= $this->packageConfigLoader->getPackageConfigurations();
+        return $this->packageConfigCache ??= $this->packageConfigLoader->getPackageConfigurations();
     }
 }

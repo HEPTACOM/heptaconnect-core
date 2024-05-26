@@ -29,7 +29,7 @@ final readonly class ExploreService implements ExploreServiceInterface
         private ExplorerStackProcessorInterface $explorerStackProcessor,
         private ExplorationFlowExplorersFactoryInterface $explorationFlowExplorersFactory,
         private ExplorerStackBuilderFactoryInterface $explorerStackBuilderFactory,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private PortalStackServiceContainerFactory $portalStackContainerFactory,
         private LoggerInterface $logger,
         private JobDispatcherContract $jobDispatcher
     ) {
@@ -89,7 +89,7 @@ final readonly class ExploreService implements ExploreServiceInterface
 
     private function getExplorers(PortalNodeKeyInterface $portalNodeKey): ExplorerCollection
     {
-        $flowComponentRegistry = $this->portalStackServiceContainerFactory
+        $flowComponentRegistry = $this->portalStackContainerFactory
             ->create($portalNodeKey)
             ->getFlowComponentRegistry();
 

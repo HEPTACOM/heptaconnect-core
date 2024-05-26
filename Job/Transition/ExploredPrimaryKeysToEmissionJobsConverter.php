@@ -13,9 +13,6 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 use Psr\Log\LoggerInterface;
 
-/**
- * @SuppressWarnings(PHPMD.LongClassName)
- */
 final readonly class ExploredPrimaryKeysToEmissionJobsConverter implements ExploredPrimaryKeysToJobsConverterInterface
 {
     public function __construct(

@@ -21,7 +21,7 @@ final class ReceiveContextFactory implements ReceiveContextFactoryInterface
 
     public function __construct(
         private readonly ConfigurationServiceInterface $configurationService,
-        private readonly PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private readonly PortalStackServiceContainerFactory $portalStackContainerFactory,
         private readonly EntityStatusContract $entityStatus,
         iterable $postProcessors
     ) {
@@ -31,7 +31,7 @@ final class ReceiveContextFactory implements ReceiveContextFactoryInterface
     public function createContext(PortalNodeKeyInterface $portalNodeKey): ReceiveContextInterface
     {
         return new ReceiveContext(
-            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->portalStackContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey),
             $this->entityStatus,
             $this->postProcessors

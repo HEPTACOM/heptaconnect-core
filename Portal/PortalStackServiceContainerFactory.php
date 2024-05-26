@@ -19,7 +19,7 @@ class PortalStackServiceContainerFactory
 
     public function __construct(
         private readonly PortalRegistryInterface $portalRegistry,
-        private readonly PortalStackServiceContainerBuilderInterface $portalStackServiceContainerBuilder,
+        private readonly PortalStackServiceContainerBuilderInterface $portalStackContainerBuilder,
         private readonly StorageKeyGeneratorContract $storageKeyGenerator
     ) {
     }
@@ -33,7 +33,7 @@ class PortalStackServiceContainerFactory
             return $result;
         }
 
-        $container = $this->portalStackServiceContainerBuilder->build(
+        $container = $this->portalStackContainerBuilder->build(
             $this->portalRegistry->getPortal($portalNodeKey),
             $this->portalRegistry->getPortalExtensions($portalNodeKey),
             $portalNodeKey

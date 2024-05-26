@@ -14,14 +14,14 @@ final readonly class ExploreContextFactory implements ExploreContextFactoryInter
 {
     public function __construct(
         private ConfigurationServiceInterface $configurationService,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private PortalStackServiceContainerFactory $portalStackContainerFactory
     ) {
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): ExploreContextInterface
     {
         return new ExploreContext(
-            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->portalStackContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
         );
     }

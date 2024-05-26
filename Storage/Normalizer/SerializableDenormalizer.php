@@ -23,18 +23,18 @@ final class SerializableDenormalizer implements DenormalizerInterface
             throw new InvalidArgumentException();
         }
 
-        $unserialize_callback_func = false;
+        $unserializeCallback = false;
 
         try {
-            $unserialize_callback_func = \ini_get('unserialize_callback_func');
+            $unserializeCallback = \ini_get('unserialize_callback_func');
             \ini_set('unserialize_callback_func', self::class . '::handleUnserializeClass');
 
             $result = \unserialize($data);
         } catch (\Throwable) {
             return null;
         } finally {
-            if (\is_string($unserialize_callback_func)) {
-                \ini_set('unserialize_callback_func', $unserialize_callback_func);
+            if (\is_string($unserializeCallback)) {
+                \ini_set('unserialize_callback_func', $unserializeCallback);
             }
         }
 

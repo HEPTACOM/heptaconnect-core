@@ -14,14 +14,14 @@ final readonly class StatusReportingContextFactory implements StatusReportingCon
 {
     public function __construct(
         private ConfigurationServiceInterface $configurationService,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private PortalStackServiceContainerFactory $portalStackContainerFactory
     ) {
     }
 
     public function factory(PortalNodeKeyInterface $portalNodeKey): StatusReportingContextInterface
     {
         return new StatusReportingContext(
-            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->portalStackContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey)
         );
     }

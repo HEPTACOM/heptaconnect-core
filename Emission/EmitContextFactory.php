@@ -15,7 +15,7 @@ final readonly class EmitContextFactory implements EmitContextFactoryInterface
 {
     public function __construct(
         private ConfigurationServiceInterface $configurationService,
-        private PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        private PortalStackServiceContainerFactory $portalStackContainerFactory,
         private IdentityErrorCreateActionInterface $identityErrorCreateAction
     ) {
     }
@@ -23,7 +23,7 @@ final readonly class EmitContextFactory implements EmitContextFactoryInterface
     public function createContext(PortalNodeKeyInterface $portalNodeKey, bool $directEmission = false): EmitContextInterface
     {
         return new EmitContext(
-            $this->portalStackServiceContainerFactory->create($portalNodeKey),
+            $this->portalStackContainerFactory->create($portalNodeKey),
             $this->configurationService->getPortalNodeConfiguration($portalNodeKey),
             $this->identityErrorCreateAction,
             $directEmission

@@ -14,7 +14,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface
 final readonly class EmissionFlowEmittersFactory implements EmissionFlowEmittersFactoryInterface
 {
     public function __construct(
-        private EmittedEntitiesToJobsConverterInterface $emittedEntitiesToJobsConverter,
+        private EmittedEntitiesToJobsConverterInterface $emittedEntityToJobsConverter,
         private JobDispatcherContract $jobDispatcher,
         private int $jobBatchSize
     ) {
@@ -25,7 +25,7 @@ final readonly class EmissionFlowEmittersFactory implements EmissionFlowEmitters
         return new EmitterCollection([
             new ReceiveJobDispatchingEmitter(
                 $entityType,
-                $this->emittedEntitiesToJobsConverter,
+                $this->emittedEntityToJobsConverter,
                 $this->jobDispatcher,
                 $this->jobBatchSize
             ),

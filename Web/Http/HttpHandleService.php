@@ -27,9 +27,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveParameterList)
- */
 final class HttpHandleService implements HttpHandleServiceInterface
 {
     /**

@@ -31,7 +31,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
         private readonly FileRequestUrlProviderInterface $fileRequestUrlProvider,
         private readonly NormalizationRegistryContract $normalizationRegistry,
         private readonly RequestStorageContract $requestStorage,
-        private readonly PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        private readonly PortalStackServiceContainerFactory $portalStackContainerFactory
     ) {
         $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
     }
@@ -40,7 +40,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
     {
         if ($fileReference instanceof PublicUrlFileReference) {
             $portalNodeKey = $fileReference->getPortalNodeKey();
-            $httpClient = $this->portalStackServiceContainerFactory->create($portalNodeKey)->getWebHttpClient();
+            $httpClient = $this->portalStackContainerFactory->create($portalNodeKey)->getWebHttpClient();
 
             return new ResolvedPublicUrlFileReference(
                 $portalNodeKey,
@@ -50,7 +50,7 @@ final class FileReferenceResolver extends FileReferenceResolverContract
             );
         } elseif ($fileReference instanceof RequestFileReference) {
             $portalNodeKey = $fileReference->getPortalNodeKey();
-            $httpClient = $this->portalStackServiceContainerFactory->create($portalNodeKey)->getWebHttpClient();
+            $httpClient = $this->portalStackContainerFactory->create($portalNodeKey)->getWebHttpClient();
 
             return new ResolvedRequestFileReference(
                 $portalNodeKey,

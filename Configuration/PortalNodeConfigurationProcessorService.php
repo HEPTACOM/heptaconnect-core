@@ -8,27 +8,24 @@ use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationPro
 use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorServiceInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
 
-/**
- * @SuppressWarnings(PHPMD.LongClassName)
- */
 final class PortalNodeConfigurationProcessorService implements PortalNodeConfigurationProcessorServiceInterface
 {
     /**
      * @var PortalNodeConfigurationProcessorInterface[]
      */
-    private readonly array $configurationProcessors;
+    private readonly array $configProcessors;
 
     /**
-     * @param iterable<PortalNodeConfigurationProcessorInterface> $configurationProcessors
+     * @param iterable<PortalNodeConfigurationProcessorInterface> $configProcessors
      */
-    public function __construct(iterable $configurationProcessors)
+    public function __construct(iterable $configProcessors)
     {
-        $this->configurationProcessors = \iterable_to_array($configurationProcessors);
+        $this->configProcessors = \iterable_to_array($configProcessors);
     }
 
     public function applyRead(PortalNodeKeyInterface $portalNodeKey, \Closure $read): array
     {
-        foreach ($this->configurationProcessors as $configurationProcessor) {
+        foreach ($this->configProcessors as $configurationProcessor) {
             $readConfiguration = $read;
             $read = static fn (): array => $configurationProcessor->read($portalNodeKey, $readConfiguration);
         }
@@ -41,7 +38,7 @@ final class PortalNodeConfigurationProcessorService implements PortalNodeConfigu
         array $configuration,
         \Closure $write
     ): void {
-        foreach ($this->configurationProcessors as $configurationProcessor) {
+        foreach ($this->configProcessors as $configurationProcessor) {
             $writeConfiguration = $write;
             $write = static function (array $config) use ($configurationProcessor, $portalNodeKey, $writeConfiguration): void {
                 $configurationProcessor->write($portalNodeKey, $config, $writeConfiguration);
