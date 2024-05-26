@@ -8,8 +8,6 @@ use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\DenormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Http\Discovery\Psr17FactoryDiscovery;
-use League\Flysystem\FilesystemException;
-use League\Flysystem\FilesystemReader;
 use Psr\Http\Message\StreamFactoryInterface;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 
@@ -18,7 +16,7 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
-        private FilesystemReader $filesystem,
+        private string $streamDataDirectory,
         private StreamPathContract $streamPath
     ) {
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
@@ -44,10 +42,10 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
             throw new UnexpectedValueException('data is empty', 1634868819);
         }
 
-        try {
-            $resource = $this->filesystem->readStream($this->streamPath->buildPath($data));
-        } catch (FilesystemException $e) {
-            throw new UnexpectedValueException('File can not be read from', 1637101289, $e);
+        $resource = \fopen($this->getFullPath($data), 'rb');
+
+        if ($resource === false) {
+            throw new UnexpectedValueException('File can not be read from', 1637101289);
         }
 
         return new SerializableStream($this->streamFactory->createStreamFromResource($resource));
@@ -68,15 +66,16 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
             return false;
         }
 
-        try {
-            return $this->filesystem->fileExists($this->streamPath->buildPath($data));
-        } catch (FilesystemException) {
-            return false;
-        }
+        return \file_exists($this->getFullPath($data));
     }
 
     public function getSupportedTypes(?string $format): array
     {
         return [$this->getType() => true];
+    }
+
+    private function getFullPath(string $data): string
+    {
+        return $this->streamDataDirectory . '/' . ltrim($this->streamPath->buildPath($data), '/');
     }
 }

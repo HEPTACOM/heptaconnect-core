@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add constant `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::PORTAL_CONFIGURATION_PARAMETER_PREFIX`, that is preceding a portal node configuration binding aliases
 - Add exception code `1710936675` to `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder::build` when property `httpHandleService` is not set
 - Add `\Heptacom\HeptaConnect\Core\Bridge\Portal\PortalLoaderInterface` to allow for easier decoration of `\Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader`
+- Add exception code `1716752000` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer::normalize` when the stream cannot be copied to disk
 
 ### Changed
 

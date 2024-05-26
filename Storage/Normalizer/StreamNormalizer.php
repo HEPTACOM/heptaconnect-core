@@ -9,7 +9,6 @@ use Heptacom\HeptaConnect\Core\Storage\Contract\StreamPathContract;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\NormalizerInterface;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Contract\SerializableStream;
 use Heptacom\HeptaConnect\Portal\Base\Serialization\Exception\InvalidArgumentException;
-use League\Flysystem\FilesystemWriter;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Type\Hexadecimal;
 use Ramsey\Uuid\Uuid;
@@ -25,7 +24,7 @@ final readonly class StreamNormalizer implements NormalizerInterface
     public const NS_FILENAME = '048a23d3ac504a67a477da1d098090b0';
 
     public function __construct(
-        private FilesystemWriter $filesystem,
+        private string $streamDataDirectory,
         private StreamPathContract $streamPath,
         private LoggerInterface $logger
     ) {
@@ -78,9 +77,20 @@ final readonly class StreamNormalizer implements NormalizerInterface
             'code' => 1635462690,
         ]);
 
-        $this->filesystem->writeStream($path, $stream);
+        $fullPath = $this->streamDataDirectory . '/' . ltrim($path, '/');
+        $fullDir = \dirname($fullPath);
+
+        if (!\is_dir($fullDir)) {
+            \mkdir($fullDir, 0777, true);
+        }
+
+        $written = @\file_put_contents($fullPath, $stream);
 
         \fclose($stream);
+
+        if ($written === false) {
+            throw new InvalidArgumentException('File could not be written', 1716752000);
+        }
 
         return $filename;
     }
