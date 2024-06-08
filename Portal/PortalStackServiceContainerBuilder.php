@@ -65,11 +65,11 @@ use Psr\Http\Message\UploadedFileFactoryInterface;
 use Psr\Http\Message\UriFactoryInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\GlobFileLoader;
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -277,7 +277,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             (new Definition())
                 ->setClass(PortalConfiguration::class)
                 ->setArguments([
-                    new BoundArgument('%' . self::PORTAL_CONFIGURATION_PARAMETER_PREFIX . '%'),
+                    new Parameter(self::PORTAL_CONFIGURATION_PARAMETER_PREFIX),
                 ])
         );
 
