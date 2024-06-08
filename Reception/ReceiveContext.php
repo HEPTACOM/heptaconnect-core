@@ -11,8 +11,8 @@ use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Support\PostProcessorDataBag;
 use Heptacom\HeptaConnect\Portal\Base\Support\Contract\EntityStatusContract;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 final class ReceiveContext extends AbstractPortalNodeContext implements ReceiveContextInterface
