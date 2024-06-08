@@ -126,6 +126,14 @@ final class RewritePathStreamWrapper implements StreamWrapperInterface
     #[\Override]
     public function stream_read(int $count)
     {
+        if ($count < 0) {
+            return false;
+        }
+
+        if ($count === 0) {
+            return '';
+        }
+
         try {
             if (\is_resource($this->file)) {
                 return \fread($this->file, $count);

@@ -105,7 +105,7 @@ interface StreamWrapperInterface
     /**
      * Read from stream
      *
-     * @param int<0, max> $count
+     * @phpstan-assert int<1, max> $count
      *
      * @return string|false
      */
