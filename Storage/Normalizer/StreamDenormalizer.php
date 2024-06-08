@@ -58,7 +58,7 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
             return false;
         }
 
-        if ($data !== '') {
+        if ($data === '') {
             return false;
         }
 
