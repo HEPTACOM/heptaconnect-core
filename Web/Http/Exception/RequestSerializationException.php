@@ -8,12 +8,9 @@ use Psr\Http\Message\RequestInterface;
 
 class RequestSerializationException extends \RuntimeException
 {
-    private readonly RequestInterface $request;
-
-    public function __construct(RequestInterface $request, int $code, ?\Throwable $previous = null)
+    public function __construct(private readonly RequestInterface $request, int $code, ?\Throwable $previous = null)
     {
         parent::__construct('Serialization of request failed', $code, $previous);
-        $this->request = $request;
     }
 
     public function getRequest(): RequestInterface

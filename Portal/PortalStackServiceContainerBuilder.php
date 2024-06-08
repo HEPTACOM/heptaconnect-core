@@ -74,19 +74,19 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class PortalStackServiceContainerBuilder implements PortalStackServiceContainerBuilderInterface
 {
-    public const STATUS_REPORTER_SOURCE_TAG = 'heptaconnect.flow_component.status_reporter_source';
+    public const string STATUS_REPORTER_SOURCE_TAG = 'heptaconnect.flow_component.status_reporter_source';
 
-    public const EMITTER_SOURCE_TAG = 'heptaconnect.flow_component.emitter_source';
+    public const string EMITTER_SOURCE_TAG = 'heptaconnect.flow_component.emitter_source';
 
-    public const EXPLORER_SOURCE_TAG = 'heptaconnect.flow_component.explorer_source';
+    public const string EXPLORER_SOURCE_TAG = 'heptaconnect.flow_component.explorer_source';
 
-    public const RECEIVER_SOURCE_TAG = 'heptaconnect.flow_component.receiver_source';
+    public const string RECEIVER_SOURCE_TAG = 'heptaconnect.flow_component.receiver_source';
 
-    public const WEB_HTTP_HANDLER_SOURCE_TAG = 'heptaconnect.flow_component.web_http_handler_source';
+    public const string WEB_HTTP_HANDLER_SOURCE_TAG = 'heptaconnect.flow_component.web_http_handler_source';
 
-    public const SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
+    public const string SERVICE_FROM_A_PORTAL_TAG = 'heptaconnect.service_from_a_portal';
 
-    public const PORTAL_CONFIGURATION_PARAMETER_PREFIX = 'portal_config.';
+    public const string PORTAL_CONFIGURATION_PARAMETER_PREFIX = 'portal_config.';
 
     private ?DirectEmissionFlowContract $directEmissionFlow = null;
 

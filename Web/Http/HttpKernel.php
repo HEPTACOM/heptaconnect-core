@@ -13,20 +13,14 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\UploadedFileFactoryInterface;
 use Riverline\MultiPartParser\Converters\PSR7 as MultiPartParser;
 
-final class HttpKernel implements HttpKernelInterface
+final readonly class HttpKernel implements HttpKernelInterface
 {
-    private readonly StreamFactoryInterface $streamFactory;
-
-    private readonly UploadedFileFactoryInterface $uploadedFileFactory;
-
     public function __construct(
-        private readonly PortalNodeKeyInterface $portalNodeKey,
-        private readonly HttpHandleServiceInterface $httpHandleService,
-        StreamFactoryInterface $streamFactory,
-        UploadedFileFactoryInterface $uploadedFileFactory
+        private PortalNodeKeyInterface $portalNodeKey,
+        private HttpHandleServiceInterface $httpHandleService,
+        private StreamFactoryInterface $streamFactory,
+        private UploadedFileFactoryInterface $uploadedFileFactory
     ) {
-        $this->streamFactory = $streamFactory;
-        $this->uploadedFileFactory = $uploadedFileFactory;
     }
 
     #[\Override]
