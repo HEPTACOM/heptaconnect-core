@@ -94,6 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
 - Combine `portalNodeKey` and `path` parameter in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface::createHttpHandlerStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory::createHttpHandlerStackBuilder` using `\Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier`
 - Make class final: `\Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader`
+- Change return type of `\Heptacom\HeptaConnect\Core\Reception\ReceiveContext::getEventDispatcher` from `\Psr\EventDispatcher\EventDispatcherInterface` to `\Symfony\Component\EventDispatcher\EventDispatcherInterface` in order to allow registering listeners
 
 ### Deprecated
 
