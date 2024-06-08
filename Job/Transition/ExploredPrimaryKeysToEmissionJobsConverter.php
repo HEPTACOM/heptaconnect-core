@@ -8,9 +8,9 @@ use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Core\Job\Transition\Contract\ExploredPrimaryKeysToJobsConverterInterface;
 use Heptacom\HeptaConnect\Core\Job\Type\Emission;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
-use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentStruct;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 use Psr\Log\LoggerInterface;
 
 /**

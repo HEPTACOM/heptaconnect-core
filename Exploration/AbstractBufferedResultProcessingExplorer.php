@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Heptacom\HeptaConnect\Core\Exploration;
 
-use Heptacom\HeptaConnect\Dataset\Base\Contract\CollectionInterface;
 use Heptacom\HeptaConnect\Dataset\Base\Contract\DatasetEntityContract;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExploreContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerContract;
 use Heptacom\HeptaConnect\Portal\Base\Exploration\Contract\ExplorerStackInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Contract\CollectionInterface;
 
 /**
  * Base class for explorers that capture results from a stack and process its result in batch size amount of items.

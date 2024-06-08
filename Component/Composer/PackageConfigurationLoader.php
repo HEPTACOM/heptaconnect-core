@@ -11,7 +11,7 @@ use Composer\IO\NullIO;
 use Composer\Package\CompletePackageInterface;
 use Composer\Package\Locker;
 use Composer\Package\RootPackageInterface;
-use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
+use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 

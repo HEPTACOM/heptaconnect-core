@@ -6,8 +6,8 @@ namespace Heptacom\HeptaConnect\Core\Job\Transition\Contract;
 
 use Heptacom\HeptaConnect\Core\Job\JobCollection;
 use Heptacom\HeptaConnect\Dataset\Base\EntityType;
-use Heptacom\HeptaConnect\Dataset\Base\ScalarCollection\StringCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
+use Heptacom\HeptaConnect\Utility\Collection\Scalar\StringCollection;
 
 interface ExploredPrimaryKeysToJobsConverterInterface
 {
