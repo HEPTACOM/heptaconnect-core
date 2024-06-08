@@ -81,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestSerializerInterface` and `\Heptacom\HeptaConnect\Core\Web\Http\Contract\RequestDeserializerInterface` in `\Heptacom\HeptaConnect\Core\Storage\RequestStorage` instead of `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestNormalizer` and `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer` to allow for implementation change
 - Add exception code `1647801830` in return callable from `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\PortalNodeConfigurationHelper::json` when the JSON file can not be read from the filesystem
 - Add exception code `1637432096` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\SerializableCompressNormalizer::normalize` when original normalized value is not a string
+- Add exception code `1717858650` to `\Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionFileLoader::loadInstructions` when the referenced file can not be read from the filesystem
 - Make classes final: `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration` and `\Heptacom\HeptaConnect\Core\Flow\MessageQueueFlow\MessageHandler`
 - Implement `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PortalNodeContextInterface::getLogger` in `\Heptacom\HeptaConnect\Core\Portal\AbstractPortalNodeContext::getLogger` by looking up the service in the container
 - Implement `\Heptacom\HeptaConnect\Dataset\Base\Contract\AttachmentAwareInterface` in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfiguration`
@@ -95,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Make `\Heptacom\HeptaConnect\Portal\Base\Portal\Contract\PackageContract::__construct` final as packages are stateless
 - Combine `portalNodeKey` and `path` parameter in `\Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerStackBuilderFactoryInterface::createHttpHandlerStackBuilder` and `\Heptacom\HeptaConnect\Core\Web\Http\HttpHandlerStackBuilderFactory::createHttpHandlerStackBuilder` using `\Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier`
 - Make class final: `\Heptacom\HeptaConnect\Core\Portal\ComposerPortalLoader`
+- Change parameter of type `\League\Flysystem\FilesystemInterface` in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamNormalizer::__construct` and `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::__construct` to string representing a directory
 
 ### Deprecated
 
@@ -110,6 +112,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove composer dependency `league/flysystem`
 
 ### Fixed
+
+- Fix data detection in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::supportsDenormalization` to represent denormalization support of non-empty data as supported
 
 ### Security
 
