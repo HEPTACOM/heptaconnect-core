@@ -23,7 +23,7 @@
         "rss": "https://heptaconnect.io/news/rss2.xml"
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.3",
         "ext-hash": "*",
         "ext-json": "*",
         "ext-zlib": "*",
