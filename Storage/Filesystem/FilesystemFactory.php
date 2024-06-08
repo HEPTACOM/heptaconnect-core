@@ -15,7 +15,8 @@ class FilesystemFactory
 {
     public function __construct(
         private StorageKeyGeneratorContract $storageKeyGenerator,
-        private FilesystemInterface $filesystem
+        // TODO: remove flysystem
+        // private FilesystemInterface $filesystem
     ) {
     }
 
@@ -25,6 +26,6 @@ class FilesystemFactory
         /** @var string $portalNodeId */
         $portalNodeId = \preg_replace('/[^a-zA-Z0-9]/', '_', $portalNodeId);
 
-        return new PrefixFilesystem($this->filesystem, $portalNodeId);
+        return new PrefixFilesystem(/* $this->filesystem, */$portalNodeId);
     }
 }

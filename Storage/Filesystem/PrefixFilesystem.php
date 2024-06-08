@@ -10,13 +10,16 @@ use League\Flysystem\Plugin\PluggableTrait;
 
 class PrefixFilesystem extends AbstractFilesystem
 {
-    use PluggableTrait;
+    // TODO: remove flysystem
+    // use PluggableTrait;
 
     private string $prefix;
 
-    public function __construct(FilesystemInterface $filesystem, string $prefix)
+    // TODO: remove flysystem
+    public function __construct(/* FilesystemInterface $filesystem, */string $prefix)
     {
-        parent::__construct($filesystem);
+        // TODO: remove flysystem
+        parent::__construct(/* $filesystem */);
 
         if ($prefix === '') {
             throw new \InvalidArgumentException('The prefix must not be empty.');

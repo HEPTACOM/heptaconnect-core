@@ -17,7 +17,8 @@ final class StreamDenormalizer implements DenormalizerInterface
     private StreamFactoryInterface $streamFactory;
 
     public function __construct(
-        private FilesystemInterface $filesystem,
+        // TODO: remove flysystem
+        // private FilesystemInterface $filesystem,
         private StreamPathContract $streamPath
     ) {
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();

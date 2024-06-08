@@ -13,11 +13,14 @@ use League\Flysystem\PluginInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-abstract class AbstractFilesystem implements FilesystemInterface
+abstract class AbstractFilesystem // implements FilesystemInterface
 {
     public function __construct(
-        protected FilesystemInterface $filesystem
+        // TODO: remove flysystem
+        // protected FilesystemInterface $filesystem
     ) {
+        return;
+
         if (!\method_exists($this->filesystem, 'getConfig')) {
             throw new \UnexpectedValueException('Filesystem does not expose config');
         }
