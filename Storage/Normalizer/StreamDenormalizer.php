@@ -76,6 +76,6 @@ final readonly class StreamDenormalizer implements DenormalizerInterface
 
     private function getFullPath(string $data): string
     {
-        return $this->streamDataDirectory . '/' . ltrim($this->streamPath->buildPath($data), '/');
+        return $this->streamDataDirectory . \DIRECTORY_SEPARATOR . ltrim($this->streamPath->buildPath($data), '/');
     }
 }

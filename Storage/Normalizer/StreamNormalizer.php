@@ -77,7 +77,7 @@ final readonly class StreamNormalizer implements NormalizerInterface
             'code' => 1635462690,
         ]);
 
-        $fullPath = $this->streamDataDirectory . '/' . ltrim($path, '/');
+        $fullPath = $this->streamDataDirectory . \DIRECTORY_SEPARATOR . ltrim($path, '/');
         $fullDir = \dirname($fullPath);
 
         if (!\is_dir($fullDir)) {
