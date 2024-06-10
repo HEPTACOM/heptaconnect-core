@@ -115,6 +115,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fix data detection in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::supportsDenormalization` to represent denormalization support of non-empty data as supported
+- Ensure, that all forbidden characters are removed from cache keys in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader::getPackageConfigurations`
 
 ### Security
 

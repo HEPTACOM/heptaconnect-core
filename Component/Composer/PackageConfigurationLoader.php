@@ -17,6 +17,11 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class PackageConfigurationLoader implements Contract\PackageConfigurationLoaderInterface
 {
+    /**
+     * @see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS
+     */
+    private const string SYMFONY_RESERVED_CHARACTERS = '{}()/\@:';
+
     public function __construct(
         private ?string $composerJson,
         private readonly CacheItemPoolInterface $cache
@@ -29,7 +34,7 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $cacheKey = $this->getCacheKey();
 
         if (\is_string($cacheKey)) {
-            $cacheItem = $this->cache->getItem(\str_replace('\\', '-', self::class) . '-' . $cacheKey);
+            $cacheItem = $this->cache->getItem(\str_replace(self::SYMFONY_RESERVED_CHARACTERS, '-', self::class) . '-' . $cacheKey);
 
             if ($cacheItem->isHit()) {
                 $result = $cacheItem->get();
