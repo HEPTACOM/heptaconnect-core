@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration;
 
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface;
-use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract;
 
 final readonly class InstructionFileLoader implements InstructionLoaderInterface
 {
@@ -14,11 +13,8 @@ final readonly class InstructionFileLoader implements InstructionLoaderInterface
     ) {
     }
 
-    /**
-     * @return InstructionTokenContract[]
-     */
     #[\Override]
-    public function loadInstructions(): array
+    public function loadInstructions(): InstructionTokenCollection
     {
         try {
             $config = new Config();

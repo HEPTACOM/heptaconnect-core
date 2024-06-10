@@ -6,7 +6,7 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\ClosureInstructionToken;
 use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionLoaderInterface;
-use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\Contract\InstructionTokenContract;
+use Heptacom\HeptaConnect\Core\Bridge\PortalNode\Configuration\InstructionTokenCollection;
 use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PackageQueryMatcherInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
@@ -17,10 +17,7 @@ use Psr\Log\LoggerInterface;
 
 final class PortalNodeConfigurationInstructionProcessor implements PortalNodeConfigurationProcessorInterface
 {
-    /**
-     * @var InstructionTokenContract[]|null
-     */
-    private ?array $instructions = null;
+    private ?InstructionTokenCollection $instructions = null;
 
     /**
      * @var InstructionLoaderInterface[]
@@ -62,12 +59,9 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
         $write($payload);
     }
 
-    /**
-     * @return InstructionTokenContract[]
-     */
-    private function filterInstructions(PortalNodeKeyInterface $portalNodeKey): array
+    private function filterInstructions(PortalNodeKeyInterface $portalNodeKey): InstructionTokenCollection
     {
-        $result = [];
+        $result = new InstructionTokenCollection();
         $portalExtensions = null;
 
         foreach ($this->getInstructions() as $instruction) {
@@ -77,7 +71,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
             ]));
 
             if ($matchedKeys->count() > 0) {
-                $result[] = $instruction;
+                $result->push([$instruction]);
 
                 continue;
             }
@@ -88,7 +82,7 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
             ]));
 
             if ($matchedPortals->count() > 0) {
-                $result[] = $instruction;
+                $result->push([$instruction]);
 
                 continue;
             }
@@ -96,31 +90,25 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
             $matchedExtensions = $this->packageQueryMatcher->matchPortalExtensions($query, $portalExtensions);
 
             if ($matchedExtensions->count() > 0) {
-                $result[] = $instruction;
+                $result->push([$instruction]);
             }
         }
 
         return $result;
     }
 
-    /**
-     * @return InstructionTokenContract[]
-     */
-    private function getInstructions(): array
+    private function getInstructions(): InstructionTokenCollection
     {
         return $this->instructions ??= $this->loadInstructions();
     }
 
-    /**
-     * @return InstructionTokenContract[]
-     */
-    private function loadInstructions(): array
+    private function loadInstructions(): InstructionTokenCollection
     {
-        $result = [];
+        $result = new InstructionTokenCollection();
 
         foreach ($this->instructionLoaders as $instructionLoader) {
             try {
-                $result[] = $instructionLoader->loadInstructions();
+                $result->push($instructionLoader->loadInstructions());
             } catch (\Throwable $throwable) {
                 $this->logger->critical('Failed loading instructions', [
                     'class' => $instructionLoader::class,
@@ -130,6 +118,6 @@ final class PortalNodeConfigurationInstructionProcessor implements PortalNodeCon
             }
         }
 
-        return \array_merge([], ...$result);
+        return $result;
     }
 }

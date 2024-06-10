@@ -132,15 +132,13 @@ class Config
 
     /**
      * Returns all configuration instructions and clears the buffer.
-     *
-     * @return InstructionTokenContract[]
      */
-    public function buildInstructions(): array
+    public function buildInstructions(): InstructionTokenCollection
     {
         $result = self::$instructions;
         self::$instructions = [];
 
-        return $result;
+        return new InstructionTokenCollection($result);
     }
 
     private static function unsetArrayByKeys(array &$array, array $unsetInstructions): void
