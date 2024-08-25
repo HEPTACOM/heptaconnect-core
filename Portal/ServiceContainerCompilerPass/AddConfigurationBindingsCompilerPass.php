@@ -40,7 +40,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
                 continue;
             }
 
-            if (!\class_exists($class)) {
+            if (!\class_exists($class) && !\interface_exists($class)) {
                 continue;
             }
 
@@ -119,7 +119,7 @@ final class AddConfigurationBindingsCompilerPass implements CompilerPassInterfac
     private function isParameterScalarish(\ReflectionParameter $parameter): bool
     {
         foreach ($this->getParameterTypes($parameter->getType()) as $type) {
-            if (\class_exists($type)) {
+            if (\class_exists($type) || \interface_exists($type)) {
                 return false;
             }
 

@@ -25,7 +25,7 @@ final class AddHttpMiddlewareClientCompilerPass implements CompilerPassInterface
         foreach ($definitions as $id => $definition) {
             $class = $definition->getClass() ?? $id;
 
-            if (!\class_exists($class) || !\is_a($class, HttpClientMiddlewareInterface::class, true)) {
+            if (!(\class_exists($class) || \interface_exists($class)) || !\is_a($class, HttpClientMiddlewareInterface::class, true)) {
                 continue;
             }
 

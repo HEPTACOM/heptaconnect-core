@@ -45,7 +45,7 @@ final readonly class RemoveAutoPrototypedDefinitionsCompilerPass implements Comp
 
     private function isPrototypable(string $class): bool
     {
-        if (!\class_exists($class)) {
+        if (!\class_exists($class) && !\interface_exists($class)) {
             return false;
         }
 

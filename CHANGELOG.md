@@ -117,6 +117,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fix data detection in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer::supportsDenormalization` to represent denormalization support of non-empty data as supported
 - Ensure, that all forbidden characters are removed from cache keys in `\Heptacom\HeptaConnect\Core\Component\Composer\PackageConfigurationLoader::getPackageConfigurations`
+- Ensure, that `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareCollectorCompilerPass` also collects `\Psr\Http\Server\MiddlewareInterface` services, that do not use an FQCN as service id and just use the `\Psr\Http\Server\MiddlewareInterface` as service class
+- Ensure, that `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddHttpMiddlewareClientCompilerPass` also collect `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` services, that do not use an FQCN as service id and just use the `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\HttpClientMiddlewareInterface` as service class
+- Ensure, that `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\AddConfigurationBindingsCompilerPass` also binds configuration to method calls on services, that do not use an FQCN as service id and just use an interface as service class
+- Ensure, that `\Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPrototypedDefinitionsCompilerPass` also checks for interfaces, when detecting prototypeable services, that do not use an FQCN as service id and just use an interface as service class
 
 ### Security
 
