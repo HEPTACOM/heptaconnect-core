@@ -15,7 +15,7 @@ class ExceptionCodeLogger extends AbstractLogger
     }
 
     #[\Override]
-    public function log($level, $message, array $context = []): void
+    public function log($level, \Stringable|string $message, array $context = []): void
     {
         $codeMessage = '';
         foreach ($context as $throwable) {
