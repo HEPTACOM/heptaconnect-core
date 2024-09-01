@@ -11,7 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 final class AddConfigurationBindingsCompilerPass implements CompilerPassInterface
 {
-    public const CONFIG_KEY_SEPARATORS = '_.-';
+    public const string CONFIG_KEY_SEPARATORS = '_.-';
 
     #[\Override]
     public function process(ContainerBuilder $container): void

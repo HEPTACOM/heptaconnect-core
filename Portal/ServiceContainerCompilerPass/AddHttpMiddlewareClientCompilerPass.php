@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 final class AddHttpMiddlewareClientCompilerPass implements CompilerPassInterface
 {
-    public const SERVICE_TAG = 'heptaconnect.http.client.middleware';
+    public const string SERVICE_TAG = 'heptaconnect.http.client.middleware';
 
     #[\Override]
     public function process(ContainerBuilder $container): void
