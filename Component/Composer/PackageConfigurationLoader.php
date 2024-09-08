@@ -34,7 +34,9 @@ final class PackageConfigurationLoader implements Contract\PackageConfigurationL
         $cacheKey = $this->getCacheKey();
 
         if (\is_string($cacheKey)) {
-            $cacheItem = $this->cache->getItem(\str_replace(\str_split(self::SYMFONY_RESERVED_CHARACTERS), '-', self::class) . '-' . $cacheKey);
+            $cacheKey = self::class . '-' . $cacheKey;
+            $cacheKey = \str_replace(\str_split(self::SYMFONY_RESERVED_CHARACTERS), '-', $cacheKey);
+            $cacheItem = $this->cache->getItem($cacheKey);
 
             if ($cacheItem->isHit()) {
                 $result = $cacheItem->get();
