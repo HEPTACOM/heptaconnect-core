@@ -6,14 +6,14 @@ namespace Heptacom\HeptaConnect\Core\Configuration;
 
 use Heptacom\HeptaConnect\Core\Configuration\Contract\PortalNodeConfigurationProcessorInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Psr\Cache\CacheItemPoolInterface;
 
 final readonly class PortalNodeConfigurationCacheProcessor implements PortalNodeConfigurationProcessorInterface
 {
     public function __construct(
         private CacheItemPoolInterface $cache,
-        private StorageKeyGeneratorContract $storageKeyGenerator
+        private StorageKeySerializerContract $storageKeyGenerator
     ) {
     }
 

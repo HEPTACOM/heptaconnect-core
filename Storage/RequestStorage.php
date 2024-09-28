@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Storage\Base\Action\FileReference\RequestPersist\FileR
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\FileReference\FileReferenceGetRequestActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\FileReference\FileReferencePersistRequestActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\FileReferenceRequestKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\FileReferenceRequestKeyCollection;
 use Psr\Http\Message\RequestInterface;
 
@@ -26,7 +26,7 @@ final class RequestStorage extends RequestStorageContract
         private readonly RequestDeserializerInterface $deserializer,
         private readonly FileReferenceGetRequestActionInterface $getRequestAction,
         private readonly FileReferencePersistRequestActionInterface $persistRequestAction,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator
+        private readonly StorageKeySerializerContract $storageKeyGenerator
     ) {
     }
 

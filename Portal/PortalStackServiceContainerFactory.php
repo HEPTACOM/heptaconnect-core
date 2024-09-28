@@ -8,7 +8,7 @@ use Heptacom\HeptaConnect\Core\Portal\Contract\PortalNodeContainerFacadeContract
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalRegistryInterface;
 use Heptacom\HeptaConnect\Core\Portal\Contract\PortalStackServiceContainerBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 
 class PortalStackServiceContainerFactory
 {
@@ -20,7 +20,7 @@ class PortalStackServiceContainerFactory
     public function __construct(
         private readonly PortalRegistryInterface $portalRegistry,
         private readonly PortalStackServiceContainerBuilderInterface $portalStackContainerBuilder,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator
+        private readonly StorageKeySerializerContract $storageKeyGenerator
     ) {
     }
 

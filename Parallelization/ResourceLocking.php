@@ -8,14 +8,14 @@ use Heptacom\HeptaConnect\Core\Parallelization\Contract\ResourceLockStorageContr
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Contract\ResourceLockingContract;
 use Heptacom\HeptaConnect\Portal\Base\Parallelization\Exception\ResourceIsLockedException;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\StorageKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 
 final class ResourceLocking extends ResourceLockingContract
 {
     public function __construct(
         private readonly ResourceLockStorageContract $resourceLockStorage,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator
+        private readonly StorageKeySerializerContract $storageKeyGenerator
     ) {
     }
 

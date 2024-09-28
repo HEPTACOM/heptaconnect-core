@@ -16,7 +16,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFailActionInterfac
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Psr\Log\LoggerInterface;
 
@@ -24,7 +24,7 @@ final readonly class ExplorationHandler implements ExplorationHandlerInterface
 {
     public function __construct(
         private ExploreServiceInterface $exploreService,
-        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private StorageKeySerializerContract $storageKeyGenerator,
         private JobStartActionInterface $jobStartAction,
         private JobFinishActionInterface $jobFinishAction,
         private JobFailActionInterface $jobFailAction,

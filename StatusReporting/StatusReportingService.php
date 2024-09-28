@@ -13,7 +13,7 @@ use Heptacom\HeptaConnect\Portal\Base\StatusReporting\Contract\StatusReportingCo
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterCollection;
 use Heptacom\HeptaConnect\Portal\Base\StatusReporting\StatusReporterStack;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Psr\Log\LoggerInterface;
 
 final class StatusReportingService implements StatusReportingServiceInterface
@@ -25,7 +25,7 @@ final class StatusReportingService implements StatusReportingServiceInterface
 
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
         private readonly StatusReportingContextFactoryInterface $statusReportingContextFactory
     ) {

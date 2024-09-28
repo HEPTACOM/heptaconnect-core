@@ -53,7 +53,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageFormatterCont
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartFormDataBuilderInterface;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use Psr\Http\Client\ClientInterface;
@@ -105,7 +105,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         private readonly PortalStorageFactory $portalStorageFactory,
         private readonly ResourceLockingContract $resourceLocking,
         private readonly ProfilerFactoryContract $profilerFactory,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly ConfigurationServiceInterface $configurationService,
         private readonly PublisherInterface $publisher,
         private readonly HttpHandlerUrlProviderFactoryInterface $httpHandlerUrlProviderFactory,

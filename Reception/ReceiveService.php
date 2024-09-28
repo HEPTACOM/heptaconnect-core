@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Dataset\Base\TypedDatasetEntityCollection;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiveContextInterface;
 use Heptacom\HeptaConnect\Portal\Base\Reception\Contract\ReceiverStackInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
@@ -34,7 +34,7 @@ final class ReceiveService implements ReceiveServiceInterface
     public function __construct(
         private readonly ReceiveContextFactoryInterface $receiveContextFactory,
         private readonly LoggerInterface $logger,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly ReceiverStackBuilderFactoryInterface $receiverStackBuilderFactory,
         private readonly ReceiverStackProcessorInterface $receiverStackProcessor,
         private readonly ReceptionFlowReceiversFactoryInterface $receptionFlowReceiversFactory

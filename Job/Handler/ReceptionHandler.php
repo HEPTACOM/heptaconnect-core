@@ -31,7 +31,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobFinishActionInterf
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Job\JobStartActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\RouteKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\Enum\RouteCapability;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
@@ -43,7 +43,7 @@ final readonly class ReceptionHandler implements ReceptionHandlerInterface
 {
     public function __construct(
         private LockFactory $lockFactory,
-        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private StorageKeySerializerContract $storageKeyGenerator,
         private ReceiveServiceInterface $receiveService,
         private DeepObjectIteratorContract $objectIterator,
         private RouteGetActionInterface $routeGetAction,

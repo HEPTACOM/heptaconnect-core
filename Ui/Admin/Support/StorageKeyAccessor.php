@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetA
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\Route\RouteGetActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\JobKeyInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\RouteKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Heptacom\HeptaConnect\Storage\Base\JobKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\RouteKeyCollection;
@@ -27,7 +27,7 @@ use Heptacom\HeptaConnect\Ui\Admin\Base\Contract\Support\StorageKeyAccessorInter
 final readonly class StorageKeyAccessor implements StorageKeyAccessorInterface
 {
     public function __construct(
-        private StorageKeyGeneratorContract $storageKeyGenerator,
+        private StorageKeySerializerContract $storageKeyGenerator,
         private PortalNodeGetActionInterface $portalNodeGetAction,
         private RouteGetActionInterface $routeGetAction,
         private JobGetActionInterface $jobGetAction

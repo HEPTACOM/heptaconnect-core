@@ -19,7 +19,7 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerStackIdentifier;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\ServerRequestCycle;
 use Heptacom\HeptaConnect\Storage\Base\Action\WebHttpHandlerConfiguration\Find\WebHttpHandlerConfigurationFindCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\WebHttpHandlerConfiguration\WebHttpHandlerConfigurationFindActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -44,7 +44,7 @@ final class HttpHandleService implements HttpHandleServiceInterface
         private readonly HttpHandleContextFactoryInterface $contextFactory,
         private readonly LoggerInterface $logger,
         private readonly HttpHandlerStackBuilderFactoryInterface $stackBuilderFactory,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly ResponseFactoryInterface $responseFactory,
         private readonly WebHttpHandlerConfigurationFindActionInterface $httpHandlerConfigurationFindAction,
         private readonly HttpHandleFlowHttpHandlersFactoryInterface $httpHandleFlowHttpHandlersFactory,

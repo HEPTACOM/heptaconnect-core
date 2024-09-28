@@ -15,7 +15,7 @@ use Heptacom\HeptaConnect\Portal\Base\StorageKey\PortalNodeKeyCollection;
 use Heptacom\HeptaConnect\Storage\Base\Action\PortalNode\Get\PortalNodeGetCriteria;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalExtension\PortalExtensionFindActionInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\Action\PortalNode\PortalNodeGetActionInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\PreviewPortalNodeKey;
 
 final class PortalRegistry implements PortalRegistryInterface
@@ -36,7 +36,7 @@ final class PortalRegistry implements PortalRegistryInterface
     public function __construct(
         private readonly PortalFactoryContract $portalFactory,
         private readonly PortalLoaderInterface $portalLoader,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly PortalNodeGetActionInterface $portalNodeGetAction,
         private readonly PortalExtensionFindActionInterface $portalExtensionFindAction
     ) {

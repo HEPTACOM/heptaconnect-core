@@ -17,7 +17,7 @@ use Heptacom\HeptaConnect\Portal\Base\Mapping\Contract\MappingComponentStructCon
 use Heptacom\HeptaConnect\Portal\Base\Mapping\MappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\Mapping\TypedMappingComponentCollection;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Heptacom\HeptaConnect\Storage\Base\Exception\UnsupportedStorageKeyException;
 use Psr\Log\LoggerInterface;
 
@@ -36,7 +36,7 @@ final class EmitService implements EmitServiceInterface
     public function __construct(
         private readonly EmitContextFactoryInterface $emitContextFactory,
         private readonly LoggerInterface $logger,
-        private readonly StorageKeyGeneratorContract $storageKeyGenerator,
+        private readonly StorageKeySerializerContract $storageKeyGenerator,
         private readonly EmitterStackBuilderFactoryInterface $emitterStackBuilderFactory,
         private readonly EmissionFlowEmittersFactoryInterface $emissionFlowEmittersFactory,
         private readonly EmitterStackProcessorInterface $stackProcessor

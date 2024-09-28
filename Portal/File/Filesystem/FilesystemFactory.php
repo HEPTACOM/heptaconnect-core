@@ -10,7 +10,7 @@ use Heptacom\HeptaConnect\Core\File\Filesystem\StreamUriSchemePathConverter;
 use Heptacom\HeptaConnect\Core\Portal\File\Filesystem\Contract\FilesystemFactoryInterface;
 use Heptacom\HeptaConnect\Portal\Base\File\Filesystem\Contract\FilesystemInterface;
 use Heptacom\HeptaConnect\Portal\Base\StorageKey\Contract\PortalNodeKeyInterface;
-use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
+use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeySerializerContract;
 use Psr\Http\Message\UriFactoryInterface;
 
 final readonly class FilesystemFactory implements FilesystemFactoryInterface
@@ -18,7 +18,7 @@ final readonly class FilesystemFactory implements FilesystemFactoryInterface
     public function __construct(
         private PortalNodeFilesystemStreamProtocolProviderInterface $streamProtocolProvider,
         private UriFactoryInterface $uriFactory,
-        private StorageKeyGeneratorContract $storageKeyGenerator
+        private StorageKeySerializerContract $storageKeyGenerator
     ) {
     }
 
