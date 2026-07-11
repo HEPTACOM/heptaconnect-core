@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `\Heptacom\HeptaConnect\Core\Support\Psr17FactoryRegistry` to provide PSR-17 factories for portal container
+
 ### Changed
 
 - Expand constraint for composer dependency `psr/cache: ^1.0 || ^2.0 || ^3.0`
@@ -19,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Expand constraint for composer dependency `symfony/lock: ^4.0 || ^5.0 || ^6.0`
 - Expand constraint for composer dependency `symfony/messenger: ^4.0 || ^5.0 || ^6.0`
 - Expand constraint for composer dependency `symfony/yaml: ^4.4 || ^5.0 || ^6.0`
+- Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\File\FileReferenceResolver`
+- Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`
+- Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer`
+- Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer`
 
 ### Deprecated
 

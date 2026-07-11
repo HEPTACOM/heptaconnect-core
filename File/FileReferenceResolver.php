@@ -42,9 +42,10 @@ final class FileReferenceResolver extends FileReferenceResolverContract
         FileRequestUrlProviderInterface $fileRequestUrlProvider,
         NormalizationRegistryContract $normalizationRegistry,
         RequestStorageContract $requestStorage,
-        PortalStackServiceContainerFactory $portalStackServiceContainerFactory
+        PortalStackServiceContainerFactory $portalStackServiceContainerFactory,
+        ?RequestFactoryInterface $requestFactory = null
     ) {
-        $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
         $this->fileContentsUrlProvider = $fileContentsUrlProvider;
         $this->fileRequestUrlProvider = $fileRequestUrlProvider;
         $this->normalizationRegistry = $normalizationRegistry;
