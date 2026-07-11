@@ -20,11 +20,14 @@ final class StreamDenormalizer implements DenormalizerInterface
 
     private StreamPathContract $streamPath;
 
-    public function __construct(FilesystemInterface $filesystem, StreamPathContract $streamPath)
-    {
+    public function __construct(
+        FilesystemInterface $filesystem,
+        StreamPathContract $streamPath,
+        ?StreamFactoryInterface $streamFactory = null
+    ) {
         $this->filesystem = $filesystem;
         $this->streamPath = $streamPath;
-        $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
+        $this->streamFactory = $streamFactory ?? Psr17FactoryDiscovery::findStreamFactory();
     }
 
     /**

@@ -16,10 +16,12 @@ final class Psr7RequestDenormalizer implements DenormalizerInterface
 
     private StreamFactoryInterface $streamFactory;
 
-    public function __construct()
-    {
-        $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
-        $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
+    public function __construct(
+        ?RequestFactoryInterface $requestFactory = null,
+        ?StreamFactoryInterface $streamFactory = null
+    ) {
+        $this->requestFactory = $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory();
+        $this->streamFactory = $streamFactory ?? Psr17FactoryDiscovery::findStreamFactory();
     }
 
     public function getType(): string
