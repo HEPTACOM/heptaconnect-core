@@ -19,6 +19,7 @@ use Heptacom\HeptaConnect\Core\Portal\ServiceContainerCompilerPass\RemoveAutoPro
 use Heptacom\HeptaConnect\Core\Storage\Contract\RequestStorageContract;
 use Heptacom\HeptaConnect\Core\Storage\Filesystem\FilesystemFactory;
 use Heptacom\HeptaConnect\Core\Support\Psr17FactoryRegistry;
+use Heptacom\HeptaConnect\Core\Support\Psr18ClientRegistry;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandlerUrlProviderFactoryInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\Contract\HttpHandleServiceInterface;
 use Heptacom\HeptaConnect\Core\Web\Http\HttpClient;
@@ -56,7 +57,6 @@ use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageMultiPartForm
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract;
 use Heptacom\HeptaConnect\Portal\Base\Web\Http\HttpHandlerUrlProviderInterface;
 use Heptacom\HeptaConnect\Storage\Base\Contract\StorageKeyGeneratorContract;
-use Http\Discovery\Psr18ClientDiscovery;
 use League\Flysystem\FilesystemInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -121,6 +121,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
     private Psr17FactoryRegistry $psr17FactoryRegistry;
 
+    private Psr18ClientRegistry $psr18ClientRegistry;
+
     private ?FileReferenceResolverContract $fileReferenceResolver = null;
 
     private ?HttpHandleServiceInterface $httpHandleService = null;
@@ -146,7 +148,8 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         Psr7MessageCurlShellFormatterContract $psr7MessageCurlShellFormatter,
         Psr7MessageRawHttpFormatterContract $psr7MessageRawHttpFormatter,
         Psr7MessageMultiPartFormDataBuilderInterface $psr7MessageMultiPartFormDataBuilder,
-        ?Psr17FactoryRegistry $psr17FactoryRegistry = null
+        ?Psr17FactoryRegistry $psr17FactoryRegistry = null,
+        ?Psr18ClientRegistry $psr18ClientRegistry = null
     ) {
         $this->logger = $logger;
         $this->normalizationRegistry = $normalizationRegistry;
@@ -164,6 +167,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
         $this->psr7MessageRawHttpFormatter = $psr7MessageRawHttpFormatter;
         $this->psr7MessageMultiPartFormDataBuilder = $psr7MessageMultiPartFormDataBuilder;
         $this->psr17FactoryRegistry = $psr17FactoryRegistry ?? new Psr17FactoryRegistry();
+        $this->psr18ClientRegistry = $psr18ClientRegistry ?? new Psr18ClientRegistry();
     }
 
     /**
@@ -277,6 +281,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
             Psr7MessageRawHttpFormatterContract::class => $this->psr7MessageRawHttpFormatter,
             Psr7MessageMultiPartFormDataBuilderInterface::class => $this->psr7MessageMultiPartFormDataBuilder,
             Psr17FactoryRegistry::class => $this->psr17FactoryRegistry,
+            Psr18ClientRegistry::class => $this->psr18ClientRegistry,
             HttpKernelInterface::class => new HttpKernel(
                 $portalNodeKey,
                 $this->httpHandleService,
@@ -295,7 +300,7 @@ final class PortalStackServiceContainerBuilder implements PortalStackServiceCont
 
         $containerBuilder->setDefinition(DeepCloneContract::class, new Definition());
         $containerBuilder->setDefinition(DeepObjectIteratorContract::class, new Definition());
-        $containerBuilder->setDefinition(ClientInterface::class, (new Definition())->setFactory([Psr18ClientDiscovery::class, 'find']));
+        $containerBuilder->setDefinition(ClientInterface::class, (new Definition())->setFactory([new Reference(Psr18ClientRegistry::class), 'getClient']));
         $containerBuilder->setDefinition(RequestFactoryInterface::class, (new Definition())->setFactory([new Reference(Psr17FactoryRegistry::class), 'getRequestFactory']));
         $containerBuilder->setDefinition(ServerRequestFactoryInterface::class, (new Definition())->setFactory([new Reference(Psr17FactoryRegistry::class), 'getServerRequestFactory']));
         $containerBuilder->setDefinition(UriFactoryInterface::class, (new Definition())->setFactory([new Reference(Psr17FactoryRegistry::class), 'getUriFactory']));
