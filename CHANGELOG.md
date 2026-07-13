@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Add `\Heptacom\HeptaConnect\Core\Support\Psr17FactoryRegistry` to provide PSR-17 factories for portal container
+- Add `\Heptacom\HeptaConnect\Core\Support\Psr18ClientRegistry` to provide PSR-18 HTTP client for portal container
 
 ### Changed
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`
 - Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\Psr7RequestDenormalizer`
 - Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer`
+- Support dependency-injection for PSR-18 HTTP client in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`
 
 ### Deprecated
 
