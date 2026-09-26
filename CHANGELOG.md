@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.9.8.0] - 2026-09-26
+
+### Added
+
 - Add `\Heptacom\HeptaConnect\Core\Support\Psr17FactoryRegistry` to provide PSR-17 factories for portal container
 - Add `\Heptacom\HeptaConnect\Core\Support\Psr18ClientRegistry` to provide PSR-18 HTTP client for portal container
 
@@ -28,15 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support dependency-injection for PSR-17 factories in `\Heptacom\HeptaConnect\Core\Storage\Normalizer\StreamDenormalizer`
 - Support dependency-injection for PSR-18 HTTP client in `\Heptacom\HeptaConnect\Core\Portal\PortalStackServiceContainerBuilder`
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Use `\Heptacom\HeptaConnect\Portal\Base\Web\Http\Contract\Psr7MessageRawHttpFormatterContract` instead of `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageRawHttpFormatter` in constructor signature for of `\Heptacom\HeptaConnect\Core\Web\Http\Formatter\Psr7MessageCurlShellFormatter`, to allow for decoration
-
-### Security
 
 ## [0.9.7.0] - 2024-02-10
 
